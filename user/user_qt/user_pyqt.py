@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
 
         if new_folder_path:
             os.makedirs(new_folder_path)
-            input_file = os.path.join(new_folder_path, 'inputFile')
+            input_file = os.path.join(new_folder_path, 'InputFile')
             output_file = os.path.join(new_folder_path, 'OutputFile')
             os.makedirs(input_file)
             os.makedirs(output_file)

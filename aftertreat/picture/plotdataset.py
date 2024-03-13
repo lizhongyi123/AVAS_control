@@ -21,6 +21,7 @@ class PlotDataSet(PicturePlot_2D):
         self.project_path = project_path
         self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
         self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
+        self.lattice_mulp = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
 
@@ -105,7 +106,7 @@ class PlotDataSet(PicturePlot_2D):
         lattice_res.get_parameter()
         for i in range(len(lattice_res.v_name)):
             aperture = lattice_res.aperture[i] * 1000
-
+            aperture_1 = 1
 
             element = ''
             if lattice_res.v_name[i] == "field" and lattice_res.phi_syn[i]:
@@ -114,9 +115,8 @@ class PlotDataSet(PicturePlot_2D):
                 element = "sol"
 
             if element:
-
-                square_origin = [lattice_res.v_start[i], -0.5 * aperture]
-                patch_list.append(obj_compound.create_shapes(square_origin, lattice_res.v_len[i], aperture, element))
+                square_origin = [lattice_res.v_start[i], -0.5 * aperture_1]
+                patch_list.append(obj_compound.create_shapes(square_origin, lattice_res.v_len[i], aperture_1, element))
 
 
 
@@ -169,6 +169,9 @@ class PlotDataSet(PicturePlot_2D):
             self.ylabel = "RMS_x Size(mm)"
 
             self.colors = ['r', 'r']
+            self.ylim = [-2 * np.max(np.array(rms_x)), 2 * np.max(np.array(rms_x))]
+
+            self.patch_list =patch_list
 
         elif self.picture_name == 'rms_y':
             self.x = z
@@ -177,7 +180,9 @@ class PlotDataSet(PicturePlot_2D):
             self.xlabel = "z(m)"
             self.ylabel = "RMS_y Size(mm)"
             self.colors = ['b', 'b']
+            self.ylim = [-2 * np.max(np.array(rms_x)), 2 * np.max(np.array(rms_x))]
 
+            self.patch_list =patch_list
 
 
         elif self.picture_name == 'rms_xy':
@@ -190,6 +195,10 @@ class PlotDataSet(PicturePlot_2D):
             self.labels = ['x', None, 'y', None]
             self.colors = ['r', 'r', 'b', 'b']
             self.set_legend = 1
+
+
+            self.ylim = [-2 * np.max(np.array(rms_x)), 2 * np.max(np.array(rms_x))]
+
             self.patch_list =patch_list
 
         elif self.picture_name == 'max_x':

@@ -14,7 +14,7 @@ from utils.treatfile import copy_file
 from aftertreat.dataanalysis.caltwiss import CalTwiss
 from user_defined import treat_err, treat_err2
 from utils.treat_directory import list_files_in_directory
-from utils.treatfile import split_file
+from utils.treatfile import split_file, file_in_directory
 gray240 = "rgb(240, 240, 240)"
 
 class PageBeam(QWidget):
@@ -552,9 +552,6 @@ class PageBeam(QWidget):
     # @treat_err
     def generate_beam_list(self):
         res = []
-        charge_judge = self.inspect("charge")
-        if not charge_judge:
-            return False
 
         if self.text_particle_input_file.text():
             res.append(['ReadParticleDistribution', self.text_particle_input_file.text()])
@@ -685,9 +682,9 @@ class PageBeam(QWidget):
                 box.setStyleSheet("")  # 恢复默认样式
 
 
-    def inspect(self, value):
+    def inspect(self):
         if not self.text_charge.text():
-            e = f"Missing {value}"
+            e = "Missing charge"
             QMessageBox.warning(None, 'Error', e)
             return False
         else:
@@ -702,34 +699,41 @@ class PageBeam(QWidget):
             # print(dst_file_path)
 
             source_file = dst_file_path
-            target_folder = os.path.join(self.project_path, "InputFile")
-
-            print(target_folder)
 
             relative_dst_file_path = split_file(dst_file_path)[-1]
+            target_folder = os.path.join(self.project_path, "InputFile")
 
-            if os.path.exists(target_folder):
+            target_dst_file = os.path.join(self.project_path, "InputFile", relative_dst_file_path)
+
+            #如果文件已经文件夹中
+            if file_in_directory(source_file, target_folder):
+                print(1)
+                self.text_particle_input_file.setText(relative_dst_file_path)
+
+            #如果文件不在文件夹中并且没有重名
+            elif not file_in_directory(source_file, target_folder) and \
+                split_file(source_file)[-1] != split_file(target_dst_file)[-1]:
+                print(2)
+                copy_file(source_file, target_folder)
+                self.text_particle_input_file.setText(relative_dst_file_path)
+
+            # 如果文件不在文件夹中并且重名了
+            elif not file_in_directory(source_file, target_folder) and \
+                split_file(source_file)[-1] == split_file(target_dst_file)[-1]:
+
+                copy_file(source_file, target_folder)
                 msg = QMessageBox.question(self, '文件已存在', '文件已存在，是否要覆盖？',
                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
                 if msg == QMessageBox.No:
+                    print(3)
                     return 0
-                else:
-                    print(source_file)
-                    print(list_files_in_directory(target_folder))
-                    if source_file in list_files_in_directory(target_folder):
-                        print(1)
-                        self.text_particle_input_file.setText(relative_dst_file_path)
-                        return 0
-                    else:
-                        pass
-            else:
-                pass
+                elif msg == QMessageBox.Yes:
+                    print(4)
+                    copy_file(source_file, target_folder)
+                    self.text_particle_input_file.setText(relative_dst_file_path)
 
-            copy_file(source_file, target_folder)
-            print(relative_dst_file_path)
 
-            self.text_particle_input_file.setText(relative_dst_file_path)
 
         # particle_input_text = self.text_particle_input_file.text()
         # if particle_input_text:

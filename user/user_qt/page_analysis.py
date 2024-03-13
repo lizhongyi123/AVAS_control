@@ -157,6 +157,8 @@ class EnvelopeDialog(QDialog):
         self.project_path = project_path
         self.picture_name = 'rms_x'
 
+        self.fig_size = (6.4,4.6)
+
 
     def initUI(self):
         winflags = Qt.Dialog
@@ -171,7 +173,7 @@ class EnvelopeDialog(QDialog):
         self.setWindowTitle('弹出窗口')
         # self.setGeometry(200, 200, 400, 300)
 ################################
-        self.fig = plt.figure(figsize=(6.4, 4.6))  # 创建figure对象
+        self.fig = plt.figure(figsize=self.fig_size)  # 创建figure对象
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################
@@ -736,6 +738,7 @@ class PageAnalysis(QWidget):
 
         func = plot_dataset
         self.envelope_dialog = EnvelopeDialog(self.project_path, func)
+        self.envelope_dialog.fig_size = (12.8, 6.4)
         self.envelope_dialog.initUI()
         self.envelope_dialog.show()
 

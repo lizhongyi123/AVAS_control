@@ -22,26 +22,26 @@ class DatasetParameter():
 
         self.z = [i[5] for i in dataset_info]
 
-        # self.z = []
-        # sign1 = 0
-        # sign2 = 0
-        #
-        # for i in range(len(dataset_info)):
-        #     if (dataset_info[i][35] == 0):
-        #         sign2 = 0
-        #         if (sign1 == 0):
-        #             self.z.append(dataset_info[i][5] + dataset_info[i][33])
-        #         else:
-        #             self.z.append(self.z[-1] + dataset_info[i][38])
-        #     elif (dataset_info[i][35] == 1):
-        #         self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
-        #         sign1 = 1
-        #         sign2 = 0
-        #     elif (sign2 == 0):
-        #         self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
-        #         sign2 = 1
-        #     else:
-        #         continue
+        self.z = []
+        sign1 = 0
+        sign2 = 0
+
+        for i in range(len(dataset_info)):
+            if (dataset_info[i][35] == 0):
+                sign2 = 0
+                if (sign1 == 0):
+                    self.z.append(dataset_info[i][5] + dataset_info[i][33])
+                else:
+                    self.z.append(self.z[-1] + dataset_info[i][38])
+            elif (dataset_info[i][35] == 1):
+                self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
+                sign1 = 1
+                sign2 = 0
+            elif (sign2 == 0):
+                self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
+                sign2 = 1
+            else:
+                continue
 
         self.x = [i[1] for i in dataset_info]   #m
         self.px = [i[2] for i in dataset_info]   #MeV

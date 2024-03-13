@@ -23,7 +23,7 @@ from api import basic_mulp, match_twiss, circle_match, \
 import multiprocessing
 from utils.tolattice import write_mulp_to_lattice
 from api import basic_env
-from user_defined import treat_err
+from user.user_qt.user_defined import treat_err
 
 class MainWindow(QMainWindow):
     def __init__(self):

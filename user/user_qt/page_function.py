@@ -8,7 +8,7 @@ import os
 from PyQt5.QtCore import QStandardPaths, QCoreApplication, pyqtSignal, QTimer
 from api import change_particle_number
 
-from user_defined import treat_err
+from user.user_qt.user_defined import treat_err
 import multiprocessing
 
 class PageFunction(QWidget):

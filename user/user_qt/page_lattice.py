@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction,\
 import sys
 import os
 
-from lattice_file.lattice_ide import CustomCodeEdit, MySyntaxHighlighter, MyFoldDetector
+from user.user_qt.lattice_file.lattice_ide import CustomCodeEdit, MySyntaxHighlighter, MyFoldDetector
 from pyqode.core import api, modes, panels
-from user_defined import treat_err
+from user.user_qt.user_defined import treat_err
 class PageLattice(QWidget):
     def __init__(self, project_path):
         super().__init__()

@@ -11,7 +11,7 @@ from PyQt5.QtCore import Qt, QSize
 from api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
      plot_phase, plot_phase_advance, plot_error
 from user.user_qt.user_defined import treat_err
-from page_analysis import MyPictureDialog, EnvelopeDialog
+from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
 
 
 

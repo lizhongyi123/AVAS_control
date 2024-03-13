@@ -7,7 +7,7 @@ import os
 
 from PyQt5.QtCore import Qt
 from utils.readfile import read_txt, read_dst
-from user_defined import treat_err, treat_err2
+from user.user_qt.user_defined import treat_err, treat_err2
 
 class PageInput(QWidget):
     def __init__(self, project_path):

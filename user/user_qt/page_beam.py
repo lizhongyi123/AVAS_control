@@ -12,9 +12,10 @@ from utils.readfile import read_txt, read_dst
 from utils.treatfile import copy_file
 
 from aftertreat.dataanalysis.caltwiss import CalTwiss
-from user_defined import treat_err, treat_err2
+from user.user_qt.user_defined import treat_err, treat_err2
 from utils.treat_directory import list_files_in_directory
 from utils.treatfile import split_file, file_in_directory
+
 gray240 = "rgb(240, 240, 240)"
 
 class PageBeam(QWidget):
@@ -412,12 +413,6 @@ class PageBeam(QWidget):
     def updatePath(self, new_path):
         self.project_path = new_path
 
-    # @treat_err
-    def read_beam(self):
-        beam_path = os.path.join(self.project_path, 'inputFile', 'beam.txt')
-        # print(beam_path)
-        if os.path.exists(beam_path):
-            print(read_txt(beam_path))
 
     # @treat_err
     def refreshUI(self):

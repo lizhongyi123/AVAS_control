@@ -116,9 +116,18 @@ class PicturePlot_2D():
         # 创建柱状图
         if len(self.y) == 0:
             print("The ordinate is empty")
+
         elif isinstance(self.y[0], list):
-            for i in range(len(self.y)):
-                plt.plot(self.x, self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
+            if not isinstance(self.x[0], list):
+                for i in range(len(self.y)):
+                    plt.plot(self.x, self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
+
+            elif isinstance(self.x[0], list):
+                for i in range(len(self.y)):
+                    plt.plot(self.x[i], self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
+
+
+
 
         elif isinstance(self.y[0], int) or isinstance(self.y[0], float):
             plt.plot(self.x, self.y, color=self.colors[0], marker=self.markers[0])
@@ -186,7 +195,7 @@ class CompoundShape():
         curve_path_1 = Path(points_inside_square_1, curve_codes_1)
 
         # 创建曲线
-        curve_patch_1 = patches.PathPatch(curve_path_1, linewidth=1, facecolor='none')
+        curve_patch_1 = patches.PathPatch(curve_path_1, linewidth=0.5, facecolor='none')
         shapes.append(curve_patch_1)
 
         points_inside_square_2 = [
@@ -201,7 +210,7 @@ class CompoundShape():
         curve_path_2 = Path(points_inside_square_2, curve_codes_2)
 
         # 创建曲线
-        curve_patch_2 = patches.PathPatch(curve_path_2, linewidth=1, facecolor='none')
+        curve_patch_2 = patches.PathPatch(curve_path_2, linewidth=0.5, facecolor='none')
         shapes.append(curve_patch_2)
 
         # 创建圆形

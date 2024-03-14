@@ -20,7 +20,7 @@ class DatasetParameter():
         # print(len(dataset_info[0]))
         dataset_info = [[float(j) for j in i] for i in dataset_info]
 
-        self.z = [i[5] for i in dataset_info]
+        # self.z = [i[5] for i in dataset_info]
 
         self.z = []
         sign1 = 0

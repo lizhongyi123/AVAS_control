@@ -145,6 +145,8 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_function_action)
         toolbar.addAction(page_data_action)
         toolbar.addAction(page_analysis_action)
+        toolbar.addAction(page_error_action )
+
         # toolbar.addAction(page_longdistance_action)
 
 
@@ -178,6 +180,7 @@ class MainWindow(QMainWindow):
         central_layout.addWidget(self.stacked_widget)  # 将堆叠小部件添加到布局中
 
         self.page_function.basic_signal.connect(self.get_basic_signal)
+
         self.page_function.error_signal.connect(self.get_error_signal)
         self.page_function.match_signal.connect(self.get_match_signal)
 

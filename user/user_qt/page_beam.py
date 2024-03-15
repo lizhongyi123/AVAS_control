@@ -741,6 +741,7 @@ class PageBeam(QWidget):
 #     main_window.fill_parameter()
 #     main_window.setGeometry(800, 500, 600, 650)
 #     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
+
 #     main_window.show()
 #     main_window.fill_parameter()
 #     main_window.save_beam()

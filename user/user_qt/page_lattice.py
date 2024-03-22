@@ -421,10 +421,13 @@ class PageLattice(QWidget):
     #         self.color_text_by_starting_word(new_text)  # 调用颜色处理函数处理新文本
     #         self.ignore_text_changed = False  # 重新允许文本更改信号触发
 #
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = PageLattice(r'C:\Users\anxin\Desktop\test')
-#     main_window.setGeometry(800, 500, 600, 650)
-#     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-#     main_window.show()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = PageLattice(r'C:\Users\anxin\Desktop\comparison\avas_test')
+
+    main_window.setGeometry(800, 500, 600, 650)
+    main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
+    main_window.updatePath(r'C:\Users\anxin\Desktop\comparison\avas_test')
+    main_window.fill_parameter()
+    main_window.show()
+    sys.exit(app.exec_())

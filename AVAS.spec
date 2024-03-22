@@ -45,9 +45,10 @@ a = Analysis(
     './utils/latticeconfig.py',
     './utils/myoptimize.py',
     './utils/readfile.py',
-    './utils/smalltool.py',
     './utils/tolattice.py',
     './utils/treat_directory.py',
+    './utils/treatfile.py',
+    './utils/treatlist.py',
 
 
     './user/user_arg/user_argparse.py',
@@ -61,6 +62,9 @@ a = Analysis(
     './user/user_qt/page_input.py',
     './user/user_qt/page_lattice.py',
     './user/user_qt/page_longdistance.py',
+    './user/user_qt/page_match.py',
+    './user/user_qt/page_others.py',
+    './user/user_qt/page_output.py',
     './user/user_qt/user_defined.py',
     './user/user_qt/user_pyqt.py',
     ],

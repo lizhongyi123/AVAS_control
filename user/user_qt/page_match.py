@@ -109,7 +109,7 @@ class PageMatch (QWidget):
                 self.cb_match_twiss.setChecked(False)
                 self.cb_use_initial_value.setEnabled(False)
 
-        if sender_checkbox == self.cb_match_twiss:
+        elif sender_checkbox == self.cb_match_twiss:
             if sender_checkbox.isChecked():
                 self.cb_use_initial_value.setEnabled(True)
                 self.cb_input_twiss.setChecked(False)
@@ -121,10 +121,13 @@ class PageMatch (QWidget):
 
         if self.cb_use_initial_value.isChecked():
             self.match_signal.emit('match_twiss_ini')
+            print('match_twiss_ini')
         elif self.cb_match_twiss.isChecked():
             self.match_signal.emit('match_twiss')
+            print('match_twiss')
         elif self.cb_input_twiss.isChecked():
             self.match_signal.emit('period_match')
+            print('period_match')
         else:
             self.match_signal.emit(None)
 

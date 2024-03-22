@@ -27,8 +27,10 @@ class CustomCodeEdit(api.CodeEdit):
             self.setFont(font)
         else:
             delta = event.angleDelta().y()
+            print(delta)
             scroll_bar = self.verticalScrollBar()
-            scroll_bar.setValue(scroll_bar.value() - (delta - 10))
+            scroll_bar.setValue(scroll_bar.value() - int(delta/40))
+            print(scroll_bar.value())
 
     def eventFilter(self, obj, event):
         # print(event.type())

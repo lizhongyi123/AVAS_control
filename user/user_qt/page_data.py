@@ -60,18 +60,12 @@ class PageData(QWidget):
         header = self.table_widget.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
 
-
-
         # 设置表头
         self.table_widget.setHorizontalHeaderLabels(["#", "Type", "Length", f"{global_varible.greek_letters_upper['phi']} RF(degs)",f"{global_varible.greek_letters_upper['phi']} synch.(degs)",
                                                 "W", 'Length(total)', f"{global_varible.greek_letters_upper['phi']} Abs(degs)"])
 
         # 添加表格到垂直布局
         vertical_layout_main.addWidget(self.table_widget)
-
-
-
-
 
         vertical_group_box_main.setLayout(vertical_layout_main)
         #########################################################################################

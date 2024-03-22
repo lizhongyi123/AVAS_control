@@ -15,6 +15,9 @@ from user.user_qt.page_analysis import PageAnalysis
 from user.user_qt.page_input import PageInput
 from user.user_qt.page_error import PageError
 from user.user_qt.page_longdistance import PageLongdistance
+from user.user_qt.page_match import PageMatch
+from user.user_qt.page_others import PageOthers
+from user.user_qt.page_output import PageOutput
 
 from user.user_qt.page_function import PageFunction
 from user.user_qt.page_data import PageData
@@ -100,20 +103,29 @@ class MainWindow(QMainWindow):
         self.page_lattice = PageLattice(self.project_path)
         self.page_analysis = PageAnalysis(self.project_path)
         self.page_input = PageInput(self.project_path)
-        self.page_function = PageFunction(self.project_path)
+        # self.page_function = PageFunction(self.project_path)
+        self.page_match = PageMatch(self.project_path)
+        self.page_others = PageOthers(self.project_path)
+
         self.page_data = PageData(self.project_path)
         self.page_error = PageError(self.project_path)
         self.page_longdistance = PageLongdistance(self.project_path)
+        self.page_output = PageOutput(self.project_path)
 
 
         page_beam_action = QAction("beam", self)
         page_lattice_action = QAction("lattice", self)
         page_analysis_action = QAction('analysis', self)
         page_input_action = QAction('input', self)
-        page_function_action = QAction('function', self)
+        # page_function_action = QAction('function', self)
+        page_match_action = QAction('match', self)
+        page_others_action = QAction('others', self)
+
         page_data_action = QAction('data', self)
         page_error_action = QAction('error', self)
-        page_longdistance_action = QAction('long distance', self)
+        page_output_action = QAction('output', self)
+
+        # page_longdistance_action = QAction('long distance', self)
 
 
         self.stacked_widget = QStackedWidget()
@@ -121,9 +133,14 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.page_lattice)
         self.stacked_widget.addWidget(self.page_analysis)
         self.stacked_widget.addWidget(self.page_input)
-        self.stacked_widget.addWidget(self.page_function)
+        # self.stacked_widget.addWidget(self.page_function)
+        self.stacked_widget.addWidget(self.page_match)
+
         self.stacked_widget.addWidget(self.page_data)
         self.stacked_widget.addWidget(self.page_error)
+        self.stacked_widget.addWidget(self.page_output)
+        self.stacked_widget.addWidget(self.page_others)
+
         # self.stacked_widget.addWidget(self.page_longdistance)
 
 
@@ -131,21 +148,29 @@ class MainWindow(QMainWindow):
         page_lattice_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_lattice))
         page_analysis_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_analysis))
         page_input_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_input))
-        page_function_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_function))
+        # page_function_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_function))
+        page_match_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_match))
 
         page_data_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_data))
         self.stacked_widget.currentChanged.connect(self.handle_page_change)
 
         page_error_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_error))
+        page_others_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_others))
+        page_output_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_output))
+
         # page_longdistance_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_longdistance))
 
         toolbar.addAction(page_beam_action)
         toolbar.addAction(page_lattice_action)
         toolbar.addAction(page_input_action)
-        toolbar.addAction(page_function_action)
+        # toolbar.addAction(page_function_action)
+        toolbar.addAction(page_match_action)
+        toolbar.addAction(page_error_action)
+
+        toolbar.addAction(page_output_action)
         toolbar.addAction(page_data_action)
         toolbar.addAction(page_analysis_action)
-        toolbar.addAction(page_error_action )
+        toolbar.addAction(page_others_action)
 
         # toolbar.addAction(page_longdistance_action)
 
@@ -179,14 +204,13 @@ class MainWindow(QMainWindow):
         central_layout.addWidget(line_frame)  # 将表示线的框架添加到布局中
         central_layout.addWidget(self.stacked_widget)  # 将堆叠小部件添加到布局中
 
-        self.page_function.basic_signal.connect(self.get_basic_signal)
-
-        self.page_function.error_signal.connect(self.get_error_signal)
-        self.page_function.match_signal.connect(self.get_match_signal)
+        self.page_input.basic_signal.connect(self.get_basic_signal)
+        #
+        self.page_error.error_signal.connect(self.get_error_signal)
+        self.page_match.match_signal.connect(self.get_match_signal)
 
         self.basci_mulp_process = multiprocessing.Process()
         self.basci_env_process = multiprocessing.Process()
-
         self.err_process = multiprocessing.Process()
         self.match_process = multiprocessing.Process()
 
@@ -246,18 +270,21 @@ class MainWindow(QMainWindow):
         self.page_beam.updatePath(self.project_path)
         self.page_lattice.updatePath(self.project_path)
         self.page_input.updatePath(self.project_path)
-        self.page_function.updatePath(self.project_path)
+        # self.page_function.updatePath(self.project_path)
+        self.page_match.updatePath(self.project_path)
+
         self.page_data.updatePath(self.project_path)
         self.page_analysis.updatePath(self.project_path)
         self.page_error.updatePath(self.project_path)
         self.page_longdistance.updatePath(self.project_path)
+        self.page_others.updatePath(self.project_path)
+        self.page_output.updatePath(self.project_path)
 
     @treat_err
     def page_fill_parameter(self):
         self.page_beam.fill_parameter()
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
-        self.page_data.fill_parameter()
         self.page_longdistance.fill_parameter()
 
     @treat_err
@@ -267,7 +294,7 @@ class MainWindow(QMainWindow):
 
         self.page_beam.save_beam()
         self.page_lattice.save_all_lattice()
-        self.page_input.save_input(self.basic_signal)
+        self.page_input.save_input()
 
 
     @treat_err
@@ -288,10 +315,17 @@ class MainWindow(QMainWindow):
 
             file.write("")
     @treat_err
-    def run(self ):
+    def run(self):
+        #检查有没有哪个界面
         res = self.inspect()
         if not res:
             return None
+    #检查是否有信号重复
+
+        res = self.inspect_signal()
+        if not res:
+            return None
+
         self.save_project()
         if self.match_signal == 'match_twiss_ini':
             self.func_match(1, 1)
@@ -315,12 +349,47 @@ class MainWindow(QMainWindow):
             lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice.txt')
             write_mulp_to_lattice(lattice_mulp_path, lattice_path)
             self.func_basic_mulp()
+
+            self.activate_output("basic_mulp")
+            self.page_data.fill_parameter()
+
         elif self.basic_signal == 'basic_env':
             self.func_basic_env()
         else:
             print('Nothing was chosen')
 
-        self.refresh_lattice()
+        # self.refresh_lattice()
+    def inspect_signal(self):
+        signal_list = []
+        # if self.basic_signal:
+        #     signal_list.append(self.basic_signal)
+        if self.match_signal:
+            signal_list.append(self.match_signal)
+        if self.error_signal:
+            signal_list.append(self.error_signal)
+
+        if len(signal_list) >= 2:
+            e = "The program cannot perform matching and error analysis simultaneously"
+            QMessageBox.warning(None, 'Error', e)
+            return False
+        else:
+            return True
+
+
+    def activate_output(self, signal):
+        dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
+        try:
+            os.remove(dataset_path)
+            print(f"文件 {dataset_path} 已成功删除")
+        except OSError as e:
+            print(f"删除文件 {dataset_path} 时出错：{e}")
+
+        if signal == "basic_mulp":
+            self.page_output.update_progress()
+
+
+
+
     @treat_err
     def stop(self):
         if self.basci_mulp_process.is_alive():
@@ -456,8 +525,8 @@ class MainWindow(QMainWindow):
         r1 = self.page_beam.inspect()
         r2 = self.page_lattice.inspect()
         r3 = self.page_input.inspect()
-        r4 = self.page_function.inspect()
-        return all([r1, r2, r3, r4])
+        # r4 = self.page_function.inspect()
+        return all([r1, r2, r3])
 
     def handle_page_change(self, index):
         # print(1)
@@ -470,8 +539,8 @@ class MainWindow(QMainWindow):
         else:
             self.resize(600, 700)  # 恢复到默认尺寸或其他尺寸
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    sys.exit(app.exec_())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     main_window = MainWindow()
+#     sys.exit(app.exec_())
 

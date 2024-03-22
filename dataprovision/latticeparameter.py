@@ -5,14 +5,14 @@ class LatticeParameter():
     """
     对lattice文件进行解析
     """
-    def __init__(self, lattice_path):
+    def __init__(self, lattice_mulp_path):
         """
         self.v_start_end: 每个周期的起点和终点
         self.v_start: 每个元件的起点
         self.v_len: 每个元件的长度
         self.v_name: 每个元件的名字
         """
-        self.lattice_path =lattice_path
+        self.lattice_path =lattice_mulp_path
         self.v_start = []
         self.v_len = [] 
         self.v_start_end = []
@@ -21,10 +21,17 @@ class LatticeParameter():
         self.aperture = []
     def get_parameter(self):
         lattice_info_ini = read_txt(self.lattice_path, out='list')
+        lattice_info_before_end = []
+        for i in lattice_info_ini:
+            if i[0] == 'end':
+                break
+            else:
+                lattice_info_before_end.append(i)
 
-        use_commands = global_varible.long_element + ['superpose', 'superposeend'] + ['lattice', 'lattice_end']
-        
-        lattice_info = [i for i in lattice_info_ini if i[0] in use_commands]
+        use_commands = global_varible.long_element + ['superpose', 'superposeend'] + ['lattice', 'lattice_end'] + ['end']
+
+
+        lattice_info = [i for i in lattice_info_before_end if i[0] in use_commands]
         # print(lattice_info)
         in_lattice = False
         start = 0  # 每个元件的起点
@@ -93,6 +100,7 @@ class LatticeParameter():
                         v_p.append(num_one_period)
                     else:
                         v_p.append(0)
+
     
         # print(self.v_start, len(self.v_start))
         # print(self.v_len, len(self.v_len))

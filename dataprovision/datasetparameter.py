@@ -15,7 +15,7 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
-        num_of_partticle = float(dataset_info[0][28])
+        num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
         dataset_info = [[float(j) for j in i] for i in dataset_info]
@@ -77,7 +77,7 @@ class DatasetParameter():
         self.max_yy = [-1 * i[24] for i in dataset_info]
 
         self.ek = [i[0] for i in dataset_info]  ##MeV
-        self.loss = [num_of_partticle - i[28] for i in dataset_info]  ##
+        self.loss = [num_of_particle - i[28] for i in dataset_info]  ##
 
 
 

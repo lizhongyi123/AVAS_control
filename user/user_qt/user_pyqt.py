@@ -378,11 +378,12 @@ class MainWindow(QMainWindow):
 
     def activate_output(self, signal):
         dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
-        try:
-            os.remove(dataset_path)
-            print(f"文件 {dataset_path} 已成功删除")
-        except OSError as e:
-            print(f"删除文件 {dataset_path} 时出错：{e}")
+        if os.path.exists(dataset_path):
+            try:
+                os.remove(dataset_path)
+                print(f"文件 {dataset_path} 已成功删除")
+            except OSError as e:
+                print(f"删除文件 {dataset_path} 时出错：{e}")
 
         if signal == "basic_mulp":
             self.page_output.update_progress()
@@ -539,8 +540,8 @@ class MainWindow(QMainWindow):
         else:
             self.resize(600, 700)  # 恢复到默认尺寸或其他尺寸
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = MainWindow()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    sys.exit(app.exec_())
 

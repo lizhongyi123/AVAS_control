@@ -11,14 +11,14 @@ def split_file(file_path):
     # 将文件路径使用"/"进行分割
     parts = file_path.split('/')
     # 对每个部分再次使用"\\"进行分割，并将结果扁平化
-    parts = [subpart for part in parts for subpart in part.split('\\')]
+    parts = [subpart.lower() for part in parts for subpart in part.split('\\')]
     return parts
 
 # 判断哪一个文件是否在文件夹中():
 def file_in_directory(file, directory):
     file_list = split_file(file)
     directory_list = [split_file(i) for i in list_files_in_directory(directory)]
-    print(file, directory)
+    print(file_list, directory_list)
     if file_list in directory_list:
         return True
     else:

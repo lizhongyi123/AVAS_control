@@ -702,13 +702,11 @@ class PageBeam(QWidget):
 
             #如果文件已经文件夹中
             if file_in_directory(source_file, target_folder):
-                print(1)
                 self.text_particle_input_file.setText(relative_dst_file_path)
 
             #如果文件不在文件夹中并且没有重名
             elif not file_in_directory(source_file, target_folder) and \
                 split_file(source_file)[-1] != split_file(target_dst_file)[-1]:
-                print(2)
                 copy_file(source_file, target_folder)
                 self.text_particle_input_file.setText(relative_dst_file_path)
 

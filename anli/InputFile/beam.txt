@@ -1,0 +1,2 @@
+ReadParticleDistribution   part_rfq.dst
+numOfCharge   1

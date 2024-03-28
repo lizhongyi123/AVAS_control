@@ -27,10 +27,8 @@ class CustomCodeEdit(api.CodeEdit):
             self.setFont(font)
         else:
             delta = event.angleDelta().y()
-            print(delta)
             scroll_bar = self.verticalScrollBar()
             scroll_bar.setValue(scroll_bar.value() - int(delta/40))
-            print(scroll_bar.value())
 
     def eventFilter(self, obj, event):
         # print(event.type())
@@ -99,7 +97,6 @@ class CustomCodeEdit(api.CodeEdit):
                     # 当内容折叠时，选中整个折叠区域的内容
                     fold_scope = api.FoldScope(cursor.block())
                     start, end = fold_scope.get_range(ignore_blank_lines=False)
-                    print(start, end)
 
                     cursor.movePosition(QTextCursor.StartOfLine)  # 移动到当前行的开头
                     cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor,

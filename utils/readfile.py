@@ -109,4 +109,6 @@ def read_lattice_phase_advance(lattice_path):
 #
 if __name__ == "__main__":
     # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
-    print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
+    # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
+    path = r"C:\Users\anxin\Desktop\part_dtl1.dst"
+    read_dst(path)

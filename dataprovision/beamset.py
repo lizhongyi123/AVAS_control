@@ -66,7 +66,7 @@ class BeamsetParameter():
 
                     tpye = struct.unpack("<i", f.read(4))
                     self.one_step_dict["tpye"] = int(tpye[0])
-                    # print(tpye)
+                    print("tpye", tpye)
 
                     Index = struct.unpack("<i", f.read(4))
                     self.one_step_dict["index"] = int(Index[0])

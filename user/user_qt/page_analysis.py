@@ -17,6 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from api import plot_env_beam_out
+
+from aftertreat.dataanalysis.plttodst import Plttodst
+
 class MyPictureDialog(QDialog):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
     def __init__(self, project_path, func):
@@ -598,7 +601,28 @@ class PageAnalysis(QWidget):
 
         picture_group_box = QGroupBox("Mulp")
         picture_group_box.setLayout(vbox_picture)
-#######################################################################
+
+  #######################################################################
+        group_box_1 = QGroupBox()
+        gb1_layout = QVBoxLayout()
+
+        plt_to_dst_group_box = QGroupBox()
+        plt_to_dst_layout = QVBoxLayout()
+        label_plt_to_dst = QLabel("Convert plt to dst (num)")
+        
+        self.step_of_plt_line = QLineEdit("")
+        self.button_convert_plt = QPushButton("convert")
+        self.button_convert_plt.clicked.connect(self.convert_plt_to_dst)
+        
+        hbox_plt_to_dst = QHBoxLayout()
+        hbox_plt_to_dst.addWidget(self.step_of_plt_line)
+        hbox_plt_to_dst.addWidget(self.button_convert_plt)
+
+
+        plt_to_dst_layout.addWidget(label_plt_to_dst)
+        plt_to_dst_layout.addLayout(hbox_plt_to_dst)
+        plt_to_dst_group_box.setLayout(plt_to_dst_layout)
+####
 
         vbox_phase = QVBoxLayout()
 
@@ -616,14 +640,17 @@ class PageAnalysis(QWidget):
         vbox_phase.addWidget(self.button_phase)
 
         phase_group_box = QGroupBox()
-        phase_layout = QVBoxLayout()
-        phase_layout.addLayout(vbox_phase)
-        phase_layout.addStretch(1)
-        phase_group_box.setLayout(phase_layout)
+        phase_group_box.setLayout(vbox_phase)
+
+        gb1_layout.addWidget(plt_to_dst_group_box)
+        gb1_layout.addWidget(phase_group_box)
+        gb1_layout.addStretch(1)
+
+        group_box_1.setLayout(gb1_layout)
 
 ################################################################
 
-        group_box_layout.addWidget(phase_group_box)
+        group_box_layout.addWidget(group_box_1)
         group_box_layout.addWidget(env_picture_group_box)
         group_box_layout.addWidget(picture_group_box)
 
@@ -636,6 +663,12 @@ class PageAnalysis(QWidget):
 
 
 ###########errr
+    @treat_err
+    def convert_plt_to_dst(self):
+        beamset_path = os.path.join(self.project_path, "OutputFile", "BeamSet.plt")
+        obj = Plttodst(beamset_path)
+        obj.to_dst_variable_z(int(self.step_of_plt_line.text()))
+
     @treat_err
     def env_gamma_dialog(self):
         picture_name = 'gamma'
@@ -779,13 +812,13 @@ class PageAnalysis(QWidget):
 
 
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test2')
-#     main_window.setGeometry(800, 500, 600, 650)
-#     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-#     main_window.show()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test2')
+    main_window.setGeometry(800, 500, 600, 650)
+    main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
+    main_window.show()
+    sys.exit(app.exec_())
 
 
     # app = QApplication(sys.argv)

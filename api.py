@@ -16,6 +16,7 @@ import os
 from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
+from utils.tolattice import write_mulp_to_lattice_only_sim
 ########################################################################################################################
 
 #下列为功能函数
@@ -28,7 +29,9 @@ def basic_mulp(project_path):
     """
     latice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     res = read_txt(latice_mulp_path, out = 'list')
+
     sign = ''
+    #判断是否需要矫正
     for i in res:
         if i[0] == 'adjust':
             sign = 'adjust'
@@ -38,8 +41,13 @@ def basic_mulp(project_path):
         v = ErrorAnalysis(project_path)
         res = v.only_adjust()
 
+    #如果不需要矫正，则进行简单模拟
     else:
         AVAS_obj = AVAS(project_path)
+
+        lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
+        lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
+        write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
         res = AVAS_obj.run()
     print('模拟结束')
     return res

@@ -240,29 +240,32 @@ class PageInput(QWidget):
         vbox_step_per_period.addWidget(self.step_per_period_text)
         group_box_step_per_period.setLayout(vbox_step_per_period)
         ########################################################
-        #twst
-        hbox_test = QHBoxLayout()
-        self.button1 = QPushButton("lattice_mulp")
-        self.button2 = QPushButton("lattice_env")
 
-        self.button1.clicked.connect(self.fill_parameter)
-        self.button2.clicked.connect(self.save_input)
-        hbox_test.addWidget(self.button1)
-        hbox_test.addWidget(self.button2)
+        group_box_dumpPeriodicity = QGroupBox()
+        vbox_dumpPeriodicity= QVBoxLayout()
+
+        dumpPeriodicity_label = QLabel("Output step in plt")
+        dumpPeriodicity_label.setMinimumWidth(100)
+
+        self.dumpPeriodicity_text = QLineEdit()
 
 
-        #################
+        vbox_dumpPeriodicity.addWidget(dumpPeriodicity_label)
+        vbox_dumpPeriodicity.addWidget(self.dumpPeriodicity_text)
+        group_box_dumpPeriodicity.setLayout(vbox_dumpPeriodicity)
+        ###################################################
+
+
         vertical_layout_main.addWidget(group_box_mulp_env)
         vertical_layout_main.addWidget(group_box_sc_method)
 
         vertical_layout_main.addWidget(group_box_multithreading)
         vertical_layout_main.addWidget(group_box_scan_phase)
         vertical_layout_main.addWidget(group_box_step_per_period)
-
+        vertical_layout_main.addWidget(group_box_dumpPeriodicity)
         vertical_layout_main.addWidget(group_box_sc_use)
         vertical_layout_main.addWidget(group_box_sc_step)
 
-        vertical_layout_main.addLayout(hbox_test)
 
         vertical_group_box_main.setLayout(vertical_layout_main)
         #########################################################################################
@@ -349,6 +352,8 @@ class PageInput(QWidget):
 
             self.step_per_period_text.setText(input_res.get('steppercycle', '100'))
 
+            self.dumpPeriodicity_text.setText(input_res.get('dumpperiodicity', '1'))
+
         # 对于包络模型的输入
         if input_res.get('!simtype') == "env":
             self.cb_env.setChecked(True)
@@ -401,6 +406,7 @@ class PageInput(QWidget):
                 res.append(['SpaceCharge', '0'])
 
             res.append(['StepPerCycle', self.step_per_period_text.text()])
+            res.append(['dumpPeriodicity', self.dumpPeriodicity_text.text()])
 
         elif self.cb_env.isChecked():
             res.append(["!simtype",  "env"])

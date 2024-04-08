@@ -10,6 +10,7 @@ a = Analysis(
      './aftertreat/dataanalysis/caltwiss.py',
      './aftertreat/dataanalysis/out_percentemitt.py',
      './aftertreat/dataanalysis/percentemitt.py',
+     './aftertreat/dataanalysis/plttodst.py',
 
     './aftertreat/picture/initialplot.py',
     './aftertreat/picture/plotdataset.py',
@@ -33,6 +34,7 @@ a = Analysis(
     './core/LongAcceleratorEngine.py',
 
     './dataprovision/beamparameter.py',
+    './dataprovision/beamset.py',
     './dataprovision/datasetparameter.py',
     './dataprovision/env_beam_out.py',
     './dataprovision/latticeparameter.py',

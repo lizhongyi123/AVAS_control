@@ -64,7 +64,10 @@ def read_dst(input):
 
     res = {}
     f = open(input, 'rb')
-    f.read(2)
+    # f.read(2)
+
+    data = struct.unpack("<cc", f.read(2))
+
 
     data = struct.unpack("<i", f.read(4))
     number = int(data[0])
@@ -79,8 +82,7 @@ def read_dst(input):
     freq = float(data[0])
     res['freq'] = freq*10**6
 
-    f.read(1)
-
+    data = f.read(1)
     partran_dist = numpy.arange(6 * number, dtype='float64').reshape(number, 6)
 
     for i in range(number):
@@ -102,13 +104,13 @@ def read_dst(input):
     f.close()
     return res
 
-def read_lattice_phase_advance(lattice_path):
-    lattice_info = read_txt(lattice_path, out='list')
+
 
 
 #
 if __name__ == "__main__":
     # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
     # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
-    path = r"C:\Users\anxin\Desktop\part_dtl1.dst"
-    read_dst(path)
+    path = r"C:\Users\anxin\Desktop\example3\InputFile\part_rfq.dst"
+    res = read_dst(path)
+    print(res['phase'][0])

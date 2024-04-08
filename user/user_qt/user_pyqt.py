@@ -24,7 +24,6 @@ from user.user_qt.page_data import PageData
 from api import basic_mulp, match_twiss, circle_match, \
     err_dyn, err_stat, err_stat_dyn
 import multiprocessing
-from utils.tolattice import write_mulp_to_lattice
 from api import basic_env
 from user.user_qt.user_defined import treat_err
 
@@ -345,9 +344,7 @@ class MainWindow(QMainWindow):
             self.func_err('stat_dyn')
         
         elif self.basic_signal == 'basic_mulp':
-            lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
-            lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice.txt')
-            write_mulp_to_lattice(lattice_mulp_path, lattice_path)
+
             self.func_basic_mulp()
 
             self.activate_output("basic_mulp")

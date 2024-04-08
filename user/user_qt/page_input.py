@@ -406,7 +406,8 @@ class PageInput(QWidget):
                 res.append(['SpaceCharge', '0'])
 
             res.append(['StepPerCycle', self.step_per_period_text.text()])
-            res.append(['dumpPeriodicity', self.dumpPeriodicity_text.text()])
+            if self.dumpPeriodicity_text.text():
+                res.append(['dumpPeriodicity', self.dumpPeriodicity_text.text()])
 
         elif self.cb_env.isChecked():
             res.append(["!simtype",  "env"])

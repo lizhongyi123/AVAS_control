@@ -18,7 +18,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from api import plot_env_beam_out
 
-from aftertreat.dataanalysis.plttodst import Plttodst
+from aftertreat.dataanalysis.plttodst import Plttozcode
 
 class MyPictureDialog(QDialog):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
@@ -608,7 +608,7 @@ class PageAnalysis(QWidget):
 
         plt_to_dst_group_box = QGroupBox()
         plt_to_dst_layout = QVBoxLayout()
-        label_plt_to_dst = QLabel("Convert plt to dst (num)")
+        label_plt_to_dst = QLabel("Convert plt to dst (step)")
         
         self.step_of_plt_line = QLineEdit("")
         self.button_convert_plt = QPushButton("convert")
@@ -618,8 +618,17 @@ class PageAnalysis(QWidget):
         hbox_plt_to_dst.addWidget(self.step_of_plt_line)
         hbox_plt_to_dst.addWidget(self.button_convert_plt)
 
+        self.all_step_of_plt_line = QLineEdit("")
+        self.button_get_all_step = QPushButton("get all step")
+        self.button_get_all_step.clicked.connect(self.get_all_step)
+
+        hbox_get_all_step = QHBoxLayout()
+        hbox_get_all_step.addWidget(self.all_step_of_plt_line )
+        hbox_get_all_step.addWidget(self.button_get_all_step)
+
 
         plt_to_dst_layout.addWidget(label_plt_to_dst)
+        plt_to_dst_layout.addLayout(hbox_get_all_step)
         plt_to_dst_layout.addLayout(hbox_plt_to_dst)
         plt_to_dst_group_box.setLayout(plt_to_dst_layout)
 ####
@@ -663,11 +672,17 @@ class PageAnalysis(QWidget):
 
 
 ###########errr
+    def get_all_step(self):
+        beamset_path = os.path.join(self.project_path, "OutputFile", "BeamSet.plt")
+        obj = Plttozcode(beamset_path)
+        all_step = obj.get_all_step()
+        self.all_step_of_plt_line.setText(str(all_step - 1))
+
     @treat_err
     def convert_plt_to_dst(self):
         beamset_path = os.path.join(self.project_path, "OutputFile", "BeamSet.plt")
-        obj = Plttodst(beamset_path)
-        obj.to_dst_variable_z(int(self.step_of_plt_line.text()))
+        obj = Plttozcode(beamset_path)
+        obj.write_to_dst(int(self.step_of_plt_line.text()))
 
     @treat_err
     def env_gamma_dialog(self):

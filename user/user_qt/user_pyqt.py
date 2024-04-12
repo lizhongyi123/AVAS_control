@@ -315,11 +315,12 @@ class MainWindow(QMainWindow):
             file.write("")
     @treat_err
     def run(self):
+        self.stop()
         #检查有没有哪个界面
         res = self.inspect()
         if not res:
             return None
-    #检查是否有信号重复
+        #检查是否有信号重复
 
         res = self.inspect_signal()
         if not res:

@@ -15,6 +15,7 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+        print(len(dataset_info[0]))
         num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
@@ -82,6 +83,6 @@ class DatasetParameter():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_a_t\AVAS\OutputFile\DataSet.txt"
-    # res = DatasetParameter(project_path)
-    # res.get_parameter()
+    project_path = r"C:\Users\anxin\Desktop\Example3\OutputFile\DataSet.txt"
+    res = DatasetParameter(project_path)
+    res.get_parameter()

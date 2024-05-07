@@ -11,7 +11,7 @@ import sys
 # for i in sys.path:
 #     print(i)
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
-from sko.GA import GA
+# from sko.GA import GA
 
 import random
 from scipy.optimize import minimize

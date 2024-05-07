@@ -59,7 +59,6 @@ class PageOutput(QWidget):
     #     if self.progress_value >= 100:
     #         return 0
     def update_progress(self):
-        print("开始")
         self.timer.start(1000)  # 定时器每隔1000毫秒（1秒）触发一次
 
         lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
@@ -104,7 +103,9 @@ class PageOutput(QWidget):
                         print("结束")
                         return 0
                     print("停止更新")
-
+    def stop_update_progress(self):
+        self.progress_bar.setValue(0)
+        self.timer.stop()
     def updatePath(self, new_path):
         self.project_path = new_path
 

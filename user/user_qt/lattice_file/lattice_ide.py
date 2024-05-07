@@ -156,7 +156,7 @@ class MyFoldDetector(api.FoldDetector):
         text = block.text().strip()
 
         # 自定义折叠触发条件
-        if "cryomodule" in text:
+        if "MODULE" in text:
             return 0  # 一级折叠
         elif "CELL" in text:
             return 1  # 二级折叠

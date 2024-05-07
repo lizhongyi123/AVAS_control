@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.page_data)
         self.stacked_widget.addWidget(self.page_error)
         self.stacked_widget.addWidget(self.page_output)
-        self.stacked_widget.addWidget(self.page_others)
+        # self.stacked_widget.addWidget(self.page_others)
 
         # self.stacked_widget.addWidget(self.page_longdistance)
 
@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
         self.stacked_widget.currentChanged.connect(self.handle_page_change)
 
         page_error_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_error))
-        page_others_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_others))
+        # page_others_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_others))
         page_output_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_output))
 
         # page_longdistance_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_longdistance))
@@ -170,7 +170,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_output_action)
         toolbar.addAction(page_data_action)
         toolbar.addAction(page_analysis_action)
-        toolbar.addAction(page_others_action)
+        # toolbar.addAction(page_others_action)
 
         # toolbar.addAction(page_longdistance_action)
 
@@ -403,6 +403,7 @@ class MainWindow(QMainWindow):
         elif self.match_process.is_alive():
             self.match_process.terminate()
             self.match_process.join()
+        self.page_output.stop_update_progress()
         print('结束进程')
 
 #################################

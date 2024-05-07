@@ -1,7 +1,7 @@
 ﻿from core.LinacOPTEngine import LinacOPTEngine
 import math
-from sko.PSO import PSO
-from sko.GA import GA
+# from sko.PSO import PSO
+# from sko.GA import GA
 import ctypes as C
 import os
 import shutil

@@ -22,7 +22,7 @@ a = Analysis(
     './apps/basicenv.py',
     './apps/changeNp.py',
     './apps/circlematch.py',
-    './apps/erroranalysis.py',
+    './apps/error.py',
     './apps/LongAccelerator.py',
     './apps/matchtwiss.py',
     './apps/scan.py',

@@ -29,7 +29,7 @@ import sys
 # for i in sys.path:
 #     print(i)
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
-from sko.GA import GA
+
 
 import random
 
@@ -477,7 +477,6 @@ class Errorstat(Error):
         self.only_adjust_sign = 0
 
         self.stat_dyn = 0
-
 
 
     def generate_adjust_parameter(self, input_lines):

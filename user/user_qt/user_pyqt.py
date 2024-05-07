@@ -92,6 +92,7 @@ class MainWindow(QMainWindow):
 
 
         runMenu.addAction(run_act)
+
         runMenu.addAction(run_stop_act)
 
 ########################

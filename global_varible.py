@@ -1,7 +1,7 @@
 
 c_light = 299792458
 Pi = 3.14159265358979323846
-long_element = ['drift', 'field', 'quad', 'solenoid', 'bend', 'steer']
+long_element = ['drift', 'field', 'quad', 'solenoid', 'bend', 'steerer']
 
 
 error_elemment_command = ['err_quad_ncpl_stat', 'err_quad_ncpl_dyn', 'err_cav_ncpl_stat', 'err_cav_ncpl_dyn', ]
@@ -23,7 +23,7 @@ error_beam_dyn_on = ['err_beam_dyn_on']
 error_beam_stat_on = ['err_beam_stat_on']
 
 mulp_basic_command = long_element + \
-               ['start', 'end', 'superpose', 'superposeend', ]
+               ['start', 'end', 'superpose', 'superposeend', 'outputplane']
 
 mulp_control_command = ['adjust', 'lattice', 'lattice_end']
 

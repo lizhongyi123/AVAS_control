@@ -83,6 +83,7 @@ class DatasetParameter():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\Example3\OutputFile\DataSet.txt"
+    project_path = r"C:\Users\anxin\Desktop\test_zhao\OutputFile\DataSet.txt"
     res = DatasetParameter(project_path)
     res.get_parameter()
+    print(res.z[-1])

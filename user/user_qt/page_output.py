@@ -4,12 +4,12 @@ from PyQt5.QtCore import QTimer
 from dataprovision.datasetparameter import DatasetParameter
 from dataprovision.latticeparameter import LatticeParameter
 import os
-
+import time
 import sys
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
     QApplication,QHBoxLayout
-
+from utils.treatfile import  check_file_update
 
 class PageOutput(QWidget):
     def __init__(self, project_path):
@@ -59,32 +59,51 @@ class PageOutput(QWidget):
     #     if self.progress_value >= 100:
     #         return 0
     def update_progress(self):
+        print("开始")
         self.timer.start(1000)  # 定时器每隔1000毫秒（1秒）触发一次
+
+        lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
+        lattice_obj = LatticeParameter(lattice_path)
+        lattice_obj.get_parameter()
+        total_length = sum(lattice_obj.v_len)
 
         if True:
             dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
-            lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
 
             if os.path.exists(dataset_path):
-                dataset_obj = DatasetParameter(dataset_path)
-                dataset_obj.get_parameter()
+                #如果正在更新
+                if check_file_update(dataset_path):
+                    dataset_obj = DatasetParameter(dataset_path)
+                    dataset_obj.get_parameter()
+                    z = dataset_obj.z
 
-                z = dataset_obj.z
-                num_of_z_this = len(z)
-                if self.num_of_z != num_of_z_this:
+                    print(z[-1])
+                    if z[-1] <= total_length:
+                        self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
+                        ratio = z[-1] / total_length
+                        self.progress_bar.setValue(int(ratio*100))
+                    elif z[-1] > total_length:
+                        self.label_location.setText(f"{total_length}/{total_length}")
+                        self.progress_bar.setValue(100)
+                        self.timer.stop()
 
-                    self.num_of_z = num_of_z_this
-                    lattice_obj = LatticeParameter(lattice_path)
-                    lattice_obj.get_parameter()
+                        return 0
+                else:
+                    dataset_obj = DatasetParameter(dataset_path)
+                    dataset_obj.get_parameter()
+                    z = dataset_obj.z
 
-                    # location = float(dataset_obj.z[-1])
-                    total_length = sum(lattice_obj.v_len)
-                    self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
-                    ratio = z[-1] / total_length
-                    self.progress_bar.setValue(int(ratio*100))
-                elif self.num_of_z == num_of_z_this:
-                    self.timer.stop()
-                    return 0
+                    if z[-1] <= total_length:
+                        self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
+                        ratio = z[-1] / total_length
+                        self.progress_bar.setValue(int(ratio*100))
+                    elif z[-1] > total_length:
+                        self.label_location.setText(f"{total_length}/{total_length}")
+                        self.progress_bar.setValue(100)
+                        self.timer.stop()
+                        print("结束")
+                        return 0
+                    print("停止更新")
 
     def updatePath(self, new_path):
         self.project_path = new_path

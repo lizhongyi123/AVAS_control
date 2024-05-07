@@ -17,6 +17,7 @@ from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
 from utils.tolattice import write_mulp_to_lattice_only_sim
+from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 ########################################################################################################################
 
 #下列为功能函数
@@ -30,16 +31,11 @@ def basic_mulp(project_path):
     latice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     res = read_txt(latice_mulp_path, out = 'list')
 
-    sign = ''
-    #判断是否需要矫正
-    for i in res:
-        if i[0] == 'adjust':
-            sign = 'adjust'
-            break
+    opti = judge_opti(res)
 
-    if sign == 'adjust':
-        v = ErrorAnalysis(project_path)
-        res = v.only_adjust()
+    if opti:
+        v = OnlyAdjust(project_path)
+        v.run()
 
     #如果不需要矫正，则进行简单模拟
     else:
@@ -97,8 +93,8 @@ def err_dyn(project_path):
     :param project_path:
     :return:
     """
-    v = ErrorAnalysis(project_path)
-    res = v.run_err_dyn_all_group()
+    v = ErrorDyn(project_path)
+    res = v.run()
     print('动态误差结束')
 
     return res
@@ -109,22 +105,8 @@ def err_stat(project_path):
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = ErrorAnalysis(project_path)
-    laatice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
-    res = read_txt(laatice_mulp_path, out = 'list')
-    opti = False
-    for i in res:
-        if i[0] == 'adjust':
-            opti = True
-            break
-    if opti:
-        res = v.optimize_all_group()
-        return res
-
-    #不需要优化
-    else:
-        res = v.run_err_stat_all_group()
-    print('静态误差结束')
+    v = Errorstat(project_path)
+    v.run()
     
 
 def err_stat_dyn(project_path):
@@ -134,17 +116,8 @@ def err_stat_dyn(project_path):
     :return:
     动态误差和静态误差一起跑，
     """
-    v = ErrorAnalysis(project_path)
-    laatice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
-    res = read_txt(laatice_mulp_path, out = 'list')
-    opti = False
-    for i in res:
-        if i[0] == 'adjust':
-            opti = True
-
-    res = v.run_err_stat_dyn_all_group(opti)
-    print('动态静态误差结束')
-
+    v = Errorstatdyn(project_path)
+    v.run_stat_dyn()
     return res
 
 def basic_env(project_path, lattice):
@@ -274,8 +247,23 @@ def cal_twiss(dst_path):
     res = v.get_emit_xyz()
     return res
 
+
+def judge_opti(res):
+
+    sign = []
+    # 判断是否需要矫正
+    for i in res:
+        if i[0] == 'adjust' and i[0] not in sign:
+            sign.append('adjust')
+        elif i[0].startswith('diag') and i[0] not in sign:
+            sign.append('diag')
+    if len(sign) >= 2:
+        return 1
+    else:
+        return 0
+
 if __name__ == '__main__':
-    project_path = r'C:\Users\anxin\Desktop\tu_env'
-    res = basic_env(project_path, 'InputFile\lattice_env.txt')
+    project_path = r'C:\Users\anxin\Desktop\test_mulp'
+    res = basic_mulp(project_path,)
     # res = match_twiss(project_path)
     print(res)

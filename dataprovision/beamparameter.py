@@ -130,31 +130,7 @@ class DstParameter():
 #         }
 #     return beam_parameter
 
-def get_out_beam_parameter(project_path, dst_path):
-    project_path = project_path
 
-    beam_path = project_path + r'\InputFile' + r'\beam.txt'
-    charge = 0
-
-    res = read_txt(beam_path)
-    charge = float(res.get('numOfCharge'))
-
-
-    dst_obj = DstParameter(dst_path)
-    dst_obj.get_parameter()
-
-    beam_parameter = {
-            'charge': charge,
-            'number': dst_obj.number,
-            'freq': dst_obj.freq,
-            'ib': dst_obj.Ib,
-            'basemassinmev': dst_obj.BaseMassInMeV,
-            'gamma': dst_obj.gamma,
-            'beta': dst_obj.beta,
-            'energy': dst_obj.energy
-
-    }
-    return beam_parameter
 
 
 if __name__ == "__main__":
@@ -167,8 +143,8 @@ if __name__ == "__main__":
     # # obj.get_parameter()
     # # print(obj.x_list)
     # res = get_entrance_beam_parameter(project_path)
-    dst_path = r"C:\Users\anxin\Desktop\test\OutputFile\error_middle\output_0\outData_0.477000.dst"
+    dst_path = r"C:\Users\anxin\Desktop\testz\part_rfq.dst"
 
     obj = DstParameter(dst_path)
     obj.get_parameter()
-    print(obj.energy)
+    print(obj.z1_list)

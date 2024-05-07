@@ -48,6 +48,7 @@ class BeamsetParameter():
         file_size = os.path.getsize(self.beamset_path)
         step = (file_size - byte_onestep_head) / byte_onestep
         return int(step)
+
     def get_one_parameter(self, num):
         step_num = self.get_step()
         step_list = [i for i in range(step_num)]

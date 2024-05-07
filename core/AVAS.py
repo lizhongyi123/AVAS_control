@@ -61,6 +61,6 @@ class AVAS():
         return res
 
 if __name__ == "__main__":
-    project_path = r'C:\Users\anxin\Desktop\AVAS_t'
+    project_path = r'C:\Users\anxin\Desktop\test_err_dyn 1'
     AVAS_obj = AVAS(project_path)
     res = AVAS_obj.run()

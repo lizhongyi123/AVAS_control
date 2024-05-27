@@ -6,11 +6,12 @@ from utils.readfile import read_dst
 import struct
 import os
 import numpy
-
+from dataprovision.latticeparameter import LatticeParameter
 class Plttozcode():
-    def __init__(self, pltpath):
+    def __init__(self, pltpath, project_path = None):
+        self.project_path = project_path
         self.plt_path = pltpath
-
+        self.latttice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     def get_all_step(self):
         obj = BeamsetParameter(self.plt_path)
         all_step =obj.get_step()
@@ -115,7 +116,7 @@ class Plttozcode():
 
                 data0utFile.write(struct.pack('c', b'\x7D'))
 
-                for i in range(self.np):
+                for i in range(len(exist_part_dstform_one_step)):
                     for j in range(6):
                         data0utFile.write(struct.pack('d', exist_part_dstform_one_step[i][j]))
 
@@ -125,17 +126,26 @@ class Plttozcode():
                 print("输出错误")
 
 
+    def get_location_index(self):
 
+        lattice_obj = LatticeParameter(self.latttice_mulp_path)
+        lattice_length = lattice_obj.v_start[-1] + lattice_obj.v_len[-1]
+        print(lattice_length)
+        # obj.get_parameter()
+        # res = obj.allstep_dict
+        # print(res)
     def to_dst_variable_t(self, num):
         pass
 if __name__ == "__main__":
 
-    project_path = r"C:\Users\anxin\Desktop\test_zhao"
+    project_path = r"C:\Users\anxin\Desktop\test_chu"
+    # project_path = r"C:\Users\anxin\Desktop\test_mulp"
     beamset_path = os.path.join(project_path, "OutputFile", "BeamSet.plt")
 
-    obj = Plttozcode(beamset_path)
-    obj.write_to_dst(650)
-    print(obj.get_all_step())
+    obj = Plttozcode(beamset_path, project_path)
+    obj.get_location_index()
+    # obj.write_to_dst(-1)
+    # print(obj.get_all_step())
     # for i in range(54):
     #     obj.to_dst_variable_z(i)
     # obj.write_to_dst(-1)

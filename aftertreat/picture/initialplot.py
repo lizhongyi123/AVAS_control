@@ -43,9 +43,7 @@ class PicturelBar_2D():
         else:
             return None
 
-        # 设置小坐标是朝内还是朝外
-        # plt.rcParams['xtick.direction'] = 'in'
-        # plt.rcParams['ytick.direction'] = 'in'
+
 
         # plt.xticks(fontsize=30)  # 设置x轴刻度标签的大小
         # plt.yticks(fontsize=30)  # 设置y轴刻度标签的大小
@@ -68,18 +66,18 @@ class PicturelBar_2D():
         # x_major_locator = MultipleLocator(0.2)
         # # 把x轴的刻度间隔设置为1，并存在变量里
         # xminorLocator = MultipleLocator(0.05)  # 将x轴次刻度标签设置为n的倍数
-        #
+
         # y_major_locator = MultipleLocator(20)
         # # 把y轴的刻度间隔设置为10，并存在变量里
         # y_minor_locator = MultipleLocator(5)
         # # 把y轴的刻度间隔设置为10，并存在变量里
-        #
+
         # ax = plt.gca()
         # # ax为两条坐标轴的实例
         # ax.xaxis.set_major_locator(x_major_locator)
         # ax.xaxis.set_minor_locator(xminorLocator)
         # # 把x轴的主刻度设置为1的倍数
-        #
+
         # ax.yaxis.set_major_locator(y_major_locator)
         # ax.yaxis.set_minor_locator(y_minor_locator)
 

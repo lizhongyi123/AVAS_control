@@ -25,3 +25,9 @@ def list_one_two(x, y):
                 y[int(i)][int(j)] = x.pop(0)
     return y
 
+#得到一个列表的维度
+def get_dimension(lst):
+    if not isinstance(lst, list):
+        return 0  # 不是列表，维度为 0
+    else:
+        return 1 + max(get_dimension(item) for item in lst)

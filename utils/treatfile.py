@@ -53,21 +53,10 @@ def check_file_update(file_path):
         return 2
 
 if __name__ == "__main__":
-    # project_path = r'C:/Users/anxin/Desktop/comparison/avas'
-    # target_folder = os.path.join(project_path, "InputFile")
-    # print(target_folder)
-    # relative_dst_file_path = split_file(target_folder)
-    # print(relative_dst_file_path)
-    #
-    # # print(list_files_in_directory(target_folder))
-    # v1 = list_files_in_directory(target_folder)[0]
-    # print(v1)
-    # v2 = split_file(v1)
-    # print(v2)
-    p1 = r"C:\Users\anxin\Desktop\test_zhao/inputFile/beam.txt"
-    p2 = r"C:/Users/anxin/Desktop/comparison/avas_test\InputFile"
-    p3 = r"C:\Users\anxin\Desktop\test_zhao/OutputFile/DataSet.txt"
-
-    res = check_file_update(p3)
+    path = r"C:\Users\anxin\Desktop\test_mulp\OutputFile"
+    path =os.path.join(path, 'error_output')
+    path = 'C:\\Users\\anxin\\Desktop\\test_mulp\\OutputFile\\error_output\\output_0'
+    p1 = '1.txt'
+    res = file_in_directory(p1, path)
     # # res = file_in_directory(p1,p2)
     print(res)

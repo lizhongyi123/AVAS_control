@@ -117,7 +117,7 @@ class BeamsetParameter():
 
                     location = struct.unpack("<d", f.read(8))
                     self.one_step_dict["location"] = float(location[0])
-                    print(location)
+                    print("location",location)
 
 
                     for i in range(self.numofp):
@@ -126,6 +126,13 @@ class BeamsetParameter():
                         vdata = list(vdata1) + list(vdata2)
                         self.one_step_list.append(vdata)
 
+                # z = [i[4] for i in self.one_step_list if i[6] == 0]
+                #
+                # zmax = max(z)
+                # zmin = min(z)
+                # print(zmax, zmin)
+
+                print([i for i in self.one_step_list if i[-1] == 2])
                 break
 
     def get_parameter(self):
@@ -206,17 +213,15 @@ class BeamsetParameter():
 
 if __name__ == "__main__":
     import os
-    project_path = r"C:\Users\anxin\Desktop\example3"
+    project_path = r"C:\Users\anxin\Desktop\test_chu"
     beamset_pasth = os.path.join(project_path, "OutputFile", "BeamSet.plt")
     obj = BeamsetParameter(beamset_pasth)
     res = obj.get_step()
+    obj.get_one_parameter(-2)
     print(res)
-    for i in range(0, 1177):
-
-        print(i)
-        obj.get_one_parameter(i)
-        print(len(obj.one_step_list))
-        print(obj.one_step_list[0])
+    #     obj.get_one_parameter(i)
+    #     print(len(obj.one_step_list))
+    #     print(obj.one_step_list[0])
 
 # if i == selectNumber:
 #     try:

@@ -447,6 +447,7 @@ class ErrorDyn(Error):
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
 
+        copy_file(self.lattice_path, self.error_middle_output0_path)
 
         new_name = f'output_{group}_{time}'
 
@@ -610,11 +611,11 @@ class Errorstat(Error):
                     index_of_position = index - 1
 
 
-            center_x = dataset_obj.x[index_of_position] * 1000
-            center_y = dataset_obj.y[index_of_position] * 1000
+            center_x = dataset_obj.x[index_of_position] * 1000    #mm
+            center_y = dataset_obj.y[index_of_position] * 1000    #mm
 
-            rms_x = dataset_obj.rms_x[index_of_position] * 1000
-            rms_y = dataset_obj.rms_y[index_of_position] * 1000
+            rms_x = dataset_obj.rms_x[index_of_position] * 1000   #mm
+            rms_y = dataset_obj.rms_y[index_of_position] * 1000   #mm
 
             energy = dataset_obj.ek[index_of_position]
 

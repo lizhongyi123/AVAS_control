@@ -76,7 +76,6 @@ class PageOutput(QWidget):
                     dataset_obj.get_parameter()
                     z = dataset_obj.z
 
-                    print(z[-1])
                     if z[-1] <= total_length:
                         self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
                         ratio = z[-1] / total_length

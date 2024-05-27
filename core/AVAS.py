@@ -1,3 +1,7 @@
+import sys
+import time
+
+sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
 from core.AVASEngine import AVASEngine
 import os
@@ -61,6 +65,10 @@ class AVAS():
         return res
 
 if __name__ == "__main__":
-    project_path = r'C:\Users\anxin\Desktop\test_err_dyn 1'
+    start = time.time()
+    project_path = r'C:\Users\anxin\Desktop\test_time'
     AVAS_obj = AVAS(project_path)
     res = AVAS_obj.run()
+    end = time.time()
+    print("模拟结束")
+    print(end- start)

@@ -107,6 +107,7 @@ class PercentEmit():
         sigma_x = np.average([(i - average_x) ** 2 for i in x])
         sigma_x1 = np.average([(i - average_x1) ** 2 for i in x1])
         print(len(x), len(x1))
+
         sigma_xx1 = np.average([(x[i] - average_x) * (x1[i] - average_x1) for i in range(len(x))])
 
         epsilon_x = math.sqrt(sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)

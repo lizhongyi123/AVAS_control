@@ -27,18 +27,18 @@ class PlotDataSet(PicturePlot_2D):
 
 
 
-    def get_mass_freq(self):
-        beam_txt = self.project_path + r'\InputFile\Beam.txt'
-        res = read_txt(beam_txt)
-        if res.get('readparticledistribution') is None:
-            BaseMassInMeV = float(res.get('particlerestmass'))
-            freq = float(res.get('frequency'))
-        else:
-            dstfile = self.project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
-            dst_res = read_dst(dstfile)
-            BaseMassInMeV = float(dst_res.get('basemassinmev'))
-            freq = float(dst_res.get('freq'))
-        return BaseMassInMeV, freq
+    # def get_mass_freq(self):
+    #     beam_txt = self.project_path + r'\InputFile\Beam.txt'
+    #     res = read_txt(beam_txt)
+    #     if res.get('readparticledistribution') is None:
+    #         BaseMassInMeV = float(res.get('particlerestmass'))
+    #         freq = float(res.get('frequency'))
+    #     else:
+    #         dstfile = self.project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
+    #         dst_res = read_dst(dstfile)
+    #         BaseMassInMeV = float(dst_res.get('basemassinmev'))
+    #         freq = float(dst_res.get('freq'))
+    #     return BaseMassInMeV, freq
 
     # def get_mass_freq(self, BaseMassInMeV, freq):
     #     self.BaseMassInMeV = BaseMassInMeV
@@ -46,51 +46,52 @@ class PlotDataSet(PicturePlot_2D):
     #     return None
 
     def get_x_y(self):
-        inFileName = self.dataset_path
 
-        C_light = 299792458  # 光速 常数
-
-        BaseMassInMeV, freq = self.get_mass_freq()
-
-
-        dataset_obj = DatasetParameter(self.dataset_path)
+        dataset_obj = DatasetParameter(self.dataset_path, self.project_path)
         dataset_obj.get_parameter()
+        end_index = dataset_obj.get_lattice_end_index() + 1
 
-        z = dataset_obj.z  # 束团纵向位置
-        ek = dataset_obj.ek  # 束团平均能量
+        z = dataset_obj.z[:end_index]  # 束团纵向位置
+        ek = dataset_obj.ek[:end_index]  # 束团平均能量
 
-        beta = []
 
-        emit_x = [i * 10**6 for i in dataset_obj.emit_x]
-        emit_y = [i * 10**6 for i in dataset_obj.emit_y]
-        emit_z = [i * 10**6 for i in dataset_obj.emit_z]
 
-        rms_x = [i *10**3 for i in dataset_obj.rms_x]  #单位变成mm
-        rms_xx = [i *10**3 for i in dataset_obj.rms_xx]
+        emit_x = [i * 10**6 for i in dataset_obj.emit_x][:end_index]
+        emit_y = [i * 10**6 for i in dataset_obj.emit_y][:end_index]
+        emit_z = [i * 10**6 for i in dataset_obj.emit_z][:end_index]
 
-        rms_y = [i *10**3 for i in dataset_obj.rms_y]
-        rms_yy = [i *10**3 for i in dataset_obj.rms_yy]
+        rms_x = [i *10**3 for i in dataset_obj.rms_x][:end_index]#单位变成mm
+        rms_xx = [i *10**3 for i in dataset_obj.rms_xx][:end_index]
 
-        max_x = [i *10**3 for i in dataset_obj.max_x]
-        max_xx = [i *10**3 for i in dataset_obj.max_xx]
+        rms_y = [i *10**3 for i in dataset_obj.rms_y][:end_index]
+        rms_yy = [i *10**3 for i in dataset_obj.rms_yy][:end_index]
 
-        max_y = [i *10**3 for i in dataset_obj.rms_y]
-        max_yy = [i *10**3 for i in dataset_obj.rms_yy]
+        max_x = [i *10**3 for i in dataset_obj.max_x][:end_index]
+        max_xx = [i *10**3 for i in dataset_obj.max_xx][:end_index]
 
-        rms_z = []
-        rms_zz = []
+        max_y = [i *10**3 for i in dataset_obj.rms_y][:end_index]
+        max_yy = [i *10**3 for i in dataset_obj.rms_yy][:end_index]
 
-        beta_x = dataset_obj.beta_x
-        beta_y = dataset_obj.beta_y
-        beta_z = dataset_obj.beta_z
 
-        loss = dataset_obj.loss
 
-        for i in range(len(dataset_obj.ek)):
-            gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
-            beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-            rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
-            rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * 162.5e6 * 360))
+        beta_x = dataset_obj.beta_x[:end_index]
+        beta_y = dataset_obj.beta_y[:end_index]
+        beta_z = dataset_obj.beta_z[:end_index]
+
+        loss = dataset_obj.loss[:end_index]
+        phi = dataset_obj.phi[:end_index]
+        phi_phi = dataset_obj.phi_phi[:end_index]
+        BaseMassInMeV = dataset_obj.BaseMassInMeV
+        freq = dataset_obj.freq
+
+        # for i in range(len(dataset_obj.ek)):
+        #     gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
+        #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+        #     v = dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360
+        #     # rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
+        #     # rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360))
+        #     rms_z.append(v)
+        #     rms_zz.append(-1 * v)
 
         # for i in range(len(data)):
         #     gammaaaa = data[i][0] / BaseMassInMeV + 1
@@ -124,6 +125,7 @@ class PlotDataSet(PicturePlot_2D):
 
             self.xlabel = "z(m)"
             self.ylabel = "Emit_y(pi*mm*mrad)"
+
 
 
         elif self.picture_name == 'emittance_z':
@@ -200,12 +202,13 @@ class PlotDataSet(PicturePlot_2D):
             self.set_legend = 1
 
 
-        elif self.picture_name == 'rms_z':
+        elif self.picture_name == 'phi':
             self.x = z
-            self.y = rms_z
+            self.y = phi
 
             self.xlabel = "z(m)"
-            self.ylabel = "P(deg)(162.5MHz)"
+            v_freq = freq/(10**6)
+            self.ylabel = f"P(deg)({v_freq}MHz)"
 
 
 
@@ -246,6 +249,7 @@ class PlotDataSet(PicturePlot_2D):
 
             self.labels = [r"$\beta_{x}$", r"$\beta_{y}$", r"$\beta_{z}$"]
             self.set_legend = 1
+
         return self.x, self.y
 
     def need_element(self, aper=1):

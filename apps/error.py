@@ -1,20 +1,3 @@
-import random
-from scipy.optimize import minimize
-from typing import List
-import copy
-import numpy as np
-from core.AVAS import AVAS
-from dataprovision.latticeparameter import LatticeParameter
-from dataprovision.datasetparameter import DatasetParameter
-from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
-import time
-import multiprocessing
-from dataprovision.beamparameter import DstParameter
-import global_varible
-import copy
-from utils.readfile import read_txt
-from utils.treatlist import flatten_list, list_one_two
-from utils.treatfile import copy_file
 
 # 工作流程：
 #    generate_adjust_parameter：根据lattice_mulp记录需要adjust的元件及参数位置，这里的位置是整个
@@ -22,27 +5,34 @@ from utils.treatfile import copy_file
 
 #    get_goal：修改参数，添加end，然后写入lattice
 #    根据诊断命令，计算loss
+import sys
+sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+from scipy.optimize import minimize
+
+import numpy as np
+
+from dataprovision.latticeparameter import LatticeParameter
+from dataprovision.datasetparameter import DatasetParameter
+
+from utils.readfile import read_txt
+from utils.treatlist import flatten_list, list_one_two
+from utils.treatfile import copy_file, split_file
+from utils.tool import write_to_txt,calculate_mean, calculate_rms, add_to_txt
 
 import os
-import sys
-
-# for i in sys.path:
-#     print(i)
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
 
 import random
-
 from core.AVAS import AVAS
 
 from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
-import time
+
 import multiprocessing
 
 import global_varible
 import copy
 
-
+from utils.tolattice import write_mulp_to_lattice_only_sim
 class Error():
     """
     该类为误差分析
@@ -60,6 +50,10 @@ class Error():
         self.error_middle_path = os.path.join(self.project_path, 'OutputFile', 'error_middle')
         self.error_middle_output0_path = os.path.join(self.project_path, 'OutputFile', 'error_middle', 'output_0')
         self.error_output_path = os.path.join(self.project_path, 'OutputFile', 'error_output')
+        self.normal_out_path = os.path.join(self.error_output_path, 'output_-1_-1')
+
+        self.errors_par_tot_path = os.path.join(self.output_path, "errors_par_tot.txt")
+        self.errors_par_path = os.path.join(self.output_path, "errors_par.txt")
 
         self.loss = []
         self.opti_res = []
@@ -74,7 +68,7 @@ class Error():
         self.all_group = 1
         self.all_time = 1
         self.lattice_mulp_list = []
-
+        self.errors_par_tot_list_first = []
         # self.err_beam_stat_on = [0] * 25
         # self.err_quad_stat_on = [0, 0, 0, 0, 0, 0, 0]
         # self.err_cav_stat_on = [0, 0, 0, 0, 0, 0, 0]
@@ -92,17 +86,16 @@ class Error():
         self.err_cav_dyn_on = []
 
 
-
         self.decimal = 5  # 小数点保留多少位
 
         self.result_queue = multiprocessing.Queue()
-        if os.path.exists(self.error_middle_path):
-            delete_directory(self.error_middle_path)
-        os.makedirs(self.error_middle_path)
-
-        if os.path.exists(self.error_output_path):
-            delete_directory(self.error_output_path)
-        os.makedirs(self.error_output_path)
+        # if os.path.exists(self.error_middle_path):
+        #     delete_directory(self.error_middle_path)
+        # os.makedirs(self.error_middle_path)
+        #
+        # if os.path.exists(self.error_output_path):
+        #     delete_directory(self.error_output_path)
+        # os.makedirs(self.error_output_path)
 
     def delete_element_end_index(self, error_lattice):
         error_lattice_copy = copy.deepcopy(error_lattice)
@@ -198,8 +191,6 @@ class Error():
                         res[i].append(command)
 
                 N -= 1
-
-
 
     def get_dimension(self, lst):
         if not isinstance(lst, list):
@@ -300,7 +291,7 @@ class Error():
                 target[2] = 0
 
 
-            elif int(input[2]) == -1:
+            elif int(input[2]) == 2:
 
                 for i in range(3, len(input) - 1):
                     dx = float(input[i]) / self.all_group
@@ -308,7 +299,7 @@ class Error():
                 target[2] = 0
 
 
-            elif int(input[2]) == 2:
+            elif int(input[2]) == -1:
                 for i in range(3, len(input) - 1):
                     dx = float(input[i]) / self.all_group
                     target[i] = dx * (group + 1)
@@ -331,13 +322,13 @@ class Error():
                 target[1] = 0
 
 
-            elif int(input[1]) == -1:
+            elif int(input[1]) == 2:
                 for i in range(2, len(input)):
                     dx = float(input[i]) / self.all_group
                     target[i] = round(random.gauss(0, dx * (group + 1)), self.decimal)
                 target[1] = 0
 
-            elif int(input[1]) == 2:
+            elif int(input[1]) == -1:
                 for i in range(2, len(input)):
                     dx = float(input[i]) / self.all_group
                     target[i] = dx * (group + 1)
@@ -405,6 +396,401 @@ class Error():
         AVAS_obj = AVAS(p_path)
         res = AVAS_obj.run(output_file=out_putfile_)
 
+    def run_normal(self):
+        os.makedirs(self.normal_out_path)
+        #模拟没有误差的情况
+        write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
+
+
+        process = multiprocessing.Process(target=self.run_avas,
+                                          args=(self.project_path, 'outputfile\error_output\output_-1_-1'))
+
+        process.start()  # 启动子进程
+        process.join()  # 等待子进程运行结束
+
+        copy_file(self.lattice_path, self.normal_out_path)
+
+
+    # def get_normal_data(self):
+    #     path = os.path.join(self.error_output_path, "output_-1_-1")
+    #     dataset_path = os.path.join(path, "DataSet.txt")
+    #     print(dataset_path)
+    #     dataset_obj = DatasetParameter(dataset_path, self.project_path)
+    #     dataset_obj.get_parameter()
+    #
+    #     normal_data = [0,
+    #                    dataset_obj.num_of_particle,  # 总粒子数
+    #                    dataset_obj.emit_x[0],  # m, rad
+    #                    dataset_obj.emit_y[0],  # m, rad
+    #                    dataset_obj.emit_z[0],  # m, rad
+    #                    dataset_obj.x[-1],  # m
+    #                    dataset_obj.y[-1],  # m
+    #                    dataset_obj.x_1[-1],
+    #                    dataset_obj.y_1[-1],
+    #                    dataset_obj.rms_x[-1],
+    #                    dataset_obj.rms_y[-1],
+    #                    dataset_obj.rms_x1[-1],
+    #                    dataset_obj.rms_y1[-1],
+    #                    dataset_obj.ek[-1],  # MeV
+    #                    dataset_obj.phi[-1],  # deg
+    #
+    #                    ]
+    #     self.normal_data = normal_data
+    #     return normal_data
+
+
+    def write_err_par_tot_title(self):
+        errors_par_tot_title = [[
+        "step_err",     #组 0
+        "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1
+        "emit_y_increase",
+        "emit_z_increase",
+        "x_center(m)", #中心位置 5
+        "y_center(m)",
+        "x_'(rad)",
+        "y_'(rad)",
+        "rms_x(m)",
+        "rms_y(m)",
+        "rms_x'(rad)",   #11
+        "rms_y'(rad)",   #12
+        "delat_energy(MeV)", #能量变化  13
+        # "delat_phase",  #14
+        ]]
+        write_to_txt(self.errors_par_tot_path, errors_par_tot_title)
+
+
+    def write_err_par_title(self):
+        errors_par_title = [
+            [
+                "step_err",  # 组 0
+                "ave(ratio_loss)",  # 束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+                "ave(emit_x_increase)",  # ,x, y z方向发射度增长， x/x0 - 1
+                "ave(emit_y_increase)",
+                "ave(emit_z_increase)",
+                "rms(x_center(m))",  # 中心位置 5
+                "rms(y_center(m))",#6
+                "rms(x_'(rad))",  #7
+                "rms(y_'(rad))",  #8
+                "ave(rms_x(m))",  #9
+                "ave(rms_y(m))", #10
+                "ave(rms_x'(rad))",  # 11
+                "ave(rms_y'(rad))",  # 12
+
+                "ave(delat_energy)",  # 能量变化  13
+
+                "ave(x_center(m))",  # 中心位置 14
+                "ave(y_center(m))",
+                "ave(x_'(rad))",
+                "ave(y_'(rad))",
+
+                "rms(delat_energy(MeV))",  # 能量变化  18
+            ]
+        ]
+
+        write_to_txt(self.errors_par_path, errors_par_title)
+
+    def write_err_par_every_time(self, group, time):
+        #误差模拟完毕后对文件进行后处理
+        #1.解析dataset文件
+
+
+        if time == -1:
+            output = self.normal_out_path
+        else:
+            output = os.path.join(self.error_output_path, f"Output_{group}_{time}")
+
+        if time == -1:
+            self.write_err_par_title()
+            self.write_err_par_tot_title()
+
+        #解析正常的情况
+        if True:
+            dataset_path = os.path.join(self.normal_out_path, "DataSet.txt")
+
+            dataset_obj = DatasetParameter(dataset_path, self.project_path)
+            dataset_obj.get_parameter()
+
+            normal_ek = dataset_obj.ek[-1]
+
+
+        dataset_path = os.path.join(output, "DataSet.txt")
+        dataset_obj = DatasetParameter(dataset_path, self.project_path)
+        dataset_obj.get_parameter()
+
+        if time == -1:
+            self.normal_ek = dataset_obj.ek[-1]
+
+        errors_par_tot_list = [
+        f"{group}_{time}",
+        dataset_obj.loss[-1] / dataset_obj.num_of_particle,
+        dataset_obj.emit_x[-1]/dataset_obj.emit_x[0] - 1,
+        dataset_obj.emit_y[-1]/dataset_obj.emit_y[0] - 1,
+        dataset_obj.emit_z[-1]/dataset_obj.emit_z[0] - 1,
+        dataset_obj.x[-1],  # m
+        dataset_obj.y[-1],  # m
+        dataset_obj.x_1[-1],
+        dataset_obj.y_1[-1],
+        dataset_obj.rms_x[-1],
+        dataset_obj.rms_y[-1],
+        dataset_obj.rms_x1[-1],
+        dataset_obj.rms_y1[-1],
+        dataset_obj.ek[-1] - normal_ek,  # MeV
+        # dataset_obj.phi[-1] - normal_data[14],  # deg
+        ]
+
+
+        #写入到errors_par_tot
+        for i in range(1, len(errors_par_tot_list)):
+            errors_par_tot_list[i] = "{:.5e}".format(errors_par_tot_list[i])
+        add_to_txt(self.errors_par_tot_path, [errors_par_tot_list])
+
+        #写入到errors_par
+        if time == -1:
+            t1_lis = errors_par_tot_list + errors_par_tot_list[5:9] + [errors_par_tot_list[13]]
+            t1_lis[0] = -1
+
+            add_to_txt(self.errors_par_path, [t1_lis])
+
+        elif time == self.all_time -1:
+            errors_par_tot_list = read_txt(self.errors_par_tot_path, out = "list")
+
+            t_lis = [j for j in errors_par_tot_list[1:] if int(j[0].split("_")[0]) == group]
+
+            t1_lis = [0] * 19
+            if len(t_lis) == 1:
+                t1_lis = t_lis[0]
+
+            elif len(t_lis) > 1:
+                t1_lis[0] = group
+                t1_lis[1] = calculate_mean([float(j[1]) for j in t_lis])
+                t1_lis[2] = calculate_mean([float(j[2]) for j in t_lis])
+                t1_lis[3] = calculate_mean([float(j[3]) for j in t_lis])
+                t1_lis[4] = calculate_mean([float(j[4]) for j in t_lis])
+
+                t1_lis[5] = calculate_rms([float(j[5]) for j in t_lis])
+                t1_lis[6] = calculate_rms([float(j[6]) for j in t_lis])
+                t1_lis[7] = calculate_rms([float(j[7]) for j in t_lis])
+                t1_lis[8] = calculate_rms([float(j[8]) for j in t_lis])
+
+                t1_lis[9] = calculate_mean([float(j[9]) for j in t_lis])
+                t1_lis[10] = calculate_mean([float(j[10]) for j in t_lis])
+                t1_lis[11] = calculate_mean([float(j[11]) for j in t_lis])
+                t1_lis[12] = calculate_mean([float(j[12]) for j in t_lis])
+
+                t1_lis[13] = calculate_mean([float(j[13]) for j in t_lis])
+
+                t1_lis[14] = calculate_mean([float(j[5]) for j in t_lis])
+                t1_lis[15] = calculate_mean([float(j[6]) for j in t_lis])
+                t1_lis[16] = calculate_mean([float(j[7]) for j in t_lis])
+                t1_lis[17] = calculate_mean([float(j[8]) for j in t_lis])
+                t1_lis[18] = calculate_rms([float(j[13]) for j in t_lis])
+
+            print(t1_lis)
+            for i in range(1, len(t1_lis)):
+                t1_lis[i] = "{:.5e}".format(t1_lis[i])
+            add_to_txt(self.errors_par_path, [t1_lis])
+
+    def write_err_par(self):
+        #误差模拟完毕后对文件进行后处理
+        #1.解析dataset文件
+
+        print(self.error_output_path)
+        errr_out_file_list = list_files_in_directory(self.error_output_path)
+
+        print(errr_out_file_list)
+        errors_par_tot_list = [[
+        "step_err",     #组 0
+        "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1
+        "emit_y_increase",
+        "emit_z_increase",
+        "x_center(m)", #中心位置 5
+        "y_center(m)",
+        "x_'(rad)",
+        "y_'(rad)",
+        "rms_x(m)",
+        "rms_y(m)",
+        "rms_x'(rad)",   #11
+        "rms_y'(rad)",   #12
+        "delat_energy", #能量变化  13
+        # "delat_phase",  #14
+        ]
+        ]
+
+        #正常模拟数据，无误差
+        normal_data=[]
+        for i in errr_out_file_list:
+            step_err = split_file(i)[-1].split("output_")[-1]
+
+            dataset_path = os.path.join(i,"DataSet.txt")
+            dataset_obj = DatasetParameter(dataset_path, self.project_path)
+            dataset_obj.get_parameter()
+
+            if int(step_err) == -1:
+
+                normal_data = [ 0,
+                dataset_obj.num_of_particle,  #总粒子数
+                dataset_obj.emit_x[0],  #m, rad
+                dataset_obj.emit_y[0],  #m, rad
+                dataset_obj.emit_z[0],  #m, rad
+                dataset_obj.x[-1],  #m
+                dataset_obj.y[-1],  #m
+                dataset_obj.x_1[-1],  
+                dataset_obj.y_1[-1],  
+                dataset_obj.rms_x[-1],  
+                dataset_obj.rms_y[-1],  
+                dataset_obj.rms_x1[-1],  
+                dataset_obj.rms_y1[-1],
+                dataset_obj.ek[-1],  #MeV
+                dataset_obj.phi[-1], #deg
+
+                ]
+
+            if True:
+                t_lis = [
+                step_err,
+                dataset_obj.loss[-1] / normal_data[1],
+                dataset_obj.emit_x[-1]/normal_data[2] - 1,
+                dataset_obj.emit_y[-1]/normal_data[3] - 1,
+                dataset_obj.emit_z[-1]/normal_data[4] - 1,
+                dataset_obj.x[-1],  # m
+                dataset_obj.y[-1],  # m
+                dataset_obj.x_1[-1],
+                dataset_obj.y_1[-1],
+                dataset_obj.rms_x[-1],
+                dataset_obj.rms_y[-1],
+                dataset_obj.rms_x1[-1],
+                dataset_obj.rms_y1[-1],
+                dataset_obj.ek[-1] - normal_data[13],  # MeV
+                # dataset_obj.phi[-1] - normal_data[14],  # deg
+                ]
+                errors_par_tot_list.append(t_lis)
+
+
+
+        #生成errors_par.txt
+        errors_par_lis = [
+            [
+                "step_err",  # 组 0
+                "ave(ratio_loss)",  # 束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+                "ave(emit_x_increase)",  # ,x, y z方向发射度增长， x/x0 - 1
+                "ave(emit_y_increase)",
+                "ave(emit_z_increase)",
+                "rms(x_center(m))",  # 中心位置 5
+                "rms(y_center(m))",#6
+                "rms(x_'(rad))",  #7
+                "rms(y_'(rad))",  #8
+                "ave(rms_x(m))",  #9
+                "ave(rms_y(m))", #10
+                "ave(rms_x'(rad))",  # 11
+                "ave(rms_y'(rad))",  # 12
+
+                "ave(delat_energy)",  # 能量变化  13
+
+                "ave(x_center(m))",  # 中心位置 14
+                "ave(y_center(m))",
+                "ave(x_'(rad))",
+                "ave(y_'(rad))",
+
+                "rms(delat_energy)",  # 能量变化  18
+            ]
+        ]
+
+
+        errors_par_lis.append(errors_par_tot_list[1]+errors_par_tot_list[1][5:9] + [errors_par_tot_list[1][13]])
+
+        all_step_iden = [i[0].split('_') for i in errors_par_tot_list][2:]
+        # print(all_step_iden)
+        max_step = max(list(set([int(i[0]) for i in all_step_iden])))
+        # print(max_step)
+
+        for i in range(max_step + 1):
+            t_lis = [j for j in errors_par_tot_list[1:] if int(j[0].split("_")[0]) == i]
+
+            t1_lis = [0] * 19
+            if len(t_lis) == 1:
+                t1_lis = t_lis
+
+            elif len(t_lis) > 1:
+                t1_lis[0] = i
+                t1_lis[1] = calculate_mean([float(j[1]) for j in t_lis])
+                t1_lis[2] = calculate_mean([float(j[2]) for j in t_lis])
+                t1_lis[3] = calculate_mean([float(j[3]) for j in t_lis])
+                t1_lis[4] = calculate_mean([float(j[4]) for j in t_lis])
+
+                t1_lis[5] = calculate_rms([float(j[5]) for j in t_lis])
+                t1_lis[6] = calculate_rms([float(j[6]) for j in t_lis])
+                t1_lis[7] = calculate_rms([float(j[7]) for j in t_lis])
+                t1_lis[8] = calculate_rms([float(j[8]) for j in t_lis])
+
+                t1_lis[9] = calculate_mean([float(j[9]) for j in t_lis])
+                t1_lis[10] = calculate_mean([float(j[10]) for j in t_lis])
+                t1_lis[11] = calculate_mean([float(j[11]) for j in t_lis])
+                t1_lis[12] = calculate_mean([float(j[12]) for j in t_lis])
+
+                t1_lis[13] = calculate_mean([float(j[13]) for j in t_lis])
+
+                t1_lis[14] = calculate_mean([float(j[5]) for j in t_lis])
+                t1_lis[15] = calculate_mean([float(j[6]) for j in t_lis])
+                t1_lis[16] = calculate_mean([float(j[7]) for j in t_lis])
+                t1_lis[17] = calculate_mean([float(j[8]) for j in t_lis])
+                t1_lis[18] = calculate_rms([float(j[13]) for j in t_lis])
+
+            errors_par_lis.append(t1_lis)
+
+
+        for i in range(1, len(errors_par_lis)):
+            for j in range(1,len(errors_par_lis[0])):
+                errors_par_lis[i][j] = "{:.5e}".format(errors_par_lis[i][j])
+
+
+        errors_par_path = os.path.join(self.output_path, "errors_par.txt")
+        write_to_txt(errors_par_path, errors_par_lis)
+
+
+
+        for i in range(1, len(errors_par_tot_list)):
+            for j in range(1, len(errors_par_tot_list[0])):
+                errors_par_tot_list[i][j] = "{:.5e}".format(errors_par_tot_list[i][j])
+
+        errors_par_tot_path = os.path.join(self.output_path, "errors_par_tot.txt")
+        write_to_txt(errors_par_tot_path, errors_par_tot_list)
+
+        return 0
+
+
+
+
+    def write_err_datas(self, group, time):
+
+        err_datas_path = os.path.join(self.output_path, f"Error_Datas_{group}_{time}.txt")
+        lattice_path = self.lattice_path
+        input = read_txt(lattice_path, out ="list")
+        print(input)
+        # 为每个元件加编号
+        index = 0
+        for i in input:
+            if i[0] in global_varible.long_element:
+                add_name = f'element_{index}'
+                i.append(add_name)
+                index += 1
+
+        res = []
+        for i in range(len(input)):
+            if input[i][0] == global_varible.error_elemment_command_dyn[1]:
+                #quad
+                index = input[i+1][-1].split('_')[-1]
+                err_name = f"CAV_ERROR[{index}]"
+                t_lis = [err_name] + input[i][3:]
+                res.append(t_lis)
+            elif input[i][0] == global_varible.error_elemment_command_dyn[0]:
+                # quad
+                index = input[i + 1][-1].split('_')[-1]
+                err_name = f"QUAD_ERROR[{index}]"
+                t_lis = [err_name] + input[i][3:]
+                res.append(t_lis)
+        write_to_txt(err_datas_path, res)
 
 class ErrorDyn(Error):
     def __init__(self, project_path):
@@ -461,7 +847,8 @@ class ErrorDyn(Error):
         跑动态误差
         return:
         """
-
+        self.run_normal()
+        self.write_err_par_every_time(-1, -1)
         self.get_group_time()
 
 
@@ -469,6 +856,8 @@ class ErrorDyn(Error):
             for j in range(self.all_time):
                 self.generate_lattice_mulp_list(i)
                 self.run_one_time(i, j)
+                self.write_err_datas(i, j)
+                self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
     def __init__(self, project_path):
@@ -981,6 +1370,9 @@ class Errorstat(Error):
             return 0
 
     def run(self):
+        self.run_normal()
+        self.write_err_par_every_time(-1, -1)
+
         self.get_group_time()
         self.opti = self.judge_opti()
 
@@ -991,6 +1383,8 @@ class Errorstat(Error):
                     self.generate_lattice_mulp_list(i)
                     self.all_error_lattice.append(self.lattice_mulp_list)
                     self.run_one_time_opti(i, j)
+                    self.write_err_datas(i, j)
+                    self.write_err_par_every_time(i, j)
 
         else:
             for i in range(self.all_group):
@@ -998,6 +1392,8 @@ class Errorstat(Error):
                     print(i, j)
                     self.generate_lattice_mulp_list(i)
                     self.run_use_corrected_result(0, i, j, self.lattice_mulp_list, 0, 0)
+                    self.write_err_datas(i, j)
+                    self.write_err_par_every_time(i, j)
 
 
 class Errorstatdyn(Errorstat):
@@ -1153,8 +1549,8 @@ class Errorstatdyn(Errorstat):
         2. 不需要优选
         :return:
         """
-
-
+        self.run_normal()
+        self.write_err_par_every_time(-1, -1)
         self.opti = self.judge_opti()
 
         # 第一种情况，需要优化
@@ -1186,6 +1582,9 @@ class Errorstatdyn(Errorstat):
 
                     self.run_stat_dyn_one_time(x, i, j, error_lattice_index,
                                                    adjust_element_num, adjust_parameter_num, True)
+                    self.write_err_datas(i, j)
+                    self.write_err_par_every_time(i, j)
+
         # 第二种情况，不需要优化
         else:
             self.get_group_time()
@@ -1195,12 +1594,17 @@ class Errorstatdyn(Errorstat):
                     error_lattice_index = self.generate_lattice_mulp_list(i)
                     self.all_error_lattice.append(error_lattice_index)
                     self.run_stat_dyn_one_time([], i, j, error_lattice_index, [], [], False)
-                print(self.all_error_lattice)
+                    self.write_err_datas(i, j)
+                    self.write_err_par_every_time(i, j)
+
+
 class OnlyAdjust(Errorstat):
     def __init__(self, project_path):
         super().__init__(project_path)
 
     def run(self):
+        self.run_normal()
+
         self.only_adjust_sign = 1
 
         input_lines = read_txt(self.lattice_mulp_path, out='list')
@@ -1228,6 +1632,7 @@ class OnlyAdjust(Errorstat):
         #                           adjust_element_num, adjust_parameter_num)
         self.opti = 1
         self.run_one_time_opti(0,0)
+
 if __name__ == "__main__":
     # obj = ErrorStat(r'C:\Users\anxin\Desktop\test_control\test_error')
     # obj.read_lattice_parameter()
@@ -1236,16 +1641,20 @@ if __name__ == "__main__":
     # # obj.optimize_one_group(1)
     # obj.treat_diag()
 
-    start = time.time()
-    print("start", start)
-    # obj = ErrorDyn(r'C:\Users\anxin\Desktop\test_err_dyn')
-    # obj.run()
-
-    obj = Errorstat(r'C:\Users\anxin\Desktop\test_err_stat')
+    # start = time.time()
+    # print("start", start)
+    obj = ErrorDyn(r'C:\Users\anxin\Desktop\test_err_dyn')
     obj.run()
+
+    # obj = Errorstat(r'C:\Users\anxin\Desktop\test_err_stat')
+    # obj.run()
 
     # obj = OnlyAdjust(r'C:\Users\anxin\Desktop\only_adjust')
     # obj.run()
 
     # obj = Errorstatdyn(r'C:\Users\anxin\Desktop\test_err_stat_dyn')
     # obj.run_stat_dyn()
+    # obj = Error(r"C:\Users\anxin\Desktop\test_err_dyn")
+    # obj.get_normal_data()
+    # obj.get_group_time()
+    # obj.write_err_par_every_time(1, 1)

@@ -1,5 +1,9 @@
-﻿from utils.readfile import read_txt
+﻿import sys
+sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+
+from utils.readfile import read_txt
 import global_varible
+
 #得到 lattice的基本信息
 class LatticeParameter():
     """
@@ -19,6 +23,8 @@ class LatticeParameter():
         self.v_name = []
         self.phi_syn = []
         self.aperture = []
+        self.total_length = 0
+
     def get_parameter(self):
         lattice_info_ini = read_txt(self.lattice_path, out='list')
         lattice_info_before_end = []
@@ -133,14 +139,15 @@ class LatticeParameter():
             if i[0] == 'field' and i[4] == '1':
                 self.phi_syn.append(float(i[6]))
             elif i[0] in global_varible.long_element:
-                self.phi_syn.append('')
+                self.phi_syn.append(0)
 
         for i in lattice_info:
             if i[0] in global_varible.long_element:
                 self.aperture.append(float(i[2]))
-
+        
+        self.total_length = self.v_start[-1] + self.v_len[-1]
 if __name__ == "__main__":
-    lattice_path = r'C:/Users/anxin/Desktop/comparison/avas\InputFile\lattice.txt'
+    lattice_path = r'C:/Users/anxin/Desktop/test_zhao\InputFile\lattice_mulp.txt'
     res = LatticeParameter(lattice_path)
     res.get_parameter()
-    print(res.phi_syn)
+    print(res.total_length)

@@ -2,7 +2,7 @@
 from dataprovision.beamset import BeamsetParameter
 import math
 from global_varible import c_light, Pi
-from utils.readfile import read_dst
+
 import struct
 import os
 import numpy
@@ -11,7 +11,8 @@ class Plttozcode():
     def __init__(self, pltpath, project_path = None):
         self.project_path = project_path
         self.plt_path = pltpath
-        self.latttice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
+        if project_path:
+            self.latttice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     def get_all_step(self):
         obj = BeamsetParameter(self.plt_path)
         all_step =obj.get_step()

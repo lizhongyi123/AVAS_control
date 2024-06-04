@@ -19,7 +19,7 @@ from apps.LongAccelerator import LongAccelerator
 from utils.tolattice import write_mulp_to_lattice_only_sim
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 ########################################################################################################################
-
+import multiprocessing
 #下列为功能函数
 #基础运行
 def basic_mulp(project_path):
@@ -263,7 +263,13 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    project_path = r'C:\Users\anxin\Desktop\test_mulp'
-    res = basic_mulp(project_path,)
-    # res = match_twiss(project_path)
-    print(res)
+    for i in range(2):
+        project_path = r'C:\Users\anxin\Desktop\test_mulp'
+
+        process = multiprocessing.Process(target=basic_mulp,
+                                          args=(project_path, ))
+
+        process.start()  # 启动子进程
+        process.join()  # 等待子进程运行结束
+        print(i)
+

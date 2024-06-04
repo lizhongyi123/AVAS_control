@@ -86,6 +86,7 @@ class PageOutput(QWidget):
                         self.timer.stop()
 
                         return 0
+                #停止更新
                 else:
                     dataset_obj = DatasetParameter(dataset_path)
                     dataset_obj.get_parameter()
@@ -95,6 +96,7 @@ class PageOutput(QWidget):
                         self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
                         ratio = z[-1] / total_length
                         self.progress_bar.setValue(int(ratio*100))
+                        self.timer.stop()
                     elif z[-1] > total_length:
                         self.label_location.setText(f"{total_length}/{total_length}")
                         self.progress_bar.setValue(100)

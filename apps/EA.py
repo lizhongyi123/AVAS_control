@@ -1,3 +1,6 @@
+import sys
+sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+
 import random
 from scipy.optimize import minimize
 from typing import List
@@ -15,14 +18,12 @@ import copy
 from utils.readfile import read_txt
 from utils.treatlist import flatten_list, list_one_two, get_dimension
 from utils.treatfile import copy_file
-
-
+from utils.tool import write_to_txt,calculate_mean, calculate_rms, add_to_txt
+from utils.treatfile import copy_file, split_file
 import os
 import sys
+from utils.tolattice import write_mulp_to_lattice_only_sim
 
-# for i in sys.path:
-#     print(i)
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
 
 import random
@@ -52,6 +53,8 @@ class EA():
         self.error_middle_path = os.path.join(self.project_path, 'OutputFile', 'error_middle')
         self.error_middle_output0_path = os.path.join(self.project_path, 'OutputFile', 'error_middle', 'output_0')
         self.error_output_path = os.path.join(self.project_path, 'OutputFile', 'error_output')
+        self.normal_out_path = os.path.join(self.error_output_path, 'output_-1')
+        self.ea_errors_par_tot_path = os.path.join(self.output_path, "EA_errors_par_tot.txt")
 
         self.loss = []
         self.opti_res = []
@@ -66,6 +69,9 @@ class EA():
         self.all_group = 1
         self.all_time = 1
         self.lattice_mulp_list = []
+
+        self.normal_data = []
+
 
         max_err_quad_tran = 5
         max_err_quad_rot = 5
@@ -141,10 +147,14 @@ class EA():
                 new_lines.append(i_copy)
             else:
                 new_lines.append(i)
-
+        #为每个误差添加编号
         new_lines = self.add_index(new_lines)
+
+        #添加on命令
         new_lines = self.add_element_on_command(new_lines)
+        #添加beam命令
         new_lines = self.add_beam_err_command(new_lines)
+
         new_lines.insert(1, ['step', 1 , 1])
         # for i in new_lines:
         #     print(i)
@@ -161,7 +171,7 @@ class EA():
         num = 0
         for i in lattice:
             if i[0] == "err_quad_ncpl_dyn":
-                i.append(f"mag_{num}")
+                i.append(f"quad_{num}")
                 num += 1
 
         num = 0
@@ -195,12 +205,12 @@ class EA():
 
         return lattice
 
-    def add_err(self, lattice, err):
+    def set_err(self, lattice, err):
         """
         为lattice增加误差
-        err:二维列表，元素为err_type, err_index, err_choose, err_value
+        err:二维列表，元素为err_type, element_index, err_choose, err_value
         """
-
+        print(err)
         lattice = copy.deepcopy(lattice)
         for i in lattice:
             for j in err:
@@ -208,9 +218,8 @@ class EA():
                     if i[0] == j[0]:
                         i[j[2] + 2] = j[3]
 
-                elif i[0] == j[0] and int(i[-1].split("_")[-1]) == j[1]:
+                elif i[0] == f"err_{j[0]}_ncpl_dyn" and int(i[-1].split("_")[-1]) == j[1]:
                     i[j[2] + 3] = j[3]
-
 
 
         return lattice
@@ -219,6 +228,7 @@ class EA():
 
 
     def get_err_element_num(self, lattice):
+        #得到所有的磁场元件和腔体元件
         quad_num = 0
         cav_num = 0
         for i in lattice:
@@ -229,28 +239,39 @@ class EA():
         return quad_num, cav_num
 
     def generate_max_element_err(self, quad_num, cav_num):
-        #该功能为产生所有原件的最大误差命令课表
-        #元素为err_type, err_index, err_choose, err_value
+        #该功能为产生所有原件的最大误差命令列表
+        #元素为 腔体误差或者磁场元件误差, element_index, err_choose, err_value
         lis = []
         #此处只产生元件误差
         for i in range(quad_num):
             for j in range(self.err_quad_parameter_num):
-                v_lis = ["err_quad_ncpl_dyn", i, j, self.err_quad_max_value_lis[j]]
+                v_lis = ["quad", i, j, self.err_quad_max_value_lis[j]]
                 lis.append(v_lis)
 
         for i in range(cav_num):
             for j in range(self.err_cav_parameter_num):
-                v_lis = ["err_cav_ncpl_dyn", i, j, self.err_cav_max_value_lis[j]]
+                v_lis = ["cav", i, j, self.err_cav_max_value_lis[j]]
                 lis.append(v_lis)
         return lis
 
 
 
     def write_to_lattice(self, lattice):
+        #带误差的
         lattice = copy.deepcopy(lattice)
+        #去掉编号
         for i in lattice:
             if i[0] == "err_quad_ncpl_dyn" or i[0] =="err_cav_ncpl_dyn":
                 i.pop()
+
+        for i in lattice:
+            if i[0] in global_varible.error_elemment_command_dyn:
+                if set(i[3:]) == {0}: 
+                    i.append(False)
+
+        lattice = [i for i in lattice if i[-1] is not False]
+
+
         with open(self.lattice_path, 'w') as f:
             for i in lattice:
                 f.write(' '.join(map(str, i)) + '\n')
@@ -261,17 +282,17 @@ class EA():
         res = AVAS_obj.run(output_file=out_putfile)
         print("模拟结束")
 
-    def simulate(self, lattice):
+    def simulate(self, lattice, time):
         self.write_to_lattice(lattice)
-
+        # self.error_output_path
         process = multiprocessing.Process(target=self.basic_simulate,
                                           args=(self.project_path, 'outputfile\error_middle'))
 
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
 
-        suffix = self.get_max_file_suffix(self.error_output_path) + 1
-        new_name = f"output_{suffix}"
+        # suffix = self.get_max_file_suffix(self.error_output_path) + 1
+        new_name = f"output_{time}"
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
@@ -301,20 +322,261 @@ class EA():
         print(max_suffix)
         return max_suffix
 
+    def write_ea_err_datas(self, time):
 
-    def add_max_err_run(self):
+        err_datas_path = os.path.join(self.output_path, f"EA_Error_Datas_{time}.txt")
+        lattice_path = self.lattice_path
+        input = read_txt(lattice_path, out ="list")
+        # 为每个元件加编号
+        index = 0
+        for i in input:
+            if i[0] in global_varible.long_element:
+                add_name = f'element_{index}'
+                i.append(add_name)
+                index += 1
+
+        res = []
+        for i in range(len(input)):
+            if input[i][0] == global_varible.error_elemment_command_dyn[1]:
+                #quad
+                index = input[i+1][-1].split('_')[-1]
+                err_name = f"CAV_ERROR[{index}]"
+                
+                t_lis = [err_name] + input[i][3:]
+                res.append(t_lis)
+            elif input[i][0] == global_varible.error_elemment_command_dyn[0]:
+                # quad
+                index = input[i + 1][-1].split('_')[-1]
+                err_name = f"QUAD_ERROR[{index}]"
+                t_lis = [err_name] + input[i][3:]
+                res.append(t_lis)
+        
+        # res = [i for i in res  if set(i[1:]) != {"0"} ]
+
+        write_to_txt(err_datas_path, res)
+
+
+    def write_ea_err_par(self):
+        #误差模拟完毕后对文件进行后处理
+        #1.解析dataset文件
+
+        print(self.error_output_path)
+        errr_out_file_list = list_files_in_directory(self.error_output_path)
+
+        print(errr_out_file_list)
+        errors_par_tot_list = [[
+        "step_err",     #组 0
+        "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1
+        "emit_y_increase",
+        "emit_z_increase",
+        "x_center(m)", #中心位置 5
+        "y_center(m)",
+        "x_'(rad)",
+        "y_'(rad)",
+        "rms_x(m)",
+        "rms_y(m)",
+        "rms_x'(rad)",   #11
+        "rms_y'(rad)",   #12
+        "delat_energy", #能量变化  13
+        # "delat_phase",  #14
+        ]
+        ]
+
+        #正常模拟数据，无误差
+        normal_data=[]
+        for i in errr_out_file_list:
+            step_err = split_file(i)[-1].split("output_")[-1]
+
+            dataset_path = os.path.join(i ,"DataSet.txt")
+            print(dataset_path)
+            dataset_obj = DatasetParameter(dataset_path, self.project_path)
+            dataset_obj.get_parameter()
+
+            if int(step_err) == -1:
+
+                normal_data = [ 0,
+                dataset_obj.num_of_particle,  #总粒子数
+                dataset_obj.emit_x[0],  #m, rad
+                dataset_obj.emit_y[0],  #m, rad
+                dataset_obj.emit_z[0],  #m, rad
+                dataset_obj.x[-1],  #m
+                dataset_obj.y[-1],  #m
+                dataset_obj.x_1[-1],
+                dataset_obj.y_1[-1],
+                dataset_obj.rms_x[-1],
+                dataset_obj.rms_y[-1],
+                dataset_obj.rms_x1[-1],
+                dataset_obj.rms_y1[-1],
+                dataset_obj.ek[-1],  #MeV
+                dataset_obj.phi[-1], #deg
+
+                ]
+
+            if True:
+                t_lis = [
+                step_err,
+                dataset_obj.loss[-1] / normal_data[1],
+                dataset_obj.emit_x[-1]/normal_data[2] - 1,
+                dataset_obj.emit_y[-1]/normal_data[3] - 1,
+                dataset_obj.emit_z[-1]/normal_data[4] - 1,
+                dataset_obj.x[-1],  # m
+                dataset_obj.y[-1],  # m
+                dataset_obj.x_1[-1],
+                dataset_obj.y_1[-1],
+                dataset_obj.rms_x[-1],
+                dataset_obj.rms_y[-1],
+                dataset_obj.rms_x1[-1],
+                dataset_obj.rms_y1[-1],
+                dataset_obj.ek[-1] - normal_data[13],  # MeV
+                # dataset_obj.phi[-1] - normal_data[14],  # deg
+                ]
+                errors_par_tot_list.append(t_lis)
+
+
+        for i in range(1, len(errors_par_tot_list)):
+            for j in range(1, len(errors_par_tot_list[0])):
+                errors_par_tot_list[i][j] = "{:.5e}".format(errors_par_tot_list[i][j])
+
+        errors_par_tot_path = os.path.join(self.output_path, "EA_errors_par_tot.txt")
+        write_to_txt(errors_par_tot_path, errors_par_tot_list)
+
+        return 0
+
+    def get_normal_data(self):
+        path = self.normal_out_path
+        dataset_path = os.path.join(path, "DataSet.txt")
+        print(dataset_path)
+        dataset_obj = DatasetParameter(dataset_path, self.project_path)
+        dataset_obj.get_parameter()
+
+        normal_data = [0,
+                       dataset_obj.num_of_particle,  # 总粒子数
+                       dataset_obj.emit_x[0],  # m, rad
+                       dataset_obj.emit_y[0],  # m, rad
+                       dataset_obj.emit_z[0],  # m, rad
+                       dataset_obj.x[-1],  # m
+                       dataset_obj.y[-1],  # m
+                       dataset_obj.x_1[-1],
+                       dataset_obj.y_1[-1],
+                       dataset_obj.rms_x[-1],
+                       dataset_obj.rms_y[-1],
+                       dataset_obj.rms_x1[-1],
+                       dataset_obj.rms_y1[-1],
+                       dataset_obj.ek[-1],  # MeV
+                       dataset_obj.phi[-1],  # deg
+
+                       ]
+        self.normal_data = normal_data
+        return normal_data
+
+    def write_ea_err_par_title(self):
+        errors_par_tot_title = [[
+        "step_err",     #组 0
+        "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
+        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1
+        "emit_y_increase",
+        "emit_z_increase",
+        "x_center(m)", #中心位置 5
+        "y_center(m)",
+        "x_'(rad)",
+        "y_'(rad)",
+        "rms_x(m)",
+        "rms_y(m)",
+        "rms_x'(rad)",   #11
+        "rms_y'(rad)",   #12
+        "delat_energy(MeV)", #能量变化  13
+        # "delat_phase",  #14
+        ]]
+        write_to_txt(self.ea_errors_par_tot_path, errors_par_tot_title)
+
+    def write_ea_err_par_every_time(self, time):
+        #误差模拟完毕后对文件进行后处理
+        #1.解析dataset文件
+
+        output = os.path.join(self.error_output_path, f"Output_{time}")
+
+        if time == -1:
+            self.write_ea_err_par_title()
+
+        #解析正常的情况
+        if True:
+            dataset_path = os.path.join(self.normal_out_path, "DataSet.txt")
+
+            dataset_obj = DatasetParameter(dataset_path, self.project_path)
+            dataset_obj.get_parameter()
+
+            normal_ek = dataset_obj.ek[-1]
+
+        dataset_path = os.path.join(output, "DataSet.txt")
+        dataset_obj = DatasetParameter(dataset_path, self.project_path)
+        dataset_obj.get_parameter()
+
+
+        t_lis = [
+        time,
+        dataset_obj.loss[-1] / dataset_obj.num_of_particle,
+        dataset_obj.emit_x[-1]/dataset_obj.emit_x[0] - 1,
+        dataset_obj.emit_y[-1]/dataset_obj.emit_y[0] - 1,
+        dataset_obj.emit_z[-1]/dataset_obj.emit_z[0] - 1,
+        dataset_obj.x[-1],  # m
+        dataset_obj.y[-1],  # m
+        dataset_obj.x_1[-1],
+        dataset_obj.y_1[-1],
+        dataset_obj.rms_x[-1],
+        dataset_obj.rms_y[-1],
+        dataset_obj.rms_x1[-1],
+        dataset_obj.rms_y1[-1],
+        dataset_obj.ek[-1] - normal_ek,  # MeV
+        # dataset_obj.phi[-1] - normal_data[14],  # deg
+        ]
+
+
+        for i in range(1, len(t_lis)):
+            t_lis[i] = "{:.5e}".format(t_lis[i])
+
+        add_to_txt(self.ea_errors_par_tot_path, [t_lis])
+
+        return 0
+    def run_normal(self):
+        if os.path.exists(self.normal_out_path):
+            delete_directory(self.normal_out_path)
+        else:
+            os.makedirs(self.normal_out_path)
+
+        #模拟没有误差的情况
+        write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
+
+
+        process = multiprocessing.Process(target=self.basic_simulate,
+                                          args=(self.project_path, 'outputfile\error_output\output_-1'))
+
+        process.start()  # 启动子进程
+        process.join()  # 等待子进程运行结束
+
+        copy_file(self.lattice_path, self.normal_out_path)
+
+
+    def set_max_err_run(self):
         # 为每个原件设置最大误差，并且进行模拟
         lattice = self.generate_basic_lattice()
+
         quad_num, cav_num = self.get_err_element_num(lattice)
+
+        #产生最大误差的命令
         com_lis = self.generate_max_element_err(quad_num, cav_num)
-        print(com_lis)
 
-        for i in com_lis[:2]:
-            new_lattice = self.add_err(lattice, [i])
-            self.simulate(new_lattice)
+        self.run_normal()
+        self.write_ea_err_par_every_time(-1)
+        for i in range(0, len(com_lis)):
 
-
-
+            new_lattice = self.set_err(lattice, [com_lis[i]])
+            self.simulate(new_lattice, i)
+            self.write_ea_err_datas(i)
+            try:
+                self.write_ea_err_par_every_time(i)
+            except Exception as e:
+                pass
     def test(self):
         # lattice = self.generate_basic_lattice()
 
@@ -325,8 +587,11 @@ class EA():
         # lattice = self.add_err(lattice, lis)
         # for i in lattice:
         #     print(i)
-        # self.add_max_err_run()
-        self.add_max_err_run()
+        self.set_max_err_run()
+        # self.get_normal_data()
+
+        # self.write_ea_err_par_every_time(1)
 if __name__ == "__main__":
     obj = EA(r"C:\Users\anxin\Desktop\test_mulp")
-    obj.test()
+    # obj.test()
+    obj.set_max_err_run()

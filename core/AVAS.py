@@ -8,7 +8,7 @@ import os
 from utils.beamconfig import BeamConfig
 from utils.inputconfig import InputConfig
 from utils.latticeconfig import LatticeConfig
-
+import multiprocessing
 class AVAS():
     """
     多粒子模拟
@@ -59,16 +59,22 @@ class AVAS():
 
         res = self.AVAS_engine.main_agent(1)
         print(res)
-        if res == 1:
-            raise Exception('error')
+        # if res == 1:
+        #     raise Exception('error')
 
         return res
+def worker(project_path):
+    obj = AVAS(project_path, )
+    obj.run()
 
 if __name__ == "__main__":
-    start = time.time()
-    project_path = r'C:\Users\anxin\Desktop\test_time'
-    AVAS_obj = AVAS(project_path)
-    res = AVAS_obj.run()
-    end = time.time()
-    print("模拟结束")
-    print(end- start)
+
+    project_path = r'C:\Users\anxin\Desktop\test_mulp'
+    for i in range(3):
+        # process = multiprocessing.Process(target=worker,
+        #                                   args=( project_path, ))
+        #
+        # process.start()  # 启动子进程
+        # process.join()  # 等待子进程运行结束
+        worker(project_path)
+        print(i)

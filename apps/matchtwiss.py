@@ -1,4 +1,4 @@
-ï»¿from core.LinacOPTEngine import LinacOPTEngine
+from core.LinacOPTEngine import LinacOPTEngine
 import math
 # from sko.PSO import PSO
 # from sko.GA import GA
@@ -12,7 +12,7 @@ import time
 from utils.myoptimize import gradient_descent_minimize
 from apps.basicenv import BasicEnvSim
 def mismatch( Twiss1, Twiss2):
-    # å¤±é…åº¦å‡½æ•°
+    # Ê§Åä¶Èº¯Êı
     alpha1 = Twiss1[0]
     beta1 = Twiss1[1]
     gamma1 = (1 + alpha1 * alpha1) / beta1
@@ -21,11 +21,11 @@ def mismatch( Twiss1, Twiss2):
     beta2 = Twiss2[1]
     gamma2 = (1 + alpha2 * alpha2) / beta2
 
-    # æ— å¥ˆå¦¥åä¹‹ä¸¾åŠ¨
+    # ÎŞÄÎÍ×Ğ­Ö®¾Ù¶¯
     if beta2 < 0:
         return 100
     T = beta2 * gamma1 + beta1 * gamma2 - 2 * alpha1 * alpha2
-    # æ•°å€¼è¯¯å·®
+    # ÊıÖµÎó²î
     if T < 2:
         T = 2
     M = math.sqrt((T + math.sqrt(T * T - 4)) / 2) - 1
@@ -33,7 +33,7 @@ def mismatch( Twiss1, Twiss2):
 
 class MatchTwiss():
     """
-    twisså‚æ•°åŒ¹é…(linacopt)
+    twiss²ÎÊıÆ¥Åä(linacopt)
     """
     def __init__(self, project_path):
         self.project_path = project_path
@@ -44,20 +44,20 @@ class MatchTwiss():
 
 
     def matchfile(self, filename):
-        # ç”¨äºå¤„ç†æ–‡ä»¶å¹¶åˆ›å»ºç”¨äºå¾ªç¯çš„lattice
+        # ÓÃÓÚ´¦ÀíÎÄ¼ş²¢´´½¨ÓÃÓÚÑ­»·µÄlattice
         lattice_file_name = f"InputFile\match_no_command.txt"
         lattice_file_name = os.path.join(self.project_path, lattice_file_name)
         fo_in = open(filename, "r")
         fname_out = open(lattice_file_name, "w+")
         fo_out = open(lattice_file_name, "w+")
-        com_number = 1  # ç¬¬å‡ ä¸ªå…ƒä»¶ï¼Œä»1å¼€å§‹
-        match_number = 0  # ç¬¬å‡ æ¡è®°å½•ï¼Œä»0å¼€å§‹
-        changeline = []  # ç»å…¸çš„change line ä¸ æ˜¯å¦å­˜åœ¨å…³è”å‚æ•°æ— å…³
-        constraint_eq = []  # ç­‰å¼çº¦æŸçš„å‡½æ•°é˜Ÿåˆ—
-        constraint_ueq = []  # ä¸ç­‰çº¦æŸçš„å‡½æ•°é˜Ÿåˆ—
-        name_line = []  # å‚æ•°åé˜Ÿåˆ—
-        tatch_line = []  # å…³è”å‚æ•°ç›¸å…³ ç¬¬å‡ ä¸ªå…ƒä»¶ ç¬¬å‡ ä¸ªå‚æ•°  ç¬¬ä¸‰ä¸ªæ•°ä¸º0
-        tatch_list = []  # ç”¨äºä¿å­˜ å…³è”åˆ°ç¬¬å‡ ä¸ªå‚æ•°ï¼ˆcom_numberï¼‰,å…³è”æ–¹å¼ k*para+b
+        com_number = 1  # µÚ¼¸¸öÔª¼ş£¬´Ó1¿ªÊ¼
+        match_number = 0  # µÚ¼¸Ìõ¼ÇÂ¼£¬´Ó0¿ªÊ¼
+        changeline = []  # ¾­µäµÄchange line Óë ÊÇ·ñ´æÔÚ¹ØÁª²ÎÊıÎŞ¹Ø
+        constraint_eq = []  # µÈÊ½Ô¼ÊøµÄº¯Êı¶ÓÁĞ
+        constraint_ueq = []  # ²»µÈÔ¼ÊøµÄº¯Êı¶ÓÁĞ
+        name_line = []  # ²ÎÊıÃû¶ÓÁĞ
+        tatch_line = []  # ¹ØÁª²ÎÊıÏà¹Ø µÚ¼¸¸öÔª¼ş µÚ¼¸¸ö²ÎÊı  µÚÈı¸öÊıÎª0
+        tatch_list = []  # ÓÃÓÚ±£´æ ¹ØÁªµ½µÚ¼¸¸ö²ÎÊı£¨com_number£©,¹ØÁª·½Ê½ k*para+b
         lb = []
         ub = []
         goal_twiss = []
@@ -67,8 +67,8 @@ class MatchTwiss():
             if linelist[0] == 'MATCHING':
                 match_number += 1
                 changeline.append(com_number)
-                changeline.append(int(linelist[2]))  # ç¬¬å‡ ä¸ªå‚æ•°éœ€è¦æ”¹å˜
-                changeline.append(0)  # å ä½ç¬¦
+                changeline.append(int(linelist[2]))  # µÚ¼¸¸ö²ÎÊıĞèÒª¸Ä±ä
+                changeline.append(0)  # Õ¼Î»·û
                 lb.append(float(linelist[3]))
                 ub.append(float(linelist[4]))
                 if len(linelist) == 6:
@@ -81,20 +81,20 @@ class MatchTwiss():
                 goal_twiss.append(float(linelist[4]))
                 goal_twiss.append(float(linelist[5]))
             elif linelist[0] == 'MATCH_LINK':
-                # ç»„ç¼–å·æµç•™å‡ºæ¥
+                # ×é±àºÅÁ÷Áô³öÀ´
 
-                idx = name_line.index(linelist[2])  # l1 æˆ–g1
-                # ä¸ºäº†ä¿æŒå½¢å¼çš„ä¸€è‡´æ€§ï¼Œä»è€Œæ¥èµ·æ¥
+                idx = name_line.index(linelist[2])  # l1 »òg1
+                # ÎªÁË±£³ÖĞÎÊ½µÄÒ»ÖÂĞÔ£¬´Ó¶ø½ÓÆğÀ´
                 tatch_line.append(com_number)
-                tatch_line.append(int(linelist[3]))  # ç¬¬å‡ ä¸ªå‚æ•°éœ€è¦æ”¹å˜
-                tatch_line.append(0)  # ä¸ä¹‹å…³è”çš„å‚æ•°æ˜¯å“ªä¸ªä¸€ä¸ª
+                tatch_line.append(int(linelist[3]))  # µÚ¼¸¸ö²ÎÊıĞèÒª¸Ä±ä
+                tatch_line.append(0)  # ÓëÖ®¹ØÁªµÄ²ÎÊıÊÇÄÄ¸öÒ»¸ö
                 tatch_list.append(idx)
                 tatch_list.append(int(linelist[4]))
                 tatch_list.append(int(linelist[5]))
             elif linelist[0] == 'MATCH_CONSTRAINTS':
-                # ç”¨äºæå–çº¦æŸæ¡ä»¶
-                Number = len(linelist)  # æœ‰å¤šå°‘ä¸ªæ•°
-                # çº¦æŸæœ¬èº«æ˜¯ä¸€ä¸ªå‡½æ•°é˜Ÿåˆ—
+                # ÓÃÓÚÌáÈ¡Ô¼ÊøÌõ¼ş
+                Number = len(linelist)  # ÓĞ¶àÉÙ¸öÊı
+                # Ô¼Êø±¾ÉíÊÇÒ»¸öº¯Êı¶ÓÁĞ
                 cond = 'lambda x:'
                 for i in range(int((Number - 4) / 2)):
                     idx = name_line.index(linelist[2 * i + 4])
@@ -116,7 +116,7 @@ class MatchTwiss():
         return changeline, tatch_line, tatch_list, lb, ub, goal_twiss, constraint_eq, constraint_ueq, fo_out_list
 
     def get_goal(self, changeline, tatch_line, tatch_list, goalTwiss):
-        # ç”¨äºå¾—åˆ°ç›®æ ‡ä¼˜åŒ–å‡½æ•°
+        # ÓÃÓÚµÃµ½Ä¿±êÓÅ»¯º¯Êı
         def goal(x):
             for i in range(int(len(changeline) / 3)):
                 changeline[3 * i + 2] = x[i]
@@ -182,7 +182,7 @@ class MatchTwiss():
                         f.write(str(j))
                         f.write(' ')
                     f.write('\n')
-        print("æœ€ä¼˜latticeä¸ºï¼š")
+        print("×îÓÅlatticeÎª£º")
         with open(goal_file_name, 'r') as f:
             out = f.read()
             print(out)
@@ -245,7 +245,7 @@ class MatchTwiss():
 
         if use_lattice_initial_value == 1:
             changeline_list = [changeline[i:i + 3] for i in range(0, len(changeline), 3)]
-            # è¾“å‡ºåˆ†ç»„åçš„ç»“æœ
+            # Êä³ö·Ö×éºóµÄ½á¹û
 
             lattice_initial_value = []
             for i in range(len(changeline_list)):
@@ -260,13 +260,13 @@ class MatchTwiss():
         if use_lattice_initial_value == 0:
             result = gradient_descent_minimize(goal, m_lb, m_ub, constraints, options)
 
-        # è¾“å‡ºæœ€å°funcå€¼çš„result
+        # Êä³ö×îĞ¡funcÖµµÄresult
         self.goal_lattice(changeline, tatch_line, tatch_list, result.x)
 
         if result.fun < 0.05:
-            print("å·²å®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:", result.fun)
+            print("ÒÑÍê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:", result.fun)
         else:
-            print("æœªå®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:", result.fun)
+            print("Î´Íê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:", result.fun)
             # print(pso.gbest_y)
 
         self.re_run_one()
@@ -280,9 +280,9 @@ class MatchTwiss():
         # best_x, best_y = pso.gbest_x, pso.gbest_y
         #
         # if best_y < 0.5:
-        #     print("å·²å®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:")
+        #     print("ÒÑÍê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:")
         # else:
-        #     print("æœªå®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:")
+        #     print("Î´Íê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:")
         #
         # print(best_y)
         # self.goal_lattice(changeline, tatch_line, tatch_list, best_x)
@@ -295,9 +295,9 @@ class MatchTwiss():
         # best_x, best_y = ga.run()
         #
         # if best_y < 0.5:
-        #     print("å·²å®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:")
+        #     print("ÒÑÍê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:")
         # else:
-        #     print("æœªå®ŒæˆåŒ¹é…,ç›®æ ‡ä½ç½®ä¸ç›®æ ‡Twissçš„å¤±é…åº¦ä¸º:")
+        #     print("Î´Íê³ÉÆ¥Åä,Ä¿±êÎ»ÖÃÓëÄ¿±êTwissµÄÊ§Åä¶ÈÎª:")
         #     # print(pso.gbest_y)
         # print(best_y)
         # # goal_lattice(changeline,pso.gbest_x)
@@ -321,19 +321,19 @@ if __name__ == '__main__':
     #
     # max_value = max(my_list)
     #
-    # # æ±‚æœ€å°å€¼
+    # # Çó×îĞ¡Öµ
     # min_value = min(my_list)
     #
-    # # æ±‚å¹³å‡å€¼
+    # # ÇóÆ½¾ùÖµ
     # average_value = sum(my_list) / len(my_list)
     #
     # variance = sum((x - average_value) ** 2 for x in my_list) / (len(my_list) - 1)
     #
-    # # æ‰“å°ç»“æœ
-    # print("æœ€å¤§å€¼:", max_value)
-    # print("æœ€å°å€¼:", min_value)
-    # print("å¹³å‡å€¼:", average_value)
-    # # æ‰“å°ç»“æœ
-    # print("æ–¹å·®:", variance)
+    # # ´òÓ¡½á¹û
+    # print("×î´óÖµ:", max_value)
+    # print("×îĞ¡Öµ:", min_value)
+    # print("Æ½¾ùÖµ:", average_value)
+    # # ´òÓ¡½á¹û
+    # print("·½²î:", variance)
 
 

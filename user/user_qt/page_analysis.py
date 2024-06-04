@@ -227,7 +227,7 @@ class EnvelopeDialog(QDialog):
         menu_items = {
             "rms_x": cmenu.addAction("rms_x"),
             "rms_y": cmenu.addAction("rms_y"),
-            "rms_z": cmenu.addAction("rms_z"),
+            "phi": cmenu.addAction("phi"),
             "rms_xy": cmenu.addAction("rms_xy"),
             "max_x": cmenu.addAction("max_x"),
             "max_y": cmenu.addAction("max_y"),
@@ -681,7 +681,9 @@ class PageAnalysis(QWidget):
     @treat_err
     def convert_plt_to_dst(self):
         beamset_path = os.path.join(self.project_path, "OutputFile", "BeamSet.plt")
+        print(beamset_path)
         obj = Plttozcode(beamset_path)
+        print(685, int(self.step_of_plt_line.text()))
         obj.write_to_dst(int(self.step_of_plt_line.text()))
 
     @treat_err
@@ -829,7 +831,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test2')
+    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test_chu')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

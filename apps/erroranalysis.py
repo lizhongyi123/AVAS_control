@@ -291,12 +291,6 @@ class ErrorAnalysis():
         # for i in res_treat:
         #     print(i)
 
-
-
-
-
-
-
     def generate_error(self, input, group):
         """
         根据每一个error命令产生对应的error

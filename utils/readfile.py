@@ -111,6 +111,6 @@ def read_dst(input):
 if __name__ == "__main__":
     # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
     # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
-    path = r"C:\Users\anxin\Desktop\example3\InputFile\part_rfq.dst"
+    path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
     res = read_dst(path)
     print(res['phase'][0])

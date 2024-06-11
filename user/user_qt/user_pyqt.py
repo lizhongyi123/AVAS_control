@@ -27,6 +27,7 @@ import multiprocessing
 from api import basic_env
 from user.user_qt.user_defined import treat_err
 
+from user.user_qt.page_acc import PageAccept
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -111,6 +112,8 @@ class MainWindow(QMainWindow):
         self.page_error = PageError(self.project_path)
         self.page_longdistance = PageLongdistance(self.project_path)
         self.page_output = PageOutput(self.project_path)
+        self.page_accept = PageAccept(self.project_path)
+
 
 
         page_beam_action = QAction("beam", self)
@@ -124,6 +127,7 @@ class MainWindow(QMainWindow):
         page_data_action = QAction('data', self)
         page_error_action = QAction('error', self)
         page_output_action = QAction('output', self)
+        page_accept_action = QAction('accept', self)
 
         # page_longdistance_action = QAction('long distance', self)
 
@@ -139,6 +143,8 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.page_data)
         self.stacked_widget.addWidget(self.page_error)
         self.stacked_widget.addWidget(self.page_output)
+        self.stacked_widget.addWidget(self.page_accept)
+
         # self.stacked_widget.addWidget(self.page_others)
 
         # self.stacked_widget.addWidget(self.page_longdistance)
@@ -157,6 +163,7 @@ class MainWindow(QMainWindow):
         page_error_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_error))
         # page_others_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_others))
         page_output_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_output))
+        page_accept_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_accept))
 
         # page_longdistance_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_longdistance))
 
@@ -170,6 +177,8 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_output_action)
         toolbar.addAction(page_data_action)
         toolbar.addAction(page_analysis_action)
+        toolbar.addAction(page_accept_action)
+
         # toolbar.addAction(page_others_action)
 
         # toolbar.addAction(page_longdistance_action)
@@ -279,6 +288,8 @@ class MainWindow(QMainWindow):
         self.page_longdistance.updatePath(self.project_path)
         self.page_others.updatePath(self.project_path)
         self.page_output.updatePath(self.project_path)
+        self.page_accept.updatePath(self.project_path)
+
 
     @treat_err
     def page_fill_parameter(self):

@@ -240,7 +240,7 @@ class PercentEmit():
 
 
 if __name__ == '__main__':
-    dst_path = r"C:\Users\anxin\Desktop\trace\part_rfq.dst"
+    dst_path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
     # dst_path = r"C:\Users\anxin\Desktop\tace_test\result\part_dtl1.dst"
     # dst_path = r"D:\重要程序\lizituijinzongjie\75\butongliuqiang\OutputFile\outData_100000.000000.dst"
     v = PercentEmit(dst_path)

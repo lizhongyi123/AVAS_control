@@ -280,22 +280,24 @@ class PlotDataSet(PicturePlot_2D):
 
         aperture_up = [i for i in aperture]
         aperture_up += [aperture_up[-1]]
+        print(aperture_up)
 
         aperture_down = [-i for i in aperture]
         aperture_down += [aperture_down[-1]]
 
         aper_x = lattice_res.v_start + [lattice_res.v_start[-1] + lattice_res.v_len[-1]]
-
+        print(aper_x)
 
 
         self.x = [self.x]*len(self.y) + [aper_x] * 2
 
-        self.y = self.y +  [aperture_up] + [aperture_down]
+        self.y = self.y + [aperture_up] + [aperture_down]
 
         self.labels = self.labels + [None, None]
         self.colors += ["black", "black"]
 
         self.patch_list = patch_list
+        self.ylim = []
 
         if aper == 0:
             self.x = self.x[:-2]
@@ -305,8 +307,8 @@ class PlotDataSet(PicturePlot_2D):
             self.colors = self.colors[:-2]
 
 if __name__ == "__main__":
-    a = PlotDataSet(r'C:\Users\anxin\Desktop\comparison\avas_test',  'rms_x')
+    a = PlotDataSet(r'C:\Users\anxin\Desktop\cafe\AVAS',  'rms_x')
     a.get_x_y()
-    a.need_element(aper=0)
+    a.need_element(aper=1)
     a.run(show_=1)
 

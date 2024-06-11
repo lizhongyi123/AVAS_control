@@ -114,13 +114,13 @@ class EA():
         self.decimal = 5  # 小数点保留多少位
 
         self.result_queue = multiprocessing.Queue()
-        if os.path.exists(self.error_middle_path):
-            delete_directory(self.error_middle_path)
-        os.makedirs(self.error_middle_path)
+        # if os.path.exists(self.error_middle_path):
+        #     delete_directory(self.error_middle_path)
+        # os.makedirs(self.error_middle_path)
 
-        if os.path.exists(self.error_output_path):
-            delete_directory(self.error_output_path)
-        os.makedirs(self.error_output_path)
+        # if os.path.exists(self.error_output_path):
+        #     delete_directory(self.error_output_path)
+        # os.makedirs(self.error_output_path)
 
     def generate_basic_lattice(self):
         lines = read_txt(self.lattice_mulp_path, out='list')
@@ -212,6 +212,7 @@ class EA():
         """
         print(err)
         lattice = copy.deepcopy(lattice)
+
         for i in lattice:
             for j in err:
                 if i[0] == "err_beam_dyn":
@@ -565,12 +566,12 @@ class EA():
 
         #产生最大误差的命令
         com_lis = self.generate_max_element_err(quad_num, cav_num)
-
-        self.run_normal()
-        self.write_ea_err_par_every_time(-1)
-        for i in range(0, len(com_lis)):
+        # self.run_normal()
+        # self.write_ea_err_par_every_time(-1)
+        for i in range(23, len(com_lis)):
 
             new_lattice = self.set_err(lattice, [com_lis[i]])
+
             self.simulate(new_lattice, i)
             self.write_ea_err_datas(i)
             try:
@@ -591,6 +592,8 @@ class EA():
         # self.get_normal_data()
 
         # self.write_ea_err_par_every_time(1)
+
+
 if __name__ == "__main__":
     obj = EA(r"C:\Users\anxin\Desktop\test_mulp")
     # obj.test()

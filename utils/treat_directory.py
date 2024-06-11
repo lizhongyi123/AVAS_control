@@ -1,6 +1,6 @@
 ﻿import os
 import shutil
-
+from send2trash import send2trash
 def list_files_in_directory(directory):
     """
     查找一个文件夹下面的所有文件
@@ -45,7 +45,8 @@ def delete_directory(path):
     :param path:
     :return:
     """
-    shutil.rmtree(path)
+    send2trash(path)
+    # shutil.rmtree(path)
 if __name__ == "__main__":
 
     path = r"C:\Users\anxin\Desktop\test_mulp\OutputFile\error_output"

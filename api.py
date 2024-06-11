@@ -11,7 +11,8 @@ from apps.changeNp import ChangeNp
 from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
 from apps.matchtwiss import MatchTwiss
 from apps.circlematch import CircleMatch
-from apps.erroranalysis import ErrorAnalysis
+
+from apps.calacceptance import Acceptance
 import os
 from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
@@ -118,7 +119,7 @@ def err_stat_dyn(project_path):
     """
     v = Errorstatdyn(project_path)
     v.run_stat_dyn()
-    return res
+    return None
 
 def basic_env(project_path, lattice):
     """
@@ -135,8 +136,12 @@ def basic_env(project_path, lattice):
 def longdistance( project_path, kind):
     obj = LongAccelerator(project_path, kind)
     obj.run()
-    return res
+    return None
 
+def cal_acceptance(project_path, kind):
+    obj = Acceptance(project_path)
+    emit, norm_emit, x_min, xx_min = obj.cal_accptance(kind)
+    return emit, norm_emit, x_min, xx_min
 
 # #扫描
 # def AVAS_scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place):

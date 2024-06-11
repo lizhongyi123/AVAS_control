@@ -63,18 +63,17 @@ class AVAS():
         #     raise Exception('error')
 
         return res
-def worker(project_path):
-    obj = AVAS(project_path, )
-    obj.run()
 
 if __name__ == "__main__":
 
-    project_path = r'C:\Users\anxin\Desktop\test_mulp'
-    for i in range(3):
-        # process = multiprocessing.Process(target=worker,
-        #                                   args=( project_path, ))
-        #
-        # process.start()  # 启动子进程
-        # process.join()  # 等待子进程运行结束
-        worker(project_path)
-        print(i)
+    project_path = r"C:\Users\anxin\Desktop\test_acct"
+    obj = AVAS(project_path)
+    obj.run()
+    # for i in range(3):
+    #     # process = multiprocessing.Process(target=worker,
+    #     #                                   args=( project_path, ))
+    #     #
+    #     # process.start()  # 启动子进程
+    #     # process.join()  # 等待子进程运行结束
+    #     worker(project_path)
+    #     print(i)

@@ -213,54 +213,16 @@ class BeamsetParameter():
 
 if __name__ == "__main__":
     import os
-    project_path = r"C:\Users\anxin\Desktop\test_chu"
+    # project_path = r"C:\Users\anxin\Desktop\test_chu"
+    project_path = r"C:\Users\anxin\Desktop\test_acct"
+
     beamset_pasth = os.path.join(project_path, "OutputFile", "BeamSet.plt")
     obj = BeamsetParameter(beamset_pasth)
     res = obj.get_step()
-    obj.get_one_parameter(-2)
     print(res)
-    #     obj.get_one_parameter(i)
-    #     print(len(obj.one_step_list))
-    #     print(obj.one_step_list[0])
-
-# if i == selectNumber:
-#     try:
-#         tdata = struct.unpack("<c", f.read(1))
-#         char1 = str(tdata[0])
-#     except struct.error:
-#         print("selectNumber设置超过最大值".format(aa=i - 1))
-#         exit(0)
-#     else:
-#         print("已读取束团分布，参数如下所示：".format(aa=i))
-#         tdata = struct.unpack("<i", f.read(4))
-#         type = int(tdata[0])
-#         if (type == 0):
-#             print("束团分布为T-code模式")
-#         else:
-#             print("束团分布为Z-code模式")
-#         tdata = struct.unpack("<i", f.read(4))
-#         Index = float(tdata[0])
-#         print("输出为第{aa}次模拟循环中的束团分布".format(aa=Index))
-#
-#         tdata = struct.unpack("<d", f.read(8))
-#         time = float(tdata[0])
-#         print("输出束团所处的时间点：{aa}s".format(aa=time))
-#         tdata = struct.unpack("<d", f.read(8))
-#         Zgen = float(tdata[0])
-#         print("输出束团所处的纵向位置为：{aa}m".format(aa=Zgen))
-#
-#         for j in range(numofp):
-#             tdata = f.read(28)
-#             tdata = struct.unpack("<fffffff", tdata)
-#             xdata[j, 0] = tdata[0]
-#             xdata[j, 1] = tdata[1]
-#             xdata[j, 2] = tdata[2]
-#             xdata[j, 3] = tdata[3]
-#             xdata[j, 4] = tdata[4]
-#             xdata[j, 5] = tdata[5]
-#             xdata[j, 6] = tdata[6]
-#         # print(xdata[j, 6])
-#         break
+    obj.get_one_parameter(-1)
+    for i in obj.one_step_list:
+        i.append(10)
 
 
 

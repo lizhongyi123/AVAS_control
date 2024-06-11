@@ -387,8 +387,8 @@ class PageBeam(QWidget):
 
 
         vertical_layout2.addLayout(hbox_distribution)
-        vertical_layout2.addLayout(hbox_displacePos)
-        vertical_layout2.addLayout(hbox_displaceDpos)
+        # vertical_layout2.addLayout(hbox_displacePos)
+        # vertical_layout2.addLayout(hbox_displaceDpos)
         vertical_layout2.addStretch(1)
 
 
@@ -413,6 +413,7 @@ class PageBeam(QWidget):
     def updatePath(self, new_path):
         self.project_path = new_path
 
+        self.clean_prarameter()
 
     # @treat_err
     def refreshUI(self):
@@ -441,41 +442,9 @@ class PageBeam(QWidget):
 
         if beam_res.get("readparticledistribution") is not None:
             self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
-            # dst_path = os.path.join(self.project_path, "InputFile", self.text_particle_input_file.text())
-            #
-            # if os.path.exists(dst_path):
-            #     pass
-            # else:
-            #     QMessageBox.warning(None, 'Error', f'{self.text_particle_input_file.text()} does not exist')
-            #
-            # dst_res = read_dst(dst_path)
-            #
-            # #print(dst_res)
+
             self.text_charge.setText(beam_res.get('numofcharge'))
-            # self.text_mass.setText(str(dst_res.get('basemassinmev')))
-            # self.text_current.setText(str(dst_res.get('ib')))
-            # self.text_particel_number.setText(str(dst_res.get('number')))
-            # self.text_frequency.setText(str(dst_res.get('freq')))
-            #
-            # obj = CalTwiss(dst_path)
-            # obj.get_data()
-            # energy = round(obj.energy, self.decimals)
-            # self.text_energy.setText(str(energy))
-            #
-            # twiss = CalTwiss(dst_path).get_emit_xyz()
-            #
-            # self.alpha_xx_text.setText(str(round(twiss[0][0], self.decimals)))
-            # self.beta_xx_text.setText(str(round(twiss[0][1], self.decimals)))
-            #
-            # self.alpha_yy_text.setText(str(round(twiss[1][0], self.decimals)))
-            # self.beta_yy_text.setText(str(round(twiss[1][1], self.decimals)))
-            #
-            # self.alpha_zz_text.setText(str(round(twiss[2][0], self.decimals)))
-            # self.beta_zz_text.setText(str(round(twiss[2][1], self.decimals)))
-            #
-            # self.varepsilon_xx_text.setText(str(round(twiss[0][2], self.decimals)))
-            # self.varepsilon_yy_text.setText(str(round(twiss[1][2],self.decimals)))
-            # self.varepsilon_zz_text.setText(str(round(twiss[2][2], self.decimals)))
+
 
 
 
@@ -647,6 +616,19 @@ class PageBeam(QWidget):
                 # 将每个子列表的字符串写入文件
                 file.write(line + '\n')
 
+    def clean_prarameter(self):
+        text_group = [
+        self.text_mass, self.text_current, self.text_current, self.text_particel_number, self.text_frequency,
+        self.text_energy, self.alpha_xx_text, self.beta_xx_text, self.alpha_yy_text, self.beta_yy_text, self.alpha_zz_text, self.beta_zz_text,
+        self.varepsilon_xx_text, self.varepsilon_yy_text, self.varepsilon_zz_text, self.text_displacePos_x,
+        self.text_displacePos_y, self.text_displacePos_z, self.text_displaceDpos_x, self.text_displaceDpos_y,
+        self.text_displaceDpos_z
+        ]
+        QComboBox_group = [self.distribution_combo_trans, self.distribution_combo_longi]
+        for line_edit in text_group:
+            line_edit.clear()
+        for box in QComboBox_group:
+            box.setCurrentIndex(0)
     # @treat_err
     def onParticleInputTextChanged(self):
         text_group = [

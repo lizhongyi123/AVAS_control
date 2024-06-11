@@ -16,7 +16,7 @@ class PageInput(QWidget):
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
-        self.multithreading_num = -1
+        # self.multithreading_num = -1
 
         self.initUI()
 
@@ -149,22 +149,22 @@ class PageInput(QWidget):
         self.cb_picnic.stateChanged.connect(self.cb_sc_method_change)
 
  ##########################################################
-        group_box_multithreading = QGroupBox()
-
-        hbox_multithreading = QHBoxLayout()
-
-        multithreading_label = QLabel("MultiThreading")
-        # default_size = multithreading_label.sizeHint()
-        # print("Default Size:", default_size) #72 12
-        # self.multithreading_x_text = QLineEdit()
-
-        self.multithreading_checkbox = QCheckBox('Using Multithreading', self)
-        self.multithreading_checkbox.stateChanged.connect(self.multithreading_change)
-
-        hbox_multithreading.addWidget(multithreading_label)
-        # hbox_multithreading.addWidget(self.multithreading_x_text)
-        hbox_multithreading.addWidget(self.multithreading_checkbox)
-        group_box_multithreading.setLayout(hbox_multithreading)
+        # # group_box_multithreading = QGroupBox()
+        #
+        # hbox_multithreading = QHBoxLayout()
+        #
+        # multithreading_label = QLabel("MultiThreading")
+        # # default_size = multithreading_label.sizeHint()
+        # # print("Default Size:", default_size) #72 12
+        # # self.multithreading_x_text = QLineEdit()
+        #
+        # self.multithreading_checkbox = QCheckBox('Using Multithreading', self)
+        # self.multithreading_checkbox.stateChanged.connect(self.multithreading_change)
+        #
+        # hbox_multithreading.addWidget(multithreading_label)
+        # # hbox_multithreading.addWidget(self.multithreading_x_text)
+        # hbox_multithreading.addWidget(self.multithreading_checkbox)
+        # group_box_multithreading.setLayout(hbox_multithreading)
         ##########################################################
         group_box_scan_phase = QGroupBox()
 
@@ -259,7 +259,7 @@ class PageInput(QWidget):
         vertical_layout_main.addWidget(group_box_mulp_env)
         vertical_layout_main.addWidget(group_box_sc_method)
 
-        vertical_layout_main.addWidget(group_box_multithreading)
+        # vertical_layout_main.addWidget(group_box_multithreading)
         vertical_layout_main.addWidget(group_box_scan_phase)
         vertical_layout_main.addWidget(group_box_step_per_period)
         vertical_layout_main.addWidget(group_box_dumpPeriodicity)
@@ -333,13 +333,13 @@ class PageInput(QWidget):
                     self.picnic_meshrms_z_text.setText(input_res.get('meshrms')[2])
 
 
-            self.multithreading_num = int(input_res.get('multithreading', 0))
+            # self.multithreading_num = int(input_res.get('multithreading', 0))
 
-            if self.multithreading_num == 0:
-                self.multithreading_checkbox.setChecked(False)
-
-            elif self.multithreading_num == 1:
-                self.multithreading_checkbox.setChecked(True)
+            # if self.multithreading_num == 0:
+            #     self.multithreading_checkbox.setChecked(False)
+            #
+            # elif self.multithreading_num == 1:
+            #     self.multithreading_checkbox.setChecked(True)
 
             self.scan_phase_num = int(input_res.get('scanphase', 1))
             self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
@@ -393,10 +393,10 @@ class PageInput(QWidget):
                 res.append(['MeshRms', self.picnic_meshrms_x_text.text(), self.picnic_meshrms_y_text.text(),
                             self.picnic_meshrms_z_text.text()])
 
-            if self.multithreading_checkbox.isChecked():
-                res.append(['MultiThreading', '1'])
-            elif not self.multithreading_checkbox.isChecked():
-                res.append(['MultiThreading', '0'])
+            # if self.multithreading_checkbox.isChecked():
+            #     res.append(['MultiThreading', '1'])
+            # elif not self.multithreading_checkbox.isChecked():
+            #     res.append(['MultiThreading', '0'])
 
 
             res.append(['ScanPhase', str(self.scan_phase_combo.currentIndex())])
@@ -443,11 +443,11 @@ class PageInput(QWidget):
                 # 将每个子列表的字符串写入文件
                 file.write(line + '\n')
 
-    def multithreading_change(self, state):
-        if state == Qt.Checked:
-            self.multithreading_num = 1
-        else:
-            self.multithreading_num = 0
+    # def multithreading_change(self, state):
+    #     if state == Qt.Checked:
+    #         self.multithreading_num = 1
+    #     else:
+    #         self.multithreading_num = 0
 
     def sc_use_change(self, state):
         if state == Qt.Checked:
@@ -479,12 +479,14 @@ class PageInput(QWidget):
             return True
 
     def mulp_env_behavior(self):
-        mulp_box = [self.cb_fft, self.cb_picnic, self.multithreading_checkbox]
+        # mulp_box = [self.cb_fft, self.cb_picnic, self.multithreading_checkbox]
+        mulp_box = [self.cb_fft, self.cb_picnic]
+
         mulp_line = [self.fft_numofgrid_x_text, self.fft_numofgrid_y_text, self.fft_numofgrid_z_text,
                      self.fft_meshrms_x_text, self.fft_meshrms_y_text, self.fft_meshrms_z_text,
                      self.picnic_numofgrid_x_text, self.picnic_numofgrid_y_text, self.picnic_numofgrid_z_text,
                      self.picnic_meshrms_x_text, self.picnic_meshrms_y_text, self.picnic_meshrms_z_text,
-                     self.step_per_period_text
+                     self.step_per_period_text, self.dumpPeriodicity_text
                      ]
 
         env_line = [self.sc_step_text]

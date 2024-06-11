@@ -518,8 +518,6 @@ class Error():
         dataset_obj = DatasetParameter(dataset_path, self.project_path)
         dataset_obj.get_parameter()
 
-        if time == -1:
-            self.normal_ek = dataset_obj.ek[-1]
 
         errors_par_tot_list = [
         f"{group}_{time}",

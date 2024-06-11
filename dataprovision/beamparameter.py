@@ -92,43 +92,7 @@ class DstParameter():
 
         self.rms_y = np.sqrt( np.sum([(i-self.center_y)**2 for i in self.y_list ]) / self.number)
 
-# def get_entrance_beam_parameter(project_path):
-#     project_path = project_path
-#
-#     beam_path = project_path + r'\InputFile' + r'\beam.txt'
-#     lattice_path = project_path + r'\InputFile' + r'\lattice.txt'
-#     input_path = project_path + r'\InputFile' + r'\input.txt'
-#
-#     charge = 0
-#
-#     res = read_txt(beam_path)
-#     charge = float(res.get('numOfCharge'))
-#
-#     if res.get('readparticledistribution') is None:
-#         BaseMassInMeV = float(res.get('particlerestmass'))
-#         freq = float(res.get('frequency'))
-#         beam_parameter = {
-#             'charge': charge,
-#             'freq': freq,
-#             'basemassinmev': BaseMassInMeV,
-#         }
-#     else:
-#         dst_path = project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
-#         dst_obj = DstParameter(dst_path)
-#         dst_obj.get_parameter()
-#
-#         beam_parameter = {
-#                 'charge': charge,
-#                 'number': dst_obj.number,
-#                 'freq': dst_obj.freq,
-#                 'ib': dst_obj.Ib,
-#                 'basemassinmev': dst_obj.BaseMassInMeV,
-#                 'gamma': dst_obj.gamma,
-#                 'beta': dst_obj.beta,
-#                 'energy': dst_obj.energy
-#
-#         }
-#     return beam_parameter
+
 
 
 

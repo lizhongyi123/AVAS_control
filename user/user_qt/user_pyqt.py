@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         runMenu.addAction(run_act)
 
         runMenu.addAction(run_stop_act)
+        runMenu.addAction(run_stop_act)
 
 ########################
         toolbar = QToolBar("工具栏标题")
@@ -360,7 +361,7 @@ class MainWindow(QMainWindow):
 
             self.func_basic_mulp()
 
-            self.activate_output("basic_mulp")
+            # self.activate_output("basic_mulp")
             self.page_data.fill_parameter()
 
         elif self.basic_signal == 'basic_env':

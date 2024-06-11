@@ -57,32 +57,45 @@ class PageAccept(QWidget):
         layout_01 = QHBoxLayout()
         self.emit_label = QLabel("Emittance")
         self.emit_line = QLineEdit()
+        self.emit_unit = QLabel("\u03C0.mm.mrad")
+
 
         self.emit_norm_label = QLabel("Norm Emittance")
         self.emit_norm_line = QLineEdit()
+        self.emit_norm_unit = QLabel("\u03C0.mm.mrad")
 
         layout_01.addWidget(self.emit_label)
         layout_01.addWidget(self.emit_line)
+        layout_01.addWidget(self.emit_unit)
         layout_01.addWidget(self.emit_norm_label)
         layout_01.addWidget(self.emit_norm_line)
-
+        layout_01.addWidget(self.emit_norm_unit)
 
         layout_02 = QHBoxLayout()
         self.x_label = QLabel("Min_x")
         self.x_line = QLineEdit()
+        self.x_unit = QLabel("mm")
 
         self.y_label = QLabel("Min_y")
         self.y_line = QLineEdit()
+        self.y_unit = QLabel("mrad")
 
         layout_02.addWidget(self.x_label)
         layout_02.addWidget(self.x_line)
+        layout_02.addWidget(self.x_unit)
+
         layout_02.addWidget(self.y_label)
         layout_02.addWidget(self.y_line)
+        layout_02.addWidget(self.y_unit)
 
         label_list = [self.emit_label, self.emit_norm_label, self.x_label, self.y_label]
         for i in label_list:
             i.setMinimumWidth(84)
-        
+
+        qline_list = [self.emit_line, self.emit_norm_line, self.x_line, self.y_line]
+        for i in qline_list:
+            i.setFixedWidth(84)
+
         layout_0.addLayout(layout_01)
         layout_0.addLayout(layout_02)
         gb_0.setLayout(layout_0)

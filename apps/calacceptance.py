@@ -87,7 +87,7 @@ class Acceptance():
 
                     zz = (v_z - average_z)/v_z * 1000
 
-                    phi = t * 2 * Pi * self.freq /Pi * 180
+                    phi = t * 2 * Pi * self.freq /Pi * 180  #度
                     E = (gamma - 1) * self.BaseMassInMeV  #MeV
 
 
@@ -145,7 +145,7 @@ class Acceptance():
         in_dis = pd.DataFrame(in_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
         out_dis = pd.DataFrame(out_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
 
-        #
+        # #
         # v=  out_dis[out_dis['loss'] == 0]
         # r, c  = v.shape
         # print(r)
@@ -194,7 +194,7 @@ class Acceptance():
             #y方向
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["y"], in_dis["yy"], btgm)
 
-
+            print(emit_norm, t_alpha, t_beta, t_gamma )
 
             loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["y"] ** 2 +
                              2 * t_alpha * loss_particles["y"] * loss_particles["yy"] +
@@ -209,7 +209,9 @@ class Acceptance():
             yy_min = loss_particles.loc[min_loss_index, 'yy']
 
             norm_emit = loss_min_emit * btgm
+            print(loss_min_emit, norm_emit, y_min, yy_min)
             return loss_min_emit, norm_emit, y_min, yy_min
+
         elif kind == 2:
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["z"], in_dis["zz"], btgm)
 
@@ -248,6 +250,6 @@ class Acceptance():
         return emit_norm, alpha, beta, gamma
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_chu"
+    project_path = r"C:\Users\wangh\Desktop\avas_1"
     obj = Acceptance(project_path)
-    obj.cal_accptance(2)
+    obj.cal_accptance(1)

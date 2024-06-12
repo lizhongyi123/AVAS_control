@@ -10,7 +10,7 @@ from dataprovision.latticeparameter import LatticeParameter
 import matplotlib.pyplot as plt
 
 
-class Acceptance():
+class PlotAcc():
     def __init__(self, project_path = None):
         self.project_path = project_path
         self.plt_path = os.path.join(project_path, "OutputFile", "BeamSet.plt")
@@ -149,7 +149,7 @@ class Acceptance():
         return all_part
 
 
-    def cal_accptance(self, kind):
+    def plot_accptance(self, kind):
 
         in_dis = self.get_para(0)
         out_dis = self.get_para(-1)
@@ -201,14 +201,12 @@ class Acceptance():
             xx_min = loss_particles.loc[min_loss_index, 'xx']
 
             norm_emit = loss_min_emit * btgm
-            print(loss_min_emit, norm_emit, x_min, xx_min)
-            return loss_min_emit, norm_emit, x_min, xx_min
+
 
         elif kind == 1:
             #y方向
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["y"], in_dis["yy"], btgm)
 
-            print(emit_norm, t_alpha, t_beta, t_gamma )
 
             loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["y"] ** 2 +
                              2 * t_alpha * loss_particles["y"] * loss_particles["yy"] +
@@ -223,8 +221,7 @@ class Acceptance():
             yy_min = loss_particles.loc[min_loss_index, 'yy']
 
             norm_emit = loss_min_emit * btgm
-            print(loss_min_emit, norm_emit, y_min, yy_min)
-            return loss_min_emit, norm_emit, y_min, yy_min
+
 
         elif kind == 3:
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["phi"], in_dis["E"], btgm)
@@ -238,6 +235,8 @@ class Acceptance():
             loss_min_emit = loss_particles['ellipse'].min()
 
 
+
+
             min_loss_index = loss_particles['ellipse'].idxmin()
 
             # 找到对应的 z 和 zz
@@ -247,7 +246,6 @@ class Acceptance():
             norm_emit = loss_min_emit * btgm
 
 
-            return loss_min_emit, norm_emit, phi_min, E_min
 
         elif kind == 2:
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["z"], in_dis["zz"], btgm)
@@ -268,17 +266,25 @@ class Acceptance():
 
             norm_emit = loss_min_emit * btgm
 
-            return loss_min_emit, norm_emit, z_min, zz_min
+        self.plot(t_alpha, t_beta, t_gamma, loss_min_emit, loss_particles, kind)
+        return 0
 
-    def plot(self, alpha, beta, gamma, loss_min_emit, loss_particles):
+    def plot(self, alpha, beta, gamma, loss_min_emit, loss_particles, kind):
 
         fig, ax = plt.subplots()
-        loss_particles.plot(kind='scatter', x="y", y="yy", s=1, c='k', ax=ax)
+        if kind == 0:
+            loss_particles.plot(kind='scatter', x="x", y="xx", s=1, c='k', ax=ax)
+        if kind == 1:
+            loss_particles.plot(kind='scatter', x="y", y="yy", s=1, c='k', ax=ax)
+        if kind == 2:
+            loss_particles.plot(kind='scatter', x="z", y="zz", s=1, c='k', ax=ax)
+        if kind == 3:
+            loss_particles.plot(kind='scatter', x="phi", y="E", s=1, c='k', ax=ax)
 
         x = np.linspace(-40, 40, 40)
         xp = np.linspace(-60, 60, 40)
-        ax.set_ylim([-60, 60])
-        ax.set_xlim([-40, 40])
+        # ax.set_ylim([-60, 60])
+        # ax.set_xlim([-40, 40])
         x, xp = np.meshgrid(x, xp)
         ax.contour(x, xp, gamma * x ** 2 + 2 * alpha * x * xp + beta * xp ** 2,
                    [loss_min_emit], colors='r')

@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from utils.readfile import read_txt, read_dst
 from user.user_qt.user_defined import treat_err, treat_err2, gray240
 from api import cal_acceptance
+from api import plot_acc
 
 class PageAccept(QWidget):
     basic_signal = pyqtSignal(str)
@@ -44,9 +45,13 @@ class PageAccept(QWidget):
         self.cb_z = QCheckBox("zz'", self)
         self.cb_z.stateChanged.connect(self.cb_xyz_change)
 
+        self.cb_phie = QCheckBox("phiE", self)
+        self.cb_phie.stateChanged.connect(self.cb_xyz_change)
+
         layout_xyz.addWidget(self.cb_x)
         layout_xyz.addWidget(self.cb_y)
         layout_xyz.addWidget(self.cb_z)
+        layout_xyz.addWidget(self.cb_phie)
 
         gb_xyz.setLayout(layout_xyz)
         ##############################################
@@ -110,7 +115,13 @@ class PageAccept(QWidget):
         self.buttonm_run = QPushButton("Run")
         self.buttonm_run.setMaximumWidth(84)
         self.buttonm_run.clicked.connect(self.button_run_click)
+
+        self.buttonm_plot = QPushButton("Plot")
+        self.buttonm_plot.setMaximumWidth(84)
+        self.buttonm_plot.clicked.connect(self.button_plot_click)
+
         run_layout.addWidget(self.buttonm_run)
+        run_layout.addWidget(self.buttonm_plot)
         gb_run.setLayout(run_layout)
 
         ##############################################
@@ -131,7 +142,7 @@ class PageAccept(QWidget):
         sender_checkbox = self.sender()  # 获取发送信号的复选框对象
 
         print(sender_checkbox)
-        cb_xyz = [self.cb_x, self.cb_y, self.cb_z]
+        cb_xyz = [self.cb_x, self.cb_y, self.cb_z, self.cb_phie]
         if sender_checkbox in cb_xyz:
             if sender_checkbox.isChecked():
                 cb_xyz.remove(sender_checkbox)
@@ -157,12 +168,31 @@ class PageAccept(QWidget):
         elif self.cb_z.isChecked():
             all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 2)
 
-        if self.cb_x.isChecked() or self.cb_y.isChecked() or self.cb_z.isChecked():
+        elif self.cb_phie.isChecked():
+            all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 3)
+
+        if self.cb_x.isChecked() or self.cb_y.isChecked() or self.cb_z.isChecked() \
+            or self.cb_phie.isChecked():
             self.emit_line.setText(str(round(all_emit, self.decimals)))
             self.emit_norm_line.setText(str(round(norm_emit,self.decimals)))
 
             self.x_line.setText(str(round(x_min,self.decimals)))
             self.y_line.setText(str(round(xx_min,self.decimals)))
+
+    def button_plot_click(self):
+        if self.cb_x.isChecked():
+            res = plot_acc(self.project_path, 0)
+
+        elif self.cb_y.isChecked():
+            res = plot_acc(self.project_path, 1)
+
+        elif self.cb_z.isChecked():
+            res = plot_acc(self.project_path, 2)
+
+        elif self.cb_phie.isChecked():
+            res = plot_acc(self.project_path, 3)
+
+
     def updatePath(self, new_path):
         self.project_path = new_path
 

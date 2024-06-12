@@ -148,7 +148,7 @@ class LatticeParameter():
         self.total_length = self.v_start[-1] + self.v_len[-1]
 
 if __name__ == "__main__":
-    lattice_path = r'C:/Users/anxin/Desktop/test_zhao\InputFile\lattice_mulp.txt'
+    lattice_path = r'C:\Users\anxin\Desktop\test_acct\InputFile\lattice_mulp.txt'
     res = LatticeParameter(lattice_path)
     res.get_parameter()
     print(res.total_length)

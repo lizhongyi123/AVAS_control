@@ -314,7 +314,7 @@ class PageBeam(QWidget):
         self.distribution_combo_trans.addItem("GS")
         self.distribution_combo_trans.addItem("WB")
         self.distribution_combo_trans.addItem("PB")
-        self.distribution_combo_trans.addItem("kv")
+        self.distribution_combo_trans.addItem("KV")
 
 
         # combo_font = QFont("Arial", 12)  # 使用 Arial 字体，大小为 12
@@ -329,7 +329,7 @@ class PageBeam(QWidget):
         self.distribution_combo_longi.addItem("GS")
         self.distribution_combo_longi.addItem("WB")
         self.distribution_combo_longi.addItem("PB")
-        self.distribution_combo_longi.addItem("kv")
+        self.distribution_combo_longi.addItem("KV")
 
 
         # combo_font = QFont("Arial", 12)  # 使用 Arial 字体，大小为 12

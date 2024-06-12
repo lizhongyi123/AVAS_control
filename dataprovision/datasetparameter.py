@@ -129,14 +129,16 @@ class DatasetParameter():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_err_dyn1\OutputFile\error_output\output_1_1\DataSet.txt"
+    # project_path = r"C:\Users\anxin\Desktop\test_err_dyn1\OutputFile\error_output\output_1_1\DataSet.txt"
+    project_path = r"C:\Users\anxin\Desktop\test_acct"
     res = DatasetParameter(project_path)
     res.get_parameter()
-    print(res.emit_x[0] * 10 **6)
-    print(res.emit_x[-1] * 10 **6)
-
-    print(res.emit_y[0] * 10 **6)
-    print(res.emit_y[-1] * 10 **6)
-
-    print(res.emit_z[0] * 10 **6)
-    print(res.emit_z[-1] * 10 **6)
+    print(res.z[-1])
+    # print(res.emit_x[0] * 10 **6)
+    # print(res.emit_x[-1] * 10 **6)
+    #
+    # print(res.emit_y[0] * 10 **6)
+    # print(res.emit_y[-1] * 10 **6)
+    #
+    # print(res.emit_z[0] * 10 **6)
+    # print(res.emit_z[-1] * 10 **6)

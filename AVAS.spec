@@ -14,6 +14,7 @@ a = Analysis(
      './aftertreat/dataanalysis/plttodst.py',
 
     './aftertreat/picture/initialplot.py',
+    './aftertreat/picture/plotacc.py',
     './aftertreat/picture/plotdataset.py',
     './aftertreat/picture/plotenvbeamout.py',
     './aftertreat/picture/ploterror.py',

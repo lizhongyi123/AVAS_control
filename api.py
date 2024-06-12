@@ -11,7 +11,7 @@ from apps.changeNp import ChangeNp
 from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
 from apps.matchtwiss import MatchTwiss
 from apps.circlematch import CircleMatch
-
+from aftertreat.picture.plotacc import PlotAcc
 from apps.calacceptance import Acceptance
 import os
 from utils.readfile import read_txt
@@ -143,6 +143,10 @@ def cal_acceptance(project_path, kind):
     emit, norm_emit, x_min, xx_min = obj.cal_accptance(kind)
     return emit, norm_emit, x_min, xx_min
 
+def plot_acc(project_path, kind):
+    obj = PlotAcc(project_path)
+    res = obj.plot_accptance(kind)
+    return res
 # #扫描
 # def AVAS_scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place):
 #     AVAS_scan = Scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place)

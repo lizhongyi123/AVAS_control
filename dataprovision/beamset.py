@@ -221,8 +221,7 @@ if __name__ == "__main__":
     res = obj.get_step()
     print(res)
     obj.get_one_parameter(-1)
-    for i in obj.one_step_list:
-        i.append(10)
+
 
 
 

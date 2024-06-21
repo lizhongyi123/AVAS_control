@@ -1,6 +1,9 @@
 ﻿
 import sys
+import time
+
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
     QApplication
@@ -327,7 +330,9 @@ class MainWindow(QMainWindow):
 
             file.write("")
     @treat_err
+
     def run(self):
+
         self.stop()
         #检查有没有哪个界面
         res = self.inspect()
@@ -361,7 +366,9 @@ class MainWindow(QMainWindow):
 
             self.func_basic_mulp()
 
-            # self.activate_output("basic_mulp")
+            delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
+            QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
+
             self.page_data.fill_parameter()
 
         elif self.basic_signal == 'basic_env':
@@ -388,14 +395,6 @@ class MainWindow(QMainWindow):
 
 
     def activate_output(self, signal):
-        dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
-        if os.path.exists(dataset_path):
-            try:
-                os.remove(dataset_path)
-                print(f"文件 {dataset_path} 已成功删除")
-            except OSError as e:
-                print(f"删除文件 {dataset_path} 时出错：{e}")
-
         if signal == "basic_mulp":
             self.page_output.update_progress()
 

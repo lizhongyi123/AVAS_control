@@ -1,12 +1,12 @@
 ﻿import sys
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
-from utils.readfile import read_dst, read_txt
+from utils.readfile import read_dst, read_txt, read_dst_fast
 import math
 import numpy as np
 from global_varible import c_light
 
-
+from global_varible import Pi
 class DstParameter():
     """
     对dst文件进行解析
@@ -34,14 +34,14 @@ class DstParameter():
         self.z_speed_list = []
 
     def get_parameter(self):
-        data = read_dst(self.dst_path)
+        data = read_dst_fast(self.dst_path)
 
         self.number = data.get('number')
         self.freq = data.get('freq')
         self.BaseMassInMeV = data.get('basemassinmev')
         self.Ib = data.get('ib')
 
-        data = data.get('phase')
+        data = data.get('partran_dist')
 
         self.x_list = [i[0] * 10 for i in data]   #mm
         self.x1_list = [i[1] * 1000 for i in data]  # mrad
@@ -52,6 +52,8 @@ class DstParameter():
         self.E_list = [i[5] for i in data]
         self.z_list = []
         self.z_speed_list = []
+
+        self.phi_list_deg = [i[4] * 180 / Pi for i in data]
 
         for i in data:
             tmp_gamma = 1 + i[5] / self.BaseMassInMeV

@@ -41,7 +41,7 @@ def check_file_update(file_path):
         # 获取文件的最后修改时间
         last_modified_time = os.stat(file_path).st_mtime
         now = datetime.now().timestamp()
-        if now - last_modified_time <= 0.1:
+        if now - last_modified_time <= 1:
             #正在更新
             return 1
         else:

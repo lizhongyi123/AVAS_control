@@ -159,21 +159,6 @@ class Acceptance():
         in_dis = pd.DataFrame(in_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
         out_dis = pd.DataFrame(out_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
 
-        # v=  out_dis[out_dis['loss'] == 0]
-        # r, c  = v.shape
-        # print(r)
-
-
-        #丢失的粒子
-        loss_particles = in_dis[out_dis["loss"] == 1].copy()
-
-        loss_particles_rows, _ = loss_particles.shape
-        print(loss_particles)
-        if loss_particles_rows == 0:
-            raise Exception("All particels passed  through the lattice, avas can not calculate acceptance.")
-
-
-
         w = in_dis["E"].mean()
 
         m = self.BaseMassInMeV
@@ -182,10 +167,24 @@ class Acceptance():
         beta = (1 - 1 / gamma ** 2) ** 0.5
         btgm = gamma * beta
 
+        in_dis["E"] -= w
+
+        #丢失的粒子
+        loss_particles = in_dis[out_dis["loss"] == 1].copy()
+
+        loss_particles_rows, _ = loss_particles.shape
+
+        if loss_particles_rows == 0:
+            raise Exception("All particels passed  through the lattice, avas can not calculate acceptance.")
+
+
+
+
+
         if kind == 0:
             #x方向
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["x"], in_dis["xx"], btgm)
-
+            print(emit_norm, t_alpha, t_beta, t_gamma)
 
 
             loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["x"] ** 2 +
@@ -201,7 +200,11 @@ class Acceptance():
             xx_min = loss_particles.loc[min_loss_index, 'xx']
 
             norm_emit = loss_min_emit * btgm
-            print(loss_min_emit, norm_emit, x_min, xx_min)
+
+            self.t_alpha = t_alpha
+            self.t_beta = t_beta
+            self.t_gamma = t_gamma
+            self.loss_particles = loss_particles
             return loss_min_emit, norm_emit, x_min, xx_min
 
         elif kind == 1:
@@ -223,35 +226,19 @@ class Acceptance():
             yy_min = loss_particles.loc[min_loss_index, 'yy']
 
             norm_emit = loss_min_emit * btgm
-            print(loss_min_emit, norm_emit, y_min, yy_min)
+
+            self.t_alpha = t_alpha
+            self.t_beta = t_beta
+            self.t_gamma = t_gamma
+            self.loss_particles = loss_particles
+
             return loss_min_emit, norm_emit, y_min, yy_min
 
-        elif kind == 3:
-            emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["phi"], in_dis["E"], btgm)
 
-
-
-            loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["phi"] ** 2 +
-                             2 * t_alpha * loss_particles["phi"] * loss_particles["E"] +
-                             t_beta * loss_particles["E"] ** 2)
-
-            loss_min_emit = loss_particles['ellipse'].min()
-
-
-            min_loss_index = loss_particles['ellipse'].idxmin()
-
-            # 找到对应的 z 和 zz
-            phi_min = loss_particles.loc[min_loss_index, 'phi']
-            E_min = loss_particles.loc[min_loss_index, 'E']
-
-            norm_emit = loss_min_emit * btgm
-
-
-            return loss_min_emit, norm_emit, phi_min, E_min
 
         elif kind == 2:
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["z"], in_dis["zz"], btgm)
-
+            print(emit_norm, t_alpha, t_beta, t_gamma)
 
 
             loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["z"] ** 2 +
@@ -268,21 +255,37 @@ class Acceptance():
 
             norm_emit = loss_min_emit * btgm
 
+            self.t_alpha = t_alpha
+            self.t_beta = t_beta
+            self.t_gamma = t_gamma
+            self.loss_particles = loss_particles
+
             return loss_min_emit, norm_emit, z_min, zz_min
 
-    def plot(self, alpha, beta, gamma, loss_min_emit, loss_particles):
+        elif kind == 3:
+            _, t_alpha, t_beta, t_gamma = self.twiss(in_dis["phi"], in_dis["E"] , btgm)
 
-        fig, ax = plt.subplots()
-        loss_particles.plot(kind='scatter', x="y", y="yy", s=1, c='k', ax=ax)
+            print(t_alpha, t_beta, t_gamma)
 
-        x = np.linspace(-40, 40, 40)
-        xp = np.linspace(-60, 60, 40)
-        ax.set_ylim([-60, 60])
-        ax.set_xlim([-40, 40])
-        x, xp = np.meshgrid(x, xp)
-        ax.contour(x, xp, gamma * x ** 2 + 2 * alpha * x * xp + beta * xp ** 2,
-                   [loss_min_emit], colors='r')
-        plt.show()
+            loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["phi"] ** 2 +
+                             2 * t_alpha * loss_particles["phi"] * loss_particles["E"] +
+                             t_beta * loss_particles["E"] ** 2)
+
+            loss_min_emit = loss_particles['ellipse'].min()
+
+
+            min_loss_index = loss_particles['ellipse'].idxmin()
+
+            # 找到对应的 z 和 zz
+            phi_min = loss_particles.loc[min_loss_index, 'phi']
+            E_min = loss_particles.loc[min_loss_index, 'E'] + w
+
+            self.t_alpha = t_alpha
+            self.t_beta = t_beta
+            self.t_gamma = t_gamma
+            self.loss_particles = loss_particles
+
+            return loss_min_emit, None, phi_min, E_min,
 
     def twiss(self, x, y, btgm):
         x_sigma = numpy.average(x ** 2)
@@ -296,7 +299,8 @@ class Acceptance():
         emit_norm = btgm * emit
         return emit_norm, alpha, beta, gamma
 
+
 if __name__ == "__main__":
     project_path = r"C:\Users\anxin\Desktop\test_acct"
     obj = Acceptance(project_path)
-    obj.cal_accptance(1)
+    obj.cal_accptance(3)

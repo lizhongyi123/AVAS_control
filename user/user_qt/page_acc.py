@@ -166,15 +166,21 @@ class PageAccept(QWidget):
             all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 1)
 
         elif self.cb_z.isChecked():
-            all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 2)
+            all_emit, norm_emit, x_min, xx_min= cal_acceptance(self.project_path, 2)
 
         elif self.cb_phie.isChecked():
             all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 3)
 
+
         if self.cb_x.isChecked() or self.cb_y.isChecked() or self.cb_z.isChecked() \
             or self.cb_phie.isChecked():
-            self.emit_line.setText(str(round(all_emit, self.decimals)))
-            self.emit_norm_line.setText(str(round(norm_emit,self.decimals)))
+
+            if norm_emit:
+                self.emit_line.setText(str(round(all_emit, self.decimals)))
+                self.emit_norm_line.setText(str(round(norm_emit,self.decimals)))
+            else:
+                self.emit_line.setText("")
+                self.emit_norm_line.setText(str(round(all_emit, self.decimals)))
 
             self.x_line.setText(str(round(x_min,self.decimals)))
             self.y_line.setText(str(round(xx_min,self.decimals)))

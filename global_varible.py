@@ -4,13 +4,21 @@ Pi = 3.14159265358979323846
 long_element = ['drift', 'field', 'quad', 'solenoid', 'bend', 'steerer']
 
 
-error_elemment_command = ['err_quad_ncpl_stat', 'err_quad_ncpl_dyn', 'err_cav_ncpl_stat', 'err_cav_ncpl_dyn', ]
+error_elemment_command = ['err_quad_ncpl_stat', 'err_quad_ncpl_dyn', 'err_cav_ncpl_stat', 'err_cav_ncpl_dyn',
+                          'err_quad_cpl_stat', 'err_quad_cpl_dyn', 'err_cav_cpl_stat', 'err_cav_cpl_dyn',
+                          ]
 #静态动态
 error_elemment_command_stat = ['err_quad_ncpl_stat', 'err_cav_ncpl_stat']
 error_elemment_command_dyn = ['err_quad_ncpl_dyn', 'err_cav_ncpl_dyn']
 
+error_elemment_command_stat_cpl = ['err_quad_cpl_stat', 'err_cav_cpl_stat']
+error_elemment_command_dyn_cpl = ['err_quad_cpl_dyn', 'err_cav_cpl_dyn']
+
 error_elemment_command_quad = ['err_quad_ncpl_stat', 'err_quad_ncpl_dyn']
 error_elemment_command_cav = ['err_cav_ncpl_stat', 'err_cav_ncpl_dyn', ]
+
+error_elemment_command_quad_cpl = ['err_quad_cpl_stat', 'err_quad_cpl_dyn']
+error_elemment_command_cav_cpl = ['err_cav_cpl_stat', 'err_cav_cpl_dyn', ]
 
 error_beam_command = ['err_beam_stat', 'err_beam_dyn']
 error_beam_stat = ['err_beam_stat']

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
     QApplication,QHBoxLayout
 from utils.treatfile import  check_file_update
-
+from utils.readfile import read_runsignal
 class PageOutput(QWidget):
     def __init__(self, project_path):
         super().__init__()
@@ -66,44 +66,29 @@ class PageOutput(QWidget):
         lattice_obj.get_parameter()
         total_length = sum(lattice_obj.v_len)
 
-        if True:
-            dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
+        runsignal_path = os.path.join(self.project_path, 'OutputFile', 'runsignal.txt')
+        dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
+        # print(read_runsignal(runsignal_path))
+        if read_runsignal(runsignal_path) == 1:
+            try:
+                dataset_obj = DatasetParameter(dataset_path)
+                dataset_obj.get_parameter()
+                z = dataset_obj.z
 
-            if os.path.exists(dataset_path):
-                #如果正在更新
-                if check_file_update(dataset_path):
-                    dataset_obj = DatasetParameter(dataset_path)
-                    dataset_obj.get_parameter()
-                    z = dataset_obj.z
+                if z[-1] <= total_length:
+                    self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
+                    ratio = z[-1] / total_length
+                    self.progress_bar.setValue(int(ratio*100))
+                elif z[-1] > total_length:
+                    self.label_location.setText(f"{total_length}/{total_length}")
+                    self.progress_bar.setValue(100)
+            except:
+                pass
+        #模拟结束
+        else:
+            self.timer.stop()
+            print("停止更新")
 
-                    if z[-1] <= total_length:
-                        self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
-                        ratio = z[-1] / total_length
-                        self.progress_bar.setValue(int(ratio*100))
-                    elif z[-1] > total_length:
-                        self.label_location.setText(f"{total_length}/{total_length}")
-                        self.progress_bar.setValue(100)
-                        self.timer.stop()
-
-                        return 0
-                #停止更新
-                else:
-                    dataset_obj = DatasetParameter(dataset_path)
-                    dataset_obj.get_parameter()
-                    z = dataset_obj.z
-
-                    if z[-1] <= total_length:
-                        self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
-                        ratio = z[-1] / total_length
-                        self.progress_bar.setValue(int(ratio*100))
-                        self.timer.stop()
-                    elif z[-1] > total_length:
-                        self.label_location.setText(f"{total_length}/{total_length}")
-                        self.progress_bar.setValue(100)
-                        self.timer.stop()
-                        print("结束")
-                        return 0
-                    print("停止更新")
     def stop_update_progress(self):
         self.progress_bar.setValue(0)
         self.timer.stop()

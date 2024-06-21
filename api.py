@@ -145,7 +145,7 @@ def cal_acceptance(project_path, kind):
 
 def plot_acc(project_path, kind):
     obj = PlotAcc(project_path)
-    res = obj.plot_accptance(kind)
+    res = obj.run(kind)
     return res
 # #扫描
 # def AVAS_scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place):

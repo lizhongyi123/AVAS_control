@@ -475,7 +475,7 @@ class EA():
         errors_par_tot_title = [[
         "step_err",     #组 0
         "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
-        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1
+        "emit_x_increase", #,x, y z方向发射度增长， x/x0 - 1 #2
         "emit_y_increase",
         "emit_z_increase",
         "x_center(m)", #中心位置 5
@@ -516,7 +516,7 @@ class EA():
 
         t_lis = [
         time,
-        dataset_obj.loss[-1] / dataset_obj.num_of_particle,
+        dataset_obj.loss[-1] / dataset_obj.num_of_particle,  #0
         dataset_obj.emit_x[-1]/dataset_obj.emit_x[0] - 1,
         dataset_obj.emit_y[-1]/dataset_obj.emit_y[0] - 1,
         dataset_obj.emit_z[-1]/dataset_obj.emit_z[0] - 1,
@@ -566,9 +566,9 @@ class EA():
 
         #产生最大误差的命令
         com_lis = self.generate_max_element_err(quad_num, cav_num)
-        # self.run_normal()
-        # self.write_ea_err_par_every_time(-1)
-        for i in range(23, len(com_lis)):
+        self.run_normal()
+        self.write_ea_err_par_every_time(-1)
+        for i in range(0, len(com_lis)):
 
             new_lattice = self.set_err(lattice, [com_lis[i]])
 

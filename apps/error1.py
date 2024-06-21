@@ -89,9 +89,9 @@ class Error():
         self.decimal = 5  # 小数点保留多少位
 
         self.result_queue = multiprocessing.Queue()
-        # if os.path.exists(self.error_middle_path):
-        #     delete_directory(self.error_middle_path)
-        # os.makedirs(self.error_middle_path)
+        if os.path.exists(self.error_middle_path):
+            delete_directory(self.error_middle_path)
+        os.makedirs(self.error_middle_path)
 
         if os.path.exists(self.error_output_path):
             delete_directory(self.error_output_path)
@@ -199,91 +199,33 @@ class Error():
         else:
             return 1 + max(self.get_dimension(item) for item in lst)
 
-    def judge_command_on_element(self, lattice, command):
-        lattice = copy.deepcopy(lattice)
-
-        command_index = lattice.index(command)
-        command_on_element = 0
-        for i in range(command_index, len(lattice)):
-            if lattice[i][0] in global_varible.long_element:
-                command_on_element = int(lattice[i][-1].split("_")[1])
-                break
-        return command_on_element
-
-    def set_error_to_lattice(self, lattice):
-        # for i in lattice:
-        #     print(i)
-        lattice = copy.deepcopy(lattice)
-        index = 0
-        for i in lattice:
-            if i[0] in global_varible.long_element:
-                add_name = f'element_{index}'
-                i.append(add_name)
-                index += 1
-        res = 0
-        err_command = []
-        index = 0
-        for i in lattice:
-            if i[0] in global_varible.error_elemment_command:
-                i.append(f"err_{index}")
-                err_command.append(i)
-                index += 1
-
-
-
-        err_command_action_scope = []
-        for i in err_command:
-            err_index = lattice.index(i)
-            #作用元件数量
-            N = int(lattice[err_index][1])
-            command_on_element = self.judge_command_on_element(lattice, i)
-            err_command_action_scope.append(list(range(command_on_element, command_on_element + N)))
-
-        for i in err_command:
-            print(i)
-
-        #根据命令和作用域向lattice插入
-        for i in range(len(err_command)):
-            if err_command[i][0] in ['err_quad_ncpl_stat', 'err_quad_cpl_stat',
-                                      'err_quad_ncpl_dyn', 'err_quad_cpl_dyn', ]:
-
-                for j in lattice:
-                    if j[0] == 'field' and j[4] == '3':
-                        if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
-                            j.insert(-1, err_command[i])
-
-
-            elif err_command[i][0] in ['err_cav_ncpl_stat', 'err_cav_cpl_stat',
-                                      'err_cav_ncpl_dyn', 'err_cav_cpl_dyn', ]:
-
-                for j in lattice:
-                    if j[0] == 'field' and j[4] == '1':
-                        if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
-                            j.insert(-1, err_command[i])
-
-        lattice = self.delete_element_end_index(lattice)
-        for i in lattice:
-            print(i)
-        return lattice
-
-
     def generate_lattice_mulp_list(self, group):
         input_lines = read_txt(self.lattice_mulp_path, out='list')
 
         #生成误差
-        input_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
-        # for i in input_lines:
-        #     print(i)
-        # 为每个元件加编号
+        inpiut_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
 
-        lattice = self.set_error_to_lattice(input_lines_copy)
+        #在误差末尾加一个False
+        for i in range(len(input_lines)):
+            if input_lines[i][0] in global_varible.error_elemment_command:
+                inpiut_lines_copy[i].append(False)
 
-        lattice = [i for i in lattice if i[0] not in global_varible.error_elemment_command]
+        #将误差加到每一个元件上
+        res = self.increase_error(inpiut_lines_copy)
+
+        for i in res:
+            print(i)
+
+        breakpoint()
+
+
+        #去掉误差命令
+        res = [i for i in res if i[0] not in global_varible.error_elemment_command]
 
         res_treat = []
-        for i in lattice:
+        for i in res:
             if self.get_dimension(i) == 1:
                 res_treat.append(i)
 
@@ -312,6 +254,9 @@ class Error():
                             err_command_exist.append('err_cav_ncpl_dyn')
                             err_command_exist.append('err_cav_cpl_dyn')
 
+
+
+
                         # err_command_exist.append(j[0])
                         i_copy.pop()
                     # 如果已经出现过
@@ -326,12 +271,42 @@ class Error():
                     k1 = copy.deepcopy(k)
                     res_treat.append(k1)
 
+
+
         for i in res_treat:
             if i[0] in self.error_elemment_command:
                 i.pop()
 
-        breakpoint()
 
+        # 为每个元件加编号
+        index = 0
+        for i in res_treat:
+            if i[0] in global_varible.long_element:
+                add_name = f'element_{index}'
+                i.append(add_name)
+                index += 1
+
+
+
+        self.lattice_mulp_list = self.generate_error(res_treat, group, 'ncpl')
+
+
+        for i in self.lattice_mulp_list:
+            if i[0] == "err_quad_cpl_stat":
+                i[0] = "err_quad_ncpl_stat"
+
+            elif i[0] == "err_cav_cpl_stat":
+                i[0] = "err_cav_ncpl_stat"
+
+            elif i[0] == "err_quad_cpl_dyn":
+                i[0] = "err_quad_ncpl_dyn"
+
+            elif i[0] == "err_cav_cpl_dyn":
+                i[0] = "err_cav_ncpl_dyn"
+
+
+
+        return self.lattice_mulp_list
 
 
     def generate_error_base(self, input, group):
@@ -469,6 +444,8 @@ class Error():
 
                 elif input_lines[i][0] in global_varible.error_elemment_command_stat_cpl or \
                         input_lines[i][0] in global_varible.error_elemment_command_dyn_cpl:
+
+                    print(input_lines[i])
                     input_lines[i] = self.generate_error_base(input_lines[i], group)
 
 

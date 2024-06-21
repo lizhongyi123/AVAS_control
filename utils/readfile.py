@@ -1,6 +1,7 @@
 ﻿"""该文件定义了读取各种文件的工具函数"""
 import struct
 import numpy
+import numpy as np
 
 def write_to_txt():
     pass
@@ -104,6 +105,38 @@ def read_dst(input):
     f.close()
     return res
 
+def read_dst_fast(input):
+    with open(input, 'rb') as f:
+        f.read(2)  # 跳过前2个字节
+
+        # 读取整数和两个双精度浮点数
+        number = struct.unpack("<i", f.read(4))[0]
+        Ib = struct.unpack("<d", f.read(8))[0]
+        freq = struct.unpack("<d", f.read(8))[0]
+
+        f.read(1)  # 跳过1个字节
+
+        # 读取 6 * number 个双精度浮点数 cm mrad
+        partran_dist = np.fromfile(f, dtype='<f8', count=6 * number).reshape(number, 6)
+
+        # 读取最后一个双精度浮点数
+        BaseMassInMeV = struct.unpack("<d", f.read(8))[0]
+
+    res= {}
+    res['number'] = number
+    res['ib'] = Ib
+    res['freq'] = freq*10**6
+    res['partran_dist'] = partran_dist
+    res['basemassinmev'] = BaseMassInMeV
+    return res
+
+def read_runsignal(path):
+    res = 0
+    with open(path, 'r') as file:
+        line = file.readline()
+        res = int(line)
+    return res
+
 
 
 
@@ -111,6 +144,7 @@ def read_dst(input):
 if __name__ == "__main__":
     # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
     # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
-    path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
-    res = read_dst(path)
-    print(res['phase'][0])
+    # path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
+    # res = read_dst(path)
+    # print(res['phase'][0])
+    read_runsignal(0)

@@ -17,6 +17,7 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+
         self.num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
@@ -88,6 +89,8 @@ class DatasetParameter():
 
         if self.project_path:
             self.get_phi()
+
+
     def get_lattice_end_index(self):
         lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
         lattice_obj = LatticeParameter(lattice_mulp_path)

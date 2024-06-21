@@ -20,23 +20,43 @@ class EaAnalysis():
         # print(errors_par_tot)
         # print(errors_par_tot[-1])
 
-        v1 = []
-        v2 = []
-        for i in range(0, 205, 7):
+        v1 = {} #index, 可能为None
+        all_loss = []
+
+        start = 5 #0: x  1: y 2: phix 3: phiy 4:phiz   5:场幅
+        delta = 7 - start
+
+        for i in range(start, 126, 7):
             v = errors_par_tot.get(i)
             if v:
-                v1.append(i)
-                v2.append(v)
-        v1 = [i/7 for i in v1]
-        v2 = [i[4] * 1000 for i in v2]
-        plt.plot(v1, v2)
+                v1[i] = v
+            else:
+                all_loss.append(i)
+                v1[i] = None
+
+        x = [(k+delta)/7 for k, v in v1.items() ]
+        print(x)
+        #束损
+        # y = [v[0] * 100 if v else 100 for k,v in v1.items() ]
+
+        #发射度x
+        # y = [v[1] * 100 for k, v in v1.items() if v ]
+        #质心x
+        y = [v[4] * 1000 for k,v in v1.items() if v]
 
 
-        v3 = [i for i in range(len(v1))]
-        v4 = [i for i in v3 if i not in v1]
-        print(v1)
-        print(v4)
+        loss_index = [(i+delta)/7 for i in all_loss]
 
+        print(loss_index)
+        plt.plot(x, y, marker='o')
+
+        #
+        #
+        # v3 = [i for i in range(len(v1))]
+        # v4 = [i for i in v3 if i not in v1]
+        # print(v1)
+        # print(v4)
+        #
         plt.show()
 
 

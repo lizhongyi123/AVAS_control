@@ -31,6 +31,8 @@ from api import basic_env
 from user.user_qt.user_defined import treat_err
 
 from user.user_qt.page_acc import PageAccept
+
+from send2trash import send2trash
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -242,6 +244,7 @@ class MainWindow(QMainWindow):
         default_folder_path = desktop_path
 
         new_folder_path, _ = QFileDialog.getSaveFileName(self, "Create New Folder", default_folder_path, filter="Folders (*)")
+        new_folder_path = os.path.normpath(new_folder_path)
 
         if new_folder_path:
             os.makedirs(new_folder_path)
@@ -268,6 +271,7 @@ class MainWindow(QMainWindow):
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
         folder_path = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
+        folder_path = os.path.normpath(folder_path)
 
         if folder_path:
             self.project_path = folder_path
@@ -364,10 +368,12 @@ class MainWindow(QMainWindow):
         
         elif self.basic_signal == 'basic_mulp':
 
+            self.activate_output('basic_mulp')
+
             self.func_basic_mulp()
 
-            delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
-            QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
+            # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
+            # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
 
             self.page_data.fill_parameter()
 
@@ -395,7 +401,20 @@ class MainWindow(QMainWindow):
 
 
     def activate_output(self, signal):
+
         if signal == "basic_mulp":
+            self.runsignal = os.path.join(self.project_path, 'OutputFile', 'runsignal.txt')
+
+            with open(self.runsignal, 'w') as f:
+                f.write('1')
+            try:
+                # dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
+                dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt').replace('/', '\\')
+                # print(dataset_path)
+                send2trash(dataset_path)
+            except:
+                pass
+
             self.page_output.update_progress()
 
 
@@ -526,10 +545,11 @@ class MainWindow(QMainWindow):
 
         else:
             self.project_path = self.settings.value("lastProjectPath", "")
+            print(self.project_path)
             self.path_text.setText(self.project_path)
 
             if os.path.exists(self.project_path):
-                print("存在", self.project_path)
+
                 self.refresh_page_project_path()
                 self.page_fill_parameter()
 

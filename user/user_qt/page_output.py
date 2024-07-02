@@ -60,7 +60,6 @@ class PageOutput(QWidget):
     #         return 0
     def update_progress(self):
         self.timer.start(1000)  # 定时器每隔1000毫秒（1秒）触发一次
-
         lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
         lattice_obj = LatticeParameter(lattice_path)
         lattice_obj.get_parameter()
@@ -69,21 +68,24 @@ class PageOutput(QWidget):
         runsignal_path = os.path.join(self.project_path, 'OutputFile', 'runsignal.txt')
         dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
         # print(read_runsignal(runsignal_path))
-        if read_runsignal(runsignal_path) == 1:
-            try:
-                dataset_obj = DatasetParameter(dataset_path)
-                dataset_obj.get_parameter()
-                z = dataset_obj.z
 
-                if z[-1] <= total_length:
-                    self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
-                    ratio = z[-1] / total_length
-                    self.progress_bar.setValue(int(ratio*100))
-                elif z[-1] > total_length:
-                    self.label_location.setText(f"{total_length}/{total_length}")
-                    self.progress_bar.setValue(100)
-            except:
-                pass
+        try:
+            dataset_obj = DatasetParameter(dataset_path)
+            dataset_obj.get_parameter()
+            z = dataset_obj.z
+
+            if z[-1] <= total_length:
+                self.label_location.setText(f"{round(z[-1], self.demical)}/{total_length}")
+                ratio = z[-1] / total_length
+                self.progress_bar.setValue(int(ratio*100))
+            elif z[-1] > total_length:
+                self.label_location.setText(f"{total_length}/{total_length}")
+                self.progress_bar.setValue(100)
+        except:
+            pass
+
+        if read_runsignal(runsignal_path) == 1:
+            pass
         #模拟结束
         else:
             self.timer.stop()

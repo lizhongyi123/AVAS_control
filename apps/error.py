@@ -17,7 +17,7 @@ from dataprovision.datasetparameter import DatasetParameter
 from utils.readfile import read_txt
 from utils.treatlist import flatten_list, list_one_two
 from utils.treatfile import copy_file, split_file
-from utils.tool import write_to_txt,calculate_mean, calculate_rms, add_to_txt
+from utils.tool import write_to_txt, calculate_mean, calculate_rms, add_to_txt
 
 import os
 
@@ -89,14 +89,17 @@ class Error():
         self.decimal = 5  # 小数点保留多少位
 
         self.result_queue = multiprocessing.Queue()
-        # if os.path.exists(self.error_middle_path):
-        #     delete_directory(self.error_middle_path)
-        # os.makedirs(self.error_middle_path)
+        if os.path.exists(self.error_middle_path):
+            delete_directory(self.error_middle_path)
+        os.makedirs(self.error_middle_path)
 
         if os.path.exists(self.error_output_path):
             delete_directory(self.error_output_path)
         os.makedirs(self.error_output_path)
 
+        v = LatticeParameter(self.lattice_mulp_path)
+        v.get_parameter()
+        self.lattice_total_length = v.total_length
     def delete_element_end_index(self, error_lattice):
         error_lattice_copy = copy.deepcopy(error_lattice)
         for i in error_lattice_copy:
@@ -215,32 +218,37 @@ class Error():
         #     print(i)
         lattice = copy.deepcopy(lattice)
         index = 0
+        #为元件增加编号
         for i in lattice:
             if i[0] in global_varible.long_element:
                 add_name = f'element_{index}'
                 i.append(add_name)
                 index += 1
-        res = 0
+
+
+        #为每个误差命令添加一个编号
         err_command = []
         index = 0
         for i in lattice:
             if i[0] in global_varible.error_elemment_command:
                 i.append(f"err_{index}")
-                err_command.append(i)
                 index += 1
+                err_command.append(i)
 
-
-
+        #每一个误差命令的作用范围
         err_command_action_scope = []
         for i in err_command:
+            #误差命令的索引
             err_index = lattice.index(i)
             #作用元件数量
             N = int(lattice[err_index][1])
+            #判断误差命令在哪个元件上
             command_on_element = self.judge_command_on_element(lattice, i)
+
             err_command_action_scope.append(list(range(command_on_element, command_on_element + N)))
 
-        for i in err_command:
-            print(i)
+        # for i in err_command:
+        #     print(i)
 
         #根据命令和作用域向lattice插入
         for i in range(len(err_command)):
@@ -261,25 +269,31 @@ class Error():
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
 
+        # for i in lattice:
+        # #     print(i)
         lattice = self.delete_element_end_index(lattice)
-        for i in lattice:
-            print(i)
+        # for i in lattice:
+        #     print(i)
         return lattice
 
 
     def generate_lattice_mulp_list(self, group):
+
         input_lines = read_txt(self.lattice_mulp_path, out='list')
 
-        #生成误差
+        #为cpl生成误差
         input_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
         # for i in input_lines:
         #     print(i)
-        # 为每个元件加编号
 
 
+        #将误差命令添加到每个元件上
         lattice = self.set_error_to_lattice(input_lines_copy)
 
+
+
+        #去掉误差命令
         lattice = [i for i in lattice if i[0] not in global_varible.error_elemment_command]
 
         res_treat = []
@@ -327,12 +341,44 @@ class Error():
                     res_treat.append(k1)
 
         for i in res_treat:
-            if i[0] in self.error_elemment_command:
+            if i[0] in global_varible.error_elemment_command:
                 i.pop()
 
-        breakpoint()
 
+        #对ncpl误差进行生成
+        res_treat = self.generate_error(res_treat, group, 'ncpl')
 
+        for i in res_treat:
+            if i[0] == "err_cav_cpl_dyn":
+                i[0] = "err_cav_ncpl_dyn"
+
+            elif i[0] == "err_cav_cpl_stat":
+                i[0] = "err_cav_ncpl_stat"
+
+            elif i[0] == "err_quad_cpl_dyn":
+                i[0] = "err_quad_ncpl_dyn"
+
+            elif i[0] == "err_quad_cpl_stat":
+                i[0] = "err_quad_ncpl_stat"
+
+        for i in res_treat:
+            if i[0] in global_varible.error_elemment_command:
+                i[1] = 1
+
+        # for i in res_treat:
+        #     print(i)
+        index = 0
+        for i in res_treat:
+            if i[0] in global_varible.long_element:
+                add_name = f'element_{index}'
+                i.append(add_name)
+                index += 1
+        # for i in res_treat:
+        #     print(i)
+        # sys.exit(0)
+        self.lattice_mulp_list = res_treat
+
+        # sys.exit(0)
 
     def generate_error_base(self, input, group):
         """
@@ -345,7 +391,6 @@ class Error():
 
 
         target = None
-
         if input[0] in global_varible.error_elemment_command:
             for i in range(3, len(input)):
                 input[i] = float(input[i])
@@ -362,14 +407,11 @@ class Error():
                     target[i] = round(random.uniform(-1 * dx * (group + 1), dx * (group + 1)), self.decimal)
                 target[2] = 0
 
-
             elif int(input[2]) == 2:
-
                 for i in range(3, len(input) - 1):
                     dx = float(input[i]) / self.all_group
                     target[i] = round(random.gauss(0, dx * (group + 1)), self.decimal)
                 target[2] = 0
-
 
             elif int(input[2]) == -1:
                 for i in range(3, len(input) - 1):
@@ -599,7 +641,12 @@ class Error():
 
         dataset_path = os.path.join(output, "DataSet.txt")
         dataset_obj = DatasetParameter(dataset_path, self.project_path)
-        dataset_obj.get_parameter()
+
+        v1 = dataset_obj.get_parameter()
+        if v1 is False:
+            return 0
+        if dataset_obj.z[-1] < (self.lattice_total_length-0.01):
+            return 0
 
 
         errors_par_tot_list = [
@@ -667,7 +714,7 @@ class Error():
                 t1_lis[17] = calculate_mean([float(j[8]) for j in t_lis])
                 t1_lis[18] = calculate_rms([float(j[13]) for j in t_lis])
 
-            print(t1_lis)
+
             for i in range(1, len(t1_lis)):
                 t1_lis[i] = "{:.5e}".format(t1_lis[i])
             add_to_txt(self.errors_par_path, [t1_lis])
@@ -676,10 +723,10 @@ class Error():
         #误差模拟完毕后对文件进行后处理
         #1.解析dataset文件
 
-        print(self.error_output_path)
+
         errr_out_file_list = list_files_in_directory(self.error_output_path)
 
-        print(errr_out_file_list)
+
         errors_par_tot_list = [[
         "step_err",     #组 0
         "ratio_loss", #束流损失率，1- 存在粒子/总粒子 or 损失粒子 / 总粒子
@@ -847,8 +894,8 @@ class Error():
 
         err_datas_path = os.path.join(self.output_path, f"Error_Datas_{group}_{time}.txt")
         lattice_path = self.lattice_path
-        input = read_txt(lattice_path, out ="list")
-        print(input)
+        input = read_txt(lattice_path, out="list")
+        # print(input)
         # 为每个元件加编号
         index = 0
         for i in input:
@@ -874,8 +921,10 @@ class Error():
         write_to_txt(err_datas_path, res)
 
 class ErrorDyn(Error):
-    def __init__(self, project_path):
+    def __init__(self, project_path, seed):
         super().__init__(project_path)
+
+        random.seed(seed)
 
     def run_one_time(self, group, time):
         """
@@ -928,27 +977,26 @@ class ErrorDyn(Error):
         跑动态误差
         return:
         """
-        # self.run_normal()
-        # self.write_err_par_every_time(-1, -1
+        self.run_normal()
+        self.write_err_par_every_time(-1, -1)
 
         self.get_group_time()
 
-        for i in range(self.all_group):
-            for j in range(self.all_time):
+        for i in range(0, self.all_group):
+            for j in range(0, self.all_time):
                 self.generate_lattice_mulp_list(i)
                 self.run_one_time(i, j)
                 self.write_err_datas(i, j)
                 self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
-    def __init__(self, project_path):
+    def __init__(self, project_path, seed):
         super().__init__(project_path)
         self.all_error_lattice = []
         # 只优化
         self.only_adjust_sign = 0
-
         self.stat_dyn = 0
-
+        random.seed(seed)
 
     def generate_adjust_parameter(self, input_lines):
         """
@@ -1478,8 +1526,9 @@ class Errorstat(Error):
 
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path):
+    def __init__(self, project_path, seed):
         super().__init__(project_path)
+        random.seed(seed)
 
     def run_stat_dyn_one_time(self, x, group, time, error_lattice,
                                   adjust_element_num, adjust_parameter_num, opti):
@@ -1724,7 +1773,7 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r'C:\Users\anxin\Desktop\test_err_dyn')
+    obj = ErrorDyn(r'C:\Users\shliu\Desktop\test_err_dyn', 50)
     obj.run()
 
     # obj = Errorstat(r'C:\Users\anxin\Desktop\test_err_stat')

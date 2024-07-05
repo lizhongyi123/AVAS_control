@@ -2,7 +2,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
+from utils.treatlist import get_dimension
 import numpy as np
+from matplotlib.ticker import MultipleLocator
+
 class PicturelBar_2D():
     """
     二维柱状图，父类
@@ -214,6 +217,82 @@ class CompoundShape():
         # 创建圆形
 
         return shapes
+
+class PicturePlot_2ax():
+    def __init__(self):
+        self.title = ''
+        self.xlabel = ''
+        self.ylabel1 = ''
+        self.ylabel2 = ''
+        self.fontsize = 14
+        self.fig_size = (7, 4.8)
+        self.x = []
+        self.y = []
+        self.colors = ['r', 'b', 'g']
+        self.markers = [None] * 10
+
+        self.labels1 = [None] * 10
+        self.labels2 = [None] * 10
+
+        self.xlim = []
+        self.ylim = []
+        self.set_legend = 0
+        self.xy = {}
+
+    def get_x_y(self):
+        self.xy = {"ax1_x": [],
+                     "ax1_y": [],
+                     "ax2_x": [],
+                     "ax2_y": [],
+                     }
+        return self.xy
+    def run(self, show_, ):
+
+
+        fig, ax1 = plt.subplots(figsize=self.fig_size)
+
+        lines1 = []
+        #处理第一个坐标轴
+        if True:
+            print(self.xy)
+            for i in range(len(self.xy['ax1_x'])):
+                line, = ax1.plot(self.xy['ax1_x'][i], self.xy['ax1_y'][i], label=self.labels1[i], color=self.colors1[i])
+                lines1.append(line)
+            ax1.set_xlabel(self.xlabel)
+            ax1.set_ylabel(self.ylabel1, color='b')
+
+        lines2 = []
+        ax2 = ax1.twinx()
+        # 创建第二个坐标轴，共享相同的x轴
+        if True:
+            for i in range(len(self.xy['ax2_x'])):
+                line, = ax2.plot(self.xy['ax2_x'][i], self.xy['ax2_y'][i], label=self.labels2[i], color=self.colors2[i])
+                lines1.append(line)
+
+            ax2.set_ylabel(self.ylabel2, color='b')
+
+
+
+        if self.set_legend == 1:
+            lines = lines1 + lines2
+            labels = [line.get_label() for line in lines]
+
+        # 在图表外部显示图例，防止遮挡
+        ax1.legend(lines, labels, loc='upper left')
+
+        plt.subplots_adjust(left=0.1, right=0.85, top=0.9, bottom=0.1)
+
+        x_major_locator = MultipleLocator(1)
+        # 把x轴的刻度间隔设置为1，并存在变量里
+        ax1.xaxis.set_major_locator(x_major_locator)
+
+        if show_:
+            plt.show()
+            return None
+
+        else:
+            return None
+
 
 # if __name__ == "__main__":
 #     v = PicturelBar_2D()

@@ -17,6 +17,8 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+        if '-nan(ind)' in dataset_info[-1]:
+            return False
 
         self.num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
@@ -90,6 +92,8 @@ class DatasetParameter():
         if self.project_path:
             self.get_phi()
 
+        return True
+
 
     def get_lattice_end_index(self):
         lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
@@ -134,8 +138,11 @@ class DatasetParameter():
 if __name__ == "__main__":
     # project_path = r"C:\Users\anxin\Desktop\test_err_dyn1\OutputFile\error_output\output_1_1\DataSet.txt"
     project_path = r"C:\Users\anxin\Desktop\test_acct"
-    res = DatasetParameter(project_path)
-    res.get_parameter()
+    dataset_path = r"C:\Users\shliu\Desktop\test_err_dyn\OutputFile\error_output\output_0_0\DataSet.txt"
+    dataset_path = r"C:\Users\shliu\Desktop\test_err_dyn\OutputFile\error_output\output_-1_-1\DataSet.txt"
+    res = DatasetParameter(dataset_path)
+    if res.get_parameter() is False:
+        print("fadsf")
     print(res.z[-1])
     # print(res.emit_x[0] * 10 **6)
     # print(res.emit_x[-1] * 10 **6)

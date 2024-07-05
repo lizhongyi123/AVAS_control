@@ -8,8 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
     QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
 
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
-from api import plot_cavity_syn_phase, plot_dataset, plot_cavity_voltage, \
-    plot_phase, plot_phase_advance, plot_error
+from api import plot_error_par
 from user.user_qt.user_defined import treat_err
 from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
 
@@ -209,7 +208,7 @@ class PageError(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageError(r'C:\Users\anxin\Desktop\test')
+    main_window = PageError(r'C:\Users\shliu\Desktop\test_err_dyn')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

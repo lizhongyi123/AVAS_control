@@ -19,6 +19,7 @@ from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
 from utils.tolattice import write_mulp_to_lattice_only_sim
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
+from aftertreat.picture.ploterrpar import PlotErrPar
 ########################################################################################################################
 import multiprocessing
 #下列为功能函数
@@ -88,36 +89,36 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path):
+def err_dyn(project_path, seed=5):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-    v = ErrorDyn(project_path)
+    v = ErrorDyn(project_path, seed)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path):
+def err_stat(project_path, seed):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path)
+    v = Errorstat(project_path, seed)
     v.run()
     
 
-def err_stat_dyn(project_path):
+def err_stat_dyn(project_path, seed):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path)
+    v = Errorstatdyn(project_path, seed)
     v.run_stat_dyn()
     return None
 
@@ -225,7 +226,22 @@ def plot_phase_advance(project_path, out_type, show_=1):
     res = v.run(show_)
     return res
 
-def plot_error(project_path, picture_name, picture_type, show_=1):
+# def plot_error(project_path, picture_name, picture_type, show_=1):
+#     """
+#
+#     :param project_path:
+#     :param picture_name:
+#     :param picture_type:
+#     :param show_:
+#     :return:
+#     误差图
+#     """
+#     v = PlotError(project_path)
+#     v.get_x_y(picture_name, picture_type)
+#     res = v.run(show_)
+#     return res
+
+def plot_error_par(project_path, picture_type, show_=1):
     """
 
     :param project_path:
@@ -235,8 +251,8 @@ def plot_error(project_path, picture_name, picture_type, show_=1):
     :return:
     误差图
     """
-    v = PlotError(project_path)
-    v.get_x_y(picture_name, picture_type)
+    v = PlotErrPar(project_path, picture_type)
+    v.get_x_y()
     res = v.run(show_)
     return res
 
@@ -258,7 +274,6 @@ def cal_twiss(dst_path):
 
 
 def judge_opti(res):
-
     sign = []
     # 判断是否需要矫正
     for i in res:
@@ -266,7 +281,9 @@ def judge_opti(res):
             sign.append('adjust')
         elif i[0].startswith('diag') and i[0] not in sign:
             sign.append('diag')
-    if len(sign) >= 2:
+
+    #如果这两个都包含,
+    if 'adjust' in sign and 'diag' in sign:
         return 1
     else:
         return 0

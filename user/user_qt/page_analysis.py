@@ -9,7 +9,7 @@ import os
 from utils.readfile import read_txt, read_dst
 from PyQt5.QtCore import Qt, QSize
 from api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
-     plot_phase, plot_phase_advance, plot_error
+     plot_phase, plot_phase_advance
 from user.user_qt.user_defined import treat_err
 
 from matplotlib.backends.backend_qtagg import FigureCanvas, NavigationToolbar2QT as NavigationToolbar
@@ -78,19 +78,11 @@ class MyPictureDialog(QDialog):
 
     @treat_err
     def on_resize(self):
-
         self.fig.tight_layout()
         # self.fig.subplots_adjust(left=0.5 )
 
-
-
-
     def closeEvent(self, event):
         event.accept()
-
-
-
-
 
 
 
@@ -131,6 +123,8 @@ class LossDialog(MyPictureDialog):
 
     def plot_image(self, ):
         self.func(self.project_path, self.picture_name, show_=0)
+
+
 
 class EnergyDialog(MyPictureDialog):
     def __init__(self, project_path, func):

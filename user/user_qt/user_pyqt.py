@@ -465,7 +465,7 @@ class MainWindow(QMainWindow):
             elif err_type == 'stat_dyn':
                 target = err_stat_dyn
 
-            self.err_process = multiprocessing.Process(target=target, args=(self.project_path,))
+            self.err_process = multiprocessing.Process(target=target, args=(self.project_path, 50))
             self.err_process.start()
 
     def func_match(self, match_choose, use_ini=0):

@@ -42,7 +42,8 @@ class LatticeParameter():
         in_lattice = False
         start = 0  # 每个元件的起点
         length = 0  # 每个元件的长度
-    
+
+
 
         v_p = []  # 记录周期
     

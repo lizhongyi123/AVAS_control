@@ -4,7 +4,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
     QStackedWidget, QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox, \
     QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
 
-from matplotlib.backends.backend_qtagg import FigureCanvas, NavigationToolbar2QT as NavigationToolbar
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
 
@@ -12,7 +15,7 @@ from PyQt5.QtCore import pyqtSignal
 
 
 class PictureDialog1(QDialog):
-    resize_signal = pyqtSignal()  # ÕıÈ·³õÊ¼»¯×Ô¶¨ÒåĞÅºÅ
+    resize_signal = pyqtSignal()  # æ­£ç¡®åˆå§‹åŒ–è‡ªå®šä¹‰ä¿¡å·
     def __init__(self, project_path, func):
         super().__init__()
         self.func = func
@@ -21,30 +24,35 @@ class PictureDialog1(QDialog):
 
     def initUI(self):
         winflags = Qt.Dialog
-        # Ìí¼Ó×îĞ¡»¯°´Å¥
+        # æ·»åŠ æœ€å°åŒ–æŒ‰é’®
         winflags |= Qt.WindowMinimizeButtonHint
-        # Ìí¼Ó×î´ó»¯°´Å¥
+        # æ·»åŠ æœ€å¤§åŒ–æŒ‰é’®
         winflags |= Qt.WindowMaximizeButtonHint
-        # Ìí¼Ó¹Ø±Õ°´Å¥
+        # æ·»åŠ å…³é—­æŒ‰é’®
         winflags |= Qt.WindowCloseButtonHint
-        # ÉèÖÃµ½´°ÌåÉÏ
+        # è®¾ç½®åˆ°çª—ä½“ä¸Š
         self.setWindowFlags(winflags)
 
-        # ´´½¨Ò»¸öÈİÄÉ¹¤¾ßÀ¸ºÍÍ¼ÏñµÄ QWidget
-        self.setWindowTitle('µ¯³ö´°¿Ú')
+        # åˆ›å»ºä¸€ä¸ªå®¹çº³å·¥å…·æ å’Œå›¾åƒçš„ QWidget
+        self.setWindowTitle('å¼¹å‡ºçª—å£')
         # self.setGeometry(200, 200, 640, 480)
 
 ################################
-        self.fig = plt.figure(figsize=self.figsize)  # ´´½¨figure¶ÔÏó
-        self.canvas = FigureCanvas(self.fig)  # ´´½¨figure»­²¼
-        self.figtoolbar = NavigationToolbar(self.canvas, self)  # ´´½¨figure¹¤¾ßÀ¸
+        self.fig = plt.figure(figsize=self.figsize)  # åˆ›å»ºfigureå¯¹è±¡
+        self.canvas = FigureCanvas(self.fig)  # åˆ›å»ºfigureç”»å¸ƒ
+        self.figtoolbar = NavigationToolbar(self.canvas, self)  # åˆ›å»ºfigureå·¥å…·æ 
 ###############################
-        container_widget = QWidget(self)
+        # container_widget = QWidget(self)
 
         layout = QVBoxLayout()
-        container_widget.setLayout(layout)
+        # container_widget.setLayout(layout)
 
         toolbar = QToolBar()
+
+        # refresh_action = QAction('åˆ·æ–°', self)
+        # toolbar.addAction(refresh_action)
+        ########################################
+
         layout.addWidget(toolbar)
 
 
@@ -53,15 +61,15 @@ class PictureDialog1(QDialog):
         # self.image_label.setScaledContents(True)
 
         #############
-        layout.addWidget(self.figtoolbar)  # ¹¤¾ßÀ¸Ìí¼Óµ½´°¿Ú²¼¾ÖÖĞ
-        layout.addWidget(self.canvas)  # »­²¼Ìí¼Óµ½´°¿Ú²¼¾ÖÖĞ
+        layout.addWidget(self.figtoolbar)  # å·¥å…·æ æ·»åŠ åˆ°çª—å£å¸ƒå±€ä¸­
+        layout.addWidget(self.canvas)  # ç”»å¸ƒæ·»åŠ åˆ°çª—å£å¸ƒå±€ä¸­
         # layout.addWidget(self.image_label)
 
         self.setLayout(layout)
-        self.resize_signal.connect(self.on_resize)  # Á¬½ÓĞÅºÅºÍ²Û
+        self.resize_signal.connect(self.on_resize)  # è¿æ¥ä¿¡å·å’Œæ§½
 
     def resizeEvent(self, event):
-        # µ±´°¿Ú±»À­ÉìÊ±£¬·¢³ö×Ô¶¨ÒåĞÅºÅ
+        # å½“çª—å£è¢«æ‹‰ä¼¸æ—¶ï¼Œå‘å‡ºè‡ªå®šä¹‰ä¿¡å·
         self.resize_signal.emit()
         return super().resizeEvent(event)
 

@@ -4,7 +4,7 @@ from core.AVAS import AVAS
 from aftertreat.picture.plotdataset import PlotDataSet
 from aftertreat.picture.plotphase import PlotPhase
 from aftertreat.dataanalysis.caltwiss import CalTwiss
-from aftertreat.picture.ploterror import PlotError
+from aftertreat.picture.ploterror1 import PlotError
 from aftertreat.picture.plotenvbeamout import PlotEnvBeamOut
 
 from apps.changeNp import ChangeNp
@@ -19,7 +19,8 @@ from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
 from utils.tolattice import write_mulp_to_lattice_only_sim
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
-from aftertreat.picture.ploterrpar import PlotErrPar
+
+from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
 ########################################################################################################################
 import multiprocessing
 #下列为功能函数
@@ -89,7 +90,7 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed=5):
+def err_dyn(project_path, seed):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
@@ -119,7 +120,7 @@ def err_stat_dyn(project_path, seed):
     动态误差和静态误差一起跑，
     """
     v = Errorstatdyn(project_path, seed)
-    v.run_stat_dyn()
+    v.run()
     return None
 
 def basic_env(project_path, lattice):
@@ -241,7 +242,7 @@ def plot_phase_advance(project_path, out_type, show_=1):
 #     res = v.run(show_)
 #     return res
 
-def plot_error_par(project_path, picture_type, show_=1):
+def plot_error_out(project_path, picture_type, show_=1):
     """
 
     :param project_path:
@@ -251,9 +252,24 @@ def plot_error_par(project_path, picture_type, show_=1):
     :return:
     误差图
     """
-    v = PlotErrPar(project_path, picture_type)
+    v = PlotErrout(project_path, picture_type)
     v.get_x_y()
     res = v.run(show_)
+    return res
+
+def plot_error_emit_loss(project_path, type_, show_=1, fig =None):
+    """
+
+    :param project_path:
+    :param picture_name:
+    :param picture_type:
+    :param show_:
+    :return:
+    误差图
+    """
+    v = PlotErr_emit_loss(project_path, type_)
+    v.get_x_y()
+    res = v.run(show_, fig)
     return res
 
 def plot_env_beam_out(project_path, picture_name, show_=1):
@@ -274,15 +290,16 @@ def cal_twiss(dst_path):
 
 
 def judge_opti(res):
+
     sign = []
     # 判断是否需要矫正
     for i in res:
-        if i[0] == 'adjust' and i[0] not in sign:
+        if i[0] == 'adjust':
             sign.append('adjust')
-        elif i[0].startswith('diag') and i[0] not in sign:
+        elif i[0].startswith('diag'):
             sign.append('diag')
 
-    #如果这两个都包含,
+    # 如果这两个都包含,
     if 'adjust' in sign and 'diag' in sign:
         return 1
     else:

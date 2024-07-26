@@ -3,6 +3,7 @@ import os
 from utils.treat_directory import list_files_in_directory
 import time
 from datetime import datetime
+from send2trash import send2trash
 # 复制文件到目标文件夹
 def copy_file(source_file, target_folder):
     shutil.copy(source_file, target_folder)
@@ -51,7 +52,13 @@ def check_file_update(file_path):
     else:
         #"文件不存在"
         return 2
-
+def delete_file(path):
+    """
+    删除一个文件夹
+    :param path:
+    :return:
+    """
+    send2trash(path)
 if __name__ == "__main__":
     path = r"C:\Users\anxin\Desktop\test_mulp\OutputFile"
     path =os.path.join(path, 'error_output')

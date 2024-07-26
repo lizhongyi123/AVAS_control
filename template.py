@@ -1,0 +1,21 @@
+import os.path
+
+from api import basic_mulp
+import multiprocessing
+from utils.change_win_to_linux import change_end_crlf
+if __name__ == '__main__':
+    path = r"C:\Users\shliu\Desktop\test_err_dyn"
+    beam_path = os.path.join(path, "InputFile", "beam.txt")
+    input_path = os.path.join(path, "InputFile", "input.txt")
+    change_end_crlf(beam_path)
+    change_end_crlf(input_path)
+
+    basic_mulp(path)
+
+    # project_path = r'C:\Users\anxin\Desktop\muban'
+    #
+    # process = multiprocessing.Process(target=basic_mulp,
+    #                                   args=(project_path,))
+    #
+    # process.start()  # 启动子进程
+    # process.join()  # 等待子进程运行结束

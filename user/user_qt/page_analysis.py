@@ -12,13 +12,76 @@ from api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
      plot_phase, plot_phase_advance
 from user.user_qt.user_defined import treat_err
 
-from matplotlib.backends.backend_qtagg import FigureCanvas, NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from api import plot_env_beam_out
 
 from aftertreat.dataanalysis.plttodst import Plttozcode
+class PictureDialog1(QDialog):
+    resize_signal = pyqtSignal()  # 正确初始化自定义信号
+    def __init__(self, project_path, func):
+        super().__init__()
+        self.func = func
+        self.project_path = project_path
+        self.figsize = (6.4, 4.6)
+
+    def initUI(self):
+        winflags = Qt.Dialog
+        # 添加最小化按钮
+        winflags |= Qt.WindowMinimizeButtonHint
+        # 添加最大化按钮
+        winflags |= Qt.WindowMaximizeButtonHint
+        # 添加关闭按钮
+        winflags |= Qt.WindowCloseButtonHint
+        # 设置到窗体上
+        self.setWindowFlags(winflags)
+
+        # 创建一个容纳工具栏和图像的 QWidget
+        self.setWindowTitle('弹出窗口')
+        # self.setGeometry(200, 200, 640, 480)
+
+################################
+        self.fig = plt.figure(figsize=self.figsize)  # 创建figure对象
+        self.canvas = FigureCanvas(self.fig)  # 创建figure画布
+        self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
+###############################
+        container_widget = QWidget(self)
+
+        layout = QVBoxLayout()
+        container_widget.setLayout(layout)
+
+        toolbar = QToolBar()
+        layout.addWidget(toolbar)
+
+
+        # self.image_label = QLabel(self)
+
+        # self.image_label.setScaledContents(True)
+
+        #############
+        layout.addWidget(self.figtoolbar)  # 工具栏添加到窗口布局中
+        layout.addWidget(self.canvas)  # 画布添加到窗口布局中
+        # layout.addWidget(self.image_label)
+
+        self.setLayout(layout)
+        self.resize_signal.connect(self.on_resize)  # 连接信号和槽
+
+    def resizeEvent(self, event):
+        # 当窗口被拉伸时，发出自定义信号
+        self.resize_signal.emit()
+        return super().resizeEvent(event)
+
+
+    def on_resize(self):
+        self.fig.tight_layout()
+        # self.fig.subplots_adjust(left=0.5 )
+
+    def closeEvent(self, event):
+        event.accept()
 
 class MyPictureDialog(QDialog):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
@@ -634,22 +697,44 @@ class PageAnalysis(QWidget):
 
         self.text_phase_path =QLineEdit()
 
-        self.button_phase = QPushButton("Phase")
-        self.button_phase.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        # self.button_phase.clicked.connect(self.phase_dialog)  # 连接按钮的点击事件到绘图函数
+        self.button_plot_phase = QPushButton("Plot")
+        self.button_plot_phase.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
+        self.button_plot_phase.clicked.connect(self.plot_phase)  # 连接按钮的点击事件到绘图函数
 
         vbox_phase.addWidget(self.button_import_dst_file)
         vbox_phase.addWidget(self.text_phase_path)
-        vbox_phase.addWidget(self.button_phase)
+        vbox_phase.addWidget(self.button_plot_phase)
 
         phase_group_box = QGroupBox()
         phase_group_box.setLayout(vbox_phase)
 
+
+        self.button_input =  QPushButton("Input")
+        self.button_input.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
+        self.button_input.clicked.connect(self.button_input_plot)  # 连接按钮的点击事件到绘图函数
+
+        self.button_output = QPushButton("Output")
+        self.button_output.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
+        self.button_output.clicked.connect(self.button_output_plot)  # 连接按钮的点击事件到绘图函数
+
+        layout_in_out = QHBoxLayout()
+        layout_in_out.addWidget(self.button_input)
+        layout_in_out.addWidget(self.button_output)
+
+        group_box_in_out = QGroupBox()
+        group_box_in_out.setLayout(layout_in_out)
+
+
+
         gb1_layout.addWidget(plt_to_dst_group_box)
         gb1_layout.addWidget(phase_group_box)
+        gb1_layout.addWidget(group_box_in_out)
         gb1_layout.addStretch(1)
 
         group_box_1.setLayout(gb1_layout)
+
+################################################################
+
 
 ################################################################
 
@@ -671,6 +756,22 @@ class PageAnalysis(QWidget):
         obj = Plttozcode(beamset_path)
         all_step = obj.get_all_step()
         self.all_step_of_plt_line.setText(str(all_step - 1))
+
+    def button_input_plot(self):
+        dst_path = os.path.join(self.project_path, "OutputFile", "inData.dst")
+
+        func = plot_phase
+        self.phase_dialog = PhaseDialog(self.project_path, func, dst_path)
+        self.phase_dialog.initUI()
+        self.phase_dialog.plot_image()
+        self.phase_dialog.show()
+
+        pass
+
+
+    def button_output_plot(self):
+        pass
+
 
     @treat_err
     def convert_plt_to_dst(self):
@@ -731,7 +832,7 @@ class PageAnalysis(QWidget):
         self.dialog.show()
 
     @treat_err
-    def phase_dialog(self):
+    def plot_phase(self):
         if self.text_phase_path.text() == '':
             # print('ddd')
             return 0

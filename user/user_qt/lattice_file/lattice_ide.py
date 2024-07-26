@@ -42,7 +42,7 @@ class CustomCodeEdit(api.CodeEdit):
         #     # fold_state = False
         #     #
         #     # cursor = self.textCursor()
-        #     # if api.utils.TextBlockHelper.is_fold_trigger(cursor.block()):
+        #     # if api.page_utils.TextBlockHelper.is_fold_trigger(cursor.block()):
         #     #     is_fold_trigger = True
         #     #
         #     #     fold_scope = api.folding.FoldScope(cursor.block())

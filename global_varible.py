@@ -33,6 +33,11 @@ error_beam_stat_on = ['err_beam_stat_on']
 mulp_basic_command = long_element + \
                ['start', 'end', 'superpose', 'superposeend', 'outputplane']
 
+
+err_write_command = mulp_basic_command + ['err_step', 'err_cav_ncpl_dyn', 'err_quad_ncpl_dyn', 'err_beam_dyn',
+                                          'err_quad_dyn_on', 'err_cav_dyn_on', 'err_beam_dyn_on' ]
+
+
 mulp_control_command = ['adjust', 'lattice', 'lattice_end']
 
 greek_letters_upper = {'alpha': '\u0391', 'beta': '\u0392', 'gamma': '\u0393', 'phi': '\u03A6'}

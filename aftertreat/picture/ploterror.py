@@ -1,129 +1,240 @@
-﻿import sys
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
-
-from aftertreat.picture.initialplot import PicturePlot_2D
+from aftertreat.picture.initialplot import PicturePlot_2D, CompoundShape, PicturePlot_2ax
+from utils.readfile import read_txt
 import os
-import time
-from dataprovision.datasetparameter import DatasetParameter
-import re
-import numpy as np
 
-class PlotError(PicturePlot_2D):
-    """
-    误差分析结果可视化
-    """
-    def __init__(self, project_path):
+class PlotErrout(PicturePlot_2D):
+
+    def __init__(self, project_path, picture_type, ):
+        """
+        picture_type
+        { 1: 发射度增长
+        }
+        """
         super().__init__()
         self.project_path = project_path
+        self.picture_type = picture_type
+        self.err_par_path = os.path.join(self.project_path, 'OutputFile', 'errors_par.txt')
 
 
-        self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
-        self.lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice.txt')
-        self.loss = []
-        self.ini = []
-        self.error_elemment_command = ['err_quad_ncpl_stat', 'err_quad_ncpl_dyn', 'err_cav_ncpl_stat',
-                                       'err_cav_ncpl_dyn', ]
-        self.error_beam_command = ['err_beam_stat', 'err_beam_dyn']
-
-        self.all_group = 1
-        self.all_time = 1
-        self.xlabel = 'group'
-
-        self.stat_error_output = os.path.join(self.project_path, 'OutputFile', 'error_output')
-    def get_group_time(self):
-        """
-        得到group和time
-        :return:
-        """
-        input_lines = []
-        with open(self.lattice_mulp_path, encoding='utf-8') as file_object:
-            for line in file_object:
-                input_lines.append(line)
-
-        input_lines = [i.split() for i in input_lines if i.strip()]
-        for i in input_lines:
-            if i[0] == 'err_step':
-                self.all_group = int(i[1])
-                self.all_time = int(i[2])
-        print(self.all_group, self.all_time)
-
-    def get_dataset_obj(self):
-        dic = {}
-        for i in range(self.all_group):
-            for j in range(self.all_time):
-                file_name = f'output_{i}_{j}'
-                path = os.path.join(self.stat_error_output, file_name, 'DataSet.txt')
-
-                obj = DatasetParameter(path)
-                obj.get_parameter()
-                dic[file_name] = obj
-
-        return dic
-
-    def get_x_y(self, picture_name, picture_type='average'):
-        self.get_group_time()
-        self.get_dataset_obj()
-
-        dataset_obj = self.get_dataset_obj()
-        self.x = []
-        self.y = []
-        dic = {}
-
-        for i in range(self.all_group):
-            self.x.append(i)
-            pattern = re.compile(f'^output_{i}.*')  # 定义匹配模式
-            if picture_name == 'energy':
-                output_i_value = [value.ek[-1] for key, value in dataset_obj.items() if pattern.findall(key)]
-                dic[i] = np.array(output_i_value)
-                self.ylabel = 'Ek(MeV)'
-
-            elif picture_name == 'x':
-                output_i_value = [value.x[-1] * 1000 for key, value in dataset_obj.items() if pattern.findall(key)]
-                dic[i] = np.array(output_i_value)
-                self.ylabel = 'x(mm)'
-
-            elif picture_name == 'y':
-                output_i_value = [value.y[-1] *1000 for key, value in dataset_obj.items() if pattern.findall(key)]
-                dic[i] = np.array(output_i_value)
-                self.ylabel = 'y(mm)'
+    def get_x_y(self):
+        data = read_txt(self.err_par_path, out='list')[1:]
 
 
-            elif picture_name == 'rms_x':
-                output_i_value = [value.rms_x[-1] * 1000 for key, value in dataset_obj.items() if pattern.findall(key)]
-                dic[i] = np.array(output_i_value)
-                self.ylabel = 'rms_x(mm)'
+        data = [[float(j) for j in i] for i in data]
 
-            elif picture_name == 'rms_y':
-                output_i_value = [value.rms_y[-1] * 1000 for key, value in dataset_obj.items() if pattern.findall(key)]
-                dic[i] = np.array(output_i_value)
-                self.ylabel = 'rms_y(mm)'
+        self.x = [int(i[0]) for i in data]
+        # if self.picture_type == 1:
+        # #发射度增长
+        #     emit_x_increase = [i[2] * 100 for i in data]
+        #     emit_y_increase = [i[3] * 100 for i in data]
+        #     emit_z_increase = [i[4] * 100 for i in data]
+        #     self.y = [emit_x_increase, emit_y_increase, emit_z_increase]
+        #
+        #     self.xlabel = "step"
+        #     self.ylabel = "Emittance growth (%)"
+        #
+        #     self.labels = ["emit_xx'", "emit_yy'", "emit_zz'"]
+        #     self.colors = ['r', 'b', 'g']
+        #     self.set_legend = 1
+        #
+        # if self.picture_type == 2:
+        #     #loss 图
+        #     loss = [i[1] * 100 for i in data]
+        #
+        #     self.y = loss
+        #
+        #     self.xlabel = "step"
+        #     self.ylabel = "Loss (%)"
 
-        self.markers = ['o']
-        def get_rms(x):
-            return np.sqrt(np.sum([(i - np.mean(x)) ** 2 for i in x]) / len(x))
 
-        print(dic)
-        if picture_type == 'average':
-            self.y = [np.mean(value) for key, value in dic.items()]
-        if picture_type == 'rms':
+        if self.picture_type == 'av_xy':
+        #ave_cen x, y
 
-            self.y = [get_rms(value) for key, value in dic.items()]
-        print(self.y)
+            ave_cen_x = [i[5] * 1000 for i in data]
+            ave_cen_y = [i[6] * 1000 for i in data]
+
+            self.y = [ave_cen_x, ave_cen_y]
+
+            self.xlabel = "step"
+            self.ylabel = "Average of beam position(mm)"
+
+            self.labels = ["X", "Y", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+        elif self.picture_type == 'rms_xy':
+        #rms cen x, y
+
+            rms_cen_x = [i[14] * 1000 for i in data]
+            rms_cen_y = [i[15] * 1000 for i in data]
+
+            self.y = [rms_cen_x, rms_cen_y]
+
+            self.xlabel = "step"
+            self.ylabel = "Rms  of beam position(mm)"
+
+            self.labels = ["X", "Y", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+        elif self.picture_type == "av_x1y1":
+        #ave_cen x', y'
+
+            ave_cen_x = [i[7] * 1000 for i in data]
+            ave_cen_y = [i[8] * 1000 for i in data]
+
+            self.y = [ave_cen_x, ave_cen_y]
+
+            self.xlabel = "step"
+            self.ylabel = "Average of beam angle(mrad)"
+
+            self.labels = ["X'", "Y'", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+        elif self.picture_type == 'rms_x1y1':
+        #rms_cen x', y'
+
+            rms_cen_x = [i[16] * 1000 for i in data]
+            rms_cen_y = [i[17] * 1000 for i in data]
+
+            self.y = [rms_cen_x, rms_cen_y]
+
+            self.xlabel = "step"
+            self.ylabel = "rms of beam angle(mrad)"
+
+            self.labels = ["X'", "Y'", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+
+        elif self.picture_type == 'av_ek':
+        #ave_cen Enery
+
+            ave_cen_ek = [i[13] * 1000 for i in data]
+
+            self.y = ave_cen_ek
+
+            self.xlabel = "step"
+            self.ylabel = "Average of beam energy change(keV)"
+
+
+        elif self.picture_type == 'rms_ek':
+        #rms_cen Enery
+
+            rms_cen_ek = [i[22] * 1000 for i in data]
+
+            self.y = rms_cen_ek
+
+            self.xlabel = "step"
+            self.ylabel = "Rms of beam energy change(keV)"
+
+
+
+
+        elif self.picture_type == 'av_rms_xy':
+        #ave(rms_x) 包络的平均值
+
+            ave_rms_x = [i[9] * 1000 for i in data]
+            ave_rms_y = [i[10] * 1000 for i in data]
+
+            self.y = [ave_rms_x, ave_rms_y]
+
+            self.xlabel = "step"
+            self.ylabel = "Average of rms size(mm)"
+
+            self.labels = ["X", "Y", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+        elif self.picture_type == 'rms_rms_xy':
+        #rms(rms_x) 包络的平均值
+
+            rms_rms_x = [i[18] * 1000 for i in data]
+            rms_rms_y = [i[19] * 1000 for i in data]
+
+            self.y = [rms_rms_x, rms_rms_y]
+
+            self.xlabel = "step"
+            self.ylabel = "Rms of rms size(mm)"
+
+            self.labels = ["X", "Y", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+
+        if self.picture_type == 'av_rms_x1y1':
+        #ave(rms_x') 包络的平均值
+            av_rms_x1 = [i[11] * 1000 for i in data]
+            av_rms_y1 = [i[12] * 1000 for i in data]
+
+            self.y = [av_rms_x1, av_rms_y1]
+
+            self.xlabel = "step"
+            self.ylabel = "Average of rms angle size(mrad)"
+
+            self.labels = ["X'", "Y'", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+        elif self.picture_type == 'rms_rms_x1y1':
+        #rms(rms_x') 包络的平均值
+            rms_rms_x1 = [i[20] * 1000 for i in data]
+            rms_rms_y1 = [i[21] * 1000 for i in data]
+
+            self.y = [rms_rms_x1, rms_rms_y1]
+
+            self.xlabel = "step"
+            self.ylabel = "Rms of rms angle size(mrad)"
+
+            self.labels = ["X'", "Y'", ]
+            self.colors = ['r', 'b']
+            self.set_legend = 1
+
+class PlotErr_emit_loss(PicturePlot_2ax):
+    def __init__(self, project_path, type_='par'):
+        super().__init__()
+        self.project_path = project_path
+        self.err_par_path = os.path.join(self.project_path, 'OutputFile', 'errors_par.txt')
+        self.type_ = type_
+
+    def get_x_y(self):
+
+        data = read_txt(self.err_par_path, out='list')[1:]
+        data = [[float(j) for j in i] for i in data]
+
+        x = [int(i[0]) for i in data]
+
+        emit_x_increase = [i[2] * 100 for i in data]
+        emit_y_increase = [i[3] * 100 for i in data]
+        emit_z_increase = [i[4] * 100 for i in data]
+
+
+        self.xy['ax1_x'] = [x] * 3
+        self.xy['ax1_y'] = [emit_x_increase] + [emit_y_increase] + [emit_z_increase]
+
+        loss = [i[1] * 100 for i in data]
+
+        self.xy['ax2_x'] = [x]
+        self.xy['ax2_y'] = [loss]
+
+        self.xlabel = "Step of errors"
+
+        self.ylabel1 = "Emittance growth (%)"
+        self.ylabel2 = "Loss(%)"
+
+        self.labels1 = ["emit_xx'", "emit_yy'", "emit_zz'"]
+        self.labels2 = ["loss"]
+
+        self.colors1 = ['r', 'b', 'g']
+        self.colors2 = ['m']
+
+        self.set_legend = 1
 
 
 
 if __name__ == "__main__":
-
-    start = time.time()
-    print("start", start)
-    obj = PlotError(r'C:\Users\anxin\Desktop\test')
-
-
-    obj.get_x_y('y', 'average')
+    project_path = r"C:\Users\shliu\Desktop\test_err_dyn"
+    obj = PlotErr_emit_loss(project_path, 1)
+    obj.get_x_y()
     obj.run(show_=1)
-    end = time.time()
-    print("end", end)
-
-
-
-

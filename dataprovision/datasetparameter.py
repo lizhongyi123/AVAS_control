@@ -110,13 +110,13 @@ class DatasetParameter():
         return end_index
 
     def get_mass_freq(self):
-        beam_txt = self.project_path + r'\InputFile\Beam.txt'
+        beam_txt = self.project_path + r'/InputFile/beam.txt'
         res = read_txt(beam_txt)
         if res.get('readparticledistribution') is None:
             BaseMassInMeV = float(res.get('particlerestmass'))
             freq = float(res.get('frequency'))
         else:
-            dstfile = self.project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
+            dstfile = self.project_path + r'/InputFile' + r"/" + res.get('readparticledistribution')
             dst_res = read_dst(dstfile)
             BaseMassInMeV = float(dst_res.get('basemassinmev'))
             freq = float(dst_res.get('freq'))

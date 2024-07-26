@@ -246,15 +246,16 @@ class PicturePlot_2ax():
                      "ax2_y": [],
                      }
         return self.xy
-    def run(self, show_, ):
+    def run(self, show_, fig=None):
+        if not fig:
+            fig, ax1 = plt.subplots(figsize=self.fig_size)
+        elif fig:
+            ax1 = fig.add_subplot(111)
 
-
-        fig, ax1 = plt.subplots(figsize=self.fig_size)
 
         lines1 = []
         #处理第一个坐标轴
         if True:
-            print(self.xy)
             for i in range(len(self.xy['ax1_x'])):
                 line, = ax1.plot(self.xy['ax1_x'][i], self.xy['ax1_y'][i], label=self.labels1[i], color=self.colors1[i])
                 lines1.append(line)

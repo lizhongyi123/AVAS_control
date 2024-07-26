@@ -69,8 +69,8 @@ class PlotDataSet(PicturePlot_2D):
         max_x = [i *10**3 for i in dataset_obj.max_x][:end_index]
         max_xx = [i *10**3 for i in dataset_obj.max_xx][:end_index]
 
-        max_y = [i *10**3 for i in dataset_obj.rms_y][:end_index]
-        max_yy = [i *10**3 for i in dataset_obj.rms_yy][:end_index]
+        max_y = [i *10**3 for i in dataset_obj.max_y][:end_index]
+        max_yy = [i *10**3 for i in dataset_obj.max_yy][:end_index]
 
 
 

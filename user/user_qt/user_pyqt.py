@@ -29,10 +29,10 @@ from api import basic_mulp, match_twiss, circle_match, \
 import multiprocessing
 from api import basic_env
 from user.user_qt.user_defined import treat_err
-
 from user.user_qt.page_acc import PageAccept
-
 from send2trash import send2trash
+from utils.iniconfig import IniConfig
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -255,8 +255,10 @@ class MainWindow(QMainWindow):
 
             self.project_path = new_folder_path
             self.path_text.setText(self.project_path)
-            self.create_basic_txt_file()
             self.refresh_page_project_path()
+
+            self.create_basic_txt_file()
+
             self.page_fill_parameter()
 
         self.settings.setValue("lastProjectPath", self.project_path)
@@ -298,6 +300,9 @@ class MainWindow(QMainWindow):
         self.page_output.updatePath(self.project_path)
         self.page_accept.updatePath(self.project_path)
 
+        self.ini_path = os.path.join(self.project_path, "inputFile", 'ini.ini')
+        self.ini_obj = IniConfig(self.ini_path)
+
 
     @treat_err
     def page_fill_parameter(self):
@@ -305,6 +310,7 @@ class MainWindow(QMainWindow):
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
         self.page_longdistance.fill_parameter()
+        self.page_error.fill_parameter()
 
     @treat_err
     def save_project(self):
@@ -333,7 +339,8 @@ class MainWindow(QMainWindow):
         with open(lattice_mulp, "w") as file:
 
             file.write("")
-    @treat_err
+        in_dict = self.ini_obj.initialize()
+        self.ini_obj.write_ini(in_dict)
 
     def run(self):
 
@@ -465,7 +472,9 @@ class MainWindow(QMainWindow):
             elif err_type == 'stat_dyn':
                 target = err_stat_dyn
 
-            self.err_process = multiprocessing.Process(target=target, args=(self.project_path, 50))
+            seed_value = int(self.ini_obj.read_ini()['error']['seed'])
+
+            self.err_process = multiprocessing.Process(target=target, args=(self.project_path, seed_value))
             self.err_process.start()
 
     def func_match(self, match_choose, use_ini=0):

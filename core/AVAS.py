@@ -23,6 +23,7 @@ class AVAS():
     def run(self, input_file='InputFile', output_file='OutputFile'):
         inputfilepath = os.path.join(self.project_path, input_file)
         outputfilePath = os.path.join(self.project_path, output_file)
+
         if platform.system() == 'Windows':
             self.AVAS_engine = AVASEngine()
             self.runsignal = os.path.join(outputfilePath, 'runsignal.txt')
@@ -30,11 +31,11 @@ class AVAS():
             with open(self.runsignal, 'w') as f:
                 f.write('1')
 
-            res_tmp = self.AVAS_engine.get_path(inputfilepath, outputfilePath)
-            try:
-                res = self.AVAS_engine.main_agent(1)
-            except:
-                raise Exception("底层代码发生错误")
+            # res_tmp = self.AVAS_engine.get_path(inputfilepath, outputfilePath)
+            # try:
+            res = self.AVAS_engine.main_agent(1)
+            # except:
+            #     raise Exception("底层代码发生错误")
 
             if res == 1:
                 raise Exception('非正常结束')

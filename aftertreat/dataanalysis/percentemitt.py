@@ -172,7 +172,8 @@ class PercentEmit():
     # 得到几个平面的百分比发射度
     def get_percent_emit(self, ratio):
         self.get_data()
-        #epsi_xx1：rms发射度  all_epsi_xx1：全发射度  percent_all_epsi_xx1：百分比全发射度
+        #这里的alpha，beta是根据百分比粒子求的
+        #epsi_xx1：rms发射度(归一化)  all_epsi_xx1：全twiss参数全发射度  percent_all_epsi_xx1：根据百分比twiss参数 全发射度
         alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1, all_epsi_xx1, percent_all_epsi_xx1 = self.get_any_emit(self.x_list,
                                                                                                             self.x1_list,
                                                                                                             ratio)

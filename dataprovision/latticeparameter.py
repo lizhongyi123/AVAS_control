@@ -152,4 +152,5 @@ if __name__ == "__main__":
     lattice_path = r'C:\Users\anxin\Desktop\test_acct\InputFile\lattice_mulp.txt'
     res = LatticeParameter(lattice_path)
     res.get_parameter()
+    # length =
     print(res.total_length)

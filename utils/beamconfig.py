@@ -5,3 +5,4 @@ class BeamConfig():
 
     def generae_new_beam(self):
         pass
+    def initialize(self):

@@ -31,7 +31,7 @@ class AVAS():
             with open(self.runsignal, 'w') as f:
                 f.write('1')
 
-            # res_tmp = self.AVAS_engine.get_path(inputfilepath, outputfilePath)
+            res_tmp = self.AVAS_engine.get_path(inputfilepath, outputfilePath)
             # try:
             res = self.AVAS_engine.main_agent(1)
             # except:
@@ -93,14 +93,15 @@ class AVAS():
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test_err_dyn"
+    project_path = r"C:\Users\shliu\Desktop\test812\CAFE"
 
     obj = AVAS(project_path)
 
-    # 运行两次
-    for i in range(2):
-        print(f"Running iteration {i + 1}")
-        obj.run()
-
-    end = time.time()
-    print(f"Total time: {end - start}")
+    obj.run()
+    # # 运行两次
+    # for i in range(2):
+    #     print(f"Running iteration {i + 1}")
+    #     obj.run()
+    #
+    # end = time.time()
+    # print(f"Total time: {end - start}")

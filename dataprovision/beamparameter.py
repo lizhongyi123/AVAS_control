@@ -7,6 +7,7 @@ import numpy as np
 from global_varible import c_light
 
 from global_varible import Pi
+from aftertreat.dataanalysis.percentemitt import PercentEmit
 class DstParameter():
     """
     对dst文件进行解析
@@ -95,6 +96,9 @@ class DstParameter():
         self.rms_y = np.sqrt( np.sum([(i-self.center_y)**2 for i in self.y_list ]) / self.number)
 
 
+        # v = PercentEmit(self.dst_path)
+        # self.emit = v.get_100_emit()
+
 
 
 
@@ -109,8 +113,8 @@ if __name__ == "__main__":
     # # obj.get_parameter()
     # # print(obj.x_list)
     # res = get_entrance_beam_parameter(project_path)
-    dst_path = r"C:\Users\anxin\Desktop\testz\part_rfq.dst"
+    dst_path = r"C:\Users\shliu\Desktop\test_tr_av\av_err_dyn\InputFile\part_rfq.dst"
 
     obj = DstParameter(dst_path)
     obj.get_parameter()
-    print(obj.z1_list)
+    print(obj.emit)

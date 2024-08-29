@@ -33,7 +33,7 @@ def treat_one_file(dst_path, ratio):
         f'\u03B5(rms)  = {res_100[0][2]:.5f} π.mm.mrad [ Norm. ]',
         f'\u03B5(rms)[{ratio * 100}%]  = {res_percent[0][2]:.5f} π.mm.mrad [ Norm. ]',
         f'\u03B5[{ratio * 100}%] = {res_percent[0][3]:.5f} π.mm.mrad',
-        f'\u03B5[{ratio * 100}%][{ratio * 100}% twiss] = {res_percent[0][4]:.5f} π.mm.mrad',
+        # f'\u03B5[{ratio * 100}%][{ratio * 100}% twiss] = {res_percent[0][4]:.5f} π.mm.mrad',
         f'β = {res_percent[0][1]:.5f}  mm/π.mrad',
         f'α = {res_percent[0][0]:.5f}  ',
         ' ',
@@ -66,9 +66,9 @@ def treat_one_file(dst_path, ratio):
 
 if __name__ == "__main__":
     # 计算某一个dst文件的参数
-    dst_path = r"C:\Users\anxin\Desktop\te\part_dtl1_Ele[3][5]=0.3 Ele[5][5]=0.8.dst"
+    dst_path = r"C:\Users\shliu\Desktop\shutuan81\12_5.dst"
 
-    res = treat_one_file(dst_path, 0.9)
+    res = treat_one_file(dst_path, 1)
     for i in res:
         print(i)
 

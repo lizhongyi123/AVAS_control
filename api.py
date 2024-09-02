@@ -1,5 +1,5 @@
 # -- coding: utf-8 --
-from core.AVAS import AVAS
+from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
 from aftertreat.picture.plotphase import PlotPhase
@@ -23,6 +23,7 @@ from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
 ########################################################################################################################
 import multiprocessing
+
 #下列为功能函数
 #基础运行
 def basic_mulp(project_path):
@@ -42,12 +43,12 @@ def basic_mulp(project_path):
 
     #如果不需要矫正，则进行简单模拟
     else:
-        AVAS_obj = AVAS(project_path)
+        multiparticle_obj = MultiParticle(project_path)
 
         lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
         lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
         write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
-        res = AVAS_obj.run()
+        res = multiparticle_obj.run()
     print('模拟结束')
     return res
 

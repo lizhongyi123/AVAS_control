@@ -1,5 +1,5 @@
 
-from core.AVAS import AVAS
+from core.MultiParticle import AVAS
 
 from utils.beamconfig import BeamConfig
 from utils.inputconfig import InputConfig

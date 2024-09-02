@@ -23,10 +23,8 @@ import os
 
 
 import random
-from core.AVAS import AVAS
-
+from core.MultiParticle import MultiParticle
 from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
-
 import multiprocessing
 
 import global_varible
@@ -523,9 +521,9 @@ class Error():
         return input_lines
 
 
-    def run_avas(self, p_path, out_putfile_):
-        AVAS_obj = AVAS(p_path)
-        res = AVAS_obj.run(output_file=out_putfile_)
+    def run_multiparticle(self, p_path, out_putfile_):
+        multiparticle_obj = MultiParticle(p_path)
+        res = multiparticle_obj.run(output_file=out_putfile_)
 
 
     def run_normal(self):
@@ -534,7 +532,7 @@ class Error():
         write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
 
 
-        process = multiprocessing.Process(target=self.run_avas,
+        process = multiprocessing.Process(target=self.run_multiparticle,
                                           args=(self.project_path, 'OutputFile/error_output/output_0_0'))
         print
         process.start()  # 启动子进程
@@ -851,7 +849,7 @@ class ErrorDyn(Error):
         if os.path.exists(self.error_middle_output0_path):
             delete_directory(self.error_middle_output0_path)
         # os.makedirs(self.error_middle_output0_path)
-        process = multiprocessing.Process(target=self.run_avas,
+        process = multiprocessing.Process(target=self.run_multiparticle,
                                           args=(self.project_path, 'OutputFile/error_middle'))
 
         process.start()  # 启动子进程
@@ -1240,10 +1238,10 @@ class Errorstat(Error):
                 # if self.only_adjust_sign == 1:
                 if self.err_type == 'only_adjust':
                     os.makedirs(self.error_middle_output0_path)
-                    process = multiprocessing.Process(target=self.run_avas,
+                    process = multiprocessing.Process(target=self.run_multiparticle,
                                                       args=(self.project_path, 'OutputFile/error_middle/output_0'))
                 else:
-                    process = multiprocessing.Process(target=self.run_avas,
+                    process = multiprocessing.Process(target=self.run_multiparticle,
                                                       args=(self.project_path, 'OutputFile/error_middle'))
 
                 process.start()  # 启动子进程
@@ -1412,9 +1410,9 @@ class Errorstat(Error):
         if self.err_type == 'only_adjust':
             os.makedirs(self.error_middle_output0_path)
 
-            process = multiprocessing.Process(target=self.run_avas, args=(self.project_path, 'OutputFile/error_middle/output_0'))
+            process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle/output_0'))
         else:
-            process = multiprocessing.Process(target=self.run_avas, args=(self.project_path, 'OutputFile/error_middle'))
+            process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle'))
 
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
@@ -1668,7 +1666,7 @@ class Errorstatdyn(Errorstat):
                 f.write(' '.join(map(str, i)) + '\n')
 
         try:
-            process = multiprocessing.Process(target=self.run_avas,
+            process = multiprocessing.Process(target=self.run_multiparticle,
                                               args=(self.project_path, 'OutputFile/error_middle'))
 
             process.start()  # 启动子进程

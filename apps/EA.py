@@ -1,35 +1,20 @@
 import sys
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
-import random
-from scipy.optimize import minimize
-from typing import List
-import copy
-import numpy as np
-from core.AVAS import AVAS
-from dataprovision.latticeparameter import LatticeParameter
+
 from dataprovision.datasetparameter import DatasetParameter
 from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
-import time
-import multiprocessing
-from dataprovision.beamparameter import DstParameter
-import global_varible
-import copy
+
 from utils.readfile import read_txt
 from utils.treatlist import flatten_list, list_one_two, get_dimension
-from utils.treatfile import copy_file
+
 from utils.tool import write_to_txt,calculate_mean, calculate_rms, add_to_txt
 from utils.treatfile import copy_file, split_file
 import os
-import sys
 from utils.tolattice import write_mulp_to_lattice_only_sim
 
+from core.MultiParticle import MultiParticle
 
-
-import random
-
-from core.AVAS import AVAS
-import time
 import multiprocessing
 
 import global_varible
@@ -279,8 +264,8 @@ class EA():
 
 
     def basic_simulate(self, project_path, out_putfile):
-        AVAS_obj = AVAS(project_path)
-        res = AVAS_obj.run(output_file=out_putfile)
+        multiparticle_obj = MultiParticle(project_path)
+        res = multiparticle_obj.run(output_file=out_putfile)
         print("模拟结束")
 
     def simulate(self, lattice, time):

@@ -17,9 +17,18 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+        index = 0
         if '-nan(ind)' in dataset_info[-1]:
-            return False
+            for i in range(len(dataset_info)-1, -1, -1):
+                if '-nan(ind)' in dataset_info[i]:
+                    pass
+                elif '-nan(ind)' not in dataset_info[i]:
+                    index = i
+                    break
 
+            dataset_info = dataset_info[: index+1]
+
+        #确定到哪里为nan
         self.num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
@@ -92,7 +101,11 @@ class DatasetParameter():
         if self.project_path:
             self.get_phi()
 
-        return True
+        if index != 0:
+            return False
+        else:
+            return True
+
 
 
     def get_lattice_end_index(self):
@@ -136,19 +149,7 @@ class DatasetParameter():
 
 
 if __name__ == "__main__":
-    # project_path = r"C:\Users\anxin\Desktop\test_err_dyn1\OutputFile\error_output\output_1_1\DataSet.txt"
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
-    dataset_path = r"C:\Users\shliu\Desktop\test_err_dyn\OutputFile\error_output\output_0_0\DataSet.txt"
-    dataset_path = r"C:\Users\shliu\Desktop\test_err_dyn\OutputFile\error_output\output_-1_-1\DataSet.txt"
-    res = DatasetParameter(dataset_path)
-    if res.get_parameter() is False:
-        print("fadsf")
-    print(res.z[-1])
-    # print(res.emit_x[0] * 10 **6)
-    # print(res.emit_x[-1] * 10 **6)
-    #
-    # print(res.emit_y[0] * 10 **6)
-    # print(res.emit_y[-1] * 10 **6)
-    #
-    # print(res.emit_z[0] * 10 **6)
-    # print(res.emit_z[-1] * 10 **6)
+    dataset_path = r"C:\Users\anxin\Desktop\test_830\OutputFile\DataSet.txt"
+    obj = DatasetParameter(dataset_path)
+    obj.get_parameter()
+    print(obj.z)

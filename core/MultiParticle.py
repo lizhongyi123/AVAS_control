@@ -6,13 +6,9 @@ import os
 
 sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
-from core.AVASEngine import AVASEngine
-from utils.beamconfig import BeamConfig
-from utils.inputconfig import InputConfig
-from utils.latticeconfig import LatticeConfig
+from core.MultiParticleEngine import MultiParticleEngine
 
-
-class AVAS():
+class MultiParticle():
     """
     多粒子模拟
     """
@@ -25,23 +21,23 @@ class AVAS():
         outputfilePath = os.path.join(self.project_path, output_file)
 
         if platform.system() == 'Windows':
-            self.AVAS_engine = AVASEngine()
+            self.multiparticle_engine = MultiParticleEngine()
             self.runsignal = os.path.join(outputfilePath, 'runsignal.txt')
 
-            with open(self.runsignal, 'w') as f:
-                f.write('1')
+            # with open(self.runsignal, 'w') as f:
+            #     f.write('1')
 
-            res_tmp = self.AVAS_engine.get_path(inputfilepath, outputfilePath)
+            res_tmp = self.multiparticle_engine.get_path(inputfilepath, outputfilePath)
             # try:
-            res = self.AVAS_engine.main_agent(1)
+            res = self.multiparticle_engine.main_agent(1)
             # except:
             #     raise Exception("底层代码发生错误")
 
             if res == 1:
                 raise Exception('非正常结束')
 
-            with open(self.runsignal, 'w') as f:
-                f.write('2')
+            # with open(self.runsignal, 'w') as f:
+            #     f.write('2')
 
             return res
 
@@ -93,7 +89,7 @@ class AVAS():
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test812\CAFE"
+    project_path = r"C:\Users\anxin\Desktop\teat831"
 
     obj = AVAS(project_path)
 
@@ -103,5 +99,5 @@ if __name__ == "__main__":
     #     print(f"Running iteration {i + 1}")
     #     obj.run()
     #
-    # end = time.time()
-    # print(f"Total time: {end - start}")
+    end = time.time()
+    print(f"Total time: {end - start}")

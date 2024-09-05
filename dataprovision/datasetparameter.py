@@ -18,6 +18,7 @@ class DatasetParameter():
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
         index = 0
+        #确定到哪里为nan
         if '-nan(ind)' in dataset_info[-1]:
             for i in range(len(dataset_info)-1, -1, -1):
                 if '-nan(ind)' in dataset_info[i]:
@@ -28,7 +29,7 @@ class DatasetParameter():
 
             dataset_info = dataset_info[: index+1]
 
-        #确定到哪里为nan
+
         self.num_of_particle = float(dataset_info[0][28])
         # print(dataset_info[0])
         # print(len(dataset_info[0]))

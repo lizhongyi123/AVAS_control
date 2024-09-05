@@ -37,6 +37,9 @@ def copy_directory(source_folder, destination_folder, new_name=None):
     else:
         destination_folder = os.path.join(destination_folder, new_name)
 
+    if os.path.exists(destination_folder):
+        send2trash(destination_folder)
+
     shutil.copytree(source_folder, destination_folder)
 
 def delete_directory(path):

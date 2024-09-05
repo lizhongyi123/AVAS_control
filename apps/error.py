@@ -35,10 +35,10 @@ class Error():
     """
     该类为误差分析
     """
-    def __init__(self, project_path, seed=50):
+    def __init__(self, project_path, seed=50, if_normal=0):
         random.seed(seed)
         self.project_path = project_path
-
+        self.if_normal = if_normal
         self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
         self.lattice_path = os.path.join(self.project_path, 'InputFile', 'lattice.txt')
 
@@ -219,6 +219,7 @@ class Error():
         # for i in lattice:
         #     print(i)
         lattice = copy.deepcopy(lattice)
+
         index = 0
         #为元件增加编号
         for i in lattice:
@@ -237,6 +238,9 @@ class Error():
                 index += 1
                 err_command.append(i)
 
+        # for i in err_command:
+        #     print(i)
+        # breakpoint()
         #每一个误差命令的作用范围
         err_command_action_scope = []
         for i in err_command:
@@ -271,8 +275,6 @@ class Error():
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
 
-        # for i in lattice:
-        # #     print(i)
         lattice = self.delete_element_end_index(lattice)
         # for i in lattice:
         #     print(i)
@@ -286,13 +288,12 @@ class Error():
         #为cpl生成误差
         input_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
-        # for i in input_lines:
-        #     print(i)
-
 
         #将误差命令添加到每个元件上
         lattice = self.set_error_to_lattice(input_lines_copy)
-
+        # for i in lattice:
+        #     print(i)
+        # breakpoint()
 
 
         #去掉误差命令
@@ -375,13 +376,12 @@ class Error():
                 add_name = f'element_{index}'
                 i.append(add_name)
                 index += 1
-        # for i in res_treat:
-        #     print(i)
-        # sys.exit(0)
+
         self.lattice_mulp_list = res_treat
+
         # for i in self.lattice_mulp_list:
         #     print(i)
-
+        #
         # sys.exit(0)
 
     def generate_error_base(self, input, group):
@@ -516,7 +516,6 @@ class Error():
                 elif input_lines[i][0] in global_varible.error_elemment_command_stat_cpl or \
                         input_lines[i][0] in global_varible.error_elemment_command_dyn_cpl:
                     input_lines[i] = self.generate_error_base(input_lines[i], group)
-
 
         return input_lines
 
@@ -672,18 +671,17 @@ class Error():
         else:
             output = os.path.join(self.error_output_path, f"output_{group}_{time}")
 
-        if time == 0:
-            self.write_err_par_title()
-            self.write_err_par_tot_title()
 
         #解析正常的情况
-        if True:
+        if self.if_normal == 1:
             dataset_path = os.path.join(self.normal_out_path, "DataSet.txt")
 
             dataset_obj = DatasetParameter(dataset_path, self.project_path)
             dataset_obj.get_parameter()
 
             normal_ek = dataset_obj.ek[-1]
+        if self.if_normal == 0:
+            normal_ek = 0
 
 
         dataset_path = os.path.join(output, "DataSet.txt")
@@ -691,28 +689,27 @@ class Error():
 
         v1 = dataset_obj.get_parameter()
         if v1 is False:
-            return 0
-        if dataset_obj.z[-1] < (self.lattice_total_length-0.01):
-            return 0
-
-
-        errors_par_tot_list = [
-        f"{group}_{time}",
-        dataset_obj.loss[-1] / dataset_obj.num_of_particle,
-        dataset_obj.emit_x[-1]/dataset_obj.emit_x[0] - 1,
-        dataset_obj.emit_y[-1]/dataset_obj.emit_y[0] - 1,
-        dataset_obj.emit_z[-1]/dataset_obj.emit_z[0] - 1,
-        dataset_obj.x[-1],  # m
-        dataset_obj.y[-1],  # m
-        dataset_obj.x_1[-1],
-        dataset_obj.y_1[-1],
-        dataset_obj.rms_x[-1],
-        dataset_obj.rms_y[-1],
-        dataset_obj.rms_x1[-1],
-        dataset_obj.rms_y1[-1],
-        dataset_obj.ek[-1] - normal_ek,  # MeV
-        # dataset_obj.phi[-1] - normal_data[14],  # deg
-        ]
+            errors_par_tot_list = [f"{group}_{time}"] + [1] + [0]*12
+        elif dataset_obj.z[-1] < (self.lattice_total_length-0.01):
+            errors_par_tot_list = [f"{group}_{time}"] + [1] + [0]*12
+        else:
+            errors_par_tot_list = [
+            f"{group}_{time}",
+            dataset_obj.loss[-1] / dataset_obj.num_of_particle,
+            dataset_obj.emit_x[-1]/dataset_obj.emit_x[0] - 1,
+            dataset_obj.emit_y[-1]/dataset_obj.emit_y[0] - 1,
+            dataset_obj.emit_z[-1]/dataset_obj.emit_z[0] - 1,
+            dataset_obj.x[-1],  # m
+            dataset_obj.y[-1],  # m
+            dataset_obj.x_1[-1],
+            dataset_obj.y_1[-1],
+            dataset_obj.rms_x[-1],
+            dataset_obj.rms_y[-1],
+            dataset_obj.rms_x1[-1],
+            dataset_obj.rms_y1[-1],
+            dataset_obj.ek[-1] - normal_ek,  # MeV
+            # dataset_obj.phi[-1] - normal_data[14],  # deg
+            ]
 
 
         #写入到errors_par_tot
@@ -733,11 +730,11 @@ class Error():
             t_lis = [j for j in errors_par_tot_list[1:] if int(j[0].split("_")[0]) == group]
 
             t1_lis = [0] * 23
-            print()
             if len(t_lis) == 1:
                 t1_lis = t_lis[0] + [0] * 9
                 t1_lis[0] = group
-                t1_lis = [float(i) for i in t1_lis[1:]]
+                t1_lis = [float(i) for i in t1_lis]
+
 
 
 
@@ -813,8 +810,8 @@ class Error():
         write_to_txt(err_datas_path, res)
 
 class ErrorDyn(Error):
-    def __init__(self, project_path, seed):
-        super().__init__(project_path, seed)
+    def __init__(self, project_path, seed, if_normal):
+        super().__init__(project_path, seed, if_normal)
 
 
     def run_one_time(self, group, time):
@@ -869,8 +866,12 @@ class ErrorDyn(Error):
         跑动态误差
         return:
         """
-        self.run_normal()
-        self.write_err_par_every_time(0,0)
+        self.write_err_par_title()
+        self.write_err_par_tot_title()
+
+        if self.if_normal == 1:
+            self.run_normal()
+            self.write_err_par_every_time(0,0)
 
         self.get_group_time()
 
@@ -883,8 +884,8 @@ class ErrorDyn(Error):
                 self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
-    def __init__(self, project_path, seed):
-        super().__init__(project_path, seed)
+    def __init__(self, project_path, seed, if_normal):
+        super().__init__(project_path, seed, if_normal)
         self.all_error_lattice = []
         # 只优化
         # self.only_adjust_sign = 0
@@ -1513,8 +1514,11 @@ class Errorstat(Error):
             return 0
 
     def run(self):
-        self.run_normal()
-        self.write_err_par_every_time(0, 0)
+        self.write_err_par_title()
+        self.write_err_par_tot_title()
+        if self.if_normal == 1:
+            self.run_normal()
+            self.write_err_par_every_time(0, 0)
 
         self.get_group_time()
         self.opti = self.judge_opti()
@@ -1540,8 +1544,8 @@ class Errorstat(Error):
 
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path, seed):
-        super().__init__(project_path, seed)
+    def __init__(self, project_path, seed, if_normal):
+        super().__init__(project_path, seed, if_normal)
         self.err_type = 'stat_dyn'
 
 
@@ -1695,6 +1699,9 @@ class Errorstatdyn(Errorstat):
         2. 不需要优选
         :return:
         """
+        self.write_err_par_title()
+        self.write_err_par_tot_title()
+
 
         self.opti = self.judge_opti()
 
@@ -1712,6 +1719,11 @@ class Errorstatdyn(Errorstat):
                     self.all_error_lattice.append(self.lattice_mulp_list)
                     self.run_one_time_opti(i, j)
 
+            #将优化的结果进行保存
+            new_name = f'opti_output'
+            copy_directory(self.error_output_path,  self.output_path, new_name)
+
+
             if os.path.exists(self.error_middle_path):
                 delete_directory(self.error_middle_path)
             os.makedirs(self.error_middle_path)
@@ -1720,8 +1732,9 @@ class Errorstatdyn(Errorstat):
                 delete_directory(self.error_output_path)
             os.makedirs(self.error_output_path)
 
-            self.run_normal()
-            self.write_err_par_every_time(0, 0)
+            if self.if_normal == 1:
+                self.run_normal()
+                self.write_err_par_every_time(0, 0)
 
             self.generate_lattice_mulp_list(0)
 
@@ -1743,6 +1756,10 @@ class Errorstatdyn(Errorstat):
 
         # 第二种情况，不需要优化
         else:
+            if self.if_normal == 1:
+                self.run_normal()
+                self.write_err_par_every_time(0, 0)
+
             self.get_group_time()
 
             for i in range(1, self.all_group+1):
@@ -1799,23 +1816,14 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r'C:\Users\shliu\Desktop\test_err_dyn', 50)
-    # diag_every = {'1_1': [[0.43, 0.056450073999999996, 0.07275785, 1.2959200000000002, 1.28704, 1.52703],
-    #                       [0.64, -1.3910897999999998, 0.03951293, 1.68474, 1.66266, 2.08829]]}
-    # obj.write_diag_datas(diag_every)
+    obj = ErrorDyn(r'C:\Users\shliu\Desktop\test_tr_av\av_err_dyn', 50, 0)
+
     obj.run()
     # obj.treat_diag()
     # a = [1, 2]
     # b = [[8], [7, 8]]
     # c = [10, 11, 12]
     # obj.write_adjust_datas(1, 1, a, b, c)
-
-
-
-
-
-
-
 
 
     # obj = Errorstat(r'C:\Users\anxin\Desktop\test_err_stat')

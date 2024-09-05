@@ -91,36 +91,36 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed):
+def err_dyn(project_path, seed, if_normal=1):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-    v = ErrorDyn(project_path, seed)
+    v = ErrorDyn(project_path, seed, if_normal)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed):
+def err_stat(project_path, seed, if_normal=1):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path, seed)
+    v = Errorstat(project_path, seed, if_normal)
     v.run()
     
 
-def err_stat_dyn(project_path, seed):
+def err_stat_dyn(project_path, seed, if_normal=1):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path, seed)
+    v = Errorstatdyn(project_path, seed, if_normal)
     v.run()
     return None
 

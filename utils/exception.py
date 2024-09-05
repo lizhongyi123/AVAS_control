@@ -57,7 +57,7 @@ class RangeError(ValidationError):
 class ValueError(ValidationError):
     """当值不在预定的选择范围内时抛出。"""
     def __init__(self, key, expected_value, actual_value):
-        super().__init__(f"Invalid value for key '{key}': Expected one of {expected_value}, got {key}")
+        super().__init__(f"Invalid value for key '{key}': Expected one of {expected_value}, got {actual_value}")
         self.expected_value = expected_value
 
 class ValueInLstCheckError(Exception):

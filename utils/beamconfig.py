@@ -90,15 +90,14 @@ class BeamConfig():
                 raise TypeError("numofcharge", int, type(param["numofcharge"]))
 
         else:
-
-
             for k, v in param.items():
                 if k in self.int_keys and not isinstance(v, int):
                     raise TypeError(k, int, type(v))
                 elif k in self.float_keys and not isinstance(v, (int, float)):
                     raise TypeError(k, float, type(v))
                 elif k == "distribution_x" and v.lower not in ["wb", "pb", "gs", "kv"]:
-                    raise ValueError(k, ["wb", "pb", "gs", "kv"])
+                    raise ValueError(k, ["wb", "pb", "gs", "kv"], k)
+
 
 
 

@@ -89,9 +89,9 @@ class MultiParticle():
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"C:\Users\anxin\Desktop\teat831"
+    project_path = r"C:\Users\shliu\Desktop\test_new_avas\cafe\AVAS"
 
-    obj = AVAS(project_path)
+    obj = MultiParticle(project_path)
 
     obj.run()
     # # 运行两次

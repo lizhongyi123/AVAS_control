@@ -47,7 +47,7 @@ def read_txt(input, out='dict', readdall=None):
     for i in input_lines:
         tmp_dict = {}
         if len(i) == 1:
-            pass
+            res[i[0]] = None
         elif len(i) == 2:
             res[i[0]] = i[1]
         else:

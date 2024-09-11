@@ -74,11 +74,11 @@ class BeamConfig():
             if k not in self.beam_parameter_keys:
                 raise UnknownkeywordError(message=None, key=k)
 
-        #如果不存在未知元素
+        #如果不存在未知元素, 转换类型
         for k, v in original_dict.items():
             original_dict[k] = self.convert_v(k, v)
 
-
+        #赋值给self.beam_parameter 
         if self.validate_type(original_dict):
             for k, v in original_dict.items():
                 self.beam_parameter[k] = original_dict[k]
@@ -157,6 +157,7 @@ class BeamConfig():
 
     def validate_run(self, param):
         self.read_beam()
+        #当说有输入符合
         if self.beam_parameter["readparticledistribution"] is not None:
             v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
             v_dic['numofcharge'] = self.beam_parameter['numofcharge']

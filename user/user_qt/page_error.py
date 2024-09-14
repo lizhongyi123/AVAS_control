@@ -119,7 +119,7 @@ class PageError(QWidget):
         ##############################################
         group_box_seed = QGroupBox("")
         layout_seed = QHBoxLayout()
-        label_seed = QLabel("label")
+        label_seed = QLabel("seed")
         label_seed.setFixedSize(180, 12)  # 设置宽度和高度
         # label_charge.setAlignment(Qt.AlignCenter)  # 设置水平和垂直居中
 
@@ -250,9 +250,10 @@ class PageError(QWidget):
             seed_value = int(self.text_seed.text())
         else:
             seed_value = 0
-        ini_dict = self.ini_obj.read_ini()
+        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
         ini_dict['error']['seed'] = seed_value
-        self.ini_obj.write_ini(ini_dict)
+        self.ini_obj.set_param(**ini_dict)
+        self.ini_obj.write_to_file(self.ini_path)
 
 
 
@@ -338,7 +339,7 @@ class PageError(QWidget):
     def updatePath(self, new_path):
         self.project_path = new_path
         self.ini_path = os.path.join(self.project_path, "InputFile", 'ini.ini')
-        self.ini_obj = IniConfig(self.ini_path)
+        self.ini_obj = IniConfig()
 
     def cb_error_change(self, state):
         sender_checkbox = self.sender()  # 获取发送信号的复选框对象
@@ -358,7 +359,7 @@ class PageError(QWidget):
                 self.cb_stat_error.setChecked(False)
                 self.cb_dyn_error.setChecked(False)
 
-        ini_dict = self.ini_obj.read_ini()
+        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
 
         if self.cb_stat_error.isChecked():
             self.error_signal.emit('stat_error')
@@ -374,11 +375,11 @@ class PageError(QWidget):
         else:
             self.error_signal.emit(None)
             ini_dict['error']['error_type'] = '0'
-
-        self.ini_obj.write_ini(ini_dict)
+        self.ini_obj.set_param(**ini_dict)
+        self.ini_obj.write_to_file(self.ini_path)
 
     def fill_parameter(self):
-        ini_dict = self.ini_obj.read_ini()
+        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
         if ini_dict['error'] == '0':
             pass
         elif ini_dict['error']['error_type'] == 'stat_error':
@@ -389,14 +390,16 @@ class PageError(QWidget):
             self.cb_stat_error.setChecked(True)
 
         self.text_seed.setText(ini_dict['error']['seed'])
-        self.ini_obj.write_ini(ini_dict)
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageError(r'C:\Users\shliu\Desktop\test_err_dyn')
+    main_window = PageError(r'C:\Users\shliu\Desktop\test_new_avas\test913')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()
+    main_window.updatePath(r'C:\Users\shliu\Desktop\test_new_avas\test913')
     sys.exit(app.exec_())
 
 

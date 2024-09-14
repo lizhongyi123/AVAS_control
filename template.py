@@ -16,8 +16,10 @@ if __name__ == '__main__':
 
     # project_path = r'C:\Users\shliu\Desktop\test812\CAFE'
     #
-    # process = multiprocessing.Process(target=basic_mulp,
-    #                                   args=(project_path,))
-    #
-    # process.start()  # 启动子进程
-    # process.join()  # 等待子进程运行结束
+
+    import multiprocessing
+    process = multiprocessing.Process(target=basic_mulp,
+                                      args=(project_path,))
+
+    process.start()  # 启动子进程
+    process.join()  # 等待子进程运行结束

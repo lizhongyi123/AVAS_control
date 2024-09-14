@@ -5,7 +5,7 @@ import numpy as np
 
 def write_to_txt():
     pass
-def read_txt(input, out='dict', readdall=None):
+def read_txt(input, out='dict', readdall=None, case_sensitive=None):
     """
     :param input: 需要读取的txt文件
     :out:结果返回的类型，可选参数为dict， list
@@ -33,7 +33,10 @@ def read_txt(input, out='dict', readdall=None):
 
 
     input_lines = [i.split() for i in input_lines if i.strip()]
-    input_lines = [[word.lower() for word in line] for line in input_lines]
+
+    if not case_sensitive:
+        #如果大小写不敏感，全都变成小写，如果敏感
+        input_lines = [[word.lower() for word in line] for line in input_lines]
 
     for i in input_lines:
         if i[0] == 'bend':
@@ -136,6 +139,7 @@ def read_runsignal(path):
         line = file.readline()
         res = int(line)
     return res
+
 
 
 

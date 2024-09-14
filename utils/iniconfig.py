@@ -1,40 +1,35 @@
-# class CfgConfig():
-#     def __init__(self, cfg_path):
-#         self.cfg_path = cfg_path
-#
-#     def read_cfg(self):
-#
+
+
 import configparser
 import os
 
-
 class IniConfig():
-    def __init__(self, ini_path):
-        self.ini_path = ini_path
-
-    def initialize(self):
-
-        ini_dict = \
+    def __init__(self):
+        self.ini_parameter = \
         {"project": {"project_path": 0},
         "lattice":{"length": 0},
          "input": {"sim_type": 0},
          "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
          "error": {"error_type": 0, "seed": 0},
          }
-        return ini_dict
 
-    def read_ini(self):
+    # def initialize_ini(self):
+
+
+
+
+    def creat_from_file(self, path):
         """
         读取 INI 文件并返回其内容作为一个字典。
 
         :return: 包含 INI 文件内容的字典
         """
-        if not os.path.exists(self.ini_path):
-            print(f"文件路径 {self.ini_path} 不存在。")
+        if not os.path.exists(path):
+            print(f"文件路径 {path} 不存在。")
             return {}
 
         config = configparser.ConfigParser()
-        config.read(self.ini_path, encoding='utf-8')  # 确保文件以正确的编码读取
+        config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
 
         ini_dict = {}
         for section in config.sections():
@@ -42,10 +37,23 @@ class IniConfig():
             for key, value in config.items(section):
                 ini_dict[section][key] = value
 
-        return ini_dict
+        self.ini_parameter = ini_dict
+        return self.ini_parameter
 
+    def set_param(self, **kwargs):
+        """
+        更新 INI 文件中的值。
 
-    def write_ini(self, ini_dict):
+        :param kwargs: 字典格式的键值对，用于更新 INI 文件
+        """
+        for section, values in kwargs.items():
+            if section in self.ini_parameter:
+                self.ini_parameter[section].update(values)
+            else:
+                print(f"节 {section} 不存在。")
+
+        return True
+    def write_to_file(self, path):
         """
         将字典内容写入 INI 文件。
 
@@ -54,17 +62,27 @@ class IniConfig():
         """
         config = configparser.ConfigParser()
 
-        for section, section_data in ini_dict.items():
+        for section, section_data in self.ini_parameter.items():
             config[section] = section_data
 
-        with open(self.ini_path, 'w', encoding='utf-8') as configfile:
+        with open(path, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
 
+        return True
 # 示例用法
 
+if __name__ == '__main__':
+    file_path = r"C:\Users\shliu\Desktop\test_new_avas\test913\InputFile\ini.ini"  # 替换为你的 INI 文件路径
+    cfg = IniConfig(file_path)
+    cfg.read_ini()
+    cfg.set_ini(
+        project={"project_path": "C:/new/path"},
+        lattice={"length": 100},
+        match={"use_initial_value": 1}
+    )
 
-# file_path = r'C:\Users\shliu\Desktop\78\InputFile\78.ini'  # 替换为你的 INI 文件路径
-# cfg = IniConfig(file_path)
-# ini_dict = cfg.initialize()
-# cfg.write_ini(ini_dict)
+
+    print(cfg.ini_dict)
+    # ini_dict = cfg.initialize()
+    # cfg.write_ini(ini_dict)
 

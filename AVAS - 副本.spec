@@ -18,6 +18,7 @@ a = Analysis(
     './aftertreat/picture/plotdataset.py',
     './aftertreat/picture/plotenvbeamout.py',
     './aftertreat/picture/ploterror.py',
+    './aftertreat/picture/ploterrpar.py',
     './aftertreat/picture/plotphase.py',
     './aftertreat/picture/plotpicture.py',
 

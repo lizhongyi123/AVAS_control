@@ -1,5 +1,4 @@
 """本文件主要用来处理可能遇到的各种报错"""
-from setuptools.config._validate_pyproject import ValidationError
 
 
 class CustomError(Exception):
@@ -30,7 +29,7 @@ class TypeError(Exception):
 
 class ListLengthError(Exception):
     """当列表长度不满足预期时抛出"""
-    def __init__(self, mkey, expected_length, actual_length, message=None):
+    def __init__(self, key, expected_length, actual_length, message=None):
         super().__init__(message)
         self.message = message
         self.key = key
@@ -50,10 +49,10 @@ class ValueRangeError(Exception):
         self.expected_range = expected_range
         self.actual_value = actual_value
     def __str__(self):
-        return f"Out of range value for key '{self.key}': Expected range {self.expected_range}, got {self.value}"
+        return f"Out of range value for key '{self.key}': Expected range {self.expected_range}, got {self.actual_value}"
 
 
-class ValueChoosesError(ValidationError):
+class ValueChooseError(Exception):
     """当值不在预定的选择范围内时抛出。"""
     def __init__(self, key, expected_value, actual_value, message=None):
         super().__init__(message)
@@ -63,9 +62,9 @@ class ValueChoosesError(ValidationError):
         self.actual_value = actual_value
 
     def __str__(self):
-        f"Invalid value for key '{self.key}': Expected one of {self.expected_value}, got {self.actual_value}"
+        return f"Invalid value for key '{self.key}': Expected one of {self.expected_value}, got {self.actual_value}"
 
-class ValueConvertError(ValidationError):
+class ValueConvertError(Exception):
     """当值不在预定的选择范围内时抛出。"""
     def __init__(self, key, expected_type, actual_value, message=None):
         super().__init__(message)
@@ -87,6 +86,14 @@ class UnknownkeywordError(Exception):
     def __str__(self):
         return f"Unknown keyword {self.key}"
 
+class UnknownkeywordError(Exception):
+    # 检查是否缺少元素
+    def __init__(self,  key, message=None):
+        super().__init__(message)
+        self.key = key
+
+    def __str__(self):
+        return f"Unknown keyword {self.key}"
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ from user.user_qt.page_match import PageMatch
 from user.user_qt.page_others import PageOthers
 from user.user_qt.page_output import PageOutput
 
-from user.user_qt.page_function import PageFunction
+
 from user.user_qt.page_data import PageData
 from api import basic_mulp, match_twiss, circle_match, \
     err_dyn, err_stat, err_stat_dyn
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
         self.page_accept.updatePath(self.project_path)
 
         self.ini_path = os.path.join(self.project_path, "inputFile", 'ini.ini')
-        self.ini_obj = IniConfig(self.ini_path)
+        self.ini_obj = IniConfig()
 
 
     @treat_err
@@ -339,8 +339,8 @@ class MainWindow(QMainWindow):
         with open(lattice_mulp, "w") as file:
 
             file.write("")
-        in_dict = self.ini_obj.initialize()
-        self.ini_obj.write_ini(in_dict)
+        self.ini_obj.initialize_ini()
+        self.ini_obj.write_ini()
 
     def run(self):
 

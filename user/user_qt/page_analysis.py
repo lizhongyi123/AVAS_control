@@ -726,7 +726,7 @@ class PageAnalysis(QWidget):
 
 
 
-        gb1_layout.addWidget(plt_to_dst_group_box)
+        # gb1_layout.addWidget(plt_to_dst_group_box)
         gb1_layout.addWidget(phase_group_box)
         gb1_layout.addWidget(group_box_in_out)
         gb1_layout.addStretch(1)

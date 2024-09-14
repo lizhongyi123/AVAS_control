@@ -4,7 +4,6 @@ from core.MultiParticle import MultiParticle
 from aftertreat.picture.plotdataset import PlotDataSet
 from aftertreat.picture.plotphase import PlotPhase
 from aftertreat.dataanalysis.caltwiss import CalTwiss
-from aftertreat.picture.ploterror1 import PlotError
 from aftertreat.picture.plotenvbeamout import PlotEnvBeamOut
 
 from apps.changeNp import ChangeNp

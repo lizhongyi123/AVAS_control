@@ -148,7 +148,7 @@ class BeamConfig():
 
         print("set", self.beam_parameter)
 
-        return True
+        return self.beam_parameter
 
     def convert_v(self, k, v):
         if v is not None:

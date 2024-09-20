@@ -151,4 +151,7 @@ if __name__ == "__main__":
     # path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
     # res = read_dst(path)
     # print(res['phase'][0])
-    read_runsignal(0)
+    # read_runsignal(0)
+    path = r"C:\Users\shliu\Desktop\mebt\AVAS_hu\InputFile\part_rfq.dst"
+    res = read_dst_fast(path)
+    print(res)

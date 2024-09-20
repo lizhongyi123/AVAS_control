@@ -9,7 +9,7 @@ class InputConfig():
         self.input_parameter_keys = ["scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
 
-        self.input_parameter = {'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
+        self.input_parameter = {'sim_type': None,  'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
                                 "maxthreads": None}
     # def initialize_input(self):
     #     self.input_parameter = {'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
@@ -58,7 +58,7 @@ class InputConfig():
             self.input_parameter[k] = v
 
         print("set", self.input_parameter)
-        return True
+        return self.input_parameter
     def write_to_file(self, path):
 
         v_dic = copy.deepcopy(self.input_parameter)

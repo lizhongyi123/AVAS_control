@@ -16,8 +16,6 @@ class IniConfig():
     # def initialize_ini(self):
 
 
-
-
     def creat_from_file(self, path):
         """
         读取 INI 文件并返回其内容作为一个字典。
@@ -52,7 +50,8 @@ class IniConfig():
             else:
                 print(f"节 {section} 不存在。")
 
-        return True
+        return self.ini_parameter
+
     def write_to_file(self, path):
         """
         将字典内容写入 INI 文件。
@@ -69,6 +68,7 @@ class IniConfig():
             config.write(configfile)
 
         return True
+
 # 示例用法
 
 if __name__ == '__main__':

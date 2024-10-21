@@ -1,6 +1,6 @@
 ﻿import sys
 import time
-
+from matplotlib.figure import Figure
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget, QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox, \
     QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
 import os
 from utils.readfile import read_txt, read_dst
 from PyQt5.QtCore import Qt, QSize
-from api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
+from apis.basic_api.api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
      plot_phase, plot_phase_advance
 from user.user_qt.user_defined import treat_err
 
@@ -18,7 +18,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
-from api import plot_env_beam_out
+from apis.basic_api.api import plot_env_beam_out
 
 from aftertreat.dataanalysis.plttodst import Plttozcode
 class PictureDialog1(QDialog):
@@ -90,6 +90,8 @@ class MyPictureDialog(QDialog):
         self.func = func
         self.project_path = project_path
         self.figsize = (6.4, 4.6)
+        self.fig = Figure(figsize=self.figsize) # 创建figure对象
+
 
     def initUI(self):
         winflags = Qt.Dialog
@@ -107,7 +109,7 @@ class MyPictureDialog(QDialog):
         # self.setGeometry(200, 200, 640, 480)
 
 ################################
-        self.fig = plt.figure(figsize=self.figsize)  # 创建figure对象
+
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################
@@ -156,7 +158,8 @@ class SyncPhaseDialog(MyPictureDialog):
 
 
     def plot_image(self):
-        self.func(self.project_path, show_=0)
+        self.func(self.project_path, show_=0, fig=self.fig)
+        self.canvas.draw()
 
 
 
@@ -171,7 +174,7 @@ class PhaseDialog(MyPictureDialog):
 
 
     def plot_image(self):
-        self.func(self.dst_path, show_=0)
+        self.func(self.dst_path, show_=0, fig=self.fig)
 
 
 
@@ -185,7 +188,7 @@ class LossDialog(MyPictureDialog):
 
 
     def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, show_=0)
+        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
 
 
 
@@ -195,7 +198,7 @@ class EnergyDialog(MyPictureDialog):
         self.picture_name = 'energy'
 
     def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, show_=0)
+        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
 
 
 class BeamPahseAdvanceDialog(MyPictureDialog):
@@ -205,7 +208,7 @@ class BeamPahseAdvanceDialog(MyPictureDialog):
 
     def plot_image(self):
 
-        self.func(self.project_path, self.pm, show_=0)
+        self.func(self.project_path, self.pm, show_=0, fig=self.fig)
         self.canvas.draw()
 
 
@@ -218,7 +221,7 @@ class EnvelopeDialog(QDialog):
         self.picture_name = 'rms_x'
 
         self.fig_size = (6.4,4.6)
-
+        self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
 
     def initUI(self):
         winflags = Qt.Dialog
@@ -233,7 +236,6 @@ class EnvelopeDialog(QDialog):
         self.setWindowTitle('弹出窗口')
         # self.setGeometry(200, 200, 400, 300)
 ################################
-        self.fig = plt.figure(figsize=self.fig_size)  # 创建figure对象
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################
@@ -259,9 +261,8 @@ class EnvelopeDialog(QDialog):
         self.plot_image()
 
     def plot_image(self):
-        print(self.picture_name)
         # self.fig.clf()
-        self.func(self.project_path, self.picture_name, show_=0)
+        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
         self.canvas.draw()
 
     def resizeEvent(self, event):
@@ -341,7 +342,7 @@ class CavityVoltageDialog(QDialog):
         self.project_path = project_path
         self.ratio = {}
         self.field_num = 0
-
+        self.fig = Figure(figsize=(6.4, 4.6))  # 创建figure对象
     def initUI(self):
         winflags = Qt.Dialog
         # 添加最小化按钮
@@ -356,7 +357,7 @@ class CavityVoltageDialog(QDialog):
         self.setWindowTitle('弹出窗口')
 
 ################################
-        self.fig = plt.figure(figsize=(6.4, 4.6))  # 创建figure对象
+
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################
@@ -416,7 +417,8 @@ class CavityVoltageDialog(QDialog):
 
 
     def plot_image(self):
-        self.func(self.project_path, self.ratio, show_=0)
+        self.fig.clear()
+        self.func(self.project_path, self.ratio, show_=0, fig=self.fig)
         self.canvas.draw()
 
 
@@ -467,7 +469,7 @@ class EnvBeamOutDialog(MyPictureDialog):
         self.picture_name = picture_name
 
     def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, show_=0)
+        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
 
 class EnvAlphaDialog(EnvelopeDialog):
     def __init__(self, project_path, func):
@@ -926,7 +928,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test_chu')
+    main_window = PageAnalysis(r'C:\Users\shliu\Desktop\eee')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
 
         self.page_data = PageData(self.project_path)
         self.page_error = PageError(self.project_path)
-        self.page_longdistance = PageLongdistance(self.project_path)
+        # self.page_longdistance = PageLongdistance(self.project_path)
         self.page_output = PageOutput(self.project_path)
         self.page_accept = PageAccept(self.project_path)
 
@@ -295,7 +295,7 @@ class MainWindow(QMainWindow):
         self.page_data.updatePath(self.project_path)
         self.page_analysis.updatePath(self.project_path)
         self.page_error.updatePath(self.project_path)
-        self.page_longdistance.updatePath(self.project_path)
+        # self.page_longdistance.updatePath(self.project_path)
         self.page_others.updatePath(self.project_path)
         self.page_output.updatePath(self.project_path)
         self.page_accept.updatePath(self.project_path)
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
         self.page_beam.fill_parameter()
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
-        self.page_longdistance.fill_parameter()
+        # self.page_longdistance.fill_parameter()
         self.page_error.fill_parameter()
 
     @treat_err
@@ -381,8 +381,10 @@ class MainWindow(QMainWindow):
 
             # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
             # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
-
-            self.page_data.fill_parameter()
+            try:
+                self.page_data.fill_parameter()
+            except Exception as e:
+                print(e)
 
         elif self.basic_signal == 'basic_env':
             self.func_basic_env()
@@ -422,8 +424,11 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
-            self.page_output.update_progress()
-
+            try:
+                print(428)
+                self.page_output.update_progress()
+            except Exception as e:
+                print(e)
 
 
 
@@ -472,7 +477,7 @@ class MainWindow(QMainWindow):
             elif err_type == 'stat_dyn':
                 target = err_stat_dyn
 
-            seed_value = int(self.ini_obj.read_ini()['error']['seed'])
+            seed_value = int(self.ini_obj.creat_from_file(self.ini_path)['error']['seed'])
 
             self.err_process = multiprocessing.Process(target=target, args=(self.project_path, seed_value))
             self.err_process.start()
@@ -549,6 +554,7 @@ class MainWindow(QMainWindow):
         self.match_signal = signal
 
     def initialize_page(self):
+        print(self.settings.value("lastProjectPath", None))
         if self.settings.value("lastProjectPath", None) is None:
             pass
 

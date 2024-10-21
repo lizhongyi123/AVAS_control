@@ -30,7 +30,7 @@ class CreatBasicFile():
     def create_basic_input_file(self):
         input_config = InputConfig()
         input_info = {
-            'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0,
+            "!sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0,
             "maxthreads": -1
         }
         input_config.set_param(**input_info)
@@ -43,14 +43,22 @@ class CreatBasicFile():
 
     def create_basic_ini_file(self):
         ini_config = IniConfig()
+        ini_info = {"input": {"!sim_type": "mulp"}}
+
+        ini_config.set_param(**ini_info)
         ini_config.write_to_file(self.ini_path)
 
-class CreatBasicProject():
+class CreateBasicProject():
     def __init__(self, project_path):
         self.project_path = project_path
 
     def create_project(self):
-        os.makedirs(self.project_path)
+        if not os.path.exists(self.project_path):
+            os.makedirs(self.project_path)
+        elif os.path.exists(self.project_path):
+            raise FileExistsError(f"The directory '{project_path}' already exists.")
+
+
         input_file = os.path.join(self.project_path, 'InputFile')
         output_file = os.path.join(self.project_path, 'OutputFile')
         os.makedirs(input_file)
@@ -66,12 +74,12 @@ class CreatBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test_new_avas\eee"
+    project_path = r"C:\Users\shliu\Desktop\eee"
     # CreatBasicFile(project_path).create_basic_beam_file()
     # CreatBasicFile(project_path).create_basic_input_file()
     # CreatBasicFile(project_path).create_basic_lattice_mulp_file()
     # CreatBasicFile(project_path).create_basic_ini_file()
 
-    obj = CreatBasicProject(project_path)
+    obj = CreateBasicProject(project_path)
     obj.create_project()
 

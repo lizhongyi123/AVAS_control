@@ -257,7 +257,8 @@ class PageLattice(QWidget):
 
             self.text_match_lattice.setPlainText(file_contents)
 
-
+        else:
+            pass
     @treat_err
     def save_file(self):
         if not self.project_path:

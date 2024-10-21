@@ -31,6 +31,7 @@ import global_varible
 import copy
 
 from utils.tolattice import write_mulp_to_lattice_only_sim
+from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
 class Error():
     """
     该类为误差分析
@@ -530,15 +531,25 @@ class Error():
         #模拟没有误差的情况
         write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
 
+        ouput = os.path.normpath(os.path.join(self.project_path, 'OutputFile/error_middle/output_0'))
+        os.mkdir(ouput)
 
         process = multiprocessing.Process(target=self.run_multiparticle,
-                                          args=(self.project_path, 'OutputFile/error_output/output_0_0'))
-        print
+                                          args=(self.project_path, 'OutputFile/error_middle/output_0'))
+
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
 
+        self.write_density_every_time(0, 0)
+
         copy_file(self.lattice_path, self.normal_out_path)
 
+        new_name = f'output_0_0'
+
+
+        copy_directory(self.error_middle_output0_path, self.error_output_path, new_name)
+
+        delete_directory(self.error_middle_output0_path)
 
     # def get_normal_data(self):
     #     path = os.path.join(self.error_output_path, "output_-1_-1")
@@ -775,9 +786,52 @@ class Error():
             add_to_txt(self.errors_par_path, [t1_lis])
 
 
+    def write_density_every_time(self, group, time):
 
+        is_normal = 0
+        if group == 0:
+            is_normal = 1
 
+        beamset_path = os.path.join(self.error_middle_output0_path, "BeamSet.plt")
 
+        dataset_path = os.path.join(self.error_middle_output0_path, "DataSet.txt")
+        target_density_path = os.path.join(self.output_path,  f"density_par_{group}_{time}.dat")
+        # print(dataset_path)
+        # sys.exit()
+        if is_normal == 1:
+            # print(802)
+            # print(dataset_path)
+            # print(target_density_path)
+            density_obj = PlttoDensity(beamset_path,  dataset_path, target_density_path)
+            density_obj.generate_density_file_onestep(is_normal)
+
+        elif is_normal == 0:
+            #如果不是正常模拟
+            normal_density_path = os.path.join(self.output_path,  f"density_par_{0}_{0}.dat")
+            density_obj = PlttoDensity(beamset_path, dataset_path, target_density_path, normal_density_path, self.project_path)
+            density_obj.generate_density_file_onestep(is_normal)
+
+        os.remove(beamset_path)
+
+        if time == self.all_time:
+            #到了某一组的最后一次模拟
+            all_file = list_files_in_directory(self.output_path)
+
+            filtered_files = [path for path in all_file if f'density_par_{group}' in path]
+            target_density_path = os.path.join(self.output_path, f"density_tot_par_{group}.dat")
+
+            merge_obj = MergeDensityData(filtered_files, target_density_path)
+            merge_obj.generate_density_file()
+
+        if group == self.all_group and time == self.all_time:
+            #到了所有组的最后一次模拟
+            all_file = list_files_in_directory(self.output_path)
+
+            filtered_files = [path for path in all_file if f'density_tot_par' in path]
+            target_density_path = os.path.join(self.output_path, f"density_tot_par.dat")
+
+            merge_obj = MergeDensityData(filtered_files, target_density_path)
+            merge_obj.generate_density_file()
 
     def write_err_datas(self, group, time):
 
@@ -851,6 +905,8 @@ class ErrorDyn(Error):
 
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
+
+        self.write_density_every_time(group, time)
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
@@ -1418,6 +1474,7 @@ class Errorstat(Error):
         process.start()  # 启动子进程
         process.join()  # 等待子进程运行结束
 
+        self.write_density_every_time(group, time)
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
@@ -1687,6 +1744,8 @@ class Errorstatdyn(Errorstat):
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
+        self.write_density_every_time(group, time)
+
         new_name = f'output_{group}_{time}'
 
         copy_directory(self.error_middle_output0_path, self.error_output_path, new_name)
@@ -1816,7 +1875,8 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r'C:\Users\shliu\Desktop\test_tr_av\av_err_dyn', 50, 0)
+    obj = Errorstat(r'C:\Users\shliu\Desktop\testz',
+                    50, 1)
 
     obj.run()
     # obj.treat_diag()

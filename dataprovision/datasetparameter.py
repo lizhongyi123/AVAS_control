@@ -2,8 +2,7 @@
 
 from utils.readfile import read_dst, read_txt
 import math
-import numpy as np
-from global_varible import c_light
+
 from global_varible import Pi, c_light
 from dataprovision.latticeparameter import LatticeParameter
 class DatasetParameter():
@@ -17,6 +16,7 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+
         index = 0
         #确定到哪里为nan
         if '-nan(ind)' in dataset_info[-1]:
@@ -34,12 +34,13 @@ class DatasetParameter():
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
         dataset_info = [[float(j) for j in i] for i in dataset_info]
-        # self.z = [i[5] for i in dataset_info]
+
 
         self.z = []
         sign1 = 0
         sign2 = 0
 
+        # self.z = [i[33] for i in dataset_info]
         for i in range(len(dataset_info)):
             if (dataset_info[i][35] == 0):
                 sign2 = 0
@@ -63,6 +64,11 @@ class DatasetParameter():
         self.y = [i[3] + i[31] for i in dataset_info]
         self.py = [i[4] for i in dataset_info]
 
+        # print("66")
+        # print([i[1] for i in dataset_info][:4])
+        # print([i[3] for i in dataset_info])
+        self.syn_x = [i[29] for i in dataset_info]
+        self.syn_y = [i[31] for i in dataset_info]
 
         self.pz = [i[6] for i in dataset_info]
         
@@ -150,7 +156,41 @@ class DatasetParameter():
 
 
 if __name__ == "__main__":
-    dataset_path = r"C:\Users\anxin\Desktop\test_830\OutputFile\DataSet.txt"
-    obj = DatasetParameter(dataset_path)
+    # path1 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_0_0\DataSet.txt"
+    # obj = DatasetParameter(path1)
+    # obj.get_parameter()
+    # print(obj.z)
+    #
+    # path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
+    # obj = DatasetParameter(path2)
+    # obj.get_parameter()
+    # print(obj.z)
+    import numpy as np
+    path1 = r"C:\Users\shliu\Desktop\testz\OutputFile\output_0_0\DataSet.txt"
+    obj = DatasetParameter(path1)
     obj.get_parameter()
-    print(obj.z)
+    z1 = np.array(obj.z)
+
+    path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
+    obj = DatasetParameter(path2)
+    obj.get_parameter()
+    z2 = np.array(obj.z)
+    z3 = np.array(obj.z)[:len(z1)]
+    print(len(z1))
+    print(len(z2))
+
+    print(z1[-1])
+    print(z2[len(z1)])
+    print(z3[-1])
+    # print(z2[-5] - z1[-5])
+
+
+    print((z3-z1) * 1000)
+    x = z1
+    y = (z3-z1) * 1000
+    import matplotlib
+    import numpy as np
+    matplotlib.use('TKAgg')
+    import matplotlib.pyplot as plt
+    plt.scatter(x, y)
+    plt.show()

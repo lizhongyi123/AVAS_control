@@ -129,5 +129,5 @@ class CircleMatch():
 
 if __name__ == "__main__":
     # os.chdir(r'C:\Users\anxin\Desktop\circle_match')
-    v = CircleMatch(r'C:\Users\anxin\Desktop\test_env')
+    v = CircleMatch(r'C:\Users\shliu\Desktop\AVAS914\test')
     v.circle_match('lattice_env.txt')

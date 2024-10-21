@@ -4,14 +4,12 @@
 class CustomError(Exception):
     """基础的自定义异常类，用于处理多种不同的错误情况。"""
 
-    def __init__(self, message, error_code=None, **kwargs):
+    def __init__(self, message):
         super().__init__(message)
         self.message = message
-        self.error_code = error_code
-        self.extra_data = kwargs
 
     def __str__(self):
-        return f"{self.message} {self.extra_data}"
+        return f"{self.message}"
 
 
 
@@ -41,7 +39,7 @@ class ListLengthError(Exception):
 
 
 class ValueRangeError(Exception):
-    """当数值不在预定的范围内时抛出。"""
+    """当数值不在预定的范围内时抛出。范围"""
     def __init__(self, key, expected_range, actual_value, message=None):
         super().__init__(message)
         self.message = message
@@ -53,7 +51,7 @@ class ValueRangeError(Exception):
 
 
 class ValueChooseError(Exception):
-    """当值不在预定的选择范围内时抛出。"""
+    """当值不在预定的选择范围内时抛出。固定选择"""
     def __init__(self, key, expected_value, actual_value, message=None):
         super().__init__(message)
         self.message = message
@@ -86,14 +84,15 @@ class UnknownkeywordError(Exception):
     def __str__(self):
         return f"Unknown keyword {self.key}"
 
-class UnknownkeywordError(Exception):
-    # 检查是否缺少元素
+class MisskeywordError(Exception):
+    # 检查字典中的某个键是否存在错误
     def __init__(self,  key, message=None):
         super().__init__(message)
         self.key = key
 
     def __str__(self):
-        return f"Unknown keyword {self.key}"
+        return f"missing parameter {self.key}"
+
 
 
 if __name__ == "__main__":

@@ -18,9 +18,8 @@ def split_file(file_path):
 
 # 判断哪一个文件是否在文件夹中():
 def file_in_directory(file, directory):
-    file_list = split_file(file)
-    directory_list = [split_file(i) for i in list_files_in_directory(directory)]
-    print(file_list, directory_list)
+    file_list = os.path.normpath(file)
+    directory_list = [os.path.normpath(i) for i in list_files_in_directory(directory)]
     if file_list in directory_list:
         return True
     else:
@@ -60,10 +59,7 @@ def delete_file(path):
     """
     send2trash(path)
 if __name__ == "__main__":
-    path = r"C:\Users\anxin\Desktop\test_mulp\OutputFile"
-    path =os.path.join(path, 'error_output')
-    path = 'C:\\Users\\anxin\\Desktop\\test_mulp\\OutputFile\\error_output\\output_0'
-    p1 = '1.txt'
-    res = file_in_directory(p1, path)
-    # # res = file_in_directory(p1,p2)
+    path1 = r"C:\Users\shliu\Desktop\eee\part_rfq.dst"
+    path2 = r"C:\Users\shliu\Desktop\eee\InputFile"
+    res = file_in_directory(path1, path2)
     print(res)

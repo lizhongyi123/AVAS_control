@@ -23,26 +23,26 @@ class BeamsetParameter():
 
             tdata = struct.unpack("<i", f.read(4))
             self.dumpPeriodicity = int(tdata[0])
-            print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
+            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
 
             tdata = struct.unpack("<i", f.read(4))
-            self.numofp = int(tdata[0])
-            print("粒子数为：{aa}".format(aa=self.numofp))
+            numofp = int(tdata[0])
+            # print("粒子数为：{aa}".format(aa=self.numofp))
 
             tdata = struct.unpack("<d", f.read(8))
             self.Ib = float(tdata[0])
-            print("流强为：{aa}mA".format(aa=self.Ib))
+            # print("流强为：{aa}mA".format(aa=self.Ib))
 
             tdata = struct.unpack("<d", f.read(8))
             self.freq = float(tdata[0])
-            print("频率为：{aa}MHz".format(aa=self.freq))
+            # print("频率为：{aa}MHz".format(aa=self.freq))
 
             tdata = struct.unpack("<d", f.read(8))
             self.BaseMassInMeV = float(tdata[0])
-            print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
 
             #一步的字节数
-        byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 4) * self.numofp
+        byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 4) * numofp
         byte_onestep_head = 1 + 1 + 4*2 + 8*3
 
         file_size = os.path.getsize(self.beamset_path)
@@ -68,35 +68,35 @@ class BeamsetParameter():
 
             tdata = struct.unpack("<i", f.read(4))
             self.dumpPeriodicity = int(tdata[0])
-            print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
+            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
 
             tdata = struct.unpack("<i", f.read(4))
             self.numofp = int(tdata[0])
-            print("粒子数为：{aa}".format(aa=self.numofp))
+            # print("粒子数为：{aa}".format(aa=self.numofp))
 
             tdata = struct.unpack("<d", f.read(8))
             self.Ib = float(tdata[0])
-            print("流强为：{aa}mA".format(aa=self.Ib))
+            # print("流强为：{aa}mA".format(aa=self.Ib))
 
             tdata = struct.unpack("<d", f.read(8))
             self.freq = float(tdata[0])
-            print("频率为：{aa}MHz".format(aa=self.freq))
+            # print("频率为：{aa}MHz".format(aa=self.freq))
 
             tdata = struct.unpack("<d", f.read(8))
             self.BaseMassInMeV = float(tdata[0])
-            print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
 
             #一步的字节数
             byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 4) * self.numofp
 
-            f.seek( num * byte_onestep, 1)
+            f.seek(num * byte_onestep, 1)
             self.one_step_dict = {}
             self.one_step_list = []
 
             while True:
                 try:
                     tdata = struct.unpack("<c", f.read(1))
-                    print(tdata)
+                    # print(tdata)
                 except struct.error:
                     print("所选步数超过了总步数")
                     break
@@ -105,19 +105,19 @@ class BeamsetParameter():
 
                     tpye = struct.unpack("<i", f.read(4))
                     self.one_step_dict["tpye"] = int(tpye[0])
-                    print("tpye", tpye)
+                    # print("tpye", tpye)
 
                     Index = struct.unpack("<i", f.read(4))
                     self.one_step_dict["index"] = int(Index[0])
-                    print("index", Index)
+                    # print("index", Index)
 
                     time = struct.unpack("<d", f.read(8))
                     self.one_step_dict["time"] = float(time[0])
-                    print(time)
+                    # print(time)
 
                     location = struct.unpack("<d", f.read(8))
                     self.one_step_dict["location"] = float(location[0])
-                    print("location",location)
+                    # print("location", location)
 
 
                     for i in range(self.numofp):
@@ -132,8 +132,10 @@ class BeamsetParameter():
                 # zmin = min(z)
                 # print(zmax, zmin)
 
-                print([i for i in self.one_step_list if i[-1] == 2])
+                # print([i for i in self.one_step_list if i[-1] == 2])
                 break
+        return self.one_step_dict, self.one_step_list
+
 
     def get_parameter(self):
         with open(self.beamset_path, 'rb') as f:
@@ -189,7 +191,7 @@ class BeamsetParameter():
 
                     Index = struct.unpack("<i", f.read(4))
                     every_step_dict["Index"] = int(Index[0])
-                    print(Index)
+                    # print(Index)
 
                     time = struct.unpack("<d", f.read(8))
                     every_step_dict["time"] = float(time[0])
@@ -213,18 +215,29 @@ class BeamsetParameter():
 
 if __name__ == "__main__":
     import os
-    # project_path = r"C:\Users\anxin\Desktop\test_chu"
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
-
-    beamset_pasth = os.path.join(project_path, "OutputFile", "BeamSet.plt")
+    import numpy as np
+    beamset_pasth = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_2\BeamSet.plt"
     obj = BeamsetParameter(beamset_pasth)
-    res = obj.get_step()
-    print(res)
-    obj.get_one_parameter(-1)
+    dict, lis = obj.get_one_parameter(-1)
+    x = [i[0]*1000 for i in lis]
+    z = [i[4] for i in lis]
+    print(np.min(x))
+    print(np.max(x))
+    print(np.min(z))
+    print(np.max(z))
+    # print(step)
 
-
-
-
-
+    # # print(res)
+    #
+    # obj.get_one_parameter(-1)
+    # time = []
+    # zg = []
+    # for i in range(step):
+    #     one_dict, one_lis = obj.get_one_parameter(i)
+    #     time.append(one_dict["time"])
+    #     zg.append(one_dict["location"])
+    # # print(time)
+    # delt_time = [time[i] - time[i-1] for i in range(1, len(time))]
+    # print(delt_time)
 
 

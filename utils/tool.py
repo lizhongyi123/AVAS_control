@@ -30,6 +30,7 @@ def calculate_mean(data):
     mean = total_sum / len(data)
 
     return mean
+
 def convert_dic2lis(dic):
     res = []
     for k, v in dic.items():

@@ -28,11 +28,13 @@ class MultiParticle():
             #     f.write('1')
 
             res_tmp = self.multiparticle_engine.get_path(inputfilepath, outputfilePath)
+
             # try:
-            res = self.multiparticle_engine.main_agent(1)
+            #     res = self.multiparticle_engine.main_agent(1)
             # except:
             #     raise Exception("底层代码发生错误")
 
+            res = self.multiparticle_engine.main_agent(1)
             if res == 1:
                 raise Exception('非正常结束')
 
@@ -89,7 +91,7 @@ class MultiParticle():
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test_new_avas\cafe\AVAS"
+    project_path = r"C:\Users\shliu\Desktop\e1"
 
     obj = MultiParticle(project_path)
 
@@ -99,5 +101,5 @@ if __name__ == "__main__":
     #     print(f"Running iteration {i + 1}")
     #     obj.run()
     #
-    end = time.time()
-    print(f"Total time: {end - start}")
+    # end = time.time()
+    # print(f"Total time: {end - start}")

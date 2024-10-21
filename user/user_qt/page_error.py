@@ -379,18 +379,20 @@ class PageError(QWidget):
         self.ini_obj.write_to_file(self.ini_path)
 
     def fill_parameter(self):
-        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
-        if ini_dict['error'] == '0':
+        if os.path.exists(self.ini_path):
+            ini_dict = self.ini_obj.creat_from_file(self.ini_path)
+            if ini_dict['error'] == '0':
+                pass
+            elif ini_dict['error']['error_type'] == 'stat_error':
+                self.cb_stat_error.setChecked(True)
+            elif ini_dict['error']['error_type'] == 'dyn_error':
+                self.cb_dyn_error.setChecked(True)
+            elif ini_dict['error']['error_type'] == 'sstat_dyn':
+                self.cb_stat_error.setChecked(True)
+
+            self.text_seed.setText(str(ini_dict['error']['seed']))
+        else:
             pass
-        elif ini_dict['error']['error_type'] == 'stat_error':
-            self.cb_stat_error.setChecked(True)
-        elif ini_dict['error']['error_type'] == 'dyn_error':
-            self.cb_dyn_error.setChecked(True)
-        elif ini_dict['error']['error_type'] == 'sstat_dyn':
-            self.cb_stat_error.setChecked(True)
-
-        self.text_seed.setText(ini_dict['error']['seed'])
-
 
 
 if __name__ == '__main__':

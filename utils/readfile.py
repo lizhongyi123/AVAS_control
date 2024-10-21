@@ -152,6 +152,6 @@ if __name__ == "__main__":
     # res = read_dst(path)
     # print(res['phase'][0])
     # read_runsignal(0)
-    path = r"C:\Users\shliu\Desktop\mebt\AVAS_hu\InputFile\part_rfq.dst"
+    path = r"C:\Users\shliu\Desktop\duibi925\926ciads\beam_end.dst"
     res = read_dst_fast(path)
     print(res)

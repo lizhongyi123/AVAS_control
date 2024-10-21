@@ -32,7 +32,8 @@ class BeamConfig():
 
 
 
-        self.beam_parameter = {'readparticledistribution': None,  'numofcharge': None, 'particlerestmass': None, 'current':None,
+        self.beam_parameter = {'readparticledistribution': None,  'numofcharge': None,
+                               'particlerestmass': None, 'current':None,
                        'particlenumber': None, 'frequency': None, 'kneticenergy': None,
                         "alpha_x": None, "beta_x": None, "emit_x": None,
                         "alpha_y": None, "beta_y": None, "emit_y": None,
@@ -45,7 +46,7 @@ class BeamConfig():
     def read_beam_txt(self, path):
         #读取beam文件
         beam_lis = read_txt(path, out='list', case_sensitive=True)
-        print(beam_lis)
+        # print(beam_lis)
 
 
         for i in beam_lis:
@@ -112,7 +113,7 @@ class BeamConfig():
 
 
 
-        print("read", self.beam_parameter)
+        # print("read", self.beam_parameter)
 
         return self.beam_parameter
 
@@ -136,7 +137,7 @@ class BeamConfig():
         v_lis = convert_dic2lis(v_dic)
         for index, i in enumerate(v_lis):
             v_lis[index] = ["" if v is None else v for v in i]
-        print("write", v_lis)
+        # print("write", v_lis)
 
         write_to_txt(path, v_lis)
         return True
@@ -146,7 +147,7 @@ class BeamConfig():
         for k, v in kwargs.items():
             self.beam_parameter[k] = v
 
-        print("set", self.beam_parameter)
+        # print("set", self.beam_parameter)
 
         return self.beam_parameter
 
@@ -206,12 +207,12 @@ class BeamConfig():
 
 
 
-
 if __name__ == "__main__":
-    path = r"C:\Users\shliu\Desktop\test_new_avas\beam1.txt"
+    path = r"C:\Users\shliu\Desktop\eee\InputFile\beam.txt"
     obj = BeamConfig()
-    obj.creat_from_file(path)
-    obj.validate_run(path)
+    res = obj.creat_from_file(path)
+    print(res)
+    # obj.validate_run(path)
     # obj.set_beam(distribution_x="wb", distribution_y="Wb")
     # # obj.set_beam(numofcharge=1.5)
     # obj.write_beam()

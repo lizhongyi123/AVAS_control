@@ -1,11 +1,13 @@
 ﻿"""改文件定义了图像的初始类"""
+import sys
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.path import Path
 from utils.treatlist import get_dimension
 import numpy as np
 from matplotlib.ticker import MultipleLocator
-
+from matplotlib.colors import LinearSegmentedColormap
 class PicturelBar_2D():
     """
     二维柱状图，父类
@@ -26,19 +28,21 @@ class PicturelBar_2D():
         self.y = []
         return self.x, self.y
 
-    def run(self, show_):
-        if show_:
-            plt.figure()
+    def run(self, show_, fig=None):
+        if not fig:
+            fig, ax1 = plt.subplots(figsize=self.fig_size)
+        elif fig:
+            ax1 = fig.add_subplot(111)
         # 创建柱状图
-        plt.bar(self.x, self.y, color = self.color)
+        ax1.bar(self.x, self.y, color = self.color)
 
         # plt.xlim(0, max(self.x) + 1)
         # plt.ylim(0, max(self.y) + 1)
 
         # 添加标题和标签
         # plt.title('Bar Chart Example')
-        plt.xlabel(self.xlabel, fontsize=self.fontsize)
-        plt.ylabel(self.ylabel, fontsize=self.fontsize)
+        ax1.set_xlabel(self.xlabel, fontsize=self.fontsize)
+        ax1.set_ylabel(self.ylabel, fontsize=self.fontsize)
         if show_:
             plt.show()
             return None
@@ -95,7 +99,7 @@ class PicturePlot_2D():
         self.xlabel = ''
         self.ylabel = ''
         self.fontsize = 14
-        self.fig_size = (6.4 , 4.8)
+        self.fig_size = (6.4, 4.8)
         self.x = []
         self.y = []
         self.colors = ['r', 'b', 'g']
@@ -111,9 +115,15 @@ class PicturePlot_2D():
         self.y = []
         return self.x, self.y
 
-    def run(self, show_, ):
-        if show_:
-            plt.figure(figsize=self.fig_size)
+    def run(self, show_, fig):
+        # print(self.x, self.y)
+        # print(fig)
+        if not fig:
+            fig, ax1 = plt.subplots(figsize=self.fig_size)
+        elif fig:
+            ax1 = fig.add_subplot(111)
+
+
         # 创建柱状图
         if len(self.y) == 0:
             print("The ordinate is empty")
@@ -121,42 +131,43 @@ class PicturePlot_2D():
         elif isinstance(self.y[0], list):
             if not isinstance(self.x[0], list):
                 for i in range(len(self.y)):
-                    plt.plot(self.x, self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
+                    print()
+                    ax1.plot(self.x, self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
 
             elif isinstance(self.x[0], list):
                 for i in range(len(self.y)):
-                    plt.plot(self.x[i], self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
+                    ax1.plot(self.x[i], self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
 
 
 
 
         elif isinstance(self.y[0], int) or isinstance(self.y[0], float):
-            plt.plot(self.x, self.y, color=self.colors[0], marker=self.markers[0])
+            ax1.plot(self.x, self.y, color=self.colors[0], marker=self.markers[0])
 
 
         # 添加标题和标签
         # plt.title('Bar Chart Example')
 
-        plt.xlabel(self.xlabel, fontsize=self.fontsize)
-        plt.ylabel(self.ylabel, fontsize=self.fontsize)
+        ax1.set_xlabel(self.xlabel, fontsize=self.fontsize)
+        ax1.set_ylabel(self.ylabel, fontsize=self.fontsize)
 
         if len(self.xlim) == 2:
-            plt.xlim(self.xlim[0], self.xlim[1])
+            ax1.set_xlim(self.xlim[0], self.xlim[1])
 
 
         if len(self.ylim) == 2:
-            plt.ylim(self.ylim[0], self.ylim[1])
+            ax1.set_ylim(self.ylim[0], self.ylim[1])
 
         if self.set_legend == 1:
-            plt.legend()
+            ax1.legend()
 
 
         if self.patch_list:
             for shapes in self.patch_list:
                 for shape in shapes:
-                    plt.gca().add_patch(shape)
+                    ax1.gca().add_patch(shape)
 
-        plt.grid()
+        ax1.grid()
 
         if show_:
             plt.show()
@@ -246,6 +257,7 @@ class PicturePlot_2ax():
                      "ax2_y": [],
                      }
         return self.xy
+
     def run(self, show_, fig=None):
         if not fig:
             fig, ax1 = plt.subplots(figsize=self.fig_size)
@@ -294,6 +306,100 @@ class PicturePlot_2ax():
         else:
             return None
 
+
+class Picturedensity():
+    """
+    二维散点图，折线图，父类
+    """
+    def __init__(self):
+        self.title = ''
+        self.xlabel = ''
+        self.ylabel = ''
+        self.fontsize = 14
+        self.fig_size = (6.4 , 4.8)
+        self.x = []
+        self.y = []
+        self.colors = ['r', 'b', 'g']
+        self.markers = [None] * 10
+        self.labels = [None] * 10
+        self.xlim = []
+        self.ylim = []
+        self.set_legend = 0
+        self.patch_list=None
+        self.bins=300
+
+    def get_data(self):
+        self.z = []
+        self.y = []
+        self.density = []
+        return self.z, self.y, self.density
+
+    def run(self, show_, fig):
+        # print(self.z, self.y)
+        # print(fig)
+        # print(self.density)
+        if not fig:
+            fig, ax1 = plt.subplots(figsize=self.fig_size)
+        elif fig:
+            ax1 = fig.add_subplot(111)
+
+        z_m = np.tile(self.z, (self.bins, 1))
+
+        y_m = np.zeros((self.bins, len(self.z)))
+        density_m = np.zeros((self.bins, len(self.z)))
+
+        for i in range(len(self.z)):
+            min_edge = self.y[i][0]
+            max_edge = self.y[i][1]
+
+
+
+            bin_edges = np.linspace(min_edge, max_edge, self.bins + 1)
+
+            y_m[:, i] = bin_edges[:-1]
+
+
+            density_m[:, i] = self.density[i] / np.max(self.density[i])
+            #
+
+
+        colors = [(1, 1, 1), *plt.cm.jet(np.linspace(0, 1, 256))]  # 第一个颜色为白色，其余为 'jet'
+        custom_cmap = LinearSegmentedColormap.from_list('custom_jet', colors)
+
+        # 使用pcolormesh绘制密度图
+        mesh = ax1.pcolormesh(z_m, y_m, density_m, cmap=custom_cmap, shading='auto')
+
+        # 为图像添加颜色条，并设置标签
+        colorbar = fig.colorbar(mesh, ax=ax1)
+        colorbar.set_label('Density')  # 设置颜色条标签
+
+        # 添加标题和标签
+        # plt.title('Bar Chart Example')
+
+        ax1.set_xlabel(self.xlabel, fontsize=self.fontsize)
+        ax1.set_ylabel(self.ylabel, fontsize=self.fontsize)
+
+        if len(self.xlim) == 2:
+            ax1.set_xlim(self.xlim[0], self.xlim[1])
+
+
+        if len(self.ylim) == 2:
+            ax1.set_ylim(self.ylim[0], self.ylim[1])
+
+        if self.set_legend == 1:
+            ax1.legend()
+
+
+
+
+        ax1.grid()
+
+        if show_:
+            plt.show()
+            return None
+
+        else:
+            return None
 
 # if __name__ == "__main__":
 #     v = PicturelBar_2D()

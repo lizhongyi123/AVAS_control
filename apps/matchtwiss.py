@@ -305,7 +305,7 @@ class MatchTwiss():
 
 ####################################################################################################
 if __name__ == '__main__':
-    project_path = r"C:\Users\anxin\Desktop\test_env"
+    project_path = r"C:\Users\shliu\Desktop\AVAS914\test"
 
     match_twiss = MatchTwiss(project_path)
     res = match_twiss.match_twiss(f'lattice_env.txt')

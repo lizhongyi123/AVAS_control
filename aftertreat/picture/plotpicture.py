@@ -163,29 +163,8 @@ class PlotPhaseAdvance(PicturePlot_2D):
 
 
 
-
-
-
-
 if __name__ == "__main__":
-#     lattice_path = r"C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt"
-#     r = {'hwr010': 5, 'hwr015': 100}
-#     v = PlotCavityVoltage(r)
-#     v.get_x_y(lattice_path)
-#
-#     v.run()
-#
-#     # # lattice_path = r"C:\Users\anxin\Desktop\815易蔓结果\AVAS (1)\inputFile\lattice.txt"
-#     # # dataset_path = r"C:\Users\anxin\Desktop\815易蔓结果\AVAS (1)\OutputFile\DataSet.txt"
-#     #
-#     # # lattice_path = r"C:\Users\anxin\Desktop\AVAS原始版本\inputFile\lattice.txt"
-#     # # dataset_path = r"C:\Users\anxin\Desktop\AVAS原始版本\OutputFile\DataSet.txt"
-#
-#
-    # lattice_path = r"C:\Users\anxin\Desktop\00000\inputFile\lattice.txt"
-    # dataset_path = r"C:\Users\anxin\Desktop\00000\OutputFile\DataSet.txt"
-    project_path = r"C:\Users\anxin\Desktop\test2"
-
-    phase_advance = PlotPhaseAdvance(project_path)
-    phase_advance.get_x_y("Period")
-    phase_advance.run(show_=1)
+    project_path = r"C:\Users\shliu\Desktop\eee"
+    obj = PlotCavitySynPhase(project_path)
+    obj.get_x_y()
+    obj.run(show_=1, fig =None)

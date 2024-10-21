@@ -6,13 +6,13 @@ import os
 class IniConfig():
     def __init__(self):
         self.ini_parameter = \
-        {"project": {"project_path": 0},
+        {"project": {"project_path": "undefined"},
         "lattice":{"length": 0},
-         "input": {"sim_type": 0},
+         "input": {"!sim_type": 0},
          "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
-         "error": {"error_type": 0, "seed": 0},
+         "error": {"error_type": "undefined", "seed": 0, "if_normal": 0},
          }
-
+        self.str_keys = ["!sim_type", "project_path", "error_type"]
     # def initialize_ini(self):
 
 
@@ -24,21 +24,22 @@ class IniConfig():
         """
         if not os.path.exists(path):
             print(f"文件路径 {path} 不存在。")
-            return {}
+            return False
 
         config = configparser.ConfigParser()
         config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
 
-        ini_dict = {}
         for section in config.sections():
-            ini_dict[section] = {}
             for key, value in config.items(section):
-                ini_dict[section][key] = value
+                if key not in self.str_keys:
+                    self.ini_parameter[section][key] = int(value)
+                else:
+                    self.ini_parameter[section][key] = value
 
-        self.ini_parameter = ini_dict
         return self.ini_parameter
 
     def set_param(self, **kwargs):
+
         """
         更新 INI 文件中的值。
 
@@ -72,17 +73,20 @@ class IniConfig():
 # 示例用法
 
 if __name__ == '__main__':
-    file_path = r"C:\Users\shliu\Desktop\test_new_avas\test913\InputFile\ini.ini"  # 替换为你的 INI 文件路径
-    cfg = IniConfig(file_path)
-    cfg.read_ini()
+    file_path = r"C:\Users\shliu\Desktop\eee\InputFile\ini.ini"  # 替换为你的 INI 文件路径
+    cfg = IniConfig()
+    res = cfg.creat_from_file(file_path)
+    print(res)
+    # cfg.write_to_file(file_path)
+
     cfg.set_ini(
         project={"project_path": "C:/new/path"},
         lattice={"length": 100},
         match={"use_initial_value": 1}
     )
-
-
-    print(cfg.ini_dict)
+    #
+    #
+    # print(cfg.ini_dict)
     # ini_dict = cfg.initialize()
     # cfg.write_ini(ini_dict)
 

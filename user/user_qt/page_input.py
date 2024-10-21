@@ -304,73 +304,75 @@ class PageInput(QWidget):
     @treat_err
     def fill_parameter(self):
         input_path = os.path.join(self.project_path, "InputFile", "input.txt")
-        input_res = read_txt(input_path, out='dict', readdall=1)
-        if input_res.get('!simtype') == "mulp":
-            self.cb_mulp.setChecked(True)
-            if input_res.get('scmethod') == "fft":
-                self.cb_fft.setChecked(True)
-                if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
-                    self.fft_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
-                    self.fft_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
-                    self.fft_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
+        if os.path.exists(input_path):
+            input_res = read_txt(input_path, out='dict', readdall=1)
+            if input_res.get('!simtype') == "mulp":
+                self.cb_mulp.setChecked(True)
+                if input_res.get('scmethod') == "fft":
+                    self.cb_fft.setChecked(True)
+                    if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
+                        self.fft_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
+                        self.fft_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
+                        self.fft_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
 
-                if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
-                    self.fft_meshrms_x_text.setText(input_res.get('meshrms')[0])
-                    self.fft_meshrms_y_text.setText(input_res.get('meshrms')[1])
-                    self.fft_meshrms_z_text.setText(input_res.get('meshrms')[2])
-
-
-            elif input_res.get('scmethod') == "picnic":
-                self.cb_picnic.setChecked(True)
-                if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
-                    self.picnic_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
-                    self.picnic_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
-                    self.picnic_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
-
-                if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
-                    self.picnic_meshrms_x_text.setText(input_res.get('meshrms')[0])
-                    self.picnic_meshrms_y_text.setText(input_res.get('meshrms')[1])
-                    self.picnic_meshrms_z_text.setText(input_res.get('meshrms')[2])
+                    if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
+                        self.fft_meshrms_x_text.setText(input_res.get('meshrms')[0])
+                        self.fft_meshrms_y_text.setText(input_res.get('meshrms')[1])
+                        self.fft_meshrms_z_text.setText(input_res.get('meshrms')[2])
 
 
-            # self.multithreading_num = int(input_res.get('multithreading', 0))
+                elif input_res.get('scmethod') == "picnic":
+                    self.cb_picnic.setChecked(True)
+                    if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
+                        self.picnic_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
+                        self.picnic_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
+                        self.picnic_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
 
-            # if self.multithreading_num == 0:
-            #     self.multithreading_checkbox.setChecked(False)
-            #
-            # elif self.multithreading_num == 1:
-            #     self.multithreading_checkbox.setChecked(True)
+                    if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
+                        self.picnic_meshrms_x_text.setText(input_res.get('meshrms')[0])
+                        self.picnic_meshrms_y_text.setText(input_res.get('meshrms')[1])
+                        self.picnic_meshrms_z_text.setText(input_res.get('meshrms')[2])
 
-            self.scan_phase_num = int(input_res.get('scanphase', 1))
-            self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
 
-            self.sc_use_num = int(input_res.get('spacecharge', 0))
-            if self.sc_use_num == 0:
-                self.sc_use_checkbox.setChecked(False)
-            elif self.sc_use_num == 1:
-                self.sc_use_checkbox.setChecked(True)
+                # self.multithreading_num = int(input_res.get('multithreading', 0))
 
-            self.step_per_period_text.setText(input_res.get('steppercycle', '100'))
+                # if self.multithreading_num == 0:
+                #     self.multithreading_checkbox.setChecked(False)
+                #
+                # elif self.multithreading_num == 1:
+                #     self.multithreading_checkbox.setChecked(True)
 
-            self.dumpPeriodicity_text.setText(input_res.get('dumpperiodicity', '1'))
+                self.scan_phase_num = int(input_res.get('scanphase', 1))
+                self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
 
-        # 对于包络模型的输入
-        if input_res.get('!simtype') == "env":
-            self.cb_env.setChecked(True)
-            self.sc_use_num_env = int(input_res.get('isspacecharge', 3))
-            if self.sc_use_num_env == 0:
-                self.sc_use_checkbox.setChecked(False)
-            elif self.sc_use_num_env == 1:
-                self.sc_use_checkbox.setChecked(True)
+                self.sc_use_num = int(input_res.get('spacecharge', 0))
+                if self.sc_use_num == 0:
+                    self.sc_use_checkbox.setChecked(False)
+                elif self.sc_use_num == 1:
+                    self.sc_use_checkbox.setChecked(True)
 
-            self.sc_step_text.setText(input_res.get('spacechargelong'))
+                self.step_per_period_text.setText(input_res.get('steppercycle', '100'))
 
-            sc_step_type = int(input_res.get('spacechargetype', 0))
-            if int(sc_step_type) == 0:
-                self.sc_step_meter_checkbox.setChecked(True)
-            elif int(sc_step_type) == 1:
-                self.sc_step_beta_checkbox.setChecked(True)
+                self.dumpPeriodicity_text.setText(input_res.get('dumpperiodicity', '1'))
 
+            # 对于包络模型的输入
+            if input_res.get('!simtype') == "env":
+                self.cb_env.setChecked(True)
+                self.sc_use_num_env = int(input_res.get('isspacecharge', 3))
+                if self.sc_use_num_env == 0:
+                    self.sc_use_checkbox.setChecked(False)
+                elif self.sc_use_num_env == 1:
+                    self.sc_use_checkbox.setChecked(True)
+
+                self.sc_step_text.setText(input_res.get('spacechargelong'))
+
+                sc_step_type = int(input_res.get('spacechargetype', 0))
+                if int(sc_step_type) == 0:
+                    self.sc_step_meter_checkbox.setChecked(True)
+                elif int(sc_step_type) == 1:
+                    self.sc_step_beta_checkbox.setChecked(True)
+        else:
+            pass
 
     @treat_err2
     def generate_input_list(self, ):

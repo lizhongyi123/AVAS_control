@@ -1,23 +1,28 @@
 from utils.readfile import read_txt
 from utils.exception import (TypeError, ValueRangeError, ValueChooseError, ListLengthError,
-                             UnknownkeywordError, ValueConvertError)
+                             UnknownkeywordError, ValueConvertError, MisskeywordError)
 from utils.tool import write_to_txt, convert_dic2lis
 import copy
-
+from utils.iniconfig import IniConfig
 class InputConfig():
     def __init__(self):
-        self.input_parameter_keys = ["scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
+        self.input_parameter_keys = ["!sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
 
-        self.input_parameter = {'sim_type': None,  'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "maxthreads": None}
+        self.input_parameter = {"!sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
+                                "maxthreads": None, "spacechargelong": None, "spacechargetype": None}
+
+
     # def initialize_input(self):
     #     self.input_parameter = {'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
     #                             "maxthreads": None}
 
+
+
+
     def read_input_txt(self, path):
         #读取beam文件
-        input_lis = read_txt(path, out='list', case_sensitive=True)
+        input_lis = read_txt(path, out='list', readdall=True, case_sensitive=True, )
 
 
         for i in input_lis:
@@ -34,7 +39,6 @@ class InputConfig():
 
     def creat_from_file(self, path):
         original_dict = self.read_input_txt(path)
-        print(original_dict)
 
         #验证是否存在未知元素
         for k, v in original_dict.items():
@@ -49,7 +53,9 @@ class InputConfig():
             for k, v in original_dict.items():
                 self.input_parameter[k] = original_dict[k]
 
-        print(original_dict)
+
+
+
         return self.input_parameter
 
     def set_param(self, **kwargs):
@@ -59,9 +65,20 @@ class InputConfig():
 
         print("set", self.input_parameter)
         return self.input_parameter
+
     def write_to_file(self, path):
 
-        v_dic = copy.deepcopy(self.input_parameter)
+        v_dic = {}
+        if self.input_parameter["!sim_type"] == 'mulp':
+            v_dic = copy.deepcopy(self.input_parameter)
+            del v_dic["spacechargelong"]
+            del v_dic["spacechargetype"]
+        elif self.input_parameter["!sim_type"] == 'env':
+            v_dic["!sim_mode"] = self.input_parameter["env"]
+            v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
+            v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
+
+
         v_lis = convert_dic2lis(v_dic)
         for index, i in enumerate(v_lis):
             v_lis[index] = ["" if v is None else v for v in i]
@@ -127,12 +144,12 @@ class InputConfig():
         #当所有输入符合
         for k in self.input_parameter_keys:
             if self.input_parameter[k] is None:
-                raise Exception(f"missing parameter {k}")
+                raise MisskeywordError(f"{k}")
 
-if __name__ == "__main__":
-    path = (r"C:\Users\shliu\Desktop\test_new_avas\input1.txt")
-    obj = InputConfig(path)
-    # obj.read_input()
-    # set_param = {'scanphase': 2}
-    # obj.set_input(**set_param)
-    obj.write_input()
+# if __name__ == "__main__":
+#     path =r"C:\Users\shliu\Desktop\AVAS20240923\test\InputFile\input.txt"
+#     obj = InputConfig(path)
+#     # obj.read_input()
+#     # set_param = {'scanphase': 2}
+#     # obj.set_input(**set_param)
+#     # obj.write_input()

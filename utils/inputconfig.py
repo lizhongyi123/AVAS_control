@@ -6,11 +6,13 @@ import copy
 from utils.iniconfig import IniConfig
 class InputConfig():
     def __init__(self):
-        self.input_parameter_keys = ["!sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
-        self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads"]
+        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads",
+                                     "isspacecharge", "spacechargelong", "spacechargetype"]
+        self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads", "isspacecharge",
+                         "spacechargelong", "spacechargetype"]
 
-        self.input_parameter = {"!sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "maxthreads": None, "spacechargelong": None, "spacechargetype": None}
+        self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
+                                "maxthreads": None, "isspacecharge": None, "spacechargelong": None, "spacechargetype": None}
 
 
     # def initialize_input(self):
@@ -28,6 +30,8 @@ class InputConfig():
         for i in input_lis:
             if len(i) == 1:
                 i.append(None)
+            if i[0] == "!sim_type":
+                i[0] = "sim_type"
 
         res = {}
         for i in input_lis:
@@ -35,6 +39,7 @@ class InputConfig():
                 res[i[0]] = i[1]
             else:
                 res[i[0]] = i[1:]
+
         return res
 
     def creat_from_file(self, path):
@@ -59,6 +64,7 @@ class InputConfig():
         return self.input_parameter
 
     def set_param(self, **kwargs):
+        print()
         self.validate_type(kwargs)
         for k, v in kwargs.items():
             self.input_parameter[k] = v
@@ -69,12 +75,16 @@ class InputConfig():
     def write_to_file(self, path):
 
         v_dic = {}
-        if self.input_parameter["!sim_type"] == 'mulp':
+        if self.input_parameter["sim_type"] == 'mulp':
             v_dic = copy.deepcopy(self.input_parameter)
+            v_dic["!sim_type"] = v_dic["sim_type"]
+
             del v_dic["spacechargelong"]
             del v_dic["spacechargetype"]
-        elif self.input_parameter["!sim_type"] == 'env':
-            v_dic["!sim_mode"] = self.input_parameter["env"]
+            del v_dic["sim_type"]
+        elif self.input_parameter["sim_type"] == 'env':
+
+            v_dic["!sim_mode"] = self.input_parameter["sim_type"]
             v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
             v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
 

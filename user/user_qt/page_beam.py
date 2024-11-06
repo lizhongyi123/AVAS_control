@@ -18,7 +18,7 @@ from utils.treatfile import split_file, file_in_directory
 from utils.beamconfig import BeamConfig
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 gray240 = "rgb(240, 240, 240)"
-
+from apis.qt_api.api import cal_beam_parameter
 class PageBeam(QWidget):
     def __init__(self, project_path):
         super().__init__()
@@ -445,6 +445,8 @@ class PageBeam(QWidget):
     def fill_parameter(self):
         print(self.project_path)
         beam_path = os.path.join(self.project_path, "InputFile", "beam.txt")
+
+
         if os.path.exists(beam_path):
             beam_obj = BeamConfig()
             beam_res = beam_obj.creat_from_file(beam_path)
@@ -457,9 +459,6 @@ class PageBeam(QWidget):
                 self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
 
                 self.text_charge.setText(beam_res.get('numofcharge'))
-
-
-
 
             else:
                 self.text_particle_input_file.clear()
@@ -559,33 +558,33 @@ class PageBeam(QWidget):
 
         dst_path = os.path.join(self.project_path, "InputFile", self.text_particle_input_file.text())
 
+
         if os.path.exists(dst_path):
-            dst_res = read_dst(dst_path)
+            dst_res = cal_beam_parameter(dst_path)
+            print(dst_res)
+
             # print(dst_res)
-            self.text_mass.setText(str(dst_res.get('basemassinmev')))
-            self.text_current.setText(str(dst_res.get('ib')))
-            self.text_particel_number.setText(str(dst_res.get('number')))
-            self.text_frequency.setText(str(dst_res.get('freq')))
+            self.text_mass.setText(str(dst_res.get('particlerestmass')))
+            self.text_current.setText(str(dst_res.get('current')))
+            self.text_particel_number.setText(str(dst_res.get('particlebumber')))
+            self.text_frequency.setText(str(dst_res.get('frequency')))
 
-            obj = CalTwiss(dst_path)
-            obj.get_data()
-            energy = round(obj.energy, self.decimals)
-            self.text_energy.setText(str(energy))
 
-            twiss = CalTwiss(dst_path).get_emit_xyz()
+            self.text_energy.setText(str(dst_res.get("kneticenergy")))
 
-            self.alpha_xx_text.setText(str(round(twiss[0][0], self.decimals)))
-            self.beta_xx_text.setText(str(round(twiss[0][1], self.decimals)))
 
-            self.alpha_yy_text.setText(str(round(twiss[1][0], self.decimals)))
-            self.beta_yy_text.setText(str(round(twiss[1][1], self.decimals)))
+            self.alpha_xx_text.setText(str(round(dst_res.get("alpha_x"), self.decimals)))
+            self.beta_xx_text.setText(str(round(dst_res.get("beta_x"), self.decimals)))
 
-            self.alpha_zz_text.setText(str(round(twiss[2][0], self.decimals)))
-            self.beta_zz_text.setText(str(round(twiss[2][1], self.decimals)))
+            self.alpha_yy_text.setText(str(round(dst_res.get("alpha_y"), self.decimals)))
+            self.beta_yy_text.setText(str(round(dst_res.get("beta_y"), self.decimals)))
 
-            self.varepsilon_xx_text.setText(str(round(twiss[0][2], self.decimals)))
-            self.varepsilon_yy_text.setText(str(round(twiss[1][2], self.decimals)))
-            self.varepsilon_zz_text.setText(str(round(twiss[2][2], self.decimals)))
+            self.alpha_zz_text.setText(str(round(dst_res.get("alpha_z"), self.decimals)))
+            self.beta_zz_text.setText(str(round(dst_res.get("beta_z"), self.decimals)))
+
+            self.varepsilon_xx_text.setText(str(round(dst_res.get("emit_x"), self.decimals)))
+            self.varepsilon_yy_text.setText(str(round(dst_res.get("emit_y"), self.decimals)))
+            self.varepsilon_zz_text.setText(str(round(dst_res.get("emit_z"), self.decimals)))
         else:
             QMessageBox.warning(None, 'Error', f'{self.text_particle_input_file.text()} does not exist')
 

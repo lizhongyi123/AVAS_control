@@ -8,11 +8,11 @@ class IniConfig():
         self.ini_parameter = \
         {"project": {"project_path": "undefined"},
         "lattice":{"length": 0},
-         "input": {"!sim_type": 0},
+         "input": {"sim_type": 0},
          "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
          "error": {"error_type": "undefined", "seed": 0, "if_normal": 0},
          }
-        self.str_keys = ["!sim_type", "project_path", "error_type"]
+        self.str_keys = ["sim_type", "project_path", "error_type"]
     # def initialize_ini(self):
 
 

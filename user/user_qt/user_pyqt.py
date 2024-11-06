@@ -32,14 +32,17 @@ from user.user_qt.user_defined import treat_err
 from user.user_qt.page_acc import PageAccept
 from send2trash import send2trash
 from utils.iniconfig import IniConfig
-
+from apis.qt_api.SimMode import SimMode
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.project_path = ''
-        self.basic_signal = None
-        self.error_signal = None
+
+        self.input_signal = None
         self.match_signal = None
+        self.error_signal = None
+
+
         self.settings = QSettings('IMP', 'AVAS')
 
         self.initUI()
@@ -219,7 +222,7 @@ class MainWindow(QMainWindow):
         central_layout.addWidget(line_frame)  # 将表示线的框架添加到布局中
         central_layout.addWidget(self.stacked_widget)  # 将堆叠小部件添加到布局中
 
-        self.page_input.basic_signal.connect(self.get_basic_signal)
+        self.page_input.input_signal.connect(self.get_input_signal)
         #
         self.page_error.error_signal.connect(self.get_error_signal)
         self.page_match.match_signal.connect(self.get_match_signal)
@@ -373,7 +376,7 @@ class MainWindow(QMainWindow):
         elif self.error_signal == 'stat_dyn':
             self.func_err('stat_dyn')
         
-        elif self.basic_signal == 'basic_mulp':
+        elif self.input_sim_type_signal == 'basic_mulp':
 
             self.activate_output('basic_mulp')
 
@@ -386,27 +389,12 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(e)
 
-        elif self.basic_signal == 'basic_env':
+        elif self.input_sim_type_signal == 'basic_env':
             self.func_basic_env()
         else:
             print('Nothing was chosen')
 
         # self.refresh_lattice()
-    def inspect_signal(self):
-        signal_list = []
-        # if self.basic_signal:
-        #     signal_list.append(self.basic_signal)
-        if self.match_signal:
-            signal_list.append(self.match_signal)
-        if self.error_signal:
-            signal_list.append(self.error_signal)
-
-        if len(signal_list) >= 2:
-            e = "The program cannot perform matching and error analysis simultaneously"
-            QMessageBox.warning(None, 'Error', e)
-            return False
-        else:
-            return True
 
 
     def activate_output(self, signal):
@@ -451,60 +439,64 @@ class MainWindow(QMainWindow):
 #################################
     #此处对应的是run和stop对应的函数
 
-    def func_basic_mulp(self):
-        print("start simulation")
-        if not self.basci_mulp_process.is_alive():
-            self.basci_mulp_process = multiprocessing.Process(target=basic_mulp, args=(self.project_path,))
-            self.basci_mulp_process.start()
+    # def func_basic_mulp(self):
+    #     print("start simulation")
+    #     if not self.basci_mulp_process.is_alive():
+    #         self.basci_mulp_process = multiprocessing.Process(target=basic_mulp, args=(self.project_path,))
+    #         self.basci_mulp_process.start()
+    #
+    #
+    # def func_basic_env(self):
+    #     print("start simulation")
+    #     lattice_env = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
+    #     if not self.basci_env_process.is_alive():
+    #         self.basci_env_process = multiprocessing.Process(target=basic_env, args=(self.project_path, lattice_env))
+    #         self.basci_env_process.start()
+    #
+    #
+    # #误差分析
+    # def func_err(self, err_type):
+    #     print("start err")
+    #     if not self.err_process.is_alive():
+    #         if err_type == 'stat':
+    #             target = err_stat
+    #         elif err_type == 'dyn':
+    #             target = err_dyn
+    #         elif err_type == 'stat_dyn':
+    #             target = err_stat_dyn
+    #
+    #         seed_value = int(self.ini_obj.creat_from_file(self.ini_path)['error']['seed'])
+    #
+    #         self.err_process = multiprocessing.Process(target=target, args=(self.project_path, seed_value))
+    #         self.err_process.start()
+    #
+    # def func_match(self, match_choose, use_ini=0):
+    #     print(match_choose)
+    #     print("start match")
+    #     if not self.match_process.is_alive():
+    #
+    #         if match_choose == 0:
+    #             # 周期匹配
+    #             target = circle_match
+    #             args = (self.project_path,)
+    #
+    #
+    #         elif match_choose == 1:
+    #             # twiss command匹配
+    #             target = match_twiss
+    #             args = (self.project_path, use_ini)
+    #         else:
+    #             return 0
+    #
+    #         self.match_process = multiprocessing.Process(target=target, args=args)
+    #         self.match_process.start()
+    #         # 启用监测器，开始检查进程状态
+
+    def func_sim(self):
+        obj = SimMode(self.project_path)
 
 
-    def func_basic_env(self):
-        print("start simulation")
-        lattice_env = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-        if not self.basci_env_process.is_alive():
-            self.basci_env_process = multiprocessing.Process(target=basic_env, args=(self.project_path, lattice_env))
-            self.basci_env_process.start()
-
-
-    #误差分析
-    def func_err(self, err_type):
-        print("start err")
-        if not self.err_process.is_alive():
-            if err_type == 'stat':
-                target = err_stat
-            elif err_type == 'dyn':
-                target = err_dyn
-            elif err_type == 'stat_dyn':
-                target = err_stat_dyn
-
-            seed_value = int(self.ini_obj.creat_from_file(self.ini_path)['error']['seed'])
-
-            self.err_process = multiprocessing.Process(target=target, args=(self.project_path, seed_value))
-            self.err_process.start()
-
-    def func_match(self, match_choose, use_ini=0):
-        print(match_choose)
-        print("start match")
-        if not self.match_process.is_alive():
-
-            if match_choose == 0:
-                # 周期匹配
-                target = circle_match
-                args = (self.project_path,)
-
-
-            elif match_choose == 1:
-                # twiss command匹配
-                target = match_twiss
-                args = (self.project_path, use_ini)
-            else:
-                return 0
-
-            self.match_process = multiprocessing.Process(target=target, args=args)
-            self.match_process.start()
-            # 启用监测器，开始检查进程状态
-
-
+        obj.run()
     def check_basci_mulp_process_status(self):
         if self.basci_mulp_process is not None:
             if self.basci_mulp_process.is_alive():
@@ -541,17 +533,15 @@ class MainWindow(QMainWindow):
     def refresh_input(self):
         self.page_input.fill_parameter()
 
-    def get_basic_signal(self, signal):
-        self.basic_signal = signal
-
+    def get_signal(self, signal):
+        self.input_signal = signal
 
     def get_error_signal(self, signal):
         self.error_signal = signal
-        print(signal)
-
 
     def get_match_signal(self, signal):
         self.match_signal = signal
+
 
     def initialize_page(self):
         print(self.settings.value("lastProjectPath", None))

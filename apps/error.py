@@ -206,6 +206,7 @@ class Error():
             return 1 + max(self.get_dimension(item) for item in lst)
 
     def judge_command_on_element(self, lattice, command):
+        #返回一个命令对应的是哪个元件
         lattice = copy.deepcopy(lattice)
 
         command_index = lattice.index(command)
@@ -286,11 +287,10 @@ class Error():
 
         input_lines = read_txt(self.lattice_mulp_path, out='list')
 
-        #为cpl生成误差
+        #为cpl生成误差，如果是cpl，直接生成对应的误差
         input_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
-
-        #将误差命令添加到每个元件上
+        #将误差命令添加到每个元件上，钱加到每个元件的结尾
         lattice = self.set_error_to_lattice(input_lines_copy)
         # for i in lattice:
         #     print(i)
@@ -301,6 +301,14 @@ class Error():
         lattice = [i for i in lattice if i[0] not in global_varible.error_elemment_command]
 
         res_treat = []
+
+        error_commands_map = {
+            'err_quad_stat': ['err_quad_ncpl_stat', 'err_quad_cpl_stat'],
+            'err_quad_dyn': ['err_quad_ncpl_dyn', 'err_quad_cpl_dyn'],
+            'err_cav_stat': ['err_cav_ncpl_stat', 'err_cav_cpl_stat'],
+            'err_cav_dyn': ['err_cav_ncpl_dyn', 'err_cav_cpl_dyn']
+        }
+
         for i in lattice:
             if self.get_dimension(i) == 1:
                 res_treat.append(i)
@@ -310,25 +318,38 @@ class Error():
                 err_command_exist = []
 
                 i_copy = copy.deepcopy(i)
+
                 for j in i[::-1]:
                     if isinstance(j, list) and j[0] not in err_command_exist:
                         lis.append(j)
 
-                        if j[0] in ['err_quad_ncpl_stat', 'err_quad_cpl_stat']:
-                            err_command_exist.append('err_quad_ncpl_stat')
-                            err_command_exist.append('err_quad_cpl_stat')
+                        if j[0] in error_commands_map["err_quad_stat"]:
+                            err_command_exist.extend(error_commands_map["err_quad_stat"])
 
-                        elif j[0] in ['err_cav_ncpl_stat', 'err_cav_cpl_stat']:
-                            err_command_exist.append('err_cav_ncpl_stat')
-                            err_command_exist.append('err_cav_cpl_stat')
+                        elif j[0] in error_commands_map["err_quad_dyn"]:
+                            err_command_exist.extend(error_commands_map["err_quad_dyn"])
 
-                        elif j[0] in ['err_quad_ncpl_dyn', 'err_quad_cpl_dyn']:
-                            err_command_exist.append('err_quad_ncpl_dyn')
-                            err_command_exist.append('err_quad_cpl_dyn')
+                        elif j[0] in error_commands_map["err_cav_stat"]:
+                            err_command_exist.extend(error_commands_map["err_cav_stat"])
 
-                        elif j[0] in ['err_cav_ncpl_dyn', 'err_cav_cpl_dyn']:
-                            err_command_exist.append('err_cav_ncpl_dyn')
-                            err_command_exist.append('err_cav_cpl_dyn')
+                        elif j[0] in error_commands_map["err_cav_dyn"]:
+                            err_command_exist.extend(error_commands_map["err_cav_dyn"])
+
+                        # if j[0] in ['err_quad_ncpl_stat', 'err_quad_cpl_stat']:
+                        #     err_command_exist.append('err_quad_ncpl_stat')
+                        #     err_command_exist.append('err_quad_cpl_stat')
+                        #
+                        # elif j[0] in ['err_cav_ncpl_stat', 'err_cav_cpl_stat']:
+                        #     err_command_exist.append('err_cav_ncpl_stat')
+                        #     err_command_exist.append('err_cav_cpl_stat')
+                        #
+                        # elif j[0] in ['err_quad_ncpl_dyn', 'err_quad_cpl_dyn']:
+                        #     err_command_exist.append('err_quad_ncpl_dyn')
+                        #     err_command_exist.append('err_quad_cpl_dyn')
+                        #
+                        # elif j[0] in ['err_cav_ncpl_dyn', 'err_cav_cpl_dyn']:
+                        #     err_command_exist.append('err_cav_ncpl_dyn')
+                        #     err_command_exist.append('err_cav_cpl_dyn')
 
                         # err_command_exist.append(j[0])
                         i_copy.pop()
@@ -380,6 +401,8 @@ class Error():
 
         self.lattice_mulp_list = res_treat
 
+        #返回值后面带了一个元件索引
+        return self.lattice_mulp_list
         # for i in self.lattice_mulp_list:
         #     print(i)
         #
@@ -787,7 +810,7 @@ class Error():
 
 
     def write_density_every_time(self, group, time):
-
+        return 0
         is_normal = 0
         if group == 0:
             is_normal = 1
@@ -868,7 +891,7 @@ class ErrorDyn(Error):
         super().__init__(project_path, seed, if_normal)
 
 
-    def run_one_time(self, group, time):
+    def run_one_time(self, group, time, lattice_mulp_list):
         """
         动态误差
         :param group:
@@ -878,7 +901,7 @@ class ErrorDyn(Error):
 
 
         #去掉末尾编号
-        error_lattice = self.delete_element_end_index(self.lattice_mulp_list)
+        error_lattice = self.delete_element_end_index(lattice_mulp_list)
 
 
         for i in error_lattice:
@@ -934,8 +957,8 @@ class ErrorDyn(Error):
         for i in range(1, self.all_group + 1):
             for j in range(1, self.all_time + 1):
                 print(i, j)
-                self.generate_lattice_mulp_list(i)
-                self.run_one_time(i, j)
+                lattice_mulp_list = self.generate_lattice_mulp_list(i)
+                self.run_one_time(i, j, lattice_mulp_list)
                 self.write_err_datas(i, j)
                 self.write_err_par_every_time(i, j)
 
@@ -980,23 +1003,22 @@ class Errorstat(Error):
                 i.append(add_name)
                 index += 1
 
+
+        #为每个调整命令增加作用元件数
+        for i in lattice:
+            if i[0] == "adjust":
+                adjust_on_element = self.judge_command_on_element(lattice, i)
+                i.append(adjust_on_element)
+                if adjust_on_element not in adjust_element_num:
+                    adjust_element_num.append(adjust_on_element)
+
+        #[['adjust', '0', '1', '0', '0', '0.3', '0', 'adjust_0', 2]]
         all_adjust_command = []
         for i in lattice:
             if i[0] == "adjust":
-                all_adjust_command.append(i)
+                all_adjust_command.append(copy.deepcopy(i))
 
 
-        # for i in all_adjust_command:
-        #     print(i)
-
-        for i in all_adjust_command:
-            adjust_on_element = self.judge_command_on_element(lattice, i)
-            i.append(adjust_on_element)
-            if adjust_on_element not in adjust_element_num:
-                adjust_element_num.append(adjust_on_element)
-
-        # for i in lattice:
-        #     print(i)
 
         adjust_parameter_num = [[] for _ in range(len(adjust_element_num))]
         adjust_parameter_range = [[] for _ in range(len(adjust_element_num))]
@@ -1010,6 +1032,7 @@ class Errorstat(Error):
                 adjust_parameter_range[index].append([float(i[4]), float(i[5])])
                 adjust_parameter_n[index].append(int(i[3]))
                 adjust_parameter_use_init[index].append(int(i[6]))
+
 
         adjust_parameter_initial_value = [[] for _ in range(len(adjust_element_num))]
         for i in range(len(adjust_element_num)):
@@ -1072,7 +1095,8 @@ class Errorstat(Error):
         # return adjust_parameter_lattice_command, adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
         #        adjust_parameter_n, adjust_parameter_use_init
 
-    def treat_diag(self, group, time):
+    def treat_diag(self, group, time, error_lattice):
+
         """
         得到loss
         :return:
@@ -1081,7 +1105,7 @@ class Errorstat(Error):
         # 读取新的lattice信息
 
 
-        input_lines = read_txt(self.lattice_mulp_path, out='list')
+        input_lines = error_lattice
 
         # 产生每一个diag针对的位置
         lattice_obj = LatticeParameter(self.lattice_mulp_path)
@@ -1090,6 +1114,7 @@ class Errorstat(Error):
 
         lattice_copy = copy.deepcopy(input_lines)
         index = 0
+        #为diag添加diag_0
         for i in lattice_copy:
             if i[0].startswith("diag"):
                 add_name = f'diag_{index}'
@@ -1305,7 +1330,7 @@ class Errorstat(Error):
                 process.join()  # 等待子进程运行结束
                 process.terminate()  # 终止子进程
 
-                loss = self.treat_diag(group, time)
+                loss = self.treat_diag(group, time, error_lattice_no_index)
 
             except Exception as e:
                 # 处理异常，如果需要
@@ -1392,7 +1417,7 @@ class Errorstat(Error):
 
         goal = self.get_goal(error_lattice, adjust_element_num, adjust_parameter_num, group, time)
 
-        options = {'maxiter': 100, 'eps':10**-1, 'ftol':10**-4}
+        options = {'maxiter': 100, 'eps': 10**-1, 'ftol': 10**-4}
 
         self.ini_this = []
         self.loss_this = []
@@ -1484,7 +1509,7 @@ class Errorstat(Error):
 
         delete_directory(self.error_middle_output0_path)
 
-    def run_one_time_opti(self, group, time):
+    def run_one_time_opti(self, group, time, lattice_mulp_list):
         self.diag_every.clear()
         """
         静态误差完整跑一次, 需要矫正
@@ -1496,13 +1521,13 @@ class Errorstat(Error):
 
         # 得到lattice的定位信息
         adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
-        adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(self.lattice_mulp_list)
+        adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(lattice_mulp_list)
 
         # print( adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
         # adjust_parameter_n, adjust_parameter_use_init)
         # sys.exit()
         #进行优化
-        opti_res_this, loss_this = self.optimize_one_group(group, time, self.lattice_mulp_list,
+        opti_res_this, loss_this = self.optimize_one_group(group, time, lattice_mulp_list,
                                             adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num,
                                             adjust_parameter_range, \
                                             adjust_parameter_n, adjust_parameter_use_init)
@@ -1514,12 +1539,16 @@ class Errorstat(Error):
         #将优化参数写入到文件
         self.write_adjust_datas(group, time, adjust_element_num, adjust_parameter_num, opti_res_this)
 
+        print(self.diag_every)
         self.write_diag_datas(self.diag_every)
-        if self.err_type == 'stat' or self.err_type == 'only_adjust':
-            #使用优化后的结果运行一次
-            self.run_use_corrected_result(opti_res_this, group, time, self.lattice_mulp_list,
-                                          adjust_element_num, adjust_parameter_num)
 
+        if self.err_type == 'stat':
+            #使用优化后的结果运行一次
+            self.run_use_corrected_result(opti_res_this, group, time, lattice_mulp_list,
+                                          adjust_element_num, adjust_parameter_num)
+        elif self.err_type == 'stat_dyn':
+            pass
+        breakpoint()
     def write_diag_datas(self, diag_every):
         k = list(diag_every.keys())[0]
         v = list(diag_every.values())[0]
@@ -1536,7 +1565,6 @@ class Errorstat(Error):
                       f"energy {v[5]}" + "\n",
             ]
             diag_lis.append(t_lis)
-        print(diag_lis)
         write_to_txt(diag_datas_path, diag_lis)
 
     def write_adjust_datas(self, group, time, adjust_element_num, adjust_parameter_num, opti_res_this):
@@ -1582,11 +1610,11 @@ class Errorstat(Error):
 
         if self.opti:
             for i in range(1, self.all_group+1):
-                for j in range(1, self.all_time +1):
+                for j in range(1, self.all_time + 1):
                     print(i, j)
-                    self.generate_lattice_mulp_list(i)
-                    self.all_error_lattice.append(self.lattice_mulp_list)
-                    self.run_one_time_opti(i, j)
+                    lattice_mulp_list = self.generate_lattice_mulp_list(i)
+                    self.all_error_lattice.append(lattice_mulp_list)
+                    self.run_one_time_opti(i, j, lattice_mulp_list)
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
@@ -1594,8 +1622,8 @@ class Errorstat(Error):
             for i in range(1, self.all_group+1):
                 for j in range(1, self.all_time+1):
                     print(i, j)
-                    self.generate_lattice_mulp_list(i)
-                    self.run_use_corrected_result(0, i, j, self.lattice_mulp_list, 0, 0)
+                    lattice_mulp_list = self.generate_lattice_mulp_list(i)
+                    self.run_use_corrected_result(0, i, j, lattice_mulp_list, 0, 0)
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
@@ -1774,42 +1802,42 @@ class Errorstatdyn(Errorstat):
             for i in range(1, self.all_group+1):
                 for j in range(1, self.all_time+1):
                     print(i, j)
-                    self.generate_lattice_mulp_list(i)
-                    self.all_error_lattice.append(self.lattice_mulp_list)
-                    self.run_one_time_opti(i, j)
+                    lattice_mulp_list = self.generate_lattice_mulp_list(i)
+                    self.all_error_lattice.append(lattice_mulp_list)
+                    self.run_one_time_opti(i, j, lattice_mulp_list)
 
             #将优化的结果进行保存
-            new_name = f'opti_output'
-            copy_directory(self.error_output_path,  self.output_path, new_name)
+            # new_name = f'opti_output'
+            # copy_directory(self.error_output_path,  self.output_path, new_name)
 
-
-            if os.path.exists(self.error_middle_path):
-                delete_directory(self.error_middle_path)
-            os.makedirs(self.error_middle_path)
-
-            if os.path.exists(self.error_output_path):
-                delete_directory(self.error_output_path)
-            os.makedirs(self.error_output_path)
+            #
+            # if os.path.exists(self.error_middle_path):
+            #     delete_directory(self.error_middle_path)
+            # os.makedirs(self.error_middle_path)
+            #
+            # if os.path.exists(self.error_output_path):
+            #     delete_directory(self.error_output_path)
+            # os.makedirs(self.error_output_path)
 
             if self.if_normal == 1:
                 self.run_normal()
                 self.write_err_par_every_time(0, 0)
 
-            self.generate_lattice_mulp_list(0)
+            lattice_mulp_list = self.generate_lattice_mulp_list(0)
 
             adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
-            adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(self.lattice_mulp_list)
+            adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(lattice_mulp_list)
 
 
             for i in range(1, self.all_group+1):
                 for j in range(1, self.all_time+1):
                     x = self.opti_res[(i-1) * self.all_time + (j-1)]
-                    error_lattice_index = self.all_error_lattice[i * self.all_time + j]
+                    error_lattice_index = self.all_error_lattice[(i-1) * self.all_time + (j-1)]
 
                     # 得到lattice的定位信息
-
                     self.run_stat_dyn_one_time(x, i, j, error_lattice_index,
                                                    adjust_element_num, adjust_parameter_num, True)
+
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
@@ -1875,8 +1903,8 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = Errorstat(r'C:\Users\shliu\Desktop\testz',
-                    50, 1)
+    obj = ErrorDyn(r'C:\Users\shliu\Desktop\testz',
+                    50, 0)
 
     obj.run()
     # obj.treat_diag()

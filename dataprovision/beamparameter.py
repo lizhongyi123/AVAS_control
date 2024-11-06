@@ -7,7 +7,7 @@ import numpy as np
 from global_varible import c_light
 
 from global_varible import Pi
-from aftertreat.dataanalysis.percentemitt import PercentEmit
+
 class DstParameter():
     """
     对dst文件进行解析

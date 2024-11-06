@@ -166,31 +166,32 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     import numpy as np
-    path1 = r"C:\Users\shliu\Desktop\testz\OutputFile\output_0_0\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\DataSet.txt"
     obj = DatasetParameter(path1)
     obj.get_parameter()
     z1 = np.array(obj.z)
-
-    path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
-    obj = DatasetParameter(path2)
-    obj.get_parameter()
-    z2 = np.array(obj.z)
-    z3 = np.array(obj.z)[:len(z1)]
-    print(len(z1))
-    print(len(z2))
-
     print(z1[-1])
-    print(z2[len(z1)])
-    print(z3[-1])
-    # print(z2[-5] - z1[-5])
-
-
-    print((z3-z1) * 1000)
-    x = z1
-    y = (z3-z1) * 1000
-    import matplotlib
-    import numpy as np
-    matplotlib.use('TKAgg')
-    import matplotlib.pyplot as plt
-    plt.scatter(x, y)
-    plt.show()
+    # path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
+    # obj = DatasetParameter(path2)
+    # obj.get_parameter()
+    # z2 = np.array(obj.z)
+    # z3 = np.array(obj.z)[:len(z1)]
+    # print(len(z1))
+    # print(len(z2))
+    #
+    # print(z1[-1])
+    # print(z2[len(z1)])
+    # print(z3[-1])
+    # # print(z2[-5] - z1[-5])
+    #
+    #
+    # print((z3-z1) * 1000)
+    # x = z1
+    # y = (z3-z1) * 1000
+    # import matplotlib
+    # import numpy as np
+    # matplotlib.use('TKAgg')
+    # import matplotlib.pyplot as plt
+    # plt.scatter(x, y)
+    # plt.show()

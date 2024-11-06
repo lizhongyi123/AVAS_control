@@ -118,18 +118,24 @@ class PageMatch (QWidget):
                 self.cb_use_initial_value.setEnabled(False)
 
 
+        dic = self.get_state_dict()
+        self.match_signal.emit(dic)
+
+
+    def get_state_dict(self):
+        dic = {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0}
+
+        if self.cb_input_twiss.isChecked():
+            dic["cal_input_twiss"] = 1
+
+        if self.cb_match_twiss.isChecked():
+            dic["match_with_twiss"] = 1
 
         if self.cb_use_initial_value.isChecked():
-            self.match_signal.emit('match_twiss_ini')
-            print('match_twiss_ini')
-        elif self.cb_match_twiss.isChecked():
-            self.match_signal.emit('match_twiss')
-            print('match_twiss')
-        elif self.cb_input_twiss.isChecked():
-            self.match_signal.emit('period_match')
-            print('period_match')
-        else:
-            self.match_signal.emit(None)
+            dic["use_initial_value"] = 1
+
+        return dic
+
 
     def inspect(self):
         pass

@@ -79,7 +79,7 @@ class Plotoutput(PictureDialog1):
 ########################################################
 
 class PageError(QWidget):
-    error_signal = pyqtSignal(str)
+    error_signal = pyqtSignal(dict)
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
@@ -361,22 +361,10 @@ class PageError(QWidget):
 
         ini_dict = self.ini_obj.creat_from_file(self.ini_path)
 
-        if self.cb_stat_error.isChecked():
-            self.error_signal.emit('stat_error')
-            ini_dict['error']['error_type'] = 'stat_error'
-        elif self.cb_dyn_error.isChecked():
-            self.error_signal.emit('dyn_error')
-            ini_dict['error']['error_type'] = 'dyn_error'
+        error_dic = self.get_state_dict()
+        self.error_signal.emit(error_dic)
 
-        elif self.cb_stat_dyn_error.isChecked():
-            self.error_signal.emit('stat_dyn')
-            ini_dict['error']['error_type'] = 'stat_dyn'
 
-        else:
-            self.error_signal.emit(None)
-            ini_dict['error']['error_type'] = '0'
-        self.ini_obj.set_param(**ini_dict)
-        self.ini_obj.write_to_file(self.ini_path)
 
     def fill_parameter(self):
         if os.path.exists(self.ini_path):
@@ -393,6 +381,19 @@ class PageError(QWidget):
             self.text_seed.setText(str(ini_dict['error']['seed']))
         else:
             pass
+    def get_state_dict(self):
+        dic = {"error_type": "undefined", "seed": 0, "if_normal": 1}
+        if self.cb_stat_error.isChecked():
+            dic['error_type'] = 'stat'
+        elif self.cb_dyn_error.isChecked():
+            dic['error_type'] = 'dyn'
+        elif self.cb_stat_dyn_error.isChecked():
+            dic['error_type'] = 'stat_dyn'
+        else:
+            dic['error_type'] = "undefined"
+
+        dic["seed"] = int(self.text_seed.text())
+        return dic
 
 
 if __name__ == '__main__':

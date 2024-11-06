@@ -131,6 +131,8 @@ def read_dst_fast(input):
     res['freq'] = freq*10**6
     res['partran_dist'] = partran_dist
     res['basemassinmev'] = BaseMassInMeV
+    energy_lis = np.array([i[5] for i in partran_dist])
+    res['kneticenergy'] = np.mean(energy_lis)
     return res
 
 def read_runsignal(path):

@@ -12,10 +12,6 @@ class CreatBasicFile():
         self.input_path = os.path.join(project_path, "InputFile", "input.txt")
         self.lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
         self.ini_path = os.path.join(project_path, "InputFile", "ini.ini")
-
-
-    def create_basic_beam_file(self):
-        beam_config = BeamConfig()
         self.beam_info = {
             'readparticledistribution': None, 'numofcharge': 1, 'particlerestmass': 938.272, 'current': 0,
             'particlenumber': 5000, 'frequency': 100, 'kneticenergy': 1,
@@ -24,15 +20,21 @@ class CreatBasicFile():
             "alpha_z": 0, "beta_z": 1, "emit_z": 0.1,
             "distribution_x": "GS", "distribution_y": "GS"
         }
+
+        self.input_info = {
+            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0,
+            "maxthreads": -1
+        }
+
+    def create_basic_beam_file(self):
+        beam_config = BeamConfig()
+
         beam_config.set_param(**self.beam_info)
         beam_config.write_to_file(self.beam_path)
 
     def create_basic_input_file(self):
         input_config = InputConfig()
-        self.input_info = {
-            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0,
-            "maxthreads": -1
-        }
+
         input_config.set_param(**self.input_info)
         input_config.write_to_file(self.input_path)
 

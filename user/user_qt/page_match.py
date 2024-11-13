@@ -13,7 +13,7 @@ import multiprocessing
 
 
 class PageMatch (QWidget):
-    match_signal = pyqtSignal(str)
+    match_signal = pyqtSignal(dict)
 
     def __init__(self, project_path):
         super().__init__()
@@ -108,6 +108,7 @@ class PageMatch (QWidget):
             if sender_checkbox.isChecked():
                 self.cb_match_twiss.setChecked(False)
                 self.cb_use_initial_value.setEnabled(False)
+                self.cb_use_initial_value.setChecked(False)
 
         elif sender_checkbox == self.cb_match_twiss:
             if sender_checkbox.isChecked():

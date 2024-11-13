@@ -90,7 +90,8 @@ class MultiParticle():
 if __name__ == "__main__":
     start = time.time()
     project_path = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn"
-    project_path =r"C:\Users\shliu\Desktop\test_so\cafe_project"
+    project_path =r"C:\Users\shliu\Desktop\test_cafe"
+
     obj = MultiParticle(project_path)
 
     obj.run()

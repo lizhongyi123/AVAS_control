@@ -44,3 +44,20 @@ def convert_dic2lis(dic):
         res.append(v_lis)
 
     return res
+
+def format_output(code=0, msg="success", **kwargs):
+
+    return {
+        "code": code,
+        "data": {
+            "msg": msg,
+            **kwargs
+        }
+    }
+if __name__ == '__main__':
+    code = 1
+    msg = "s"
+    kwargs = {"x": [1, 2, 3],
+              "y": [1, 2, 3]}
+    value = format_output(msg ="dad")
+    print(value)

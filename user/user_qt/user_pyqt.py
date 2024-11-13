@@ -33,6 +33,7 @@ from user.user_qt.page_acc import PageAccept
 from send2trash import send2trash
 from utils.iniconfig import IniConfig
 from apis.qt_api.SimMode import SimMode
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -323,6 +324,17 @@ class MainWindow(QMainWindow):
         self.page_beam.save_beam()
         self.page_lattice.save_all_lattice()
         self.page_input.save_input()
+        self.save_ini()
+    def save_ini(self):
+        ini_obj = IniConfig()
+        set_dict = {'input': self.input_signal,
+                    'match': self.match_signal,
+                    'error': self.error_signal,
+
+        }
+        ini_obj.set_param(**set_dict)
+
+        ini_obj.write_to_file()
 
 
     @treat_err
@@ -346,55 +358,68 @@ class MainWindow(QMainWindow):
         self.ini_obj.write_ini()
 
     def run(self):
-
         self.stop()
-        #检查有没有哪个界面
-        res = self.inspect()
-        if not res:
-            return None
-        #检查是否有信号重复
-
-        res = self.inspect_signal()
-        if not res:
-            return None
-
+        # res = self.inspect()
+        # if not res:
+        #     return None
         self.save_project()
-        if self.match_signal == 'match_twiss_ini':
-            self.func_match(1, 1)
-        elif self.match_signal == 'match_twiss':
-            self.func_match(1, 0)
-        elif self.match_signal == 'period_match':
-            self.func_match(0)
-        
-        elif self.error_signal == 'stat_error':
-            print('stat')
-            self.func_err('stat')
-
-        elif self.error_signal == 'dyn_error':
-            self.func_err('dyn')
-
-        elif self.error_signal == 'stat_dyn':
-            self.func_err('stat_dyn')
-        
-        elif self.input_sim_type_signal == 'basic_mulp':
-
-            self.activate_output('basic_mulp')
-
-            self.func_basic_mulp()
-
-            # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
-            # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
-            try:
-                self.page_data.fill_parameter()
-            except Exception as e:
-                print(e)
-
-        elif self.input_sim_type_signal == 'basic_env':
-            self.func_basic_env()
-        else:
-            print('Nothing was chosen')
+        self.func_sim()
 
         # self.refresh_lattice()
+
+
+
+
+    # def run(self):
+    #
+    #     self.stop()
+    #     #检查有没有哪个界面
+    #     res = self.inspect()
+    #     if not res:
+    #         return None
+    #     #检查是否有信号重复
+    #
+    #     res = self.inspect_signal()
+    #     if not res:
+    #         return None
+    #
+    #     self.save_project()
+    #     if self.match_signal == 'match_twiss_ini':
+    #         self.func_match(1, 1)
+    #     elif self.match_signal == 'match_twiss':
+    #         self.func_match(1, 0)
+    #     elif self.match_signal == 'period_match':
+    #         self.func_match(0)
+    #
+    #     elif self.error_signal == 'stat_error':
+    #         print('stat')
+    #         self.func_err('stat')
+    #
+    #     elif self.error_signal == 'dyn_error':
+    #         self.func_err('dyn')
+    #
+    #     elif self.error_signal == 'stat_dyn':
+    #         self.func_err('stat_dyn')
+    #
+    #     elif self.input_sim_type_signal == 'basic_mulp':
+    #
+    #         self.activate_output('basic_mulp')
+    #
+    #         self.func_basic_mulp()
+    #
+    #         # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
+    #         # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
+    #         try:
+    #             self.page_data.fill_parameter()
+    #         except Exception as e:
+    #             print(e)
+    #
+    #     elif self.input_sim_type_signal == 'basic_env':
+    #         self.func_basic_env()
+    #     else:
+    #         print('Nothing was chosen')
+    #
+    #     # self.refresh_lattice()
 
 
     def activate_output(self, signal):
@@ -419,20 +444,22 @@ class MainWindow(QMainWindow):
                 print(e)
 
 
-
     @treat_err
     def stop(self):
-        if self.basci_mulp_process.is_alive():
-            self.basci_mulp_process.terminate()
-            self.basci_mulp_process.join()
-
-        elif self.err_process.is_alive():
-            self.err_process.terminate()
-            self.err_process.join()
-
-        elif self.match_process.is_alive():
-            self.match_process.terminate()
-            self.match_process.join()
+        if self.sim_process.is_alive():
+            self.sim_process.terminate()
+            self.sim_process.join()
+        # if self.basci_mulp_process.is_alive():
+        #     self.basci_mulp_process.terminate()
+        #     self.basci_mulp_process.join()
+        #
+        # elif self.err_process.is_alive():
+        #     self.err_process.terminate()
+        #     self.err_process.join()
+        #
+        # elif self.match_process.is_alive():
+        #     self.match_process.terminate()
+        #     self.match_process.join()
         self.page_output.stop_update_progress()
         print('结束进程')
 
@@ -494,9 +521,10 @@ class MainWindow(QMainWindow):
 
     def func_sim(self):
         obj = SimMode(self.project_path)
+        if not self.sim_process.is_alive():
+            self.sim_process = multiprocessing.Process(target=obj.run, )
+            self.sim_process.start()
 
-
-        obj.run()
     def check_basci_mulp_process_status(self):
         if self.basci_mulp_process is not None:
             if self.basci_mulp_process.is_alive():
@@ -533,15 +561,15 @@ class MainWindow(QMainWindow):
     def refresh_input(self):
         self.page_input.fill_parameter()
 
-    def get_signal(self, signal):
+    def get_input_signal(self, signal):
         self.input_signal = signal
-
+        print(self.input_signal)
     def get_error_signal(self, signal):
         self.error_signal = signal
-
+        print(self.error_signal)
     def get_match_signal(self, signal):
         self.match_signal = signal
-
+        print(self.match_signal)
 
     def initialize_page(self):
         print(self.settings.value("lastProjectPath", None))

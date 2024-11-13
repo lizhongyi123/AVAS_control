@@ -303,13 +303,13 @@ class PageInput(QWidget):
 
         if self.cb_mulp.isChecked():
             dic["sim_type"] = 'mulp'
-            self.input_sim_type_signal.emit(dic)
+            self.input_signal.emit(dic)
         elif self.cb_env.isChecked():
             dic["sim_type"] = 'env'
-            self.input_sim_type_signal.emit(dic)
+            self.input_signal.emit(dic)
         else:
             dic["sim_type"] = None
-            self.input_sim_type_signal.emit(dic)
+            self.input_signal.emit(dic)
         self.mulp_env_behavior()
 
     def cb_sc_method_change(self, state):

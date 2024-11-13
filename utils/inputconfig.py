@@ -6,13 +6,12 @@ import copy
 from utils.iniconfig import IniConfig
 class InputConfig():
     def __init__(self):
-        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads",
-                                     "isspacecharge", "spacechargelong", "spacechargetype"]
+        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads", "spacechargelong", "spacechargetype"]
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads", "isspacecharge",
                          "spacechargelong", "spacechargetype"]
 
         self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "maxthreads": None, "isspacecharge": None, "spacechargelong": None, "spacechargetype": None}
+                                "maxthreads": None, "spacechargelong": None, "spacechargetype": None}
 
 
     # def initialize_input(self):
@@ -64,12 +63,11 @@ class InputConfig():
         return self.input_parameter
 
     def set_param(self, **kwargs):
-        print()
-        self.validate_type(kwargs)
+        # self.validate_type(kwargs)
         for k, v in kwargs.items():
             self.input_parameter[k] = v
 
-        print("set", self.input_parameter)
+        # print("set", self.input_parameter)
         return self.input_parameter
 
     def write_to_file(self, path):
@@ -92,8 +90,6 @@ class InputConfig():
         v_lis = convert_dic2lis(v_dic)
         for index, i in enumerate(v_lis):
             v_lis[index] = ["" if v is None else v for v in i]
-        print("write", v_lis)
-
         #检查是否存在未None的情况
 
         write_to_txt(path, v_lis)

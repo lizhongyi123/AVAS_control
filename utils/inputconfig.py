@@ -4,16 +4,20 @@ from utils.exception import (TypeError, ValueRangeError, ValueChooseError, ListL
 from utils.tool import write_to_txt, convert_dic2lis
 import copy
 from utils.iniconfig import IniConfig
+from utils.tool import format_output
+import os
 class InputConfig():
     def __init__(self):
-        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads", "spacechargelong", "spacechargetype"]
-        self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity", "maxthreads", "isspacecharge",
+        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
+                                     "spacechargelong", "spacechargetype"]
+        self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
                          "spacechargelong", "spacechargetype"]
 
         self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "maxthreads": None, "spacechargelong": None, "spacechargetype": None}
+                                "spacechargelong": None, "spacechargetype": None}
 
-
+        self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",]
+        self.env_keys = ["spacechargelong", "spacechargetype"]
     # def initialize_input(self):
     #     self.input_parameter = {'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
     #                             "maxthreads": None}
@@ -41,67 +45,109 @@ class InputConfig():
 
         return res
 
-    def creat_from_file(self, path):
-        original_dict = self.read_input_txt(path)
+    def create_from_file(self, item):
+        other_path = item.get("otherPath")
+        if other_path is None:
+            path = os.path.join(item.get("projectPath"), "InputFile", "input.txt")
+        else:
+            path = other_path
 
-        #验证是否存在未知元素
-        for k, v in original_dict.items():
-            if k not in self.input_parameter_keys:
-                raise UnknownkeywordError(message=None, key=k)
+        kwargs = {}
+        try:
+            original_dict = self.read_input_txt(path)
 
-        #如果不存在未知元素, 转换类型
-        for k, v in original_dict.items():
-            original_dict[k] = self.convert_v(k, v)
-
-        if self.validate_type(original_dict):
+            #验证是否存在未知元素
             for k, v in original_dict.items():
-                self.input_parameter[k] = original_dict[k]
+                if k not in self.input_parameter_keys:
+                    raise UnknownkeywordError(message=None, key=k)
 
+            #如果不存在未知元素, 转换类型
+            for k, v in original_dict.items():
+                original_dict[k] = self.convert_v(k, v)
 
+            if self.validate_type(original_dict):
+                for k, v in original_dict.items():
+                    self.input_parameter[k] = original_dict[k]
 
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs.update({'inputParams': {}})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
 
-        return self.input_parameter
+        # print("read", self.beam_parameter)
+        kwargs.update({'inputParams': copy.deepcopy(self.input_parameter)})
+        output = format_output(**kwargs)
+        return output
 
     def set_param(self, **kwargs):
-        # self.validate_type(kwargs)
-        for k, v in kwargs.items():
-            self.input_parameter[k] = v
+        kwargs1 = {}
+        try:
+            # self.validate_type(kwargs)
+            for k, v in kwargs.items():
+                self.input_parameter[k] = v
 
-        # print("set", self.input_parameter)
-        return self.input_parameter
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs1.update({'inputParams': {}})
+            output = format_output(code, msg=msg, **kwargs1)
+            return output
 
-    def write_to_file(self, path):
+        kwargs1.update({'inputParams': copy.deepcopy(self.input_parameter)})
+        output = format_output(**kwargs1)
+        return output
 
-        v_dic = {}
-        if self.input_parameter["sim_type"] == 'mulp':
-            v_dic = copy.deepcopy(self.input_parameter)
-            v_dic["!sim_type"] = v_dic["sim_type"]
+    def write_to_file(self, item):
+        other_path = item.get("otherPath")
+        if other_path is None:
+            path = os.path.join(item.get("projectPath"), "InputFile", "input.txt")
+        else:
+            path = other_path
 
-            del v_dic["spacechargelong"]
-            del v_dic["spacechargetype"]
-            del v_dic["sim_type"]
-        elif self.input_parameter["sim_type"] == 'env':
+        kwargs = {}
+        try:
+            v_dic = {}
+            if self.input_parameter["sim_type"] == 'mulp':
+                v_dic = copy.deepcopy(self.input_parameter)
+                v_dic["!sim_type"] = v_dic["sim_type"]
 
-            v_dic["!sim_mode"] = self.input_parameter["sim_type"]
-            v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
-            v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
+                del v_dic["spacechargelong"]
+                del v_dic["spacechargetype"]
+                del v_dic["sim_type"]
+            elif self.input_parameter["sim_type"] == 'env':
+
+                v_dic["!sim_mode"] = self.input_parameter["sim_type"]
+                v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
+                v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
 
 
-        v_lis = convert_dic2lis(v_dic)
-        for index, i in enumerate(v_lis):
-            v_lis[index] = ["" if v is None else v for v in i]
-        #检查是否存在未None的情况
+            v_lis = convert_dic2lis(v_dic)
+            for index, i in enumerate(v_lis):
+                v_lis[index] = ["" if v is None else v for v in i]
+            #检查是否存在未None的情况
 
-        write_to_txt(path, v_lis)
-        return True
+            write_to_txt(path, v_lis)
+
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs.update({'inputParams': {}})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
+
+        kwargs.update({'inputParams': copy.deepcopy(self.input_parameter)})
+        output = format_output(**kwargs)
+        return output
 
 
     def validate_type(self, param):
         #验证关键词的类型
         for k, v in param.items():
             if k == "scmethod" and v is not None:
-                if v not in ["FFT", "PICNIC"]:
-                    raise ValueChooseError(k, ["FFT", "PICNIC"], v)
+                if v not in ["FFT", "SPICNIC"]:
+                    raise ValueChooseError(k, ["FFT", "SPICNIC"], v)
             elif k == "scanphase" and v is not None:
                 if v not in [0, 1, 2]:
                     raise ValueChooseError(k, [0, 1, 2], v)
@@ -148,14 +194,20 @@ class InputConfig():
     def validate_run(self, path):
         self.creat_from_file(path)
         #当所有输入符合
-        for k in self.input_parameter_keys:
-            if self.input_parameter[k] is None:
-                raise MisskeywordError(f"{k}")
+        if self.input_parameter["sim_type"] == 'mulp':
+            for k in self.mulp_keys:
+                if self.input_parameter[k] is None:
+                    raise MisskeywordError(f"{k}")
 
-# if __name__ == "__main__":
-#     path =r"C:\Users\shliu\Desktop\AVAS20240923\test\InputFile\input.txt"
-#     obj = InputConfig(path)
-#     # obj.read_input()
-#     # set_param = {'scanphase': 2}
-#     # obj.set_input(**set_param)
-#     # obj.write_input()
+        elif self.input_parameter["sim_type"] == 'env':
+            for k in self.env_keys:
+                if self.input_parameter[k] is None:
+                    raise MisskeywordError(f"{k}")
+if __name__ == "__main__":
+    path =r"C:\Users\shliu\Desktop\AVAS20240923\test\InputFile\input.txt"
+    obj = InputConfig()
+    res = obj.create_from_file(path)
+    print(res)
+    # set_param = {'scanphase': 2}
+    # obj.set_input(**set_param)
+    # obj.write_input()

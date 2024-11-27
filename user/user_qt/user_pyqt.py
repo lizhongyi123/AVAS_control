@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget
     QApplication
 import os
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QStandardPaths, pyqtSignal, QSettings
+from PyQt5.QtCore import QStandardPaths, pyqtSignal, QSettings, QThread
 
 from utils.readfile import read_txt, read_dst
 from user.user_qt.page_beam import PageBeam
@@ -33,6 +33,30 @@ from user.user_qt.page_acc import PageAccept
 from send2trash import send2trash
 from utils.iniconfig import IniConfig
 from apis.qt_api.SimMode import SimMode
+from apis.qt_api.createbasicfile import CreateBasicProject
+from core.MultiParticle import MultiParticle
+class MultiParticleThread(QThread):
+    finished = pyqtSignal()  # 任务完成信号
+
+    def __init__(self, project_path):
+        super().__init__()
+        self.project_path = project_path
+        self.running = True
+        self.multiparticle_obj = MultiParticle(self.project_path)
+
+    def run(self):
+        # 调用 MultiParticle 的 run 方法
+        try:
+            self.multiparticle_obj.run()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.finished.emit()  # 任务完成时发出信号
+
+    def stop(self):
+        # 停止 MultiParticle 的逻辑
+        self.running = False
+        self.multiparticle_obj.stop()
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -43,7 +67,7 @@ class MainWindow(QMainWindow):
         self.match_signal = None
         self.error_signal = None
 
-
+        self.task_thread = None
         self.settings = QSettings('IMP', 'AVAS')
 
         self.initUI()
@@ -228,11 +252,11 @@ class MainWindow(QMainWindow):
         self.page_error.error_signal.connect(self.get_error_signal)
         self.page_match.match_signal.connect(self.get_match_signal)
 
-        self.basci_mulp_process = multiprocessing.Process()
-        self.basci_env_process = multiprocessing.Process()
-        self.err_process = multiprocessing.Process()
-        self.match_process = multiprocessing.Process()
-
+        # self.basci_mulp_process = multiprocessing.Process()
+        # self.basci_env_process = multiprocessing.Process()
+        # self.err_process = multiprocessing.Process()
+        # self.match_process = multiprocessing.Process()
+        self.sim_process = multiprocessing.Process()
         central_widget.setLayout(central_layout)  # 将布局设置给中央部件
 
         self.setCentralWidget(central_widget)  # 将中央部件设置为主窗口的中央部件
@@ -251,23 +275,27 @@ class MainWindow(QMainWindow):
         new_folder_path = os.path.normpath(new_folder_path)
 
         if new_folder_path:
-            os.makedirs(new_folder_path)
-            input_file = os.path.join(new_folder_path, 'InputFile')
-            output_file = os.path.join(new_folder_path, 'OutputFile')
-            os.makedirs(input_file)
-            os.makedirs(output_file)
 
             self.project_path = new_folder_path
             self.path_text.setText(self.project_path)
             self.refresh_page_project_path()
 
-            self.create_basic_txt_file()
 
+            item = {
+                "projectPath": self.project_path,
+                "beamKeys": [],
+                "inputkeys": []
+            }
+            create_project_obj = CreateBasicProject(item, 'qt')
+            res = create_project_obj.create_project()
+            if res['code'] == -1:
+                raise Exception(res["data"]['msg'])
+                return -1
             self.page_fill_parameter()
 
         self.settings.setValue("lastProjectPath", self.project_path)
 
-    # @treat_err
+    @treat_err
     def open_project(self):
         # desktop_path = QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
         # default_folder_path = desktop_path
@@ -304,8 +332,7 @@ class MainWindow(QMainWindow):
         self.page_output.updatePath(self.project_path)
         self.page_accept.updatePath(self.project_path)
 
-        self.ini_path = os.path.join(self.project_path, "inputFile", 'ini.ini')
-        self.ini_obj = IniConfig()
+
 
 
     @treat_err
@@ -325,37 +352,27 @@ class MainWindow(QMainWindow):
         self.page_lattice.save_all_lattice()
         self.page_input.save_input()
         self.save_ini()
+
     def save_ini(self):
+        item = {"projectPath": self.project_path}
         ini_obj = IniConfig()
+
         set_dict = {'input': self.input_signal,
                     'match': self.match_signal,
                     'error': self.error_signal,
-
         }
-        ini_obj.set_param(**set_dict)
+        set_dict = {k: v for k, v in set_dict.items() if v}
+        res = ini_obj.set_param(**set_dict)
+        if res["code"] == -1:
+            raise Exception(res['data']['msg'])
 
-        ini_obj.write_to_file()
-
-
-    @treat_err
-    def create_basic_txt_file(self):
-        beam = os.path.join(self.project_path, "InputFile", "beam.txt")
-        input = os.path.join(self.project_path, "InputFile", "input.txt")
-        lattice = os.path.join(self.project_path, "InputFile", "lattice.txt")
-        lattice_mulp = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
+        ini_path = os.path.join(self.project_path, "inputFile", 'ini.ini')
+        res = ini_obj.write_to_file(item)
+        if res["code"] == -1:
+            raise Exception(res['data']['msg'])
 
 
-        with open(beam, "w") as file:
-            file.write("")
-        with open(input, "w") as file:
-            file.write("")
-        with open(lattice, "w") as file:
-            file.write("")
-        with open(lattice_mulp, "w") as file:
 
-            file.write("")
-        self.ini_obj.initialize_ini()
-        self.ini_obj.write_ini()
 
     def run(self):
         self.stop()
@@ -363,50 +380,18 @@ class MainWindow(QMainWindow):
         # if not res:
         #     return None
         self.save_project()
-        self.func_sim()
 
+        if not self.task_thread or not self.task_thread.isRunning():
+            self.task_thread = MultiParticleThread(self.project_path)
+            self.task_thread.finished.connect(self.on_task_finished)
+            self.task_thread.start()
         # self.refresh_lattice()
 
-
+    def on_task_finished(self):
+        print("Task finished.")
 
 
     # def run(self):
-    #
-    #     self.stop()
-    #     #检查有没有哪个界面
-    #     res = self.inspect()
-    #     if not res:
-    #         return None
-    #     #检查是否有信号重复
-    #
-    #     res = self.inspect_signal()
-    #     if not res:
-    #         return None
-    #
-    #     self.save_project()
-    #     if self.match_signal == 'match_twiss_ini':
-    #         self.func_match(1, 1)
-    #     elif self.match_signal == 'match_twiss':
-    #         self.func_match(1, 0)
-    #     elif self.match_signal == 'period_match':
-    #         self.func_match(0)
-    #
-    #     elif self.error_signal == 'stat_error':
-    #         print('stat')
-    #         self.func_err('stat')
-    #
-    #     elif self.error_signal == 'dyn_error':
-    #         self.func_err('dyn')
-    #
-    #     elif self.error_signal == 'stat_dyn':
-    #         self.func_err('stat_dyn')
-    #
-    #     elif self.input_sim_type_signal == 'basic_mulp':
-    #
-    #         self.activate_output('basic_mulp')
-    #
-    #         self.func_basic_mulp()
-    #
     #         # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
     #         # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
     #         try:
@@ -414,10 +399,6 @@ class MainWindow(QMainWindow):
     #         except Exception as e:
     #             print(e)
     #
-    #     elif self.input_sim_type_signal == 'basic_env':
-    #         self.func_basic_env()
-    #     else:
-    #         print('Nothing was chosen')
     #
     #     # self.refresh_lattice()
 
@@ -446,9 +427,11 @@ class MainWindow(QMainWindow):
 
     @treat_err
     def stop(self):
-        if self.sim_process.is_alive():
-            self.sim_process.terminate()
-            self.sim_process.join()
+        if self.task_thread and self.task_thread.isRunning():
+            self.task_thread.stop()
+            self.task_thread.wait()  # 等待线程终止
+            print("Task stopped.")
+
         # if self.basci_mulp_process.is_alive():
         #     self.basci_mulp_process.terminate()
         #     self.basci_mulp_process.join()
@@ -464,60 +447,6 @@ class MainWindow(QMainWindow):
         print('结束进程')
 
 #################################
-    #此处对应的是run和stop对应的函数
-
-    # def func_basic_mulp(self):
-    #     print("start simulation")
-    #     if not self.basci_mulp_process.is_alive():
-    #         self.basci_mulp_process = multiprocessing.Process(target=basic_mulp, args=(self.project_path,))
-    #         self.basci_mulp_process.start()
-    #
-    #
-    # def func_basic_env(self):
-    #     print("start simulation")
-    #     lattice_env = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-    #     if not self.basci_env_process.is_alive():
-    #         self.basci_env_process = multiprocessing.Process(target=basic_env, args=(self.project_path, lattice_env))
-    #         self.basci_env_process.start()
-    #
-    #
-    # #误差分析
-    # def func_err(self, err_type):
-    #     print("start err")
-    #     if not self.err_process.is_alive():
-    #         if err_type == 'stat':
-    #             target = err_stat
-    #         elif err_type == 'dyn':
-    #             target = err_dyn
-    #         elif err_type == 'stat_dyn':
-    #             target = err_stat_dyn
-    #
-    #         seed_value = int(self.ini_obj.creat_from_file(self.ini_path)['error']['seed'])
-    #
-    #         self.err_process = multiprocessing.Process(target=target, args=(self.project_path, seed_value))
-    #         self.err_process.start()
-    #
-    # def func_match(self, match_choose, use_ini=0):
-    #     print(match_choose)
-    #     print("start match")
-    #     if not self.match_process.is_alive():
-    #
-    #         if match_choose == 0:
-    #             # 周期匹配
-    #             target = circle_match
-    #             args = (self.project_path,)
-    #
-    #
-    #         elif match_choose == 1:
-    #             # twiss command匹配
-    #             target = match_twiss
-    #             args = (self.project_path, use_ini)
-    #         else:
-    #             return 0
-    #
-    #         self.match_process = multiprocessing.Process(target=target, args=args)
-    #         self.match_process.start()
-    #         # 启用监测器，开始检查进程状态
 
     def func_sim(self):
         obj = SimMode(self.project_path)

@@ -2,7 +2,8 @@
 import struct
 import numpy
 import numpy as np
-
+import os
+from utils.exception import CustomFileNotFoundError
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
@@ -12,6 +13,9 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
     :return:{}or[]
     注意：当输出为字典格式的时候，文件中存在相同key会出现覆盖的情况
     """
+    if not os.path.exists(input):
+        raise CustomFileNotFoundError(input)
+
     with open(input, encoding='UTF-8') as file_object:
         input_lines = []
         if not readdall:

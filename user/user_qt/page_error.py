@@ -250,10 +250,9 @@ class PageError(QWidget):
             seed_value = int(self.text_seed.text())
         else:
             seed_value = 0
-        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
-        ini_dict['error']['seed'] = seed_value
-        self.ini_obj.set_param(**ini_dict)
-        self.ini_obj.write_to_file(self.ini_path)
+
+        error_dic = self.get_state_dict()
+        self.error_signal.emit(error_dic)
 
 
 
@@ -359,7 +358,6 @@ class PageError(QWidget):
                 self.cb_stat_error.setChecked(False)
                 self.cb_dyn_error.setChecked(False)
 
-        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
 
         error_dic = self.get_state_dict()
         self.error_signal.emit(error_dic)
@@ -367,20 +365,23 @@ class PageError(QWidget):
 
 
     def fill_parameter(self):
-        if os.path.exists(self.ini_path):
-            ini_dict = self.ini_obj.creat_from_file(self.ini_path)
-            if ini_dict['error'] == '0':
-                pass
-            elif ini_dict['error']['error_type'] == 'stat_error':
-                self.cb_stat_error.setChecked(True)
-            elif ini_dict['error']['error_type'] == 'dyn_error':
-                self.cb_dyn_error.setChecked(True)
-            elif ini_dict['error']['error_type'] == 'sstat_dyn':
-                self.cb_stat_error.setChecked(True)
+        item = {"projectPath": self.project_path}
+        ini_dict = self.ini_obj.create_from_file(item)
 
-            self.text_seed.setText(str(ini_dict['error']['seed']))
-        else:
-            pass
+        if ini_dict['code'] == -1:
+            raise Exception(ini_dict['data']['msg'])
+
+        ini_dict = ini_dict["data"]['iniParams']
+
+        if ini_dict['error']['error_type'] == 'stat':
+            self.cb_stat_error.setChecked(True)
+        elif ini_dict['error']['error_type'] == 'dyn':
+            self.cb_dyn_error.setChecked(True)
+        elif ini_dict['error']['error_type'] == 'stat_dyn':
+            self.cb_stat_error.setChecked(True)
+
+        self.text_seed.setText(str(ini_dict['error']['seed']))
+
     def get_state_dict(self):
         dic = {"error_type": "undefined", "seed": 0, "if_normal": 1}
         if self.cb_stat_error.isChecked():

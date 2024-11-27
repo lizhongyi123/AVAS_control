@@ -3,6 +3,8 @@ from utils.tool import write_to_txt, convert_dic2lis
 import copy
 from utils.exception import (TypeError, ValueRangeError, ValueChooseError, ListLengthError,
                              UnknownkeywordError, ValueConvertError)
+from utils.tool import format_output
+import os
 class BeamConfig():
     def __init__(self):
         self.beam_parameter = {}
@@ -71,85 +73,129 @@ class BeamConfig():
         return res
 
 
-    def creat_from_file(self, path):
-        original_dict = self.read_beam_txt(path)
-        #处理twiss参数和distribution
-        #检查twiss和distribution的长度是否正常
+    def create_from_file(self, item):
+        other_path = item.get("otherPath")
+        if other_path is None:
+            path = os.path.join(item.get("projectPath"), "InputFile", "beam.txt")
+        else:
+            path = other_path
 
 
-        if "twissx" in original_dict.keys():
-            original_dict["alpha_x"] = original_dict["twissx"][0]
-            original_dict["beta_x"] = original_dict["twissx"][1]
-            original_dict["emit_x"] = original_dict["twissx"][2]
-            del original_dict["twissx"]
-        if "twissy" in original_dict.keys():
-            original_dict["alpha_y"] = original_dict["twissy"][0]
-            original_dict["beta_y"] = original_dict["twissy"][1]
-            original_dict["emit_y"] = original_dict["twissy"][2]
-            del original_dict["twissy"]
-        if "twissz" in original_dict.keys():
-            original_dict["alpha_z"] = original_dict["twissz"][0]
-            original_dict["beta_z"] = original_dict["twissz"][1]
-            original_dict["emit_z"] = original_dict["twissz"][2]
-            del original_dict["twissz"]
-        if "distribution" in original_dict.keys():
-            original_dict["distribution_x"] = original_dict["distribution"][0]
-            original_dict["distribution_y"] = original_dict["distribution"][1]
-            del original_dict["distribution"]
+        kwargs = {}
+        try:
+            original_dict = self.read_beam_txt(path)
+            #处理twiss参数和distribution
+            #检查twiss和distribution的长度是否正常
 
-        #验证是否存在未知元素
-        for k, v in original_dict.items():
-            if k not in self.beam_parameter_keys:
-                raise UnknownkeywordError(message=None, key=k)
 
-        #如果不存在未知元素, 转换类型
-        for k, v in original_dict.items():
-            original_dict[k] = self.convert_v(k, v)
+            if "twissx" in original_dict.keys():
+                original_dict["alpha_x"] = original_dict["twissx"][0]
+                original_dict["beta_x"] = original_dict["twissx"][1]
+                original_dict["emit_x"] = original_dict["twissx"][2]
+                del original_dict["twissx"]
+            if "twissy" in original_dict.keys():
+                original_dict["alpha_y"] = original_dict["twissy"][0]
+                original_dict["beta_y"] = original_dict["twissy"][1]
+                original_dict["emit_y"] = original_dict["twissy"][2]
+                del original_dict["twissy"]
+            if "twissz" in original_dict.keys():
+                original_dict["alpha_z"] = original_dict["twissz"][0]
+                original_dict["beta_z"] = original_dict["twissz"][1]
+                original_dict["emit_z"] = original_dict["twissz"][2]
+                del original_dict["twissz"]
+            if "distribution" in original_dict.keys():
+                original_dict["distribution_x"] = original_dict["distribution"][0]
+                original_dict["distribution_y"] = original_dict["distribution"][1]
+                del original_dict["distribution"]
 
-        #赋值给self.beam_parameter
-        if self.validate_type(original_dict):
+            #验证是否存在未知元素
             for k, v in original_dict.items():
-                self.beam_parameter[k] = original_dict[k]
+                if k not in self.beam_parameter_keys:
+                    raise UnknownkeywordError(message=None, key=k)
 
+            #如果不存在未知元素, 转换类型
+            for k, v in original_dict.items():
+                original_dict[k] = self.convert_v(k, v)
 
+            #赋值给self.beam_parameter
+            if self.validate_type(original_dict):
+                for k, v in original_dict.items():
+                    self.beam_parameter[k] = original_dict[k]
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs.update({'beamParams': {}})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
 
         # print("read", self.beam_parameter)
+        kwargs.update({'beamParams': copy.deepcopy(self.beam_parameter)})
+        output = format_output(**kwargs)
+        return output
 
-        return self.beam_parameter
-
-    def write_to_file(self, path):
-        v_dic = {}
-        if self.beam_parameter["readparticledistribution"] is not None:
-            v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
-            v_dic['numofcharge'] = self.beam_parameter['numofcharge']
+    def write_to_file(self, item):
+        # item = {"projectPath": ,
+        #         "otherPath":
+        #
+        #
+        # }
+        other_path = item.get("otherPath")
+        if other_path is None:
+            path = os.path.join(item.get("projectPath"), "InputFile", "beam.txt")
         else:
-            v_dic = copy.deepcopy(self.beam_parameter)
-            v_dic["twissx"] = [self.beam_parameter["alpha_x"], self.beam_parameter["beta_x"], self.beam_parameter["emit_x"]]
-            v_dic["twissy"] = [self.beam_parameter["alpha_y"], self.beam_parameter["beta_y"], self.beam_parameter["emit_y"]]
-            v_dic["twissz"] = [self.beam_parameter["alpha_z"], self.beam_parameter["beta_z"], self.beam_parameter["emit_z"]]
-            v_dic["distribution"] = [self.beam_parameter["distribution_x"], self.beam_parameter["distribution_y"]]
-            v_key = ["alpha_x", "beta_x", "emit_x",
-                           "alpha_y", "beta_y", "emit_y",
-                           "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y", 'readparticledistribution']
-            for i in v_key:
-                del v_dic[i]
+            path = other_path
 
-        v_lis = convert_dic2lis(v_dic)
-        for index, i in enumerate(v_lis):
-            v_lis[index] = ["" if v is None else v for v in i]
-        # print("write", v_lis)
+        kwargs = {}
+        try:
+            v_dic = {}
+            if self.beam_parameter["readparticledistribution"] is not None:
+                v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
+                v_dic['numofcharge'] = self.beam_parameter['numofcharge']
+            else:
+                v_dic = copy.deepcopy(self.beam_parameter)
+                v_dic["twissx"] = [self.beam_parameter["alpha_x"], self.beam_parameter["beta_x"], self.beam_parameter["emit_x"]]
+                v_dic["twissy"] = [self.beam_parameter["alpha_y"], self.beam_parameter["beta_y"], self.beam_parameter["emit_y"]]
+                v_dic["twissz"] = [self.beam_parameter["alpha_z"], self.beam_parameter["beta_z"], self.beam_parameter["emit_z"]]
+                v_dic["distribution"] = [self.beam_parameter["distribution_x"], self.beam_parameter["distribution_y"]]
+                v_key = ["alpha_x", "beta_x", "emit_x",
+                               "alpha_y", "beta_y", "emit_y",
+                               "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y", 'readparticledistribution']
+                for i in v_key:
+                    del v_dic[i]
 
-        write_to_txt(path, v_lis)
-        return True
+            v_lis = convert_dic2lis(v_dic)
+            for index, i in enumerate(v_lis):
+                v_lis[index] = ["" if v is None else v for v in i]
+            write_to_txt(path, v_lis)
+
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs.update({'beamParams': {}})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
+
+        kwargs.update({'beamParams': copy.deepcopy(self.beam_parameter)})
+        output = format_output(**kwargs)
+        return output
 
     def set_param(self, **kwargs):
-        self.validate_type(kwargs)
-        for k, v in kwargs.items():
-            self.beam_parameter[k] = v
+        kwargs1 = {}
+        try:
+            self.validate_type(kwargs)
+            for k, v in kwargs.items():
+                self.beam_parameter[k] = v
 
-        # print("set", self.beam_parameter)
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs1.update({'beamParams': {}})
+            output = format_output(code, msg=msg, **kwargs1)
+            return output
 
-        return self.beam_parameter
+        kwargs1.update({'beamParams': copy.deepcopy(self.beam_parameter)})
+        output = format_output(**kwargs1)
+        return output
 
     def convert_v(self, k, v):
         if v is not None:
@@ -208,10 +254,14 @@ class BeamConfig():
 
 
 if __name__ == "__main__":
-    path = r"C:\Users\shliu\Desktop\eee\InputFile\beam.txt"
+    beam_path = r"C:\Users\shliu\Desktop\test1113\test1\InputFile\beam.txt"
+    item = {
+        "projectPath": r"C:\Users\shliu\Desktop\test1113\test1"
+    }
+
     obj = BeamConfig()
-    res = obj.creat_from_file(path)
-    print(res)
+    res = obj.create_from_file(item)
+    print(1, res)
     # obj.validate_run(path)
     # obj.set_beam(distribution_x="wb", distribution_y="Wb")
     # # obj.set_beam(numofcharge=1.5)

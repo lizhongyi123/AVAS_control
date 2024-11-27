@@ -443,75 +443,76 @@ class PageBeam(QWidget):
 
 
     def fill_parameter(self):
-        print(self.project_path)
         beam_path = os.path.join(self.project_path, "InputFile", "beam.txt")
 
+        item = {"projectPath": self.project_path, }
 
-        if os.path.exists(beam_path):
-            beam_obj = BeamConfig()
-            beam_res = beam_obj.creat_from_file(beam_path)
+        beam_obj = BeamConfig()
+        beam_res = beam_obj.create_from_file(item)
+        if beam_res["code"] == -1:
+            raise Exception(beam_res["data"]["msg"])
 
-            for k, v in beam_res.items():
-                if v is not None:
-                    beam_res[k] = str(v)
+        beam_res = beam_res["data"]['beamParams']
+        for k, v in beam_res.items():
+            if v is not None:
+                beam_res[k] = str(v)
 
-            if beam_res.get("readparticledistribution") is not None:
-                self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
+        if beam_res.get("readparticledistribution") is not None:
+            self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
 
-                self.text_charge.setText(beam_res.get('numofcharge'))
+            self.text_charge.setText(beam_res.get('numofcharge'))
 
-            else:
-                self.text_particle_input_file.clear()
-                self.text_charge.setText(beam_res.get('numofcharge'))
-                self.text_mass.setText(beam_res.get('particlerestmass'))
-                self.text_current.setText(beam_res.get('current'))
-                self.text_particel_number.setText(beam_res.get('particlenumber'))
-                self.text_frequency.setText(beam_res.get('frequency'))
-                self.text_energy.setText(beam_res.get('kneticenergy'))
-
-
-                self.alpha_xx_text.setText(beam_res.get('alpha_x'))
-                self.beta_xx_text.setText(beam_res.get('beta_x'))
-                self.varepsilon_xx_text.setText(beam_res.get('emit_x'))
-
-
-
-
-                self.alpha_yy_text.setText(beam_res.get('alpha_y'))
-                self.beta_yy_text.setText(beam_res.get('beta_y'))
-                self.varepsilon_yy_text.setText(beam_res.get('emit_y'))
-
-
-
-
-                self.alpha_zz_text.setText(beam_res.get('alpha_z'))
-                self.beta_zz_text.setText(beam_res.get('beta_z'))
-                self.varepsilon_zz_text.setText(beam_res.get('emit_z'))
-
-                self.distribution_combo_trans.setCurrentText(beam_res.get('distribution_x'))
-                self.distribution_combo_longi.setCurrentText(beam_res.get('distribution_y'))
-
-
-                # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:
-                #     self.text_displacePos_x.setText(beam_res.get('displacepos')[0])
-                #     self.text_displacePos_y.setText(beam_res.get('displacepos')[1])
-                #     self.text_displacePos_z.setText(beam_res.get('displacepos')[2])
-                # else:
-                #     self.text_displacePos_x.clear()
-                #     self.text_displacePos_y.clear()
-                #     self.text_displacePos_z.clear()
-                #
-                # if isinstance(beam_res.get('displacedpos'), list) and len(beam_res.get('displacedpos')) == 3:
-                #     self.text_displaceDpos_x.setText(beam_res.get('displacedpos')[0])
-                #     self.text_displaceDpos_y.setText(beam_res.get('displacedpos')[1])
-                #     self.text_displaceDpos_z.setText(beam_res.get('displacedpos')[2])
-                # else:
-                #     self.text_displaceDpos_x.clear()
-                #     self.text_displaceDpos_y.clear()
-                #     self.text_displaceDpos_z.clear()
-            # print(self.text_particle_input_file.text())
         else:
-            pass
+            self.text_particle_input_file.clear()
+            self.text_charge.setText(beam_res.get('numofcharge'))
+            self.text_mass.setText(beam_res.get('particlerestmass'))
+            self.text_current.setText(beam_res.get('current'))
+            self.text_particel_number.setText(beam_res.get('particlenumber'))
+            self.text_frequency.setText(beam_res.get('frequency'))
+            self.text_energy.setText(beam_res.get('kneticenergy'))
+
+
+            self.alpha_xx_text.setText(beam_res.get('alpha_x'))
+            self.beta_xx_text.setText(beam_res.get('beta_x'))
+            self.varepsilon_xx_text.setText(beam_res.get('emit_x'))
+
+
+
+
+            self.alpha_yy_text.setText(beam_res.get('alpha_y'))
+            self.beta_yy_text.setText(beam_res.get('beta_y'))
+            self.varepsilon_yy_text.setText(beam_res.get('emit_y'))
+
+
+
+
+            self.alpha_zz_text.setText(beam_res.get('alpha_z'))
+            self.beta_zz_text.setText(beam_res.get('beta_z'))
+            self.varepsilon_zz_text.setText(beam_res.get('emit_z'))
+
+            self.distribution_combo_trans.setCurrentText(beam_res.get('distribution_x'))
+            self.distribution_combo_longi.setCurrentText(beam_res.get('distribution_y'))
+
+
+            # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:
+            #     self.text_displacePos_x.setText(beam_res.get('displacepos')[0])
+            #     self.text_displacePos_y.setText(beam_res.get('displacepos')[1])
+            #     self.text_displacePos_z.setText(beam_res.get('displacepos')[2])
+            # else:
+            #     self.text_displacePos_x.clear()
+            #     self.text_displacePos_y.clear()
+            #     self.text_displacePos_z.clear()
+            #
+            # if isinstance(beam_res.get('displacedpos'), list) and len(beam_res.get('displacedpos')) == 3:
+            #     self.text_displaceDpos_x.setText(beam_res.get('displacedpos')[0])
+            #     self.text_displaceDpos_y.setText(beam_res.get('displacedpos')[1])
+            #     self.text_displaceDpos_z.setText(beam_res.get('displacedpos')[2])
+            # else:
+            #     self.text_displaceDpos_x.clear()
+            #     self.text_displaceDpos_y.clear()
+            #     self.text_displaceDpos_z.clear()
+        # print(self.text_particle_input_file.text())
+
     # @treat_err
     def generate_beam_list(self):
         res = {}
@@ -559,44 +560,45 @@ class PageBeam(QWidget):
         dst_path = os.path.join(self.project_path, "InputFile", self.text_particle_input_file.text())
 
 
-        if os.path.exists(dst_path):
-            dst_res = cal_beam_parameter(dst_path)
-            print(dst_res)
 
-            # print(dst_res)
-            self.text_mass.setText(str(dst_res.get('particlerestmass')))
-            self.text_current.setText(str(dst_res.get('current')))
-            self.text_particel_number.setText(str(dst_res.get('particlebumber')))
-            self.text_frequency.setText(str(dst_res.get('frequency')))
+        dst_res = cal_beam_parameter(dst_path)
+        if dst_res["code"] == -1:
+            raise Exception(dst_res["data"]["msg"])
+
+        dst_res = dst_res['data']['beam_params']
+
+        # print(dst_res)
+        self.text_mass.setText(str(dst_res.get('particlerestmass')))
+        self.text_current.setText(str(dst_res.get('current')))
+        self.text_particel_number.setText(str(dst_res.get('particlebumber')))
+        self.text_frequency.setText(str(dst_res.get('frequency')))
 
 
-            self.text_energy.setText(str(dst_res.get("kneticenergy")))
+        self.text_energy.setText(str(dst_res.get("kneticenergy")))
 
 
-            self.alpha_xx_text.setText(str(round(dst_res.get("alpha_x"), self.decimals)))
-            self.beta_xx_text.setText(str(round(dst_res.get("beta_x"), self.decimals)))
+        self.alpha_xx_text.setText(str(round(dst_res.get("alpha_x"), self.decimals)))
+        self.beta_xx_text.setText(str(round(dst_res.get("beta_x"), self.decimals)))
 
-            self.alpha_yy_text.setText(str(round(dst_res.get("alpha_y"), self.decimals)))
-            self.beta_yy_text.setText(str(round(dst_res.get("beta_y"), self.decimals)))
+        self.alpha_yy_text.setText(str(round(dst_res.get("alpha_y"), self.decimals)))
+        self.beta_yy_text.setText(str(round(dst_res.get("beta_y"), self.decimals)))
 
-            self.alpha_zz_text.setText(str(round(dst_res.get("alpha_z"), self.decimals)))
-            self.beta_zz_text.setText(str(round(dst_res.get("beta_z"), self.decimals)))
+        self.alpha_zz_text.setText(str(round(dst_res.get("alpha_z"), self.decimals)))
+        self.beta_zz_text.setText(str(round(dst_res.get("beta_z"), self.decimals)))
 
-            self.varepsilon_xx_text.setText(str(round(dst_res.get("emit_x"), self.decimals)))
-            self.varepsilon_yy_text.setText(str(round(dst_res.get("emit_y"), self.decimals)))
-            self.varepsilon_zz_text.setText(str(round(dst_res.get("emit_z"), self.decimals)))
-        else:
-            QMessageBox.warning(None, 'Error', f'{self.text_particle_input_file.text()} does not exist')
+        self.varepsilon_xx_text.setText(str(round(dst_res.get("emit_x"), self.decimals)))
+        self.varepsilon_yy_text.setText(str(round(dst_res.get("emit_y"), self.decimals)))
+        self.varepsilon_zz_text.setText(str(round(dst_res.get("emit_z"), self.decimals)))
 
     def save_beam(self):
         beam_dict = self.generate_beam_list()
-        print(beam_dict)
         for k, v in beam_dict.items():
             if v == '':
                 beam_dict[k] = None
 
-        beam_path = os.path.join(self.project_path, 'InputFile', 'beam.txt')
 
+
+        item = {"projectPath": self.project_path}
         beam_obj = BeamConfig()
         try:
             for k, v in beam_dict.items():
@@ -607,10 +609,16 @@ class PageBeam(QWidget):
                         beam_dict[k] = float(v)
 
         except Exception as e:
-            raise
-        print(beam_dict)
-        beam_obj.set_param(**beam_dict)
-        beam_obj.write_to_file(beam_path)
+            raise Exception(e)
+
+        res = beam_obj.set_param(**beam_dict)
+        if res["code"] == -1:
+            raise Exception(res['data']['msg'])
+
+        res = beam_obj.write_to_file(item)
+        if res["code"] == -1:
+            raise Exception(res['data']['msg'])
+
 
 
 
@@ -711,9 +719,6 @@ class PageBeam(QWidget):
             # 如果文件不在文件夹中并且重名了
             elif not file_in_directory(source_file, target_folder) and \
                 file_in_directory(target_dst_file, target_folder):
-                print(source_file)
-                print(target_folder)
-                print(file_in_directory(source_file, target_folder))
                 copy_file(source_file, target_folder)
                 msg = QMessageBox.question(self, '文件已存在', '文件已存在，是否要覆盖？',
                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)

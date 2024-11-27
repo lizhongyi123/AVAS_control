@@ -9,6 +9,7 @@ import os
 from user.user_qt.lattice_file.lattice_ide import CustomCodeEdit, MySyntaxHighlighter, MyFoldDetector
 from pyqode.core import api, modes, panels
 from user.user_qt.user_defined import treat_err
+from utils.latticeconfig import LatticeConfig
 class PageLattice(QWidget):
     def __init__(self, project_path):
         super().__init__()
@@ -25,7 +26,7 @@ class PageLattice(QWidget):
 
         self.button_save = QPushButton("Save")
         self.button_save.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_save.clicked.connect(self.save_file)
+        self.button_save.clicked.connect(self.save_all_lattice)
         self.text_file_path = QLineEdit()
         self.text_file_path.setReadOnly(True)
 
@@ -36,37 +37,37 @@ class PageLattice(QWidget):
 
 
         hbox_cut = QHBoxLayout()
-        self.button_lattice = QPushButton("lattice_mulp")
-        self.button_match_lattice = QPushButton("lattice_env")
+        self.button_mulp_lattice = QPushButton("lattice_mulp")
+        self.button_env_lattice = QPushButton("lattice_env")
         # self.button_match_result = QPushButton("match result")
         # self.button_match_twiss = QPushButton("match twiss")
         self.button_input_twiss = QPushButton("input twiss")
 
 
-        hbox_cut.addWidget(self.button_lattice)
-        hbox_cut.addWidget(self.button_match_lattice)
+        hbox_cut.addWidget(self.button_mulp_lattice)
+        hbox_cut.addWidget(self.button_env_lattice)
         # hbox_cut.addWidget(self.button_match_result)
         # hbox_cut.addWidget(self.button_match_twiss)
         hbox_cut.addWidget(self.button_input_twiss)
 
         self.button_group = QButtonGroup()
-        self.button_group.addButton(self.button_lattice)
-        self.button_group.addButton(self.button_match_lattice)
+        self.button_group.addButton(self.button_mulp_lattice)
+        self.button_group.addButton(self.button_env_lattice)
         # self.button_group.addButton(self.button_match_result)
         # self.button_group.addButton(self.button_match_twiss)
         self.button_group.addButton(self.button_input_twiss)
 
         self.button_group.setExclusive(True)
 
-        self.button_lattice.setCheckable(True)
-        self.button_match_lattice.setCheckable(True)
+        self.button_mulp_lattice.setCheckable(True)
+        self.button_env_lattice.setCheckable(True)
         # self.button_match_result.setCheckable(True)
         # self.button_match_twiss.setCheckable(True)
         self.button_input_twiss.setCheckable(True)
 
 ###########################################################
-        self.text_lattice = CustomCodeEdit()
-        self.text_match_lattice = QTextEdit()
+        self.text_mulp_lattice = CustomCodeEdit()
+        self.text_env_lattice = QTextEdit()
         # self.text_match_result = QTextEdit()
         # self.text_match_twiss = QTextEdit()
 
@@ -74,15 +75,15 @@ class PageLattice(QWidget):
 
 
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.addWidget(self.text_lattice)
-        self.stacked_widget.addWidget(self.text_match_lattice)
+        self.stacked_widget.addWidget(self.text_mulp_lattice)
+        self.stacked_widget.addWidget(self.text_env_lattice)
         # self.stacked_widget.addWidget(self.text_match_result)
         # self.stacked_widget.addWidget(self.text_match_twiss)
         self.stacked_widget.addWidget(self.text_input_twiss)
 
 
-        self.button_lattice.clicked.connect(self.lattice_click)
-        self.button_match_lattice.clicked.connect(self.match_lattice_click)
+        self.button_mulp_lattice.clicked.connect(self.mulp_lattice_click)
+        self.button_env_lattice.clicked.connect(self.env_lattice_click)
         # self.button_match_result.clicked.connect(self.match_result_click)
         # self.button_match_twiss.clicked.connect(self.match_twiss_click)
         self.button_input_twiss.clicked.connect(self.input_twiss_click)
@@ -104,10 +105,10 @@ class PageLattice(QWidget):
 
 
         if True:
-            self.text_lattice.modes.append(modes.CodeCompletionMode())
-            sh_text_lattice = self.text_lattice.modes.append(MySyntaxHighlighter(self.text_lattice.document()))
+            self.text_mulp_lattice.modes.append(modes.CodeCompletionMode())
+            sh_text_lattice = self.text_mulp_lattice.modes.append(MySyntaxHighlighter(self.text_mulp_lattice.document()))
             sh_text_lattice.fold_detector = MyFoldDetector()
-            self.text_lattice.panels.append(panels.FoldingPanel())
+            self.text_mulp_lattice.panels.append(panels.FoldingPanel())
 
 
 
@@ -230,87 +231,75 @@ class PageLattice(QWidget):
 
     # @treat_err
     def fill_parameter(self):
+        item = {"projectPath": self.project_path,}
 
-        if os.path.exists(self.lattice_mulp_path):
-            self.stacked_widget.setCurrentWidget(self.text_lattice)
-            self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
-            # print(self.lattice_path)
-            self.text_file_path.setText(self.lattice_mulp_path)
+        self.stacked_widget.setCurrentWidget(self.text_mulp_lattice)
+        self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
+        # print(self.lattice_path)
+        self.text_file_path.setText(self.lattice_mulp_path)
 
-            with open(self.lattice_mulp_path, 'r', encoding='utf-8') as file:
-                file_contents = file.read()
 
-            self.text_lattice.setPlainText(file_contents, mime_type="text/plain", encoding='utf-8')
-            self.button_lattice.setChecked(True)
-            self.button_state()
+        obj = LatticeConfig()
+        res = obj.create_from_file(item)
 
-        if os.path.exists(self.lattice_env_path):
-            self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-            self.text_file_path.setText(self.lattice_env_path)
+        if res["code"] == -1:
+            raise Exception(str(res["data"]['msg']))
+        file_contents = res["data"]["latticeParams"]
 
-            if not os.path.exists(self.lattice_env_path):
-                with open(self.lattice_env_path, 'w', encoding='utf-8') as file:
-                    file.write("")
+        self.text_mulp_lattice.setPlainText(file_contents, mime_type="text/plain", encoding='utf-8')
 
-            with open(self.lattice_env_path, 'r', encoding='utf-8') as file:
-                file_contents = file.read()
 
-            self.text_match_lattice.setPlainText(file_contents)
 
-        else:
-            pass
-    @treat_err
-    def save_file(self):
-        if not self.project_path:
-            return None
-        current_index = self.stacked_widget.currentIndex()
 
-        if current_index == 0:
-            path = self.lattice_mulp_path
-            text = self.text_lattice.toPlainText()
-        elif current_index == 1:
-            path = self.lattice_env_path
-            text = self.text_match_lattice.toPlainText()
-        else:
-            return None
-        # 打开文件以写入数据
-        with open(path, 'w', encoding='utf-8') as file:
-            # 遍历嵌套列表的每个子列表
-            file.write(text)
+        self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
+        self.text_file_path.setText(self.lattice_env_path)
 
-    @treat_err
+        obj = LatticeConfig()
+        res = obj.create_from_file(item)
+        if res["code"] == -1:
+            raise Exception(str(res["data"]['msg']))
+        file_contents = res["data"]["latticeParams"]
+
+        self.text_env_lattice.setPlainText(file_contents)
+
+        self.button_mulp_lattice.setChecked(True)
+        self.button_state()
+
+
+
+
     def save_all_lattice(self):
-        path = self.lattice_mulp_path
-        text = self.text_lattice.toPlainText()
-        if os.path.exists(path):
-            with open(path, 'w', encoding='utf-8') as file:
-                # 遍历嵌套列表的每个子列表
-                file.write(text)
-        else:
-            pass
+        item = {"projectPath": self.project_path}
+
+        obj = LatticeConfig()
+        res = obj.set_param({"latticeInfo": self.text_mulp_lattice.toPlainText()})
+        res = obj.write_to_file(item)
+        print(res)
+        if res["code"] == -1:
+            raise Exception(str(res["data"]['msg']))
+
 
         path = self.lattice_env_path
         #如果路径为空, 那么不保存
-        if os.path.exists(path):
-            text = self.text_match_lattice.toPlainText()
-            with open(path, 'w',encoding='utf-8') as file:
-                # 遍历嵌套列表的每个子列表
-                file.write(text)
-        else:
-            pass
+
+        obj = LatticeConfig()
+        res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
+        res = obj.write_to_file(item)
+        if res["code"] == -1:
+            raise Exception(str(res["data"]['msg']))
 
     # @treat_err
     def fill_text_lattice_path(self, path):
         self.text_lattice_path.setText(path)
 
     # @treat_err
-    def lattice_click(self):
+    def mulp_lattice_click(self):
         if not self.project_path:
             pass
         else:
             self.button_state()
 
-            self.stacked_widget.setCurrentWidget(self.text_lattice)
+            self.stacked_widget.setCurrentWidget(self.text_mulp_lattice)
             # self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
             # self.text_file_path.setText(self.lattice_mulp_path)
             #
@@ -320,12 +309,12 @@ class PageLattice(QWidget):
             # self.text_lattice.setPlainText(file_contents, mime_type="text/plain", encoding='utf-8')
 
     @treat_err
-    def match_lattice_click(self):
+    def env_lattice_click(self):
         if not self.project_path:
             pass
         else:
             self.button_state()
-            self.stacked_widget.setCurrentWidget(self.text_match_lattice)
+            self.stacked_widget.setCurrentWidget(self.text_env_lattice)
             # self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
             # self.text_file_path.setText(self.lattice_env_path)
             #
@@ -359,8 +348,10 @@ class PageLattice(QWidget):
     # @treat_err
     def button_state(self):
         button = self.sender()
+        print(button)
+
         if button is None:
-            button = self.button_lattice
+            button = self.button_mulp_lattice
         # print(button)
 
         if button.isChecked():
@@ -428,7 +419,7 @@ if __name__ == '__main__':
 
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-    main_window.updatePath(r'C:\Users\anxin\Desktop\comparison\avas_test')
+    main_window.updatePath(r'C:\Users\shliu\Desktop\test1113\test1')
     main_window.fill_parameter()
     main_window.show()
     sys.exit(app.exec_())

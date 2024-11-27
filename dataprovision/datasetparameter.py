@@ -167,7 +167,7 @@ if __name__ == "__main__":
     # print(obj.z)
     import numpy as np
     path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn\OutputFile\DataSet.txt"
-    path1 = r"C:\Users\shliu\Desktop\test_cafe\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\test_100wan\DataSet.txt"
     obj = DatasetParameter(path1)
     obj.get_parameter()
     z1 = np.array(obj.z)

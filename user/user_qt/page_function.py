@@ -282,10 +282,10 @@ class PageFunction(QWidget):
         return True
 
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = PageFunction(r'C:\Users\anxin\Desktop\00000')
-#     main_window.setGeometry(800, 500, 600, 650)
-#     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-#     main_window.show()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = PageFunction(r'C:\Users\anxin\Desktop\00000')
+    main_window.setGeometry(800, 500, 600, 650)
+    main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
+    main_window.show()
+    sys.exit(app.exec_())

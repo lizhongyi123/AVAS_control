@@ -93,7 +93,14 @@ class MisskeywordError(Exception):
     def __str__(self):
         return f"missing parameter {self.key}"
 
+class CustomFileNotFoundError(Exception):
+    def __init__(self, file_path, message=None):
 
+        super().__init__(message)
+        self.file_path = file_path
+
+    def __str__(self):
+        return f"FileNotFoundError: {self.file_path}"
 
 if __name__ == "__main__":
     def process_data(data):

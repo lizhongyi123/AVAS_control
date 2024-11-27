@@ -122,6 +122,22 @@ class PageMatch (QWidget):
         dic = self.get_state_dict()
         self.match_signal.emit(dic)
 
+    def fill_parameter(self):
+
+        ini_dict = self.ini_obj.creat_from_file(self.ini_path)
+        if ini_dict['code'] == -1:
+            raise Exception(ini_dict['data']['msg'])
+        ini_dict = ini_dict["data"]['ini_params']
+
+
+        if ini_dict['match']['cal_input_twiss'] == 1:
+            self.cb_input_twiss.setChecked(True)
+
+        if ini_dict['match']['match_with_twiss'] == 1:
+            self.cb_match_twiss.setChecked(True)
+        if ini_dict['match']['use_initial_value'] == 1:
+            self.cb_use_initial_value.setChecked(True)
+
 
     def get_state_dict(self):
         dic = {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0}

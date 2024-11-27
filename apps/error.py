@@ -252,9 +252,10 @@ class Error():
             N = int(lattice[err_index][1])
             #判断误差命令在哪个元件上
             command_on_element = self.judge_command_on_element(lattice, i)
-
-            err_command_action_scope.append(list(range(command_on_element, command_on_element + N)))
-
+            if command_on_element is not None:
+                err_command_action_scope.append(list(range(command_on_element, command_on_element + N)))
+            else:
+                err_command_action_scope.append([])
         # for i in err_command:
         #     print(i)
 
@@ -290,7 +291,7 @@ class Error():
         #为cpl生成误差，如果是cpl，直接生成对应的误差
         input_lines_copy = self.generate_error(input_lines, group, 'cpl')
 
-        #将误差命令添加到每个元件上，钱加到每个元件的结尾
+        #将误差命令添加到每个元件上，加到每个元件的结尾
         lattice = self.set_error_to_lattice(input_lines_copy)
         # for i in lattice:
         #     print(i)
@@ -401,8 +402,12 @@ class Error():
 
         self.lattice_mulp_list = res_treat
 
+        # for i in self.lattice_mulp_list:
+        #     print(i)
+        # sys.exit()
         #返回值后面带了一个元件索引
         return self.lattice_mulp_list
+
         # for i in self.lattice_mulp_list:
         #     print(i)
         #
@@ -914,6 +919,11 @@ class ErrorDyn(Error):
                 i[0] = "!" + i[0]
 
         error_lattice = [i for i in error_lattice if i[0] in global_varible.err_write_command]
+
+        for i in error_lattice:
+            print(i)
+
+        sys.exit()
         with open(self.lattice_path, 'w') as f:
             for i in error_lattice:
                 if not i[0].startswith("!"):
@@ -1903,7 +1913,7 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r'C:\Users\shliu\Desktop\testz',
+    obj = ErrorDyn(r"C:\Users\shliu\Desktop\test1120",
                     50, 0)
 
     obj.run()

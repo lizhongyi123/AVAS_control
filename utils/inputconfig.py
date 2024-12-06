@@ -204,10 +204,22 @@ class InputConfig():
                 if self.input_parameter[k] is None:
                     raise MisskeywordError(f"{k}")
 if __name__ == "__main__":
-    path =r"C:\Users\shliu\Desktop\AVAS20240923\test\InputFile\input.txt"
+    import json
+
+    path =r"C:\Users\shliu\Desktop\test1113\test4"
+    item = {"projectPath": path}
     obj = InputConfig()
-    res = obj.create_from_file(path)
+    res = obj.create_from_file(item)
     print(res)
+
+    v = {k: v if v else " " for k, v in res["data"]["inputParams"].items()}
+    print(1, v)
+    # print(res)
+    # for k, v in res["data"]["inputParams"].items():
+    #     if v:
+    #         print(v)
+    v = json.dumps(v)
+    print(2, v)
     # set_param = {'scanphase': 2}
     # obj.set_input(**set_param)
     # obj.write_input()

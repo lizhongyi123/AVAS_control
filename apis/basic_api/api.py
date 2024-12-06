@@ -31,23 +31,23 @@ def basic_mulp(project_path):
     :return:
     多粒子模拟
     """
-    latice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
-    res = read_txt(latice_mulp_path, out = 'list')
+    # latice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
+    # res = read_txt(latice_mulp_path, out = 'list')
+    #
+    # opti = judge_opti(res)
+    #
+    # if opti:
+    #     v = OnlyAdjust(project_path)
+    #     v.run()
+    #
+    # #如果不需要矫正，则进行简单模拟
+    # else:
+    multiparticle_obj = MultiParticle(project_path)
 
-    opti = judge_opti(res)
-
-    if opti:
-        v = OnlyAdjust(project_path)
-        v.run()
-
-    #如果不需要矫正，则进行简单模拟
-    else:
-        multiparticle_obj = MultiParticle(project_path)
-
-        lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
-        lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
-        write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
-        res = multiparticle_obj.run()
+    lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
+    lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
+    write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
+    res = multiparticle_obj.run()
     print('模拟结束')
     return res
 

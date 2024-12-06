@@ -180,7 +180,7 @@ class LatticeParameter():
         print(self.total_length)
 
 if __name__ == "__main__":
-    lattice_path = r'C:\Users\anxin\Desktop\teat831\InputFile\lattice_mulp.txt'
+    lattice_path = r"C:\Users\shliu\Desktop\test_yiman\AVAS\InputFile\lattice.txt"
     res = LatticeParameter(lattice_path)
     res.get_parameter()
     print(res.total_length)

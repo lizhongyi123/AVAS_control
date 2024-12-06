@@ -177,10 +177,6 @@ class Acceptance():
         if loss_particles_rows == 0:
             raise Exception("All particels passed  through the lattice, avas can not calculate acceptance.")
 
-
-
-
-
         if kind == 0:
             #x方向
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["x"], in_dis["xx"], btgm)

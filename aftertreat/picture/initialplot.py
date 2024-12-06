@@ -115,12 +115,12 @@ class PicturePlot_2D():
         self.y = []
         return self.x, self.y
 
-    def run(self, show_, fig):
+    def run(self, show_, fig=None):
         # print(self.x, self.y)
         # print(fig)
         if not fig:
             fig, ax1 = plt.subplots(figsize=self.fig_size)
-        elif fig:
+        else:
             ax1 = fig.add_subplot(111)
 
 

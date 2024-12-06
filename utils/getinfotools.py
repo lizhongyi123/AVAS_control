@@ -20,15 +20,15 @@ def get_mass_freq(project_path):
 
 def get_timestep(project_path):
     BaseMassInMeV, freq = get_mass_freq(project_path)
-    input_path = os.path.join(project_path, 'InputFile', "input.txt")
-    input_obj = InputConfig()
-    input = input_obj.creat_from_file(input_path)
 
-    steppercycle = input['steppercycle']
+    input_obj = InputConfig()
+    item = {"projectPath": project_path,}
+    input = input_obj.create_from_file(item)
+    steppercycle = input["data"]["inputParams"]['steppercycle']
     timestep = 1 / freq / steppercycle
     return timestep
 
 if __name__ == '__main__':
-    project_path = r'C:\Users\shliu\Desktop\AVAS20240923\test'
+    project_path = r'C:\Users\shliu\Desktop\test_yiman\AVAS3'
     timestep = get_timestep(project_path)
     print(timestep)

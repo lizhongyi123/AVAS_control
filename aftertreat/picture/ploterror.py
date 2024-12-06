@@ -234,7 +234,11 @@ class PlotErr_emit_loss(PicturePlot_2ax):
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test_err_dyn"
-    obj = PlotErr_emit_loss(project_path, 1)
+    project_path = r"C:\Users\shliu\Desktop\testPPT\testerror"
+    # obj = PlotErr_emit_loss(project_path, 1)
+    # obj.get_x_y()
+    # obj.run(show_=1)
+
+    obj = PlotErrout(project_path, "av_rms_xy")
     obj.get_x_y()
     obj.run(show_=1)

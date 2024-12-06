@@ -23,15 +23,22 @@ class CreatBasicFile():
         }
 
         self.input_info = {
-            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0
+            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": None, "spacechargetype": None
         }
 
-        self.ini_info = {"input": {"sim_type": "mulp"}}
+        self.ini_info = \
+            {"project": {"project_path": "undefined"},
+            "lattice":{"length": 0},
+             "input": {"sim_type": 0},
+             "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
+             "error": {"error_type": "undefined", "seed": 0, "if_normal": 0},
+             }
+
     def create_basic_beam_file(self):
         beam_config = BeamConfig()
 
         beam_config.set_param(**self.beam_info)
-        item = {"projectPath": self.project_path,}
+        item = {"projectPath": self.project_path, }
         beam_config.write_to_file(item)
 
     def create_basic_input_file(self):
@@ -50,15 +57,17 @@ class CreatBasicFile():
         lattice_config = LatticeConfig()
 
         item = {"projectPath": self.project_path,
-                "otherPath": os.path.join(self.project_path, "InputFile", "lattice_env.txt")}
+                "sim_type": "env"}
         lattice_config.write_to_file(item)
 
     def create_basic_ini_file(self):
         ini_config = IniConfig()
 
-        ini_config.set_param(**self.ini_info)
-        item = {"projectPath": self.project_path,}
+        res = ini_config.set_param(**self.ini_info)
+        item = {"projectPath": self.project_path, }
         ini_config.write_to_file(item)
+
+
 
 class CreateBasicProject():
     def __init__(self, item, platform):
@@ -157,7 +166,7 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test1113\test5"
+    project_path = r"C:\Users\shliu\Desktop\1128\test1"
     # CreatBasicFile(project_path).create_basic_beam_file()
     # CreatBasicFile(project_path).create_basic_input_file()
     # CreatBasicFile(project_path).create_basic_lattice_mulp_file()

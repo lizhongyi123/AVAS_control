@@ -191,7 +191,7 @@ class BeamsetParameter():
 
                     Index = struct.unpack("<i", f.read(4))
                     every_step_dict["Index"] = int(Index[0])
-                    # print(Index)
+                    print(Index)
 
                     time = struct.unpack("<d", f.read(8))
                     every_step_dict["time"] = float(time[0])
@@ -216,28 +216,12 @@ class BeamsetParameter():
 if __name__ == "__main__":
     import os
     import numpy as np
-    beamset_pasth = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_2\BeamSet.plt"
+    beamset_pasth = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\BeamSet.plt"
     obj = BeamsetParameter(beamset_pasth)
-    dict, lis = obj.get_one_parameter(-1)
-    x = [i[0]*1000 for i in lis]
-    z = [i[4] for i in lis]
-    print(np.min(x))
-    print(np.max(x))
-    print(np.min(z))
-    print(np.max(z))
-    # print(step)
-
-    # # print(res)
-    #
-    # obj.get_one_parameter(-1)
-    # time = []
-    # zg = []
-    # for i in range(step):
-    #     one_dict, one_lis = obj.get_one_parameter(i)
-    #     time.append(one_dict["time"])
-    #     zg.append(one_dict["location"])
-    # # print(time)
-    # delt_time = [time[i] - time[i-1] for i in range(1, len(time))]
-    # print(delt_time)
-
+    all_step = obj.get_step()
+    print(all_step)
+    # for i in range(all_step):
+    #     print(i)
+    #     obj.get_one_parameter(i)
+    obj.get_parameter()
 

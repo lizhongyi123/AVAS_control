@@ -29,14 +29,21 @@ class PlttoDensity():
         all_step =obj.get_step()
         return all_step
     def read_beamset_onestep_worker(self, args):
-        dataset_obj, beamset_obj, index = args
+        dataset_obj, beamset_obj, index0, dataset_index_list = args
+
         # 这里复制 read_beamset_onestep 的逻辑
         res = {}
         # 读取beasmset中的某一步，并返回结果
-        one_dict, one_lis = beamset_obj.get_one_parameter(index)
+        one_dict, one_lis = beamset_obj.get_one_parameter(index0)
         # 位置
+        beamset_index = int(one_dict["index"])
 
+        if beamset_index in dataset_index_list:
+            index = dataset_index_list.index(beamset_index)
+        else:
+            return {}
         zg = one_dict["location"]
+
 
         emit = [dataset_obj.emit_x[index], dataset_obj.emit_y[index], dataset_obj.emit_z[index]]
         rms_size = [dataset_obj.rms_x[index], dataset_obj.rms_y[index], dataset_obj.rms_z[index]]
@@ -46,8 +53,10 @@ class PlttoDensity():
 
 
 
-        # t1 = time.time()
-        filtered_lis = [i for i in one_lis if i[-1] != 1]
+        if one_dict["tpye"] == 0:
+            filtered_lis = [i for i in one_lis if i[-1] != 1]
+        elif one_dict["tpye"] == 1:
+            filtered_lis = [i for i in one_lis if i[-1] != 0]
         x = np.array([i[0] for i in filtered_lis]) + syn_x
         y = np.array([i[2] for i in filtered_lis]) + syn_y
         z = np.array([i[4] for i in filtered_lis])
@@ -106,7 +115,8 @@ class PlttoDensity():
         """
         dataset_obj = DatasetParameter(self.dataset_path)
         dataset_obj.get_parameter()
-        # print(dataset_obj.x[-1])
+        dataset_index_list = dataset_obj.dataset_index
+
         beamset_obj = BeamsetParameter(self.plt_path)
         all_step = beamset_obj.get_step() - 1
 
@@ -118,7 +128,7 @@ class PlttoDensity():
         num_workers = cpu_count()  # 根据 CPU 核心数动态调整
         with Pool(num_workers) as pool:  # 使用上下文管理器
             # 准备每一步的参数
-            args = [(dataset_obj, beamset_obj, i) for i in range(all_step)]
+            args = [(dataset_obj, beamset_obj, i, dataset_index_list) for i in range(all_step)]
 
             # 使用进程池并行执行每一步数据处理
             results = pool.map(self.read_beamset_onestep_worker, args)
@@ -128,8 +138,8 @@ class PlttoDensity():
         # self.dt2 =0
         # self.dt3 =0
         # results = []
-        # for i in range(0, 1000):
-        #     args = (dataset_obj, beamset_obj, i)
+        # for i in range(0, all_step):
+        #     args = (dataset_obj, beamset_obj, i, dataset_index_list)
         #     results.append(self.read_beamset_onestep_worker(args))
         # print(self.dt1)
         # print(self.dt2)
@@ -137,6 +147,7 @@ class PlttoDensity():
         # breakpoint()
         # args = (dataset_obj, beamset_obj, 18036)
         # results.append(self.read_beamset_onestep_worker(args))
+        results = list(filter(bool, results))
 
         zg_lis = [res["zg"] for res in results]
         emit_lis = [res["emit"] for res in results]
@@ -259,102 +270,6 @@ class PlttoDensity():
         res["tab_lis"] = tab_lis
 
         return res
-    # def write_file(self, path, data):
-    #     binary_data = struct.pack("i", len(data["zg_lis"]))  #该文件共有多少步
-    #     binary_data += struct.pack("i", self.bins)   #网格划分步数
-    #
-    #     for i in range(len(data["zg_lis"])):
-    #         print(i)
-    #         # 依次打包不同的数据字段
-    #         binary_data += struct.pack('f', data["zg_lis"][i])  # 打包 zg_lis
-    #         # print(len(data["emit_lis"][i]))
-    #         binary_data += struct.pack('f' * 3, *data["emit_lis"][i])  # 打包 emit_lis 3 个 float
-    #         binary_data += struct.pack('f' * 3, *data["rms_size_lis"][i])  # 打包 rms_size 3 个 float
-    #         binary_data += struct.pack('i', data["nownumofp_lis"][i])  # 打包 nownumofp_lis 为 int
-    #         binary_data += struct.pack('i', data["lost_lis"][i])  # 打包 lost_lis 为 int
-    #         binary_data += struct.pack('i', data["maxlost_lis"][i])  # 打包 maxlost_lis 为 int
-    #         binary_data += struct.pack('i', data["minlost_lis"][i])  # 打包 minlost_lis 为 int
-    #
-    #         # 打包 4 个 float
-    #         binary_data += struct.pack('f' * 4, *data["moy_lis"][i])
-    #         binary_data += struct.pack('f' * 4, *data["maxb_lis"][i])
-    #         binary_data += struct.pack('f' * 4, *data["minb_lis"][i])
-    #         binary_data += struct.pack('f' * 4, *data["maxr_lis"][i])
-    #         binary_data += struct.pack('f' * 4, *data["minr_lis"][i])
-    #
-    #         # 动态处理 self.bins 数量的数据
-    #         binary_data += struct.pack('i' * self.bins, *data["tab_lis"][i][0])
-    #         binary_data += struct.pack('i' * self.bins, *data["tab_lis"][i][1])
-    #         binary_data += struct.pack('i' * self.bins, *data["tab_lis"][i][2])
-    #         binary_data += struct.pack('i' * self.bins, *data["tab_lis"][i][3])
-    #
-    #     # 直接写入二进制数据
-    #     with open(path, "wb") as f:
-    #         f.write(binary_data)
-
-    # def process_data_chunk(self, data_chunk):
-    #     binary_data = []
-    #     binary_data.append(struct.pack('f', data_chunk["zg_lis"]))  # 打包 zg_lis
-    #     binary_data.append(struct.pack('f' * 3, *data_chunk["emit_lis"]))  # 打包 emit_lis
-    #     binary_data.append(struct.pack('f' * 3, *data_chunk["rms_size_lis"]))  # 打包 rms_size
-    #     binary_data.append(struct.pack('i', data_chunk["nownumofp_lis"]))  # 打包 nownumofp_lis
-    #     binary_data.append(struct.pack('i', data_chunk["lost_lis"]))  # 打包 lost_lis
-    #     binary_data.append(struct.pack('i', data_chunk["maxlost_lis"]))  # 打包 maxlost_lis
-    #     binary_data.append(struct.pack('i', data_chunk["minlost_lis"]))  # 打包 minlost_lis
-    #
-    #     # 打包 4 个 float
-    #     binary_data.append(struct.pack('f' * 4, *data_chunk["moy_lis"]))
-    #     binary_data.append(struct.pack('f' * 4, *data_chunk["maxb_lis"]))
-    #     binary_data.append(struct.pack('f' * 4, *data_chunk["minb_lis"]))
-    #     binary_data.append(struct.pack('f' * 4, *data_chunk["maxr_lis"]))
-    #     binary_data.append(struct.pack('f' * 4, *data_chunk["minr_lis"]))
-    #
-    #     # 动态处理 bins 数量的数据
-    #     binary_data.append(struct.pack('i' * self.bins, *data_chunk["tab_lis"][0]))
-    #     binary_data.append(struct.pack('i' * self.bins, *data_chunk["tab_lis"][1]))
-    #     binary_data.append(struct.pack('i' * self.bins, *data_chunk["tab_lis"][2]))
-    #     binary_data.append(struct.pack('i' * self.bins, *data_chunk["tab_lis"][3]))
-    #
-    #     return b''.join(binary_data)
-    #
-    # # 主进程负责调度和写文件
-    # def write_file(self, path, data):
-    #     # 初始步骤信息：文件共有多少步和网格划分步数
-    #     initial_data = []
-    #     initial_data.append(struct.pack("i", len(data["zg_lis"])))  # 文件共有多少步
-    #     initial_data.append(struct.pack("i", self.bins))  # 网格划分步数
-    #
-    #     # 将所有数据块打包为元组 (data_chunk, bins) 传递给子进程
-    #     data_chunks = [
-    #             {
-    #                 "zg_lis": data["zg_lis"][i],
-    #                 "emit_lis": data["emit_lis"][i],
-    #                 "rms_size_lis": data["rms_size_lis"][i],
-    #                 "nownumofp_lis": data["nownumofp_lis"][i],
-    #                 "lost_lis": data["lost_lis"][i],
-    #                 "maxlost_lis": data["maxlost_lis"][i],
-    #                 "minlost_lis": data["minlost_lis"][i],
-    #                 "moy_lis": data["moy_lis"][i],
-    #                 "maxb_lis": data["maxb_lis"][i],
-    #                 "minb_lis": data["minb_lis"][i],
-    #                 "maxr_lis": data["maxr_lis"][i],
-    #                 "minr_lis": data["minr_lis"][i],
-    #                 "tab_lis": data["tab_lis"][i]
-    #             }
-    #         for i in range(len(data["zg_lis"]))
-    #     ]
-    #
-    #     # 使用 Pool 来进行并行处理
-    #     num_workers = cpu_count()  # 你可以根据系统的 CPU 核心数量调整这个值
-    #     with Pool(num_workers) as pool:
-    #         # 利用 map 分发任务并获取结果
-    #         results = pool.map(self.process_data_chunk, data_chunks)
-    #
-    #     # 将处理好的数据写入文件
-    #     with open(path, "wb") as f:
-    #         f.write(b''.join(initial_data))  # 先写入初始步骤信息
-    #         for result in results:
-    #             f.write(result)  # 写入每个进程处理的结果
 
     def write_file(self, path, data):
         binary_data = []  # 使用列表来存储中间结果，减少拼接操作
@@ -507,7 +422,7 @@ class MergeDensityData(PlttoDensity):
                                                    weights=all_tab_lis[j][i][3])
                 combined_z += countsz_rescaled
 
-            v_lis= [combined_x, combined_y, combined_r, combined_z]
+            v_lis = [combined_x, combined_y, combined_r, combined_z]
             combined_counts.append(v_lis)
         tab_lis = combined_counts
 
@@ -531,11 +446,11 @@ class MergeDensityData(PlttoDensity):
         self.write_file(self.target_path, data)
 
 if __name__ == "__main__":
-    # beamset_path = r"C:\Users\shliu\Desktop\testz\test_density_sudu\BeamSet.plt"
-    # dataset_path = r"C:\Users\shliu\Desktop\testz\test_density_sudu\DataSet.txt"
-    # target_density_path = r"C:\Users\shliu\Desktop\testz\test_density_sudu\density_0_0.dat"
-    # obj = PlttoDensity(beamset_path, dataset_path, target_density_path)
-    # obj.generate_density_file_onestep(isnormal=1)
+    beamset_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\BeamSet.plt"
+    dataset_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\DataSet.txt"
+    target_density_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\density_0_0.dat"
+    obj = PlttoDensity(beamset_path, dataset_path, target_density_path)
+    obj.generate_density_file_onestep(isnormal=1)
     #
     #
     # # beamset_path = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\BeamSet.plt"
@@ -556,11 +471,11 @@ if __name__ == "__main__":
     # # obj = PlttoDensity(beamset_path, dataset_path, target_density_path, normal_density_path, project_path)
     # # obj.generate_density_file_onestep(isnormal=0)
 
-    paths = [
-        r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\density_1_1.dat",
-        r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_2\density_1_2.dat",
-    ]
-
-    target_path = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\density_tot_1.dat"
-    obj = MergeDensityData(paths, target_path)
-    obj.generate_density_file()
+    # paths = [
+    #     r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\density_1_1.dat",
+    #     r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_2\density_1_2.dat",
+    # ]
+    #
+    # target_path = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\density_tot_1.dat"
+    # obj = MergeDensityData(paths, target_path)
+    # obj.generate_density_file()

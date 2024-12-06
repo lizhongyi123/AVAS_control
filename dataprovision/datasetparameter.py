@@ -16,31 +16,45 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
-
+        # v = [int(i[-1]) for i in dataset_info]
+        # for i in range(24184):
+        #     if i not in v:
+        #         print(i)
+        # breakpoint()
         index = 0
-        #确定到哪里为nan
-        if '-nan(ind)' in dataset_info[-1]:
-            for i in range(len(dataset_info)-1, -1, -1):
-                if '-nan(ind)' in dataset_info[i]:
-                    pass
-                elif '-nan(ind)' not in dataset_info[i]:
-                    index = i
-                    break
 
-            dataset_info = dataset_info[: index+1]
+        nan_in = False
+        for index0, i in enumerate(dataset_info):
+            if '-nan(ind)' in i or 'nan' in i:
+                nan_in = True
+                index = index0
+                break
+        if nan_in:
+            dataset_info = dataset_info[: index]
+        else:
+            pass
 
 
+        # for i in dataset_info:
+        #     print(len(i))
+        # print(dataset_info[-1])
         self.num_of_particle = float(dataset_info[0][28])
+
         # print(dataset_info[0])
         # print(len(dataset_info[0]))
+        # for i in dataset_info:
+        #     print(i)
         dataset_info = [[float(j) for j in i] for i in dataset_info]
-
+        self.dataset_index = [int(i[-1]) for i in dataset_info]
 
         self.z = []
         sign1 = 0
         sign2 = 0
-
         # self.z = [i[33] for i in dataset_info]
+        # print(len(dataset_info))
+        # for i in dataset_info[3:]:
+        #     print(i)
+
         for i in range(len(dataset_info)):
             if (dataset_info[i][35] == 0):
                 sign2 = 0
@@ -108,7 +122,7 @@ class DatasetParameter():
         if self.project_path:
             self.get_phi()
 
-        if index != 0:
+        if nan_in:
             return False
         else:
             return True
@@ -161,37 +175,16 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    # path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
-    # obj = DatasetParameter(path2)
-    # obj.get_parameter()
-    # print(obj.z)
-    import numpy as np
-    path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn\OutputFile\DataSet.txt"
-    path1 = r"C:\Users\shliu\Desktop\test_100wan\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_output\output_0_0\DataSet.txt"
     obj = DatasetParameter(path1)
-    obj.get_parameter()
-    z1 = np.array(obj.z)
-    print(z1[-1])
-    # path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\DataSet.txt"
-    # obj = DatasetParameter(path2)
+
+    v = obj.get_parameter()
+    print(v)
+    import numpy as np
+    # import time
+    # t0 = time.time()
+    # path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn\OutputFile\DataSet.txt"
+    # path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\DataSet.txt"
+    # obj = DatasetParameter(path1)
     # obj.get_parameter()
-    # z2 = np.array(obj.z)
-    # z3 = np.array(obj.z)[:len(z1)]
-    # print(len(z1))
-    # print(len(z2))
-    #
-    # print(z1[-1])
-    # print(z2[len(z1)])
-    # print(z3[-1])
-    # # print(z2[-5] - z1[-5])
-    #
-    #
-    # print((z3-z1) * 1000)
-    # x = z1
-    # y = (z3-z1) * 1000
-    # import matplotlib
-    # import numpy as np
-    # matplotlib.use('TKAgg')
-    # import matplotlib.pyplot as plt
-    # plt.scatter(x, y)
-    # plt.show()
+    # print(obj.dataset_index)

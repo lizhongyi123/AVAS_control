@@ -75,7 +75,8 @@ class DensityParameter():
         return data
 
 if __name__ == "__main__":
-    path = r"C:\Users\shliu\Desktop\testz\OutputFile\density_par_2_1.dat"
+    path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\density_tot_par_1.dat"
     obj = DensityParameter(path)
     data = obj.get_parameter()
-    print(data["maxb_lis"])
+    print(len(data["zg_lis"]))
+    print(len(data["tab_lis"]))

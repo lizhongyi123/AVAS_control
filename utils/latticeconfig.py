@@ -18,8 +18,12 @@ class LatticeConfig():
 
     def create_from_file(self, item):
         other_path = item.get("otherPath")
+        sim_type = item.get("sim_type")
         if other_path is None:
-            path = os.path.join(item.get("projectPath"), "InputFile", "lattice_mulp.txt")
+            if sim_type == "env":
+                path = os.path.join(item.get("projectPath"), "InputFile", "lattice_env.txt")
+            else:
+                path = os.path.join(item.get("projectPath"), "InputFile", "lattice_mulp.txt")
         else:
             path = other_path
 
@@ -59,17 +63,20 @@ class LatticeConfig():
         return self.lattice_parameter
     def write_to_file(self, item):
         other_path = item.get("otherPath")
+        sim_type = item.get("sim_type")
         if other_path is None:
-            path = os.path.join(item.get("projectPath"), "InputFile", "lattice_mulp.txt")
+            if sim_type == "env":
+                path = os.path.join(item.get("projectPath"), "InputFile", "lattice_env.txt")
+            else:
+                path = os.path.join(item.get("projectPath"), "InputFile", "lattice_mulp.txt")
         else:
             path = other_path
-        # write_to_txt(path, self.lattice_parameter)
+
 
         kwargs = {}
         try:
             with open(path, 'w', encoding='utf-8') as file:
                 # 遍历嵌套列表的每个子列表
-                print(self.lattice_parameter)
                 file.write(self.lattice_parameter)
 
         except Exception as e:
@@ -82,7 +89,9 @@ class LatticeConfig():
         return output
 
 if __name__ == "__main__":
-    lattice_path = r"C:\Users\shliu\Desktop\test1113\lattice_mulp.txt"
+    path = r"C:\Users\shliu\Desktop\1128"
     obj = LatticeConfig()
-    item = {"projectPath": 1}
+    item = {"projectPath": path,
+            "sim_type": "mulp",
+            }
     res = obj.write_to_file(item)

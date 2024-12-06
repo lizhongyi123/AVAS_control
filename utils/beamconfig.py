@@ -35,7 +35,7 @@ class BeamConfig():
 
 
         self.beam_parameter = {'readparticledistribution': None,  'numofcharge': None,
-                               'particlerestmass': None, 'current':None,
+                               'particlerestmass': None, 'current': None,
                        'particlenumber': None, 'frequency': None, 'kneticenergy': None,
                         "alpha_x": None, "beta_x": None, "emit_x": None,
                         "alpha_y": None, "beta_y": None, "emit_y": None,
@@ -263,6 +263,5 @@ if __name__ == "__main__":
     res = obj.create_from_file(item)
     print(1, res)
     # obj.validate_run(path)
-    # obj.set_beam(distribution_x="wb", distribution_y="Wb")
-    # # obj.set_beam(numofcharge=1.5)
-    # obj.write_beam()
+    res = obj.set_param(distribution_x="wb", distribution_y="WB")
+    print(res)

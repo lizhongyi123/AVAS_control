@@ -44,7 +44,7 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
 
     for i in input_lines:
         if i[0] == 'bend':
-            i[1] == float(i[4]/180) * float(i[5])
+            i[1] =np.abs(float(i[4])/180 * np.pi * float(i[5]))
 
     if out == 'list':
         return input_lines

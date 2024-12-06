@@ -4,18 +4,12 @@ import os
 import copy
 from utils.tool import format_output
 
-def cal_beam_parameter(dst_path):
-    kwargs= {}
+def cal_beam_parameter(item):
+    dst_path = item["dstPath"]
+    kwargs = {}
+
     try:
         beam_parameter = {}
-        # beam_parameter_keys = ['readparticledistribution', 'numofcharge', 'particlerestmass',
-        #                             'current', 'particlenumber', 'frequency',
-        #                             'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
-        #                             "alpha_y", "beta_y", "emit_y",
-        #                             "alpha_z", "beta_z", "emit_z",
-        #                             'distribution_x', 'distribution_y']
-
-
         if os.path.exists(dst_path):
             dst_res = read_dst_fast(dst_path)
             beam_parameter['particlerestmass'] = dst_res['basemassinmev']
@@ -46,19 +40,33 @@ def cal_beam_parameter(dst_path):
     except Exception as e:
         code = -1
         msg = str(e)
-        kwargs.update({'beam_params': {}})
+        kwargs.update({'beamParams': {}})
         output = format_output(code, msg=msg, **kwargs)
-        print(output)
         return output
 
-    kwargs.update({'beam_params': copy.deepcopy(beam_parameter)})
-    output = format_output(**kwargs)
-    print(output)
-    return output
-    return beam_parameter
+    beam_parameter["readparticledistribution"] = ""
+    beam_parameter["distribution_x"] = ""
+    beam_parameter["distribution_y"] = ""
+    kwargs.update({'beamParams': copy.deepcopy(beam_parameter)})
 
+    output = format_output(**kwargs)
+    return output
+
+def get_inputfile_path(item):
+    #item = {"projectPath": "fdasf" }
+    kwargs = {}
+    input_path = os.path.join(item["projectPath"], "InputFile")
+    kwargs.update({'inputFilePath': input_path})
+    output = format_output(**kwargs)
+    return output
 
 if __name__ == '__main__':
     dst_path = "E:\project\MEBT\RFQ_55_73_59_proton.dst"
-    beam_parameter = cal_beam_parameter(dst_path)
+    item = {"dstPath": dst_path}
+    beam_parameter = cal_beam_parameter(item)
     print(beam_parameter)
+
+    path = r"C:\Users\shliu\Desktop\field_ciads"
+    item = {"projectPath": path}
+    res = get_inputpath(item)
+    print(res)

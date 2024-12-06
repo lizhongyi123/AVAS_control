@@ -4,7 +4,7 @@ import platform
 import subprocess
 import os
 import re
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+sys.path.append(r'E:\AVAS_CONTROL\AVAS_control')
 
 from core.MultiParticleEngine import MultiParticleEngine
 import multiprocessing
@@ -30,12 +30,12 @@ class MultiParticle():
         #     raise Exception("底层代码发生错误")
 
         res = self.multiparticle_engine.main_agent(1)
-        # if res == 1:
-        #     raise Exception('非正常结束')
+        if res == 1:
+            raise Exception('非正常结束')
 
         # with open(self.runsignal, 'w') as f:
         #     f.write('2')
-        print(38, res)
+
         return res
     # def __init__(self, project_path):  # *arg **kwargs #dllpath写死
     #     self.project_path = project_path
@@ -128,11 +128,11 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test1120"
+    project_path = r"C:\Users\shliu\Desktop\field_ciads"
     obj = MultiParticle(project_path)
 
-    for i in range(2):
-        obj.run()
+
+    obj.run()
     # process = multiprocessing.Process(target=basic_mulp,
     #                               args=(project_path, ))
     #

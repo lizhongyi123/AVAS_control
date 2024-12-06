@@ -92,8 +92,8 @@ class Error():
             delete_directory(self.error_middle_path)
         os.makedirs(self.error_middle_path)
 
-        # midlle_output_0_path = os.path.join(self.error_middle_path, 'output_0')
-        # os.makedirs(midlle_output_0_path)
+        midlle_output_0_path = os.path.join(self.error_middle_path, 'output_0')
+        os.makedirs(midlle_output_0_path)
 
         if os.path.exists(self.error_output_path):
             delete_directory(self.error_output_path)
@@ -268,7 +268,9 @@ class Error():
                     if j[0] == 'field' and j[4] == '3':
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
-
+                    elif j[0] == "quad":
+                        if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
+                            j.insert(-1, err_command[i])
 
             elif err_command[i][0] in ['err_cav_ncpl_stat', 'err_cav_cpl_stat',
                                       'err_cav_ncpl_dyn', 'err_cav_cpl_dyn', ]:
@@ -562,11 +564,13 @@ class Error():
         ouput = os.path.normpath(os.path.join(self.project_path, 'OutputFile/error_middle/output_0'))
         os.mkdir(ouput)
 
-        process = multiprocessing.Process(target=self.run_multiparticle,
-                                          args=(self.project_path, 'OutputFile/error_middle/output_0'))
+        # process = multiprocessing.Process(target=self.run_multiparticle,
+        #                                   args=(self.project_path, 'OutputFile/error_middle/output_0'))
+        #
+        # process.start()  # 启动子进程
+        # process.join()  # 等待子进程运行结束
 
-        process.start()  # 启动子进程
-        process.join()  # 等待子进程运行结束
+        self.run_multiparticle(self.project_path, 'OutputFile/error_middle/output_0')
 
         self.write_density_every_time(0, 0)
 
@@ -729,7 +733,7 @@ class Error():
         v1 = dataset_obj.get_parameter()
         if v1 is False:
             errors_par_tot_list = [f"{group}_{time}"] + [1] + [0]*12
-        elif dataset_obj.z[-1] < (self.lattice_total_length-0.01):
+        elif dataset_obj.z[-1] < (self.lattice_total_length-0.05):
             errors_par_tot_list = [f"{group}_{time}"] + [1] + [0]*12
         else:
             errors_par_tot_list = [
@@ -815,7 +819,7 @@ class Error():
 
 
     def write_density_every_time(self, group, time):
-        return 0
+
         is_normal = 0
         if group == 0:
             is_normal = 1
@@ -827,7 +831,6 @@ class Error():
         # print(dataset_path)
         # sys.exit()
         if is_normal == 1:
-            # print(802)
             # print(dataset_path)
             # print(target_density_path)
             density_obj = PlttoDensity(beamset_path,  dataset_path, target_density_path)
@@ -920,10 +923,8 @@ class ErrorDyn(Error):
 
         error_lattice = [i for i in error_lattice if i[0] in global_varible.err_write_command]
 
-        for i in error_lattice:
-            print(i)
 
-        sys.exit()
+
         with open(self.lattice_path, 'w') as f:
             for i in error_lattice:
                 if not i[0].startswith("!"):
@@ -1558,7 +1559,6 @@ class Errorstat(Error):
                                           adjust_element_num, adjust_parameter_num)
         elif self.err_type == 'stat_dyn':
             pass
-        breakpoint()
     def write_diag_datas(self, diag_every):
         k = list(diag_every.keys())[0]
         v = list(diag_every.values())[0]
@@ -1913,10 +1913,12 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r"C:\Users\shliu\Desktop\test1120",
-                    50, 0)
+    obj = ErrorDyn(r"C:\Users\shliu\Desktop\testPPT\testerror",
+                    50, 1)
 
     obj.run()
+
+
     # obj.treat_diag()
     # a = [1, 2]
     # b = [[8], [7, 8]]

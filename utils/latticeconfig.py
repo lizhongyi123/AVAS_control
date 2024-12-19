@@ -62,6 +62,7 @@ class LatticeConfig():
     def add_element(self):
         return self.lattice_parameter
     def write_to_file(self, item):
+
         other_path = item.get("otherPath")
         sim_type = item.get("sim_type")
         if other_path is None:
@@ -74,6 +75,7 @@ class LatticeConfig():
 
 
         kwargs = {}
+
         try:
             with open(path, 'w', encoding='utf-8') as file:
                 # 遍历嵌套列表的每个子列表
@@ -87,6 +89,7 @@ class LatticeConfig():
         kwargs.update({'latticeParams': self.lattice_parameter })
         output = format_output(**kwargs)
         return output
+
 
 if __name__ == "__main__":
     path = r"C:\Users\shliu\Desktop\1128"

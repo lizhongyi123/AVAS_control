@@ -269,19 +269,19 @@ class PageLattice(QWidget):
 
 
     def save_all_lattice(self):
-        item = {"projectPath": self.project_path}
+        item = {"projectPath": self.project_path,}
 
+        item["sim_type"] = "mulp"
         obj = LatticeConfig()
         res = obj.set_param({"latticeInfo": self.text_mulp_lattice.toPlainText()})
         res = obj.write_to_file(item)
-        print(res)
         if res["code"] == -1:
             raise Exception(str(res["data"]['msg']))
 
 
-        path = self.lattice_env_path
-        #如果路径为空, 那么不保存
 
+        #如果路径为空, 那么不保存
+        item["sim_type"] = "env"
         obj = LatticeConfig()
         res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
         res = obj.write_to_file(item)
@@ -301,7 +301,7 @@ class PageLattice(QWidget):
 
             self.stacked_widget.setCurrentWidget(self.text_mulp_lattice)
             # self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
-            # self.text_file_path.setText(self.lattice_mulp_path)
+            self.text_file_path.setText(self.lattice_mulp_path)
             #
             # with open(self.lattice_mulp_path, 'r', encoding='utf-8') as file:
             #     file_contents = file.read()
@@ -316,7 +316,7 @@ class PageLattice(QWidget):
             self.button_state()
             self.stacked_widget.setCurrentWidget(self.text_env_lattice)
             # self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-            # self.text_file_path.setText(self.lattice_env_path)
+            self.text_file_path.setText(self.lattice_env_path)
             #
             # if not os.path.exists(self.lattice_env_path):
             #     with open(self.lattice_env_path, 'w', encoding='utf-8') as file:
@@ -348,7 +348,7 @@ class PageLattice(QWidget):
     # @treat_err
     def button_state(self):
         button = self.sender()
-        print(button)
+        # print(button)
 
         if button is None:
             button = self.button_mulp_lattice
@@ -369,49 +369,7 @@ class PageLattice(QWidget):
     def inspect(self):
         pass
         return True
-    # def color_text_by_starting_word(self, text):
-    #     cursor = QTextCursor(self.text_lattice.document())
-    #     cursor.beginEditBlock()
-    #
-    #     lines = text.split('\n')
-    #
-    #     for line in lines:
-    #         words = line.split()
-    #         if words:
-    #             first_word = words[0]
-    #             if first_word == "drift":
-    #                 format = QTextCharFormat()
-    #                 format.setForeground(QColor('blue'))
-    #                 cursor.setCharFormat(format)
-    #                 cursor.insertText(line)
-    #
-    #             elif first_word == "field":
-    #                 format = QTextCharFormat()
-    #                 format.setForeground(QColor('green'))
-    #                 cursor.setCharFormat(format)
-    #                 cursor.insertText(line)
-    #             else:
-    #                 format = QTextCharFormat()
-    #                 format.setForeground(QColor('black'))
-    #                 cursor.setCharFormat(format)
-    #                 cursor.insertText(line)
-    #
-    #         else:
-    #             cursor.insertText(line)
-    #
-    #         cursor.insertBlock()
-    #
-    #     cursor.endEditBlock()
-    #
-    # def color_new_text_by_starting_word(self):
-    #     # 防止触发无限循环
-    #     if not self.ignore_text_changed:
-    #         self.ignore_text_changed = True
-    #         # 获取新输入的文本
-    #         new_text = self.text_lattice.toPlainText()
-    #         self.text_lattice.clear()  # 清除文本框内容
-    #         self.color_text_by_starting_word(new_text)  # 调用颜色处理函数处理新文本
-    #         self.ignore_text_changed = False  # 重新允许文本更改信号触发
+
 #
 if __name__ == '__main__':
     app = QApplication(sys.argv)

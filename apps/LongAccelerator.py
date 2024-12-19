@@ -1,6 +1,6 @@
 ﻿import sys
 
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+# sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 from core.LongAcceleratorEngine import LongAcceleratorEngine
 import os
 import shutil

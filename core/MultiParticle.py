@@ -4,7 +4,7 @@ import platform
 import subprocess
 import os
 import re
-sys.path.append(r'E:\AVAS_CONTROL\AVAS_control')
+# sys.path.append(r'E:\AVAS_CONTROL\AVAS_control')
 
 from core.MultiParticleEngine import MultiParticleEngine
 import multiprocessing
@@ -128,7 +128,7 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\field_ciads"
+    project_path = r"C:\Users\shliu\Desktop\test_avas_qt\avaserr2"
     obj = MultiParticle(project_path)
 
 

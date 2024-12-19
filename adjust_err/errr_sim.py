@@ -1,6 +1,6 @@
 
 from apps.error import ErrorDyn
-from conv2 import import_adjust, tran_tracewin_avas, add_err, write_to_avas_lattice
+from adjust_err.conv2 import import_adjust, tran_tracewin_avas, add_err, write_to_avas_lattice
 import os
 class NewError(ErrorDyn):
     def __init__(self, project_path, seed, if_normal):
@@ -13,6 +13,7 @@ class NewError(ErrorDyn):
         if self.if_normal == 1:
             self.run_normal()
             self.write_err_par_every_time(0,0)
+
 
         self.all_group = 3
         self.all_time = 100
@@ -28,21 +29,23 @@ class NewError(ErrorDyn):
                 self.write_err_par_every_time(i, j)
 
 
-    def tran_trace2avas(self, index):
-        tracewin_lattiace_path = os.path.join(self.project_path, "InputFile", "end to end-design.dat")
+    def tran_trace2avas(self, index, ):
+        tracewin_lattice_path = os.path.join(self.project_path, "InputFile", "end to end-design.dat")
         avas_lattice_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
 
         adjust_file = os.path.join(self.project_path, "adjust_err", f"Adjusted_Values.txt_{index}")
         error_file = os.path.join(self.project_path, "adjust_err", f"Error_Datas.txt_{index}")
 
         # 修改后的lattice
-        adjust_tracewin_lattice = import_adjust(tracewin_lattiace_path, adjust_file)
+        adjust_tracewin_lattice = import_adjust(tracewin_lattice_path, adjust_file)
 
+        #不修改，直接读取
         # adjust_tracewin_lattice = read_tracewin(adjust_tracewin_lattice)
+
         # 将lattice转换成avas
         avas_lattice = tran_tracewin_avas(adjust_tracewin_lattice)
 
-        new_avaslattice = add_err(avas_lattice, error_file)
+        new_avaslattice = add_err(avas_lattice, error_file, self.all_group, self.all_time)
         write_to_avas_lattice(new_avaslattice, avas_lattice_path)
 
 
@@ -73,7 +76,7 @@ def write_trace_to_avas1(tracewin_lattiace_path, avas_lattice_path):
 
 if __name__ == '__main__':
     project_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1"
-
+    # project_path = r"C:\Users\shliu\Desktop\chaodao"
     tracewin_lattiace_path = os.path.join(project_path, "InputFile", "end to end-design.dat")
     avas_lattice_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
 

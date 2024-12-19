@@ -379,7 +379,7 @@ def import_adjust(tracewin_lattice_path, adjust_file):
 
     return adjust_tracewin_lattice
 
-def add_err(avas_lattice, error_file):
+def add_err(avas_lattice, error_file, group, time):
     avas_element_lis = ['drift', 'field', 'quad', 'bend', 'steerer', 'edge', ]
     avas_diag_list = ['DIAG_CURRENT'.lower(), 'DIAG_SIZE'.lower(), 'DIAG_POSITION'.lower(),  "DIAG_PHASE".lower(),]
 
@@ -395,7 +395,7 @@ def add_err(avas_lattice, error_file):
     err_content = read_txt(error_file, out='list', case_sensitive= True)[5:]
 
     err_on_lis = [
-        ["err_step", 3, 100],
+        ["err_step", group, time],
         ["err_beam_dyn_on"] + [1] * 13,
         ["err_quad_dyn_on"] + [1] * 7,
         ["err_cav_dyn_on"] + [1] * 7,
@@ -476,5 +476,5 @@ if __name__ == "__main__":
     #将lattice转换成avas
     # avas_lattice = tran_tracewin_avas(adjust_tracewin_lattice)
     #
-    # new_avaslattice = add_err(avas_lattice, error_file)
+    new_avaslattice = add_err(avas_lattice, error_file)
     # write_to_avas_lattice(new_avaslattice, avas_lattice_path)

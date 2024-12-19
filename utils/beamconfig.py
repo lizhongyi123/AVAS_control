@@ -238,17 +238,20 @@ class BeamConfig():
 
         return True
 
-    def validate_run(self, path):
-        self.creat_from_file(path)
+    def validate_run(self, item):
+        res = self.create_from_file(item)
+        if res["code"] == -1:
+            raise Exception(res["data"]["msg"])
+        beam_params = res["data"]["beamParams"]
         #当所有输入符合
-        if self.beam_parameter["readparticledistribution"] is not None:
+        if beam_params["readparticledistribution"] is not None:
             for k in self.with_dst_keys:
-                if self.beam_parameter[k] is None:
+                if beam_params[k] is None:
                     raise Exception(f"missing parameter {k}")
 
         else:
             for k in self.no_dst_keys:
-                if self.beam_parameter[k] is None:
+                if beam_params[k] is None:
                     raise Exception(f"missing parameter {k}")
 
 

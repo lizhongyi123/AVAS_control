@@ -2,7 +2,6 @@
 import sys
 import time
 
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
@@ -35,28 +34,37 @@ from utils.iniconfig import IniConfig
 from apis.qt_api.SimMode import SimMode
 from apis.qt_api.createbasicfile import CreateBasicProject
 from core.MultiParticle import MultiParticle
-class MultiParticleThread(QThread):
+
+
+
+
+class RunThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
 
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
-        self.running = True
-        self.multiparticle_obj = MultiParticle(self.project_path)
+        self.process = None
 
     def run(self):
-        # 调用 MultiParticle 的 run 方法
-        try:
-            self.multiparticle_obj.run()
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        finally:
-            self.finished.emit()  # 任务完成时发出信号
+        print("Thread started")
+        item = {"projectPath": self.project_path}
+
+        obj = SimMode(item)
+        self.process = multiprocessing.Process(target=obj.run)
+
+        self.process.start()  # 启动子进程
+        self.process.join()   # 等待子进程运行结束
+        self.finished.emit()  # 任务完成信号
+        print("Thread finished")
 
     def stop(self):
-        # 停止 MultiParticle 的逻辑
-        self.running = False
-        self.multiparticle_obj.stop()
+        if self.process and self.process.is_alive():
+            print("Stopping process...")
+            self.process.terminate()  # 强制终止子进程
+            self.process.join()       # 等待子进程结束
+            print("Process stopped")
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -67,7 +75,7 @@ class MainWindow(QMainWindow):
         self.match_signal = None
         self.error_signal = None
 
-        self.task_thread = None
+        self.thread = None
         self.settings = QSettings('IMP', 'AVAS')
 
         self.initUI()
@@ -256,7 +264,7 @@ class MainWindow(QMainWindow):
         # self.basci_env_process = multiprocessing.Process()
         # self.err_process = multiprocessing.Process()
         # self.match_process = multiprocessing.Process()
-        self.sim_process = multiprocessing.Process()
+
         central_widget.setLayout(central_layout)  # 将布局设置给中央部件
 
         self.setCentralWidget(central_widget)  # 将中央部件设置为主窗口的中央部件
@@ -373,6 +381,8 @@ class MainWindow(QMainWindow):
 
 
 
+    def on_task_finished(self):
+        print("Task finished.")
 
     def run(self):
         self.stop()
@@ -381,11 +391,9 @@ class MainWindow(QMainWindow):
         #     return None
         self.save_project()
 
-        if not self.task_thread or not self.task_thread.isRunning():
-            self.task_thread = MultiParticleThread(self.project_path)
-            self.task_thread.finished.connect(self.on_task_finished)
-            self.task_thread.start()
-        # self.refresh_lattice()
+        self.thread = RunThread(self.project_path)
+        self.thread.finished.connect(self.on_task_finished)
+        self.thread.start()
 
     def on_task_finished(self):
         print("Task finished.")
@@ -425,13 +433,12 @@ class MainWindow(QMainWindow):
                 print(e)
 
 
-    @treat_err
+    # @treat_err
     def stop(self):
-        if self.task_thread and self.task_thread.isRunning():
-            self.task_thread.stop()
-            self.task_thread.wait()  # 等待线程终止
-            print("Task stopped.")
-
+        if self.thread:
+            self.thread.stop()
+            self.thread.wait()  # 等待线程安全停止
+        self.on_task_finished()
         # if self.basci_mulp_process.is_alive():
         #     self.basci_mulp_process.terminate()
         #     self.basci_mulp_process.join()

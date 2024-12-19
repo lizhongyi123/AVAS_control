@@ -119,8 +119,8 @@ class DatasetParameter():
         self.ek = [i[0] for i in dataset_info]  ##MeV
         self.loss = [self.num_of_particle - i[28] for i in dataset_info]  ##
 
-        if self.project_path:
-            self.get_phi()
+        # if self.project_path:
+        #     self.get_phi()
 
         if nan_in:
             return False
@@ -129,44 +129,44 @@ class DatasetParameter():
 
 
 
-    def get_lattice_end_index(self):
-        lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
-        lattice_obj = LatticeParameter(lattice_mulp_path)
-        lattice_obj.get_parameter()
-        total_length = lattice_obj.total_length
-
-        end_index = 0
-        for i in range(len(self.z)):
-            if self.z[i] > total_length:
-                end_index = i
-                break
-        print("end_index", end_index)
-        return end_index
-
-    def get_mass_freq(self):
-        beam_txt = self.project_path + r'/InputFile/beam.txt'
-        res = read_txt(beam_txt)
-        if res.get('readparticledistribution') is None:
-            BaseMassInMeV = float(res.get('particlerestmass'))
-            freq = float(res.get('frequency'))
-        else:
-            dstfile = self.project_path + r'/InputFile' + r"/" + res.get('readparticledistribution')
-            dst_res = read_dst(dstfile)
-            BaseMassInMeV = float(dst_res.get('basemassinmev'))
-            freq = float(dst_res.get('freq'))
-        return BaseMassInMeV, freq
-
-    def get_phi(self):
-        self.BaseMassInMeV, self.freq = self.get_mass_freq()
-        beta = []
-        self.phi = []
-        self.phi_phi = []
-        for i in range(len(self.rms_z)):
-            gammaaaa = self.ek[i] / self.BaseMassInMeV + 1
-            beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-            v = self.rms_z[i] / (beta[-1] * c_light) * self.freq * 360
-            self.phi.append(v)
-            self.phi_phi.append(-1 * v)
+    # def get_lattice_end_index(self):
+    #     lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
+    #     lattice_obj = LatticeParameter(lattice_mulp_path)
+    #     lattice_obj.get_parameter()
+    #     total_length = lattice_obj.total_length
+    #
+    #     end_index = 0
+    #     for i in range(len(self.z)):
+    #         if self.z[i] > total_length:
+    #             end_index = i
+    #             break
+    #     print("end_index", end_index)
+    #     return end_index
+    #
+    # def get_mass_freq(self):
+    #     beam_txt = self.project_path + r'/InputFile/beam.txt'
+    #     res = read_txt(beam_txt)
+    #     if res.get('readparticledistribution') is None:
+    #         BaseMassInMeV = float(res.get('particlerestmass'))
+    #         freq = float(res.get('frequency'))
+    #     else:
+    #         dstfile = self.project_path + r'/InputFile' + r"/" + res.get('readparticledistribution')
+    #         dst_res = read_dst(dstfile)
+    #         BaseMassInMeV = float(dst_res.get('basemassinmev'))
+    #         freq = float(dst_res.get('freq'))
+    #     return BaseMassInMeV, freq
+    #
+    # def get_phi(self):
+    #     self.BaseMassInMeV, self.freq = self.get_mass_freq()
+    #     beta = []
+    #     self.phi = []
+    #     self.phi_phi = []
+    #     for i in range(len(self.rms_z)):
+    #         gammaaaa = self.ek[i] / self.BaseMassInMeV + 1
+    #         beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+    #         v = self.rms_z[i] / (beta[-1] * c_light) * self.freq * 360
+    #         self.phi.append(v)
+    #         self.phi_phi.append(-1 * v)
 
 
 if __name__ == "__main__":
@@ -175,11 +175,11 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_output\output_0_0\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\chaodao\DataSet.txt"
     obj = DatasetParameter(path1)
 
     v = obj.get_parameter()
-    print(v)
+    print(obj.z[-1])
     import numpy as np
     # import time
     # t0 = time.time()

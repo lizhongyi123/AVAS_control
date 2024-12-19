@@ -23,13 +23,13 @@ class CreatBasicFile():
         }
 
         self.input_info = {
-            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": None, "spacechargetype": None
+            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0
         }
 
         self.ini_info = \
             {"project": {"project_path": "undefined"},
             "lattice":{"length": 0},
-             "input": {"sim_type": 0},
+             "input": {"sim_type": "mulp"},
              "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
              "error": {"error_type": "undefined", "seed": 0, "if_normal": 0},
              }
@@ -166,7 +166,7 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\1128\test1"
+    project_path = r"C:\Users\shliu\Desktop\test1213\test1"
     # CreatBasicFile(project_path).create_basic_beam_file()
     # CreatBasicFile(project_path).create_basic_input_file()
     # CreatBasicFile(project_path).create_basic_lattice_mulp_file()
@@ -192,4 +192,5 @@ if __name__ == "__main__":
     platform = "qt"
     obj = CreateBasicProject(item, platform)
     res = obj.create_project()
+    print(res)
 

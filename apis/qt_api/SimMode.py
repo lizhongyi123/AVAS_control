@@ -7,35 +7,37 @@ import os
 import utils.exception as exce
 from apis.basic_api.api import basic_mulp, basic_env, match_twiss, circle_match, \
     err_dyn, err_stat, err_stat_dyn
+from utils.tool import format_output
 class SimMode():
-    def __init__(self, project_path):
-        self.project_path = project_path
-        self.ini_path = os.path.join(project_path, "InputFile", "ini.ini")
-        self.beam_path = os.path.join(project_path, "InputFile", "beam.txt")
-        self.input_path = os.path.join(project_path, "InputFile", "input.txt")
-        self.lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
+    def __init__(self, item):
+        self.item = item
+        self.project_path =item.get('projectPath')
+        self.ini_path = os.path.join(self.project_path, "InputFile", "ini.ini")
+        self.beam_path = os.path.join(self.project_path, "InputFile", "beam.txt")
+        self.input_path = os.path.join(self.project_path, "InputFile", "input.txt")
+        self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
 
     def file_check(self):
         #检查input文件
         input_config = InputConfig()
-        input_config.validate_run(self.input_path)
+        input_config.validate_run(self.item)
 
         #检查beam文件
         beam_config = BeamConfig()
-        beam_config.validate_run(self.beam_path)
-
+        beam_config.validate_run(self.item)
 
 
     def run(self):
+
         self.file_check()
         #判断模拟类型并进行模拟
         ini_obj = IniConfig()
-        ini_info = ini_obj.creat_from_file(self.ini_path)
+        ini_info = ini_obj.create_from_file(self.item)
         if ini_info["code"] == -1:
             raise Exception(ini_info["data"]['msg'])
-        ini_info = ini_info["data"]["ini_params"]
+        ini_info = ini_info["data"]["iniParams"]
         base_mode = ini_info["input"]["sim_type"]
-        print(base_mode)
+
 
         match_mode = [
             ini_info["match"]["cal_input_twiss"],
@@ -76,7 +78,12 @@ class SimMode():
                 basic_env(self.project_path)
 
 
+        output = format_output()
+        return output
+
+
 if __name__ == '__main__':
-    path = r"C:\Users\shliu\Desktop\eee"
-    obj = SimMode(path)
+    path = r"C:\Users\shliu\Desktop\test1213\test1"
+    item = {"projectPath": path}
+    obj = SimMode(item)
     obj.run()

@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+# sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
 
 from dataprovision.datasetparameter import DatasetParameter

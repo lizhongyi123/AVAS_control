@@ -118,7 +118,7 @@ class InputConfig():
                 del v_dic["sim_type"]
             elif self.input_parameter["sim_type"] == 'env':
 
-                v_dic["!sim_mode"] = self.input_parameter["sim_type"]
+                v_dic["!sim_type"] = self.input_parameter["sim_type"]
                 v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
                 v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
 
@@ -191,17 +191,20 @@ class InputConfig():
         else:
             return v
 
-    def validate_run(self, path):
-        self.creat_from_file(path)
+    def validate_run(self, item):
+        res = self.create_from_file(item)
+        if res["code"] == -1:
+            raise Exception(res["data"]["msg"])
+        input_params = res["data"]["inputParams"]
         #当所有输入符合
-        if self.input_parameter["sim_type"] == 'mulp':
+        if input_params["sim_type"] == 'mulp':
             for k in self.mulp_keys:
-                if self.input_parameter[k] is None:
+                if input_params[k] is None:
                     raise MisskeywordError(f"{k}")
 
-        elif self.input_parameter["sim_type"] == 'env':
+        elif input_params["sim_type"] == 'env':
             for k in self.env_keys:
-                if self.input_parameter[k] is None:
+                if input_params[k] is None:
                     raise MisskeywordError(f"{k}")
 if __name__ == "__main__":
     import json

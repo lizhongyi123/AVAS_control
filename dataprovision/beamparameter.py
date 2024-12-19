@@ -1,5 +1,5 @@
 ﻿import sys
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
+# sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
 from utils.readfile import read_dst, read_txt, read_dst_fast
 import math

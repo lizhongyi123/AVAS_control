@@ -23,34 +23,34 @@ class PlotDataSet(PicturePlot_2D):
         self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
         self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
-        self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        self.dataset_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\save\error_output\output_0_0\DataSet.txt"
 
 
 
-    # def get_mass_freq(self):
-    #     beam_txt = self.project_path + r'\InputFile\Beam.txt'
-    #     res = read_txt(beam_txt)
-    #     if res.get('readparticledistribution') is None:
-    #         BaseMassInMeV = float(res.get('particlerestmass'))
-    #         freq = float(res.get('frequency'))
-    #     else:
-    #         dstfile = self.project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
-    #         dst_res = read_dst(dstfile)
-    #         BaseMassInMeV = float(dst_res.get('basemassinmev'))
-    #         freq = float(dst_res.get('freq'))
-    #     return BaseMassInMeV, freq
+    def get_mass_freq(self):
+        beam_txt = self.project_path + r'\InputFile\Beam.txt'
+        res = read_txt(beam_txt)
+        if res.get('readparticledistribution') is None:
+            BaseMassInMeV = float(res.get('particlerestmass'))
+            freq = float(res.get('frequency'))
+        else:
+            dstfile = self.project_path + r'\InputFile' + r"\\" + res.get('readparticledistribution')
+            dst_res = read_dst(dstfile)
+            BaseMassInMeV = float(dst_res.get('basemassinmev'))
+            freq = float(dst_res.get('freq'))
+        return BaseMassInMeV, freq
 
-    # def get_mass_freq(self, BaseMassInMeV, freq):
-    #     self.BaseMassInMeV = BaseMassInMeV
-    #     self.freq = freq
-    #     return None
+    def get_mass_freq(self, BaseMassInMeV, freq):
+        self.BaseMassInMeV = BaseMassInMeV
+        self.freq = freq
+        return None
 
     def get_x_y(self):
 
         dataset_obj = DatasetParameter(self.dataset_path, self.project_path)
         dataset_obj.get_parameter()
-        end_index = dataset_obj.get_lattice_end_index() + 1
-
+        # end_index = dataset_obj.get_lattice_end_index() + 1
+        end_index = -1
         z = dataset_obj.z[:end_index]  # 束团纵向位置
         ek = dataset_obj.ek[:end_index]  # 束团平均能量
 
@@ -84,20 +84,20 @@ class PlotDataSet(PicturePlot_2D):
         BaseMassInMeV = dataset_obj.BaseMassInMeV
         freq = dataset_obj.freq
 
-        # for i in range(len(dataset_obj.ek)):
-        #     gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
-        #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-        #     v = dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360
-        #     # rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
-        #     # rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360))
-        #     rms_z.append(v)
-        #     rms_zz.append(-1 * v)
+        for i in range(len(dataset_obj.ek)):
+            gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
+            beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+            v = dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360
+            # rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
+            # rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360))
+            rms_z.append(v)
+            rms_zz.append(-1 * v)
 
-        # for i in range(len(data)):
-        #     gammaaaa = data[i][0] / BaseMassInMeV + 1
-        #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-        #     rms_z.append(data[i][20] / (beta[-1] * C_light) * freq * 360)
-        #     rms_zz.append(-1 * (data[i][20] / (beta[-1] * C_light) * 162.5e6 * 360))
+        for i in range(len(data)):
+            gammaaaa = data[i][0] / BaseMassInMeV + 1
+            beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+            rms_z.append(data[i][20] / (beta[-1] * C_light) * freq * 360)
+            rms_zz.append(-1 * (data[i][20] / (beta[-1] * C_light) * 162.5e6 * 360))
 
 
 
@@ -307,8 +307,8 @@ class PlotDataSet(PicturePlot_2D):
             self.colors = self.colors[:-2]
 
 if __name__ == "__main__":
-    a = PlotDataSet(r'C:\Users\anxin\Desktop\cafe\AVAS',  'rms_x')
+    a = PlotDataSet(r"1",  'rms_xy')
     a.get_x_y()
-    a.need_element(aper=1)
+    # a.need_element(aper=1)
     a.run(show_=1)
 

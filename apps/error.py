@@ -6,7 +6,6 @@
 #    get_goal：修改参数，添加end，然后写入lattice
 #    根据诊断命令，计算loss
 import sys
-sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 from scipy.optimize import minimize
 
 import numpy as np
@@ -68,21 +67,21 @@ class Error():
         self.all_time = 1
         self.lattice_mulp_list = []
         self.errors_par_tot_list_first = []
-        # self.err_beam_stat_on = [0] * 25
-        # self.err_quad_stat_on = [0, 0, 0, 0, 0, 0, 0]
-        # self.err_cav_stat_on = [0, 0, 0, 0, 0, 0, 0]
+        self.err_beam_stat_on = [0] * 13
+        self.err_quad_stat_on = [0, 0, 0, 0, 0, 0, 0]
+        self.err_cav_stat_on = [0, 0, 0, 0, 0, 0, 0]
+
+        self.err_beam_dyn_on = [0] * 25
+        self.err_quad_dyn_on = [0, 0, 0, 0, 0, 0, 0]
+        self.err_cav_dyn_on = [0, 0, 0, 0, 0, 0, 0]
+
+        # self.err_beam_stat_on = []
+        # self.err_quad_stat_on = []
+        # self.err_cav_stat_on = []
         #
-        # self.err_beam_dyn_on = [0] * 25
-        # self.err_quad_dyn_on = [0, 0, 0, 0, 0, 0, 0]
-        # self.err_cav_dyn_on = [0, 0, 0, 0, 0, 0, 0]
-
-        self.err_beam_stat_on = []
-        self.err_quad_stat_on = []
-        self.err_cav_stat_on = []
-
-        self.err_beam_dyn_on = []
-        self.err_quad_dyn_on = []
-        self.err_cav_dyn_on = []
+        # self.err_beam_dyn_on = []
+        # self.err_quad_dyn_on = []
+        # self.err_cav_dyn_on = []
 
 
         self.decimal = 5  # 小数点保留多少位
@@ -92,8 +91,8 @@ class Error():
             delete_directory(self.error_middle_path)
         os.makedirs(self.error_middle_path)
 
-        midlle_output_0_path = os.path.join(self.error_middle_path, 'output_0')
-        os.makedirs(midlle_output_0_path)
+        # midlle_output_0_path = os.path.join(self.error_middle_path, 'output_0')
+        # os.makedirs(midlle_output_0_path)
 
         if os.path.exists(self.error_output_path):
             delete_directory(self.error_output_path)
@@ -125,28 +124,29 @@ class Error():
                 self.all_time = int(i[2])
 
             elif i[0] == 'err_beam_stat_on':
-                self.err_beam_stat_on = [int(j) for j in i[1:]]
-                self.err_beam_stat_on += [0] * (25 - len(self.err_beam_stat_on))
+                for j in range(1, len(i)):
+                    self.err_beam_stat_on[j-1] = int(i[j])
+
 
             elif i[0] == 'err_quad_stat_on':
-                self.err_quad_stat_on = [int(j) for j in i[1:]]
-                self.err_quad_stat_on += [0] * (7 - len(self.err_quad_stat_on))
+                for j in range(1, len(i)):
+                    self.err_quad_stat_on[j-1] = int(i[j])
 
             elif i[0] == 'err_cav_stat_on':
-                self.err_cav_stat_on = [int(j) for j in i[1:]]
-                self.err_cav_stat_on += [0] * (7 - len(self.err_cav_stat_on))
+                for j in range(1, len(i)):
+                    self.err_cav_stat_on[j-1] = int(i[j])
 
             elif i[0] == 'err_beam_dyn_on':
-                self.err_beam_dyn_on = [int(j) for j in i[1:]]
-                self.err_beam_dyn_on += [0] * (25 - len(self.err_beam_dyn_on))
+                for j in range(1, len(i)):
+                    self.err_beam_dyn_on[j-1] = int(i[j])
 
             elif i[0] == 'err_quad_dyn_on':
-                self.err_quad_dyn_on = [int(j) for j in i[1:]]
-                self.err_quad_dyn_on += [0] * (7 - len(self.err_quad_dyn_on))
+                for j in range(1, len(i)):
+                    self.err_quad_dyn_on[j-1] = int(i[j])
 
             elif i[0] == 'err_cav_dyn_on':
-                self.err_cav_dyn_on = [int(j) for j in i[1:]]
-                self.err_cav_dyn_on += [0] * (7 - len(self.err_cav_dyn_on))
+                for j in range(1, len(i)):
+                    self.err_cav_dyn_on[j-1] = int(i[j])
 
     def increase_error(self, input_lines):
         """
@@ -934,11 +934,12 @@ class ErrorDyn(Error):
         if os.path.exists(self.error_middle_output0_path):
             delete_directory(self.error_middle_output0_path)
         # os.makedirs(self.error_middle_output0_path)
-        process = multiprocessing.Process(target=self.run_multiparticle,
-                                          args=(self.project_path, 'OutputFile/error_middle'))
-
-        process.start()  # 启动子进程
-        process.join()  # 等待子进程运行结束
+        # process = multiprocessing.Process(target=self.run_multiparticle,
+        #                                   args=(self.project_path, 'OutputFile/error_middle'))
+        #
+        # process.start()  # 启动子进程
+        # process.join()  # 等待子进程运行结束
+        self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
 
         self.write_density_every_time(group, time)
 
@@ -1054,57 +1055,7 @@ class Errorstat(Error):
 
         return adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
                adjust_parameter_n, adjust_parameter_use_init
-        # print(adjust_element_num)
-        # print(adjust_parameter_num)
-        # print(adjust_parameter_range)
-        # print(adjust_parameter_n)
-        # print(adjust_parameter_use_init)
-        # print(adjust_parameter_initial_value)
-        # sys.exit(0)
-        #
-        # for i in range(len(input_lines)):
-        #     if input_lines[i][0] in global_varible.long_element:
-        #         index += 1
-        #
-        #
-        #     if input_lines[i][0] == 'adjust':
-        #         adjust_parameter_num_per.append(int(input_lines[i][2]))
-        #         adjust_parameter_range_per.append([float(input_lines[i][4]), float(input_lines[i][5])])
-        #         adjust_parameter_n_per.append(int(input_lines[i][3]))
-        #         adjust_parameter_use_init_per.append(int(input_lines[i][6]))
-        #
-        #         tmp_index = index + 1
-        #
-        #         if tmp_index not in adjust_element_num:
-        #             adjust_element_num.append(tmp_index)
-        #     elif input_lines[i][0] != 'adjust' and input_lines[i-1][0] == 'adjust':
-        #
-        #         adjust_parameter_lattice_command.append(input_lines[i])
-        #
-        #         adjust_parameter_num.append(copy.deepcopy(adjust_parameter_num_per))
-        #
-        #         adjust_parameter_initial_value_per = [float(input_lines[i][j]) for j in adjust_parameter_num_per]
-        #         adjust_parameter_initial_value.append(adjust_parameter_initial_value_per)
-        #
-        #         adjust_parameter_num_per.clear()
-        #
-        #
-        #
-        #         adjust_parameter_range.append(copy.deepcopy(adjust_parameter_range_per))
-        #         adjust_parameter_range_per.clear()
-        #
-        #         adjust_parameter_n.append(copy.deepcopy(adjust_parameter_n_per))
-        #         adjust_parameter_n_per.clear()
-        #
-        #
-        #         adjust_parameter_use_init.append(copy.deepcopy(adjust_parameter_use_init_per))
-        #         adjust_parameter_use_init_per.clear()
-        #
-        # print(1108, adjust_parameter_lattice_command, adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
-        # adjust_parameter_n, adjust_parameter_use_init)
-        # sys.exit(0)
-        # return adjust_parameter_lattice_command, adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
-        #        adjust_parameter_n, adjust_parameter_use_init
+
 
     def treat_diag(self, group, time, error_lattice):
 
@@ -1324,35 +1275,38 @@ class Errorstat(Error):
                 for i in error_lattice_write:
                     f.write(' '.join(map(str, i)) + '\n')
 
-            try:
-                if os.path.exists(self.error_middle_output0_path):
-                    delete_directory(self.error_middle_output0_path)
-
-                # if self.only_adjust_sign == 1:
-                if self.err_type == 'only_adjust':
-                    os.makedirs(self.error_middle_output0_path)
-                    process = multiprocessing.Process(target=self.run_multiparticle,
-                                                      args=(self.project_path, 'OutputFile/error_middle/output_0'))
-                else:
-                    process = multiprocessing.Process(target=self.run_multiparticle,
-                                                      args=(self.project_path, 'OutputFile/error_middle'))
-
-                process.start()  # 启动子进程
-                process.join()  # 等待子进程运行结束
-                process.terminate()  # 终止子进程
-
-                loss = self.treat_diag(group, time, error_lattice_no_index)
-
-            except Exception as e:
-                # 处理异常，如果需要
-                print(f"An error occurred: {str(e)}")
-                loss = 1
-
-            finally:
-                if process.is_alive():
-                    process.terminate()  # 终止子进程
+            # try:
+            #     if os.path.exists(self.error_middle_output0_path):
+            #         delete_directory(self.error_middle_output0_path)
+            #
+            #     # if self.only_adjust_sign == 1:
+            #     if self.err_type == 'only_adjust':
+            #         os.makedirs(self.error_middle_output0_path)
+            #         process = multiprocessing.Process(target=self.run_multiparticle,
+            #                                           args=(self.project_path, 'OutputFile/error_middle/output_0'))
+            #     else:
+            #         process = multiprocessing.Process(target=self.run_multiparticle,
+            #                                           args=(self.project_path, 'OutputFile/error_middle'))
+            #
+            #     process.start()  # 启动子进程
+            #     process.join()  # 等待子进程运行结束
+            #     process.terminate()  # 终止子进程
+            #
+            #     loss = self.treat_diag(group, time, error_lattice_no_index)
+            #
+            # except Exception as e:
+            #     # 处理异常，如果需要
+            #     print(f"An error occurred: {str(e)}")
+            #     loss = 1
+            #
+            # finally:
+            #     if process.is_alive():
+            #         process.terminate()  # 终止子进程
 
             delete_directory(self.error_middle_output0_path)
+            self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
+            loss = self.treat_diag(group, time, error_lattice_no_index)
+
 
             print(loss)
             self.loss_this.append(loss)
@@ -1500,15 +1454,17 @@ class Errorstat(Error):
             delete_directory(self.error_middle_output0_path)
 
         # if self.only_adjust_sign == 1:
-        if self.err_type == 'only_adjust':
-            os.makedirs(self.error_middle_output0_path)
+        # if self.err_type == 'only_adjust':
+        #     os.makedirs(self.error_middle_output0_path)
+        #
+        #     process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle/output_0'))
+        # else:
+        #     process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle'))
+        #
+        # process.start()  # 启动子进程
+        # process.join()  # 等待子进程运行结束
 
-            process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle/output_0'))
-        else:
-            process = multiprocessing.Process(target=self.run_multiparticle, args=(self.project_path, 'OutputFile/error_middle'))
-
-        process.start()  # 启动子进程
-        process.join()  # 等待子进程运行结束
+        self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
 
         self.write_density_every_time(group, time)
 
@@ -1661,6 +1617,8 @@ class Errorstatdyn(Errorstat):
         ####################
         # 将静态的动态误差的开启结合起来
         new_err_beam_dyn_on = ['err_beam_dyn_on']
+
+
         for i in range(len(self.err_beam_stat_on)):
             if self.err_beam_stat_on[i] == 1 or self.err_beam_dyn_on[i] == 1:
                 new_err_beam_dyn_on.append(1)
@@ -1764,21 +1722,22 @@ class Errorstatdyn(Errorstat):
             for i in error_lattice:
                 f.write(' '.join(map(str, i)) + '\n')
 
-        try:
-            process = multiprocessing.Process(target=self.run_multiparticle,
-                                              args=(self.project_path, 'OutputFile/error_middle'))
-
-            process.start()  # 启动子进程
-            process.join()  # 等待子进程运行结束
-
-        except Exception as e:
-            # 处理异常，如果需要
-            print(f"An error occurred: {str(e)}")
-
-        finally:
-            # 无论是否发生异常都会执行这里的代码
-            if process.is_alive():
-                process.terminate()  # 终止子进程
+        # try:
+        #     process = multiprocessing.Process(target=self.run_multiparticle,
+        #                                       args=(self.project_path, 'OutputFile/error_middle'))
+        #
+        #     process.start()  # 启动子进程
+        #     process.join()  # 等待子进程运行结束
+        #
+        # except Exception as e:
+        #     # 处理异常，如果需要
+        #     print(f"An error occurred: {str(e)}")
+        #
+        # finally:
+        #     # 无论是否发生异常都会执行这里的代码
+        #     if process.is_alive():
+        #         process.terminate()  # 终止子进程
+        self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
@@ -1861,6 +1820,7 @@ class Errorstatdyn(Errorstat):
 
             for i in range(1, self.all_group+1):
                 for j in range(1, self.all_time+1):
+                    print(i, j)
                     error_lattice_index = self.generate_lattice_mulp_list(i)
                     self.all_error_lattice.append(error_lattice_index)
                     self.run_stat_dyn_one_time([], i, j, error_lattice_index, [], [], False)
@@ -1913,7 +1873,7 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r"C:\Users\shliu\Desktop\testPPT\testerror",
+    obj = Errorstatdyn(r"C:\Users\shliu\Desktop\test_yiman3\AVAS2",
                     50, 1)
 
     obj.run()

@@ -7,7 +7,7 @@ from utils.iniconfig import IniConfig
 from utils.inputconfig import InputConfig
 def get_mass_freq(project_path):
     beam_txt = project_path + r'/InputFile/beam.txt'
-    res = read_txt(beam_txt)
+    res = read_txt(beam_txt, case_sensitive=True)
     if res.get('readparticledistribution') is None:
         BaseMassInMeV = float(res.get('particlerestmass'))
         freq = float(res.get('frequency'))

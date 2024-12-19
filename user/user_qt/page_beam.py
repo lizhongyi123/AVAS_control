@@ -560,12 +560,12 @@ class PageBeam(QWidget):
         dst_path = os.path.join(self.project_path, "InputFile", self.text_particle_input_file.text())
 
 
-
-        dst_res = cal_beam_parameter(dst_path)
+        item = {"dstPath": dst_path}
+        dst_res = cal_beam_parameter(item)
         if dst_res["code"] == -1:
             raise Exception(dst_res["data"]["msg"])
 
-        dst_res = dst_res['data']['beam_params']
+        dst_res = dst_res['data']['beamParams']
 
         # print(dst_res)
         self.text_mass.setText(str(dst_res.get('particlerestmass')))

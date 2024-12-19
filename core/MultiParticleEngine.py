@@ -1,7 +1,7 @@
 import ctypes
 import sys
 import os
-from ctypes import POINTER,c_char_p,cdll
+from ctypes import POINTER, c_char_p, cdll
 import platform
 
 class MultiParticleEngine():
@@ -27,12 +27,15 @@ class MultiParticleEngine():
 
     def get_path(self, inputfilepath, outputfilePath):
 
-        inputfilepath = ctypes.c_wchar_p(inputfilepath)
-        outputfilePath = ctypes.c_wchar_p(outputfilePath)
+
 
         if platform.system() == 'Windows':
+            inputfilepath = ctypes.c_wchar_p(inputfilepath)
+            outputfilePath = ctypes.c_wchar_p(outputfilePath)
             res = self.library.path(inputfilepath, outputfilePath)
         elif platform.system() == "Linux":
+            inputfilepath = ctypes.c_char_p(inputfilepath.encode('utf-8'))  # 转为字节并包装为 c_char_p
+            outputfilePath = ctypes.c_char_p(outputfilePath.encode('utf-8'))
             res = self.AVAS_cdll.path(inputfilepath, outputfilePath)
         return res
 

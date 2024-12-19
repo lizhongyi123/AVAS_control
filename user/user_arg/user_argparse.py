@@ -2,14 +2,9 @@
 import os
 import sys
 
-script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
 
-parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
 
-parent_directory = os.path.dirname(parent_directory)  # 获取上级目录的路径
-sys.path.append(parent_directory)
-
-from api import AVAS_simulation, plot_dataset, plot_cavity_voltage, plot_phase, change_particle_number,\
+from api import  plot_dataset, plot_cavity_voltage, plot_phase, change_particle_number,\
                 plot_phase_advance, plot_cavity_syn_phase
 
 def main_argparse():

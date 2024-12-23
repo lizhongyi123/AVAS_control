@@ -1873,7 +1873,7 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = Errorstatdyn(r"C:\Users\shliu\Desktop\test_yiman3\AVAS2",
+    obj = ErrorDyn(r"C:\Users\shliu\Desktop\test_avas_qt\avaserr2",
                     50, 1)
 
     obj.run()

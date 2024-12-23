@@ -8,13 +8,13 @@ def cal_beam_parameter(item):
     dst_path = item["dstPath"]
     kwargs = {}
 
+    beam_parameter = {}
     try:
-        beam_parameter = {}
         if os.path.exists(dst_path):
             dst_res = read_dst_fast(dst_path)
             beam_parameter['particlerestmass'] = dst_res['basemassinmev']
             beam_parameter['current'] = dst_res['ib']
-            beam_parameter['particlebumber'] = dst_res['number']
+            beam_parameter['particlenumber'] = dst_res['number']
             beam_parameter['frequency'] = dst_res['freq']
             beam_parameter['kneticenergy'] = dst_res['kneticenergy']
 
@@ -37,6 +37,10 @@ def cal_beam_parameter(item):
             beam_parameter['beta_z'] = beta_zz1
             beam_parameter['emit_z'] = epsi_zz1
 
+            beam_parameter["readparticledistribution"] = ""
+            beam_parameter["distribution_x"] = ""
+            beam_parameter["distribution_y"] = ""
+            beam_parameter["numofcharge"] = ""
     except Exception as e:
         code = -1
         msg = str(e)
@@ -44,11 +48,7 @@ def cal_beam_parameter(item):
         output = format_output(code, msg=msg, **kwargs)
         return output
 
-    beam_parameter["readparticledistribution"] = ""
-    beam_parameter["distribution_x"] = ""
-    beam_parameter["distribution_y"] = ""
     kwargs.update({'beamParams': copy.deepcopy(beam_parameter)})
-
     output = format_output(**kwargs)
     return output
 

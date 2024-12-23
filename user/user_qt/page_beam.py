@@ -570,7 +570,7 @@ class PageBeam(QWidget):
         # print(dst_res)
         self.text_mass.setText(str(dst_res.get('particlerestmass')))
         self.text_current.setText(str(dst_res.get('current')))
-        self.text_particel_number.setText(str(dst_res.get('particlebumber')))
+        self.text_particel_number.setText(str(dst_res.get('particlenumber')))
         self.text_frequency.setText(str(dst_res.get('frequency')))
 
 

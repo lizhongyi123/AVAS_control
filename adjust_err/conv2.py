@@ -150,11 +150,11 @@ def tran_tracewin_avas(tracewin_list):
             avas_list.append(tmp)
 
         elif stat[0].lower() == 'FIELD_MAP'.lower():
-            if stat[1] == "70":
-                tmp = ["field", float(stat[2])/1000, float(stat[4])/1000,0,3,0,0,1, stat[5], stat[9]]
+            if int(stat[1]) == 70:
+                tmp = ["field", float(stat[2])/1000, float(stat[4])/1000, 0,3,0,0,1, stat[5], stat[9]]
 
-            elif stat[1] == "7700":
-                tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 1, freq, stat[3], stat[6],stat[5], stat[9]]
+            elif int(stat[1]) == 7700:
+                tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 1, freq, stat[3], stat[6], stat[5], stat[9]]
 
             avas_list.append(tmp)
 
@@ -208,8 +208,8 @@ def tran_tracewin_avas(tracewin_list):
             pass
 
         else:
-            # print(101, stat)
-            pass
+            print(101, stat)
+            # pass
 
     #删掉repeat_ele后面的空格
 
@@ -464,17 +464,17 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path =r"C:\Users\shliu\Desktop\test_yiman\test3\end to end-design.dat"
+    tracewin_lattiace_path =r"C:\Users\shliu\Desktop\tr\full_sc_template.dat"
     # in_put = "test.txt"
-    avas_lattice_path =r'lattice2.txt'
+    avas_lattice_path =r'"C:\Users\shliu\Desktop\tr\latticae_mulp.txt"'
     adjust_file = r"C:\Users\shliu\Desktop\test_yiman\test3\result\Adjusted_Values.txt_0"
     # error_file = r"E:\AVAS_CONTROL\相关程序\lattice转换\adjust_err\Error_Datas.txt_3"
     #修改后的lattice
-    adjust_tracewin_lattice = import_adjust(tracewin_lattiace_path, adjust_file)
+    # adjust_tracewin_lattice = import_adjust(tracewin_lattiace_path, adjust_file)
 
 
     #将lattice转换成avas
-    # avas_lattice = tran_tracewin_avas(adjust_tracewin_lattice)
+    avas_lattice = tran_tracewin_avas(adjust_tracewin_lattice)
     #
-    new_avaslattice = add_err(avas_lattice, error_file)
-    # write_to_avas_lattice(new_avaslattice, avas_lattice_path)
+    # new_avaslattice = add_err(avas_lattice, error_file)
+    # # write_to_avas_lattice(new_avaslattice, avas_lattice_path)

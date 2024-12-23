@@ -77,15 +77,15 @@ def write_trace_to_avas1(tracewin_lattiace_path, avas_lattice_path):
 if __name__ == '__main__':
     project_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1"
     # project_path = r"C:\Users\shliu\Desktop\chaodao"
-    tracewin_lattiace_path = os.path.join(project_path, "InputFile", "end to end-design.dat")
-    avas_lattice_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
+    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\新建文件夹 (2)\MEBT_template.dat"
+    avas_lattice_path = r"C:\Users\shliu\Desktop\新建文件夹 (2)\latticae_mulp.txt"
 
 
     write_trace_to_avas1(tracewin_lattiace_path, avas_lattice_path)
 
-    obj = NewError(project_path, 1, True)
-
-    obj.run()
+    # obj = NewError(project_path, 1, True)
+    #
+    # obj.run()
 
     # project_path = r"C:\Users\shliu\Desktop\field_ciads"
     #

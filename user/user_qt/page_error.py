@@ -134,9 +134,18 @@ class PageError(QWidget):
         ##############################################
         group_box_output = QGroupBox("")
         layout1 = QVBoxLayout()
+
+        layout10 = QHBoxLayout()
+        self.button_select_error_par = QPushButton(QApplication.style().standardIcon(32),"")
+        self.button_select_error_par.clicked.connect(self.select_error_par)
+        self.text_error_par  = MyQLineEdit(" ")
+
+        layout10.addWidget(self.button_select_error_par)
+        layout10.addWidget(self.text_error_par)
+
+
+
         layout11 = QHBoxLayout()
-
-
         self.button_emit_loss = QPushButton("Emit growth && Loss")
         self.button_emit_loss.clicked.connect(self.plot_error_emit_loss_this)
 
@@ -179,6 +188,7 @@ class PageError(QWidget):
         layout12.addWidget(self.button_output_rmsx1y1)
         layout12.addWidget(self.button_output_energy_change)
 
+        layout1.addLayout(layout10)
         layout1.addLayout(layout11)
         layout1.addLayout(layout12)
 
@@ -367,7 +377,7 @@ class PageError(QWidget):
     def fill_parameter(self):
         item = {"projectPath": self.project_path}
         ini_dict = self.ini_obj.create_from_file(item)
-
+        print(380, ini_dict)
         if ini_dict['code'] == -1:
             raise Exception(ini_dict['data']['msg'])
 
@@ -395,6 +405,17 @@ class PageError(QWidget):
 
         dic["seed"] = int(self.text_seed.text())
         return dic
+    def select_error_par(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        default_directory = os.path.join(self.project_path, "OutputFile")
+        error_par_path, _ = QFileDialog.getOpenFileName(self, "Select dst File", directory=default_directory,
+                                                       options=options)
+
+        if error_par_path:
+            self.text_error_par.setText(error_par_path)
+
+
 
 
 if __name__ == '__main__':
@@ -403,7 +424,7 @@ if __name__ == '__main__':
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()
-    main_window.updatePath(r'C:\Users\shliu\Desktop\test_new_avas\test913')
+    main_window.updatePath(r'C:\Users\shliu\Desktop\test_avas_qt\avaserr2')
     sys.exit(app.exec_())
 
 

@@ -307,12 +307,13 @@ def judge_opti(res):
 
 if __name__ == '__main__':
     for i in range(2):
-        project_path = r'C:\Users\anxin\Desktop\test_mulp'
-
-        process = multiprocessing.Process(target=basic_mulp,
-                                          args=(project_path, ))
-
-        process.start()  # 启动子进程
-        process.join()  # 等待子进程运行结束
-        print(i)
+        project_path = r"C:\Users\shliu\Desktop\xinjian\ca4"
+        basic_mulp(project_path)
+        #
+        # process = multiprocessing.Process(target=basic_mulp,
+        #                                   args=(project_path, ))
+        #
+        # process.start()  # 启动子进程
+        # process.join()  # 等待子进程运行结束
+        # print(i)
 

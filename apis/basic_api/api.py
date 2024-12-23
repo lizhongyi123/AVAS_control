@@ -149,19 +149,7 @@ def plot_acc(project_path, kind):
     obj = PlotAcc(project_path)
     res = obj.run(kind)
     return res
-# #扫描
-# def AVAS_scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place):
-#     AVAS_scan = Scan(projectpath, scan_parameter, scan_start, scan_end, scan_step, scan_parameter_place)
-#     AVAS_scan_res = Scan.scan()
-#     return avas_scan_res
-#
-# #误差分析
-# def avas_error_analysis(error, dllpath, projectpath):
-#     error_analysis = ErrorAnalysis(error, dllpath, projectpath)
-#     error_analysis_res = error_analysis.run()
-#     return error_analysis_res
 
-########################################################################################################################
 
 #下列为画图函数
 
@@ -227,20 +215,7 @@ def plot_phase_advance(project_path, out_type, show_=1, fig = None):
     res = v.run(show_, fig)
     return res
 
-# def plot_error(project_path, picture_name, picture_type, show_=1):
-#     """
-#
-#     :param project_path:
-#     :param picture_name:
-#     :param picture_type:
-#     :param show_:
-#     :return:
-#     误差图
-#     """
-#     v = PlotError(project_path)
-#     v.get_x_y(picture_name, picture_type)
-#     res = v.run(show_)
-#     return res
+
 
 def plot_error_out(project_path, picture_type, show_=1, fig = None):
     """

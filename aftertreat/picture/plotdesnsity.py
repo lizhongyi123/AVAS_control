@@ -207,7 +207,7 @@ class PlotDensityProcess(PicturePlot_2D):
         self.x = data["zg_lis"]
         emit = data["emit_lis"]
         if picture_name == 'emit_x':
-            self.y = [i[0] *10**6  for i in emit]
+            self.y = [i[0] *10**6 for i in emit]
 
             self.xlabel = "z(m)"
             self.ylabel = "Average Emit_x(pi*mm*mrad)"

@@ -179,7 +179,11 @@ class BeamConfig():
         output = format_output(**kwargs)
         return output
 
-    def set_param(self, **kwargs):
+    def \
+            set_param(self, **kwargs):
+        for k, v in kwargs.items():
+            if v == '':
+                kwargs[k] = None
         kwargs1 = {}
         try:
             self.validate_type(kwargs)
@@ -259,12 +263,12 @@ class BeamConfig():
 if __name__ == "__main__":
     beam_path = r"C:\Users\shliu\Desktop\test1113\test1\InputFile\beam.txt"
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\test1113\test1"
+        "projectPath": r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
-    print(1, res)
+    # print(1, res)
     # obj.validate_run(path)
-    res = obj.set_param(distribution_x="wb", distribution_y="WB")
+    res = obj.set_param(distribution_x='')
     print(res)

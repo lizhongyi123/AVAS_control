@@ -63,6 +63,10 @@ class IniConfig():
 
         :param kwargs: 字典格式的键值对，用于更新 INI 文件
         """
+        for k, v in kwargs.items():
+            if v == '':
+                kwargs[k] = None
+
         kwargs1 = {}
         try:
             for section, values in kwargs.items():

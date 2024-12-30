@@ -60,6 +60,9 @@ def get_inputfile_path(item):
     output = format_output(**kwargs)
     return output
 
+#得到模拟进度
+
+
 if __name__ == '__main__':
     dst_path = "E:\project\MEBT\RFQ_55_73_59_proton.dst"
     item = {"dstPath": dst_path}

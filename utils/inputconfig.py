@@ -82,9 +82,12 @@ class InputConfig():
         return output
 
     def set_param(self, **kwargs):
+        for k, v in kwargs.items():
+            if v == '':
+                kwargs[k] = None
         kwargs1 = {}
         try:
-            # self.validate_type(kwargs)
+            self.validate_type(kwargs)
             for k, v in kwargs.items():
                 self.input_parameter[k] = v
 

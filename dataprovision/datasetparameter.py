@@ -76,6 +76,10 @@ class DatasetParameter():
         self.x_1 = [self.px[i] / self.pz[i] for i in range(len(self.pz))]  # rad
         self.y_1 = [self.py[i] / self.pz[i] for i in range(len(self.pz))]
 
+        self.alpha_x = [i[7] for i in dataset_info]
+        self.alpha_y = [i[8] for i in dataset_info]
+        self.alpha_z = [i[9] for i in dataset_info]
+
         self.beta_x = [i[10] for i in dataset_info]  ##  mm/π.mrad
         self.beta_y = [i[11] for i in dataset_info]
         self.beta_z = [i[12] for i in dataset_info]

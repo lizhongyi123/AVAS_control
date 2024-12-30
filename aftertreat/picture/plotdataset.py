@@ -12,19 +12,20 @@ class PlotDataSet(PicturePlot_2D):
     """
     dataset文件的可视化
     """
-    def __init__(self, project_path, picture_name):
+    def __init__(self, project_path, picture_name, dataset_path=None):
         super().__init__()
         self.picture_name = picture_name
         self.BaseMassInMeV = 0
         self.freq = 0
 
         self.project_path = project_path
-        self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
-        self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
-        self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
-        self.dataset_path = os.path.join(self.project_path, "OutputFile", "Dataset.txt" )
-
+        # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
+        # self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
+        # self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
+        # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
+        # self.dataset_path = os.path.join(self.project_path, "OutputFile", "Dataset.txt" )
+        if dataset_path:
+            self.dataset_path = dataset_path
 
 
     def get_mass_freq(self):
@@ -44,7 +45,8 @@ class PlotDataSet(PicturePlot_2D):
 
         dataset_obj = DatasetParameter(self.dataset_path, self.project_path)
         dataset_obj.get_parameter()
-        end_index = dataset_obj.get_lattice_end_index() + 1
+        # end_index = dataset_obj.get_lattice_end_index() + 1
+        end_index = -1
         z = dataset_obj.z[:end_index]  # 束团纵向位置
 
         ek = dataset_obj.ek[:end_index]  # 束团平均能量
@@ -68,41 +70,43 @@ class PlotDataSet(PicturePlot_2D):
         max_yy = [i *10**3 for i in dataset_obj.max_yy][:end_index]
 
 
+        alpha_x = dataset_obj.alpha_x[:end_index]
+        alpha_y = dataset_obj.alpha_y[:end_index]
+        alpha_z = dataset_obj.alpha_z[:end_index]
 
         beta_x = dataset_obj.beta_x[:end_index]
         beta_y = dataset_obj.beta_y[:end_index]
         beta_z = dataset_obj.beta_z[:end_index]
 
         loss = dataset_obj.loss[:end_index]
-        phi = dataset_obj.phi[:end_index]
-        phi_phi = dataset_obj.phi_phi[:end_index]
-        BaseMassInMeV = dataset_obj.BaseMassInMeV
-        freq = dataset_obj.freq
-
-        # for i in range(len(dataset_obj.ek)):
-        #     gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
-        #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-        #     v = dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360
-        #     # rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
-        #     # rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360))
-        #     rms_z.append(v)
-        #     rms_zz.append(-1 * v)
+        # phi = dataset_obj.phi[:end_index]
+        # phi_phi = dataset_obj.phi_phi[:end_index]
+        # BaseMassInMeV = dataset_obj.BaseMassInMeV
+        # freq = dataset_obj.freq
         #
-        # for i in range(len(data)):
-        #     gammaaaa = data[i][0] / BaseMassInMeV + 1
-        #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
-        #     rms_z.append(data[i][20] / (beta[-1] * C_light) * freq * 360)
-        #     rms_zz.append(-1 * (data[i][20] / (beta[-1] * C_light) * 162.5e6 * 360))
+        # # for i in range(len(dataset_obj.ek)):
+        # #     gammaaaa = dataset_obj.ek[i] / BaseMassInMeV + 1
+        # #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+        # #     v = dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360
+        # #     # rms_z.append(dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360)
+        # #     # rms_zz.append(-1 * (dataset_obj.rms_z[i] / (beta[-1] * C_light) * freq * 360))
+        # #     rms_z.append(v)
+        # #     rms_zz.append(-1 * v)
+        # #
+        # # for i in range(len(data)):
+        # #     gammaaaa = data[i][0] / BaseMassInMeV + 1
+        # #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
+        # #     rms_z.append(data[i][20] / (beta[-1] * C_light) * freq * 360)
+        # #     rms_zz.append(-1 * (data[i][20] / (beta[-1] * C_light) * 162.5e6 * 360))
 
 
 
         if self.picture_name == 'loss':
             self.x = z
             self.y = loss
-
             self.xlabel = "z(m)"
             self.ylabel = "loss"
-            self.ylim = [-max(loss)-1, max(loss) + 1]
+            self.ylim = [-max(loss)-100, max(loss) + 100]
 
 
         elif self.picture_name == 'emittance_x':
@@ -197,13 +201,13 @@ class PlotDataSet(PicturePlot_2D):
             self.set_legend = 1
 
 
-        elif self.picture_name == 'phi':
-            self.x = z
-            self.y = phi
-
-            self.xlabel = "z(m)"
-            v_freq = freq/(10**6)
-            self.ylabel = f"P(deg)({v_freq}MHz)"
+        # elif self.picture_name == 'phi':
+        #     self.x = z
+        #     self.y = phi
+        #
+        #     self.xlabel = "z(m)"
+        #     v_freq = freq/(10**6)
+        #     self.ylabel = f"P(deg)({v_freq}MHz)"
 
 
 
@@ -213,6 +217,13 @@ class PlotDataSet(PicturePlot_2D):
 
             self.xlabel = "z(m)"
             self.ylabel = "Ek(MeV)"
+
+        elif self.picture_name == 'alpha_x':
+            self.x = z
+            self.y = alpha_x
+
+            self.xlabel = "z(m)"
+            self.ylabel = r"$\alpha_{x}$"
 
         elif self.picture_name == 'beta_x':
             self.x = z
@@ -303,7 +314,13 @@ class PlotDataSet(PicturePlot_2D):
 
 if __name__ == "__main__":
     project_path = r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads"
-    a = PlotDataSet(project_path,  'rms_xy')
+    dataset_path = r"C:\Users\shliu\Desktop\hu\av_mebt\OutputFile\DataSet.txt"
+    a = PlotDataSet(project_path=None,  picture_name = 'loss', dataset_path=dataset_path)
+    a.get_x_y()
+    # a.need_element(aper=1)
+    a.run(show_=1)
+
+    a = PlotDataSet(project_path=None,  picture_name = 'alpha_x', dataset_path=dataset_path)
     a.get_x_y()
     # a.need_element(aper=1)
     a.run(show_=1)

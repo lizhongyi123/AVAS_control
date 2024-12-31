@@ -3,6 +3,7 @@ from utils.readfile import read_dst_fast
 import os
 import copy
 from utils.tool import format_output
+from utils.treat_directory import list_files_in_directory
 
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
@@ -60,16 +61,51 @@ def get_inputfile_path(item):
     output = format_output(**kwargs)
     return output
 
-#得到模拟进度
+
+#鑾峰彇涓婁紶浣嶇疆
+def get_upload_path(item):
+    #item = {"projectPath": "fdasf", fileType, " "}
+    kwargs = {}
+    projectPath = item["projectPath"]
+    fileType = item["fileType"]
+    if fileType == "dst":
+        upload_path = os.path.join(projectPath, "InputFile")
+    elif fileType == "field":
+        upload_path = os.path.join(projectPath, "InputFile", "field")
+    kwargs.update({'uploadPath': upload_path})
+    output = format_output(**kwargs)
+    return output
+
+#寰楀埌妯℃嫙杩涘害
+
+def get_fieldname(item):
+    kwargs = {}
+    fieldpath = item["fieldPath"]
+    all_files = list_files_in_directory(fieldpath)
+    suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
+                   "bsx", "bsy", "bsz"
+                   ]
+    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+    v = [i.split("\\")[-1] for i in all_files]
+    v= [i.split(".")[0] for i in v]
+    field_name = list(set(v))
+    kwargs.update({'fieldName': field_name})
+    output = format_output(**kwargs)
+    return output
+
 
 
 if __name__ == '__main__':
-    dst_path = "E:\project\MEBT\RFQ_55_73_59_proton.dst"
-    item = {"dstPath": dst_path}
-    beam_parameter = cal_beam_parameter(item)
-    print(beam_parameter)
+    # item = {"fieldPath": r"C:\Users\shliu\Desktop\field"}
+    # res = get_fieldname(item)
+    # print(res)
 
-    path = r"C:\Users\shliu\Desktop\field_ciads"
-    item = {"projectPath": path}
-    res = get_inputpath(item)
+    # dst_path = "E:\project\MEBT\RFQ_55_73_59_proton.dst"
+    # item = {"dstPath": dst_path}
+    # beam_parameter = cal_beam_parameter(item)
+    # print(beam_parameter)
+    #
+    path = r"C:\Users\shliu\Desktop\p1\P1"
+    item = {"projectPath": path, "fileType": "dst"}
+    res = get_upload_path(item)
     print(res)

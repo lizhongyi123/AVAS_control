@@ -150,7 +150,9 @@ class CreateBasicProject():
 
         os.makedirs(input_file)
         os.makedirs(output_file)
-
+        if self.platform == "web":
+            field_path = os.path.join(self.project_path, 'InputFile', "field")
+            os.makedirs(field_path)
 
         obj.create_basic_beam_file()
         obj.create_basic_input_file()
@@ -166,30 +168,27 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test1213\test1"
-    # CreatBasicFile(project_path).create_basic_beam_file()
-    # CreatBasicFile(project_path).create_basic_input_file()
-    # CreatBasicFile(project_path).create_basic_lattice_mulp_file()
-    # CreatBasicFile(project_path).create_basic_ini_file()
+    project_path = r"C:\Users\shliu\Desktop\p1\P1"
+
 
 
     item = {
         "projectPath": project_path,
 
-        "beam_keys": ['readparticledistribution', 'numofcharge', 'particlerestmass',
+        "beamKeys": ['readparticledistribution', 'numofcharge', 'particlerestmass',
                                     'current', 'particlenumber', 'frequency',
                                     'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
                                     "alpha_y", "beta_y", "emit_y",
                                     "alpha_z", "beta_z", "emit_z",
-                                    'distribution_x', 'aaa'],
+                                    'distribution_x', 'distribution_y'],
         # 'distribution_y', 'aaa'
 
 
-        "input_keys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
-                       "dumpperiodicity", "maxthreads", "spacechargelong", "bbb"]
+        "inputKeys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
+                       "dumpperiodicity", "spacechargelong",'spacechargetype' ]
         #"spacechargetype", 'bbb'
     }
-    platform = "qt"
+    platform = "web"
     obj = CreateBasicProject(item, platform)
     res = obj.create_project()
     print(res)

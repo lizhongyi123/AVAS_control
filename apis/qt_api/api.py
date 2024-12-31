@@ -93,6 +93,19 @@ def get_fieldname(item):
     output = format_output(**kwargs)
     return output
 
+def get_fieldfile(item):
+    kwargs = {}
+    fieldpath = item["fieldPath"]
+    all_files = list_files_in_directory(fieldpath)
+    suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
+                   "bsx", "bsy", "bsz"
+                   ]
+    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+    v = [i.split("\\")[-1] for i in all_files]
+    kwargs.update({'fieldFile': v})
+    output = format_output(**kwargs)
+    return output
+
 
 
 if __name__ == '__main__':
@@ -105,7 +118,7 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"C:\Users\shliu\Desktop\p1\P1"
-    item = {"projectPath": path, "fileType": "dst"}
-    res = get_upload_path(item)
+    path = r"C:\Users\shliu\Desktop\field"
+    item = {"fieldPath": path}
+    res = get_fieldfile(item)
     print(res)

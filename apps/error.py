@@ -85,8 +85,8 @@ class Error():
 
 
         self.decimal = 5  # 小数点保留多少位
-
         self.result_queue = multiprocessing.Queue()
+
         if os.path.exists(self.error_middle_path):
             delete_directory(self.error_middle_path)
         os.makedirs(self.error_middle_path)
@@ -557,7 +557,6 @@ class Error():
 
 
     def run_normal(self):
-        os.makedirs(self.normal_out_path)
         #模拟没有误差的情况
         write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
 
@@ -1873,28 +1872,13 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    obj = ErrorDyn(r"C:\Users\shliu\Desktop\test_avas_qt\avaserr2",
-                    50, 1)
+    for i in range(10):
+        print(f"{i}"*50)
+        file = r"E:\using\test_avas_qt\fileld_ciads\OutputFile"
+        delete_directory(file)
+        os.mkdir(file)
+        obj = ErrorDyn(r"E:\using\test_avas_qt\fileld_ciads",
+                        0, 1)
 
-    obj.run()
+        obj.run()
 
-
-    # obj.treat_diag()
-    # a = [1, 2]
-    # b = [[8], [7, 8]]
-    # c = [10, 11, 12]
-    # obj.write_adjust_datas(1, 1, a, b, c)
-
-
-    # obj = Errorstat(r'C:\Users\anxin\Desktop\test_err_stat')
-    # obj.run()
-
-    # obj = OnlyAdjust(r'C:\Users\anxin\Desktop\only_adjust')
-    # obj.run()
-
-    # obj = Errorstatdyn(r'C:\Users\anxin\Desktop\test_err_stat_dyn')
-    # obj.run_stat_dyn()
-    # obj = Error(r"C:\Users\anxin\Desktop\test_err_dyn")
-    # obj.get_normal_data()
-    # obj.get_group_time()
-    # obj.write_err_par_every_time(1, 1)

@@ -168,7 +168,6 @@ class PicturePlot_2D():
                     ax1.gca().add_patch(shape)
 
         ax1.grid()
-
         if show_:
             plt.show()
             return None

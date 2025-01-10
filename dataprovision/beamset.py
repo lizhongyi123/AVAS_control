@@ -134,6 +134,7 @@ class BeamsetParameter():
 
                 # print([i for i in self.one_step_list if i[-1] == 2])
                 break
+
         return self.one_step_dict, self.one_step_list
 
 
@@ -147,23 +148,23 @@ class BeamsetParameter():
 
             tdata = struct.unpack("<i", f.read(4))
             self.dumpPeriodicity = int(tdata[0])
-            print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
+            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
 
             tdata = struct.unpack("<i", f.read(4))
             self.numofp = int(tdata[0])
-            print("粒子数为：{aa}".format(aa=self.numofp))
+            # print("粒子数为：{aa}".format(aa=self.numofp))
 
             tdata = struct.unpack("<d", f.read(8))
             self.Ib = float(tdata[0])
-            print("流强为：{aa}mA".format(aa=self.Ib))
+            # print("流强为：{aa}mA".format(aa=self.Ib))
 
             tdata = struct.unpack("<d", f.read(8))
             self.freq = float(tdata[0])
-            print("频率为：{aa}MHz".format(aa=self.freq))
+            # print("频率为：{aa}MHz".format(aa=self.freq))
 
             tdata = struct.unpack("<d", f.read(8))
             self.BaseMassInMeV = float(tdata[0])
-            print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
 
             self.allstep_list = []
             self.allstep_dict = []
@@ -191,7 +192,7 @@ class BeamsetParameter():
 
                     Index = struct.unpack("<i", f.read(4))
                     every_step_dict["Index"] = int(Index[0])
-                    print(Index)
+                    print(int(Index[0]))
 
                     time = struct.unpack("<d", f.read(8))
                     every_step_dict["time"] = float(time[0])
@@ -216,12 +217,15 @@ class BeamsetParameter():
 if __name__ == "__main__":
     import os
     import numpy as np
-    beamset_pasth = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\BeamSet.plt"
+    beamset_pasth = r"E:\using\test_avas_qt\fileld_ciads2\OutputFile\BeamSet.plt"
     obj = BeamsetParameter(beamset_pasth)
-    all_step = obj.get_step()
-    print(all_step)
+    # all_step = obj.get_parameter()
+    # print(obj.allstep_dict)
     # for i in range(all_step):
     #     print(i)
     #     obj.get_one_parameter(i)
-    obj.get_parameter()
-
+    # obj.get_parameter()
+    all = obj.get_step()
+    print(all)
+    v1, v2 = obj.get_one_parameter(0)
+    print(v1)

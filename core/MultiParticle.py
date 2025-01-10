@@ -20,28 +20,19 @@ class MultiParticle():
         outputfilePath = os.path.join(self.project_path, output_file)
 
         self.multiparticle_engine = MultiParticleEngine()
-        self.runsignal = os.path.join(outputfilePath, 'runsignal.txt')
+
 
         res_tmp = self.multiparticle_engine.get_path(inputfilepath, outputfilePath)
 
-        # try:
-        #     res = self.multiparticle_engine.main_agent(1)
-        # except:
-        #     raise Exception("底层代码发生错误")
+
 
         res = self.multiparticle_engine.main_agent(1)
         if res == 1:
             raise Exception('非正常结束')
 
-        # with open(self.runsignal, 'w') as f:
-        #     f.write('2')
 
         return res
-    # def __init__(self, project_path):  # *arg **kwargs #dllpath写死
-    #     self.project_path = project_path
-    #     self.return_value = -1
-    #     self.stop_flag = False
-    #     self.process = None
+
 
 
     # def delete_file(self, outputfilePath):

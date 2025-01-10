@@ -190,5 +190,5 @@ class PlotPhase():
             return None
 
 if __name__ == "__main__":
-    a = PlotPhase(r"C:\Users\shliu\Desktop\EA_cafe_lattice\gui_test\result\part_rfq.dst")
+    a = PlotPhase(r"E:\E\空间电荷效应\shutuan81\不同磁场测试\0.2\outData_0.000000.dst")
     a.run(1)

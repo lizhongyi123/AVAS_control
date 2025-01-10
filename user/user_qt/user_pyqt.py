@@ -38,7 +38,7 @@ from core.MultiParticle import MultiParticle
 
 
 
-class RunThread(QThread):
+class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
 
     def __init__(self, project_path):
@@ -75,7 +75,7 @@ class MainWindow(QMainWindow):
         self.match_signal = None
         self.error_signal = None
 
-        self.thread = None
+        self.sim_thread = None
         self.settings = QSettings('IMP', 'AVAS')
 
         self.initUI()
@@ -271,6 +271,8 @@ class MainWindow(QMainWindow):
         self.show()
         self.initialize_page()
 
+        self.timer1 = QTimer()
+        self.timer1.timeout.connect(self.activate_output)
 
 
     # @treat_err
@@ -384,6 +386,7 @@ class MainWindow(QMainWindow):
     def on_task_finished(self):
         print("Task finished.")
 
+
     def run(self):
         self.stop()
         # res = self.inspect()
@@ -391,67 +394,36 @@ class MainWindow(QMainWindow):
         #     return None
         self.save_project()
 
-        self.thread = RunThread(self.project_path)
-        self.thread.finished.connect(self.on_task_finished)
-        self.thread.start()
+        self.sim_thread = SimThread(self.project_path)
+        self.sim_thread.finished.connect(self.on_task_finished)
+        self.sim_thread.start()
+        self.timer1.start(2000)
+
+    def activate_output(self, ):
+        print(403)
+        self.page_output.update_progress()  # @treat_err
+        if self.sim_thread:
+            pass
+        else:
+            self.timer1.stop()
+
+    def stop(self):
+
+        if self.sim_thread:
+            self.sim_thread.stop()
+            self.sim_thread.wait()  # 等待线程安全停止
+        self.on_task_finished()
+
+        self.timer1.stop()
+        print('结束进程')
 
     def on_task_finished(self):
         print("Task finished.")
+        self.sim_thread = None
 
 
-    # def run(self):
-    #         # delay_ms = 3000  # 延迟 2000 毫秒（即 2 秒）
-    #         # QTimer.singleShot(delay_ms, lambda: self.activate_output('basic_mulp'))
-    #         try:
-    #             self.page_data.fill_parameter()
-    #         except Exception as e:
-    #             print(e)
-    #
-    #
-    #     # self.refresh_lattice()
 
 
-    def activate_output(self, signal):
-
-        if signal == "basic_mulp":
-            self.runsignal = os.path.join(self.project_path, 'OutputFile', 'runsignal.txt')
-
-            with open(self.runsignal, 'w') as f:
-                f.write('1')
-            try:
-                # dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
-                dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt').replace('/', '\\')
-                # print(dataset_path)
-                send2trash(dataset_path)
-            except:
-                pass
-
-            try:
-                print(428)
-                self.page_output.update_progress()
-            except Exception as e:
-                print(e)
-
-
-    # @treat_err
-    def stop(self):
-        if self.thread:
-            self.thread.stop()
-            self.thread.wait()  # 等待线程安全停止
-        self.on_task_finished()
-        # if self.basci_mulp_process.is_alive():
-        #     self.basci_mulp_process.terminate()
-        #     self.basci_mulp_process.join()
-        #
-        # elif self.err_process.is_alive():
-        #     self.err_process.terminate()
-        #     self.err_process.join()
-        #
-        # elif self.match_process.is_alive():
-        #     self.match_process.terminate()
-        #     self.match_process.join()
-        self.page_output.stop_update_progress()
-        print('结束进程')
 
 #################################
 

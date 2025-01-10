@@ -314,14 +314,14 @@ class PlotDataSet(PicturePlot_2D):
 
 if __name__ == "__main__":
     project_path = r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads"
-    dataset_path = r"C:\Users\shliu\Desktop\hu\av_mebt\OutputFile\DataSet.txt"
-    a = PlotDataSet(project_path=None,  picture_name = 'loss', dataset_path=dataset_path)
+    dataset_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\DataSet.txt"
+    a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
     a.get_x_y()
     # a.need_element(aper=1)
     a.run(show_=1)
 
-    a = PlotDataSet(project_path=None,  picture_name = 'alpha_x', dataset_path=dataset_path)
-    a.get_x_y()
-    # a.need_element(aper=1)
-    a.run(show_=1)
-
+    # a = PlotDataSet(project_path=None,  picture_name = 'alpha_x', dataset_path=dataset_path)
+    # a.get_x_y()
+    # # a.need_element(aper=1)
+    # a.run(show_=1)
+    #

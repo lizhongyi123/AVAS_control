@@ -14,7 +14,7 @@ import time
 from multiprocessing import Pool, cpu_count
 from dataprovision.densityparameter import DensityParameter
 import matplotlib.pyplot as plt
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 class PlttoDensity():
     def __init__(self, pltpath, dataset_path, target_density_path, normal_density_path=None, project_path=None):
         self.project_path = project_path
@@ -28,13 +28,23 @@ class PlttoDensity():
         obj = BeamsetParameter(self.plt_path)
         all_step =obj.get_step()
         return all_step
+
     def read_beamset_onestep_worker(self, args):
-        dataset_obj, beamset_obj, index0, dataset_index_list = args
+        # print(args)
+        #index0 plt中的索引
+        dataset_obj, index0, dataset_index_list = args
+        beamset_obj = BeamsetParameter(self.plt_path)
 
         # 这里复制 read_beamset_onestep 的逻辑
         res = {}
         # 读取beasmset中的某一步，并返回结果
         one_dict, one_lis = beamset_obj.get_one_parameter(index0)
+        if len(one_dict) != 4:
+            print(index0, len(one_dict))
+        # if len(one_dict) == 0:
+        #     print(index0, one_dict)
+
+
         # 位置
         beamset_index = int(one_dict["index"])
 
@@ -115,38 +125,63 @@ class PlttoDensity():
         """
         dataset_obj = DatasetParameter(self.dataset_path)
         dataset_obj.get_parameter()
+
+        #dataset中所有的序号
         dataset_index_list = dataset_obj.dataset_index
 
         beamset_obj = BeamsetParameter(self.plt_path)
-        all_step = beamset_obj.get_step() - 1
+        all_step = beamset_obj.get_step()
 
         dumpPeriodicity = beamset_obj.dumpPeriodicity
+
         # print(all_step)
 
         # breakpoint()
         # 使用进程池并行处理每一步的数据
-        num_workers = cpu_count()  # 根据 CPU 核心数动态调整
+        num_workers = max(cpu_count() - 3, 1)  # 根据 CPU 核心数动态调整
+        # step_list = [i for i in range(0, all_step)]
+        v1 = [i for i in range(0, all_step, 20)]
+        v2 = [i for i in range(v1[-1] + 1, all_step)]
+        step_list = v1 + v2
         with Pool(num_workers) as pool:  # 使用上下文管理器
             # 准备每一步的参数
-            args = [(dataset_obj, beamset_obj, i, dataset_index_list) for i in range(all_step)]
+            args = [(dataset_obj, i, dataset_index_list) for i in step_list]
 
             # 使用进程池并行执行每一步数据处理
             results = pool.map(self.read_beamset_onestep_worker, args)
 
-        # 收集并整理结果
-        # self.dt1 =0
-        # self.dt2 =0
-        # self.dt3 =0
         # results = []
-        # for i in range(0, all_step):
-        #     args = (dataset_obj, beamset_obj, i, dataset_index_list)
+        # # 收集并整理结果
+        # for i in step_list:
+        #     args = (dataset_obj, i, dataset_index_list)
         #     results.append(self.read_beamset_onestep_worker(args))
-        # print(self.dt1)
-        # print(self.dt2)
-        # print(self.dt3)
-        # breakpoint()
-        # args = (dataset_obj, beamset_obj, 18036)
-        # results.append(self.read_beamset_onestep_worker(args))
+
+        # with ThreadPoolExecutor(max_workers=20) as executor:
+        #     # 准备每一步的参数
+        #     args = [(dataset_obj, i, dataset_index_list) for i in range(all_step)]
+        #
+        #     # 提交任务到线程池，将 Future 与步骤索引关联
+        #     future_to_step = {executor.submit(self.read_beamset_onestep_worker, arg): arg[1] for arg in args}
+        #
+        #     # 收集结果
+        #     results = []
+        #     for future in as_completed(future_to_step):
+        #         step_index = future_to_step[future]  # 获取任务的步骤索引
+        #         result = future.result()  # 获取任务结果
+        #         results.append((step_index, result))  # 将步骤索引与结果关联
+        #
+        #         # try:
+        #         #     result = future.result()  # 获取任务结果
+        #         #     results.append((step_index, result))  # 将步骤索引与结果关联
+        #         # except Exception as e:
+        #         #     print(f"Step {step_index} raised an exception: {e}")
+        #
+        # # 排序结果，确保按照步骤索引顺序返回
+        # results.sort(key=lambda x: x[0])
+        # results = [res[1] for res in results]  # 提取最终结果
+
+
+
         results = list(filter(bool, results))
 
         zg_lis = [res["zg"] for res in results]
@@ -446,11 +481,23 @@ class MergeDensityData(PlttoDensity):
         self.write_file(self.target_path, data)
 
 if __name__ == "__main__":
-    beamset_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\BeamSet.plt"
-    dataset_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\DataSet.txt"
-    target_density_path = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\error_middle\output_0\density_0_0.dat"
+    import time
+    t1 = time.time()
+    import multiprocessing
+    base = r"E:\using\test_avas_qt\fileld_ciads2\OutputFile2"
+
+    beamset_path = os.path.join(base, "BeamSet.plt")
+    dataset_path = os.path.join(base, "DataSet.txt")
+    target_density_path = os.path.join(base, "density_0_0.dat")
+
+    # normal_density_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_0_0.dat"
     obj = PlttoDensity(beamset_path, dataset_path, target_density_path)
     obj.generate_density_file_onestep(isnormal=1)
+    t2 = time.time()
+    print(t2-t1)
+
+
+
     #
     #
     # # beamset_path = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\BeamSet.plt"

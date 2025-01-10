@@ -256,17 +256,17 @@ if __name__ == "__main__":
     # path3 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_tot_par.dat"
 
     # path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\density_par_1_98.dat"
-    path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\save\density_par_0_0.dat"
-    # v = PlotDensity(path1)
-    # v.get_data('x')
-    # v.ylim = [-50, 50]
-    # v.run(show_=1, fig=None)
-
-
-    v = PlotDensityLevel(path1)
-    v.get_x_y(picture_type='r')
-    v.ylim = [0, 50]
+    path1 = r"E:\using\test_avas_qt\fileld_ciads\density_par_1_1.dat"
+    v = PlotDensity(path1)
+    v.get_data('x')
+    v.ylim = [-50, 50]
     v.run(show_=1, fig=None)
+
+
+    # v = PlotDensityLevel(path1)
+    # v.get_x_y(picture_type='r')
+    # v.ylim = [0, 50]
+    # v.run(show_=1, fig=None)
     # v = PlotDensityProcess(path1)
     # v.get_x_y('rms_xy')
     # v.run(show_=1, fig=None)

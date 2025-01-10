@@ -16,6 +16,7 @@ class SimMode():
         self.beam_path = os.path.join(self.project_path, "InputFile", "beam.txt")
         self.input_path = os.path.join(self.project_path, "InputFile", "input.txt")
         self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
+        self.runsignal = os.path.join(self.project_path, "OutputFile", 'runsignal.txt')
 
     def file_check(self):
         #检查input文件
@@ -56,6 +57,8 @@ class SimMode():
         if err_mode not in all_error_type:
             raise exce.ValueRangeError('error type', all_error_type, err_mode)
 
+        with open(self.runsignal, 'w') as f:
+            f.write('1')
 
         if base_mode == "mulp":
             if err_mode == "stat":
@@ -77,6 +80,9 @@ class SimMode():
             else:
                 basic_env(self.project_path)
 
+
+        with open(self.runsignal, 'w') as f:
+            f.write('2')
 
         output = format_output()
         return output

@@ -148,36 +148,7 @@ class LatticeParameter():
 
         self.total_length = self.v_start[-1] + self.v_len[-1]
 
-    def get_total_length(self):
-        lattice_info_ini = read_txt(self.lattice_path, out='list')
-        lattice_info_before_end = []
 
-        for i in lattice_info_ini:
-            if i[0] == 'end':
-                break
-            else:
-                lattice_info_before_end.append(i)
-
-        length_list = []
-        #use_commands = global_varible.long_element + ['superpose', 'superposeend'] + ['lattice', 'lattice_end'] + ['end']
-
-        in_suppose = 0
-
-        for i in range(len(lattice_info_ini)):
-            if in_suppose == 0:
-                if lattice_info_ini[i][0] in global_varible.long_element:
-                    length_list.append(float(lattice_info_ini[i][1]))
-                elif lattice_info_ini[i][0] == 'superpose':
-                    in_suppose = 1
-
-            elif in_suppose == 1:
-                if lattice_info_ini[i][0] == 'superposeend':
-                    suppose_length = float(lattice_info_ini[i-2][1]) + float(lattice_info_ini[i-1][1])
-                    length_list.append(suppose_length)
-                    in_suppose = 0
-
-        self.total_length = sum(length_list)
-        print(self.total_length)
 
 if __name__ == "__main__":
     lattice_path = r"C:\Users\shliu\Desktop\test_yiman\AVAS\InputFile\lattice.txt"

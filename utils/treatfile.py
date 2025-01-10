@@ -51,6 +51,9 @@ def check_file_update(file_path):
     else:
         #"文件不存在"
         return 2
+
+
+
 def delete_file(path):
     """
     删除一个文件夹

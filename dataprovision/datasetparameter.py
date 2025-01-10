@@ -19,7 +19,8 @@ class DatasetParameter():
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
-
+        if len(dataset_info) == 0:
+            return False
         index = 0
 
         nan_in = False
@@ -36,6 +37,11 @@ class DatasetParameter():
         self.num_of_particle = float(dataset_info[0][28])
 
         dataset_info = [[float(j) for j in i] for i in dataset_info]
+        if len(dataset_info[-1]) != 40:
+            print(4111111, dataset_info[-1])
+            print(4111111, dataset_info[-2])
+
+
         self.dataset_index = [int(i[-1]) for i in dataset_info]
 
         self.z = []
@@ -58,6 +64,7 @@ class DatasetParameter():
                 sign2 = 1
             else:
                 continue
+
 
         self.x = [i[1] + i[29] for i in dataset_info]  # m
         self.px = [i[2] for i in dataset_info]  # MeV

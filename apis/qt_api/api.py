@@ -106,7 +106,14 @@ def get_fieldfile(item):
     output = format_output(**kwargs)
     return output
 
-
+def get_allfile_relative_path(item):
+    kwargs = {}
+    fieldpath = item["filePath"]
+    all_files = list_files_in_directory(fieldpath)
+    v = [i.split("\\")[-1] for i in all_files]
+    kwargs.update({'allFile': v})
+    output = format_output(**kwargs)
+    return output
 
 if __name__ == '__main__':
     # item = {"fieldPath": r"C:\Users\shliu\Desktop\field"}
@@ -118,7 +125,7 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"C:\Users\shliu\Desktop\field"
-    item = {"fieldPath": path}
-    res = get_fieldfile(item)
+    path = r"E:\using\test_avas_qt\field2"
+    item = {"filePath": path}
+    res = get_allfile_relative_path(item)
     print(res)

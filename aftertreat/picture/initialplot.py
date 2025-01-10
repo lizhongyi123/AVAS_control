@@ -388,9 +388,6 @@ class Picturedensity():
         if self.set_legend == 1:
             ax1.legend()
 
-
-
-
         ax1.grid()
 
         if show_:

@@ -8,14 +8,14 @@ class IniConfig():
     def __init__(self):
         self.ini_parameter = \
         {"project": {"project_path": "",
-                     "f": "",
+                     "fieldSource": "",
                      },
         "lattice":{"length": 0},
          "input": {"sim_type": "mulp"},
          "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
          "error": {"error_type": "", "seed": 0, "if_normal": 0},
          }
-        self.str_keys = ["sim_type", "project_path", "f",  "error_type", ]
+        self.str_keys = ["sim_type", "project_path", "fieldSource",  "error_type", ]
     # def initialize_ini(self):
 
 
@@ -33,37 +33,33 @@ class IniConfig():
 
         kwargs = {}
         config = configparser.ConfigParser()
+        config.optionxform = str
+
         config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
-        for section in config.sections():
-            for key, value in config.items(section):
-                if key in self.str_keys:
-                    print(40, key)
-                else:
-                    pass
 
 
-        # try:
-        #     if not os.path.exists(path):
-        #         print(f"文件路径 {path} 不存在。")
-        #         return False
-        #
-        #     config = configparser.ConfigParser()
-        #     config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
-        #
-        #     for section in config.sections():
-        #         for key, value in config.items(section):
-        #             if key not in self.str_keys:
-        #                 print(47, key)
-        #                 self.ini_parameter[section][key] = int(value)
-        #             else:
-        #                 self.ini_parameter[section][key] = value
-        #
-        # except Exception as e:
-        #     code = -1
-        #     msg = str(e)
-        #     kwargs.update({'iniParams': {}})
-        #     output = format_output(code, msg=msg, **kwargs)
-        #     return output
+        try:
+            if not os.path.exists(path):
+                print(f"文件路径 {path} 不存在。")
+                return False
+
+            config = configparser.ConfigParser()
+            config.optionxform = str
+            config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
+
+            for section in config.sections():
+                for key, value in config.items(section):
+                    if key not in self.str_keys:
+                        self.ini_parameter[section][key] = int(value)
+                    else:
+                        self.ini_parameter[section][key] = value
+
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            kwargs.update({'iniParams': {}})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
 
         # print("read", self.ini_parameter)
         kwargs.update({'iniParams': copy.deepcopy(self.ini_parameter)})
@@ -76,12 +72,10 @@ class IniConfig():
 
         :param kwargs: 字典格式的键值对，用于更新 INI 文件
         """
-        # for k, v in kwargs.items():
-        #     print(77, k, v)
-        #     for k1, v1 in v.items():
-        #         print(79, k1, v1)
-        #         if v1 == '':
-        #             v[k1] = None
+        for k, v in kwargs.items():
+            for k1, v1 in v.items():
+                if v1 == None:
+                    v[k1] = ""
 
         kwargs1 = {}
 
@@ -90,7 +84,7 @@ class IniConfig():
                 if section in self.ini_parameter:
                     self.ini_parameter[section].update(values)
                 else:
-                    print(f"节 {section} 不存在。")
+                    print(89, f"{section} 不存在。")
 
         except Exception as e:
             code = -1
@@ -119,6 +113,7 @@ class IniConfig():
         kwargs = {}
         try:
             config = configparser.ConfigParser()
+            config.optionxform = str
 
             for section, section_data in self.ini_parameter.items():
                 config[section] = section_data

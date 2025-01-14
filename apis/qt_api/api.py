@@ -133,13 +133,74 @@ def get_allfile_relative_path(item):
 
 def create_from_file_input_ini(item):
     # item的格式{“projectPath”： “path”}
+    kwargs = {}
+
     input_obj = InputConfig()
     input_res = input_obj.create_from_file(item)
-    print(input_res)
+    if input_res["code"] == -1:
+        code = -1
+        msg = input_res["data"]["message"]
+        kwargs.update({'inputiniParams': {}})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
 
     ini_obj = IniConfig()
     ini_res = ini_obj.create_from_file(item)
-    # print(ini_res)
+    if input_res["code"] == -1:
+        code = -1
+        msg = input_res["data"]["message"]
+        kwargs.update({'inputiniParams': {}})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
+
+    new_dic = {}
+    new_dic.update(input_res["data"]["inputParams"])
+    fieldSource_dic = {'fieldSource': ini_res["data"]["iniParams"]["project"]["fieldSource"]}
+    new_dic.update(fieldSource_dic)
+
+
+    kwargs.update({'inputiniParams': new_dic})
+    output = format_output(**kwargs)
+    print(output)
+    return output
+
+def write_to_file_input_ini(item, param):
+    # item的格式{“projectPath”： “path”}
+    # {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
+    #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
+    #  'scmethod': 'SPICNIC', 'fieldSource': ''}
+    kwargs = {}
+
+    input_param = copy.deepcopy(param)
+    del input_param["fieldSource"]
+
+    ini_param = {"project": {"fieldSource": param["fieldSource"]}}
+
+    input_obj = InputConfig()
+    input_res = input_obj.set_param(**input_param)
+    if input_res["code"] == -1:
+        code = -1
+        msg = input_res["data"]["message"]
+        kwargs.update({'inputiniParams': {}})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
+
+    ini_obj = IniConfig()
+    ini_res = ini_obj.set_param(**ini_param)
+    if ini_res["code"] == -1:
+        code = -1
+        msg = ini_res["data"]["message"]
+        kwargs.update({'inputiniParams': {}})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
+
+    input_obj.write_to_file(item)
+    ini_obj.write_to_file(item)
+
+    new_dic = param
+    kwargs.update({'inputiniParams': new_dic})
+    output = format_output(**kwargs)
+    return output
 
 # def set_input_ini(item):
 #     project_path =
@@ -158,4 +219,8 @@ if __name__ == '__main__':
     path = r"E:\using\test_avas_qt\test_ini"
     item = {"projectPath": path}
     res = create_from_file_input_ini(item)
-    print(res)
+    params = {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
+               'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
+               'scmethod': 'SPICNIC', 'fieldSource': None}
+
+    write_to_file_input_ini(item, params)

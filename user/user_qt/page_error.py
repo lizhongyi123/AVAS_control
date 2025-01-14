@@ -9,13 +9,14 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
     QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
 
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
-from api import plot_error_out, plot_error_emit_loss
+from apis.basic_api.api import plot_error_out, plot_error_emit_loss
 from user.user_qt.user_defined import treat_err
 from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
 from user.user_qt.page_utils.picture_dialog import PictureDialog1
 
 from user.user_qt.user_defined import MyQLineEdit
 from utils.iniconfig import IniConfig
+
 class ErrorEnergyDialog(MyPictureDialog):
     def __init__(self, project_path, func, picture_type):
         super().__init__(project_path, func, )
@@ -23,7 +24,8 @@ class ErrorEnergyDialog(MyPictureDialog):
         self.picture_type = picture_type
 
     def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, self.picture_type, show_=0)
+        self.func(self.project_path, self.picture_name, self.picture_type, show_=0, fig=self.fig)
+        self.canvas.draw()
 
 
 class ErrorEnvelopeDialog(EnvelopeDialog):
@@ -53,7 +55,7 @@ class ErrorEnvelopeDialog(EnvelopeDialog):
 
     def plot_image(self):
         print(self.picture_name)
-        self.func(self.project_path, self.picture_name, self.picture_type, show_=0)
+        self.func(self.project_path, self.picture_name, self.picture_type, show_=0, fig = self.fig)
         self.canvas.draw()
 
 
@@ -72,7 +74,7 @@ class Plotoutput(PictureDialog1):
         self.picture_type = picture_type
 
     def plot_image(self, ):
-        self.func(self.project_path, self.picture_type, show_=0, )
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
 
 
 
@@ -424,7 +426,7 @@ if __name__ == '__main__':
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()
-    main_window.updatePath(r'C:\Users\shliu\Desktop\test_avas_qt\avaserr2')
+    main_window.updatePath(r'E:\using\test_avas_qt\fileld_ciads')
     sys.exit(app.exec_())
 
 

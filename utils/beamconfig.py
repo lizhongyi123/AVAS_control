@@ -179,8 +179,7 @@ class BeamConfig():
         output = format_output(**kwargs)
         return output
 
-    def \
-            set_param(self, **kwargs):
+    def set_param(self, **kwargs):
         for k, v in kwargs.items():
             if v == '':
                 kwargs[k] = None

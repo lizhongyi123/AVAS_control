@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
     QStackedWidget, QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox, \
     QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
 
-
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
@@ -20,7 +20,9 @@ class PictureDialog1(QDialog):
         super().__init__()
         self.func = func
         self.project_path = project_path
-        self.figsize = (6.4, 4.6)
+        self.fig_size = (6.4, 4.6)
+
+        self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
 
     def initUI(self):
         winflags = Qt.Dialog
@@ -38,7 +40,6 @@ class PictureDialog1(QDialog):
         # self.setGeometry(200, 200, 640, 480)
 
 ################################
-        self.fig = plt.figure(figsize=self.figsize)  # 创建figure对象
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################

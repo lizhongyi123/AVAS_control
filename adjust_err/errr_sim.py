@@ -36,10 +36,10 @@ class NewError(ErrorDyn):
         adjust_file = os.path.join(self.project_path, "adjust_err", f"Adjusted_Values.txt_{index}")
         error_file = os.path.join(self.project_path, "adjust_err", f"Error_Datas.txt_{index}")
 
-        # 修改后的lattice
+        # 根据adjust，修改后的lattice
         adjust_tracewin_lattice = import_adjust(tracewin_lattice_path, adjust_file)
 
-        #不修改，直接读取
+        #不修改，直接读取tracewin的lattice
         # adjust_tracewin_lattice = read_tracewin(adjust_tracewin_lattice)
 
         # 将lattice转换成avas

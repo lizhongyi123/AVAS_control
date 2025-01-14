@@ -5,6 +5,8 @@ import copy
 from utils.tool import format_output
 from utils.treat_directory import list_files_in_directory
 
+from utils.iniconfig import IniConfig
+from utils.inputconfig import InputConfig
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
     kwargs = {}
@@ -93,6 +95,20 @@ def get_fieldname(item):
     output = format_output(**kwargs)
     return output
 
+def get_bimap_name(item):
+    kwargs = {}
+    fieldpath = item["filePath"]
+    all_files = list_files_in_directory(fieldpath)
+    suffix_list = ["csv"
+                   ]
+    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+    v = [i.split("\\")[-1] for i in all_files]
+    v = [i.split(".")[0] for i in v]
+    bimap_name = list(set(v))
+    kwargs.update({'bimapName': bimap_name})
+    output = format_output(**kwargs)
+    return output
+
 def get_fieldfile(item):
     kwargs = {}
     fieldpath = item["fieldPath"]
@@ -115,6 +131,20 @@ def get_allfile_relative_path(item):
     output = format_output(**kwargs)
     return output
 
+def create_from_file_input_ini(item):
+    # item的格式{“projectPath”： “path”}
+    input_obj = InputConfig()
+    input_res = input_obj.create_from_file(item)
+    print(input_res)
+
+    ini_obj = IniConfig()
+    ini_res = ini_obj.create_from_file(item)
+    # print(ini_res)
+
+# def set_input_ini(item):
+#     project_path =
+
+
 if __name__ == '__main__':
     # item = {"fieldPath": r"C:\Users\shliu\Desktop\field"}
     # res = get_fieldname(item)
@@ -125,7 +155,7 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"E:\using\test_avas_qt\field2"
-    item = {"filePath": path}
-    res = get_allfile_relative_path(item)
+    path = r"E:\using\test_avas_qt\test_ini"
+    item = {"projectPath": path}
+    res = create_from_file_input_ini(item)
     print(res)

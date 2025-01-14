@@ -60,15 +60,21 @@ class SimMode():
         with open(self.runsignal, 'w') as f:
             f.write('1')
 
+        field_path = ini_info["project"]["fieldSource"]
+
+        #如果field_path是空的
+        if not field_path:
+            field_path = None
+
         if base_mode == "mulp":
             if err_mode == "stat":
-                err_stat(self.project_path, err_seed, if_normal=1)
+                err_stat(self.project_path, err_seed, if_normal=1, field_path=field_path)
             elif err_mode == "dyn":
-                err_dyn(self.project_path, err_seed, if_normal=1)
+                err_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
             elif err_mode == "stat_dyn":
-                err_stat_dyn(self.project_path, err_seed, if_normal=1)
+                err_stat_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
             else:
-                basic_mulp(self.project_path)
+                basic_mulp(self.project_path, field_path=field_path)
 
         elif base_mode == "env":
             if ini_info['match']["cal_input_twiss"] == 1:

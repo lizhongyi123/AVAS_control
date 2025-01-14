@@ -83,6 +83,8 @@ class PageOutput(QWidget):
         self.layout_3.addStretch(1)
 
 
+        self.button_save = QPushButton("b1")
+
         layout.addLayout(self.layout_1)
         layout.addWidget(self.progress_bar)
         layout.addLayout(self.layout_2)
@@ -123,6 +125,8 @@ class PageOutput(QWidget):
             self.total_step_label.setText(str(allTime))
             ratio = currentLength / totalLength
             self.progress_bar.setValue(int(ratio * 100))
+
+
     def updatePath(self, new_path):
         self.project_path = new_path
 

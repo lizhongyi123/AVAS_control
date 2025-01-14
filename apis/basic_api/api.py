@@ -25,7 +25,7 @@ import multiprocessing
 
 #下列为功能函数
 #基础运行
-def basic_mulp(project_path):
+def basic_mulp(project_path, field_path = None):
     """
     :param project_path:
     :return:
@@ -47,7 +47,7 @@ def basic_mulp(project_path):
     lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
     write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
-    res = multiparticle_obj.run()
+    res = multiparticle_obj.run(field_file=field_path)
     print('模拟结束')
     return res
 
@@ -90,36 +90,36 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed, if_normal=1):
+def err_dyn(project_path, seed, if_normal=1, field_path = None):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-    v = ErrorDyn(project_path, seed, if_normal)
+    v = ErrorDyn(project_path, seed, if_normal, field_path)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed, if_normal=1):
+def err_stat(project_path, seed, if_normal=1, field_path = None):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path, seed, if_normal)
+    v = Errorstat(project_path, seed, if_normal, field_path)
     v.run()
     
 
-def err_stat_dyn(project_path, seed, if_normal=1):
+def err_stat_dyn(project_path, seed, if_normal=1, field_path = None):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path, seed, if_normal)
+    v = Errorstatdyn(project_path, seed, if_normal, field_path)
     v.run()
     return None
 
@@ -281,15 +281,7 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    # for i in range(2):
-    #     project_path = r'C:\Users\anxin\Desktop\test_mulp'
-    #
-    #     process = multiprocessing.Process(target=basic_mulp,
-    #                                       args=(project_path, ))
-    #
-    #     process.start()  # 启动子进程
-    #     process.join()  # 等待子进程运行结束
-    #     print(i)
+    project_path = r"E:\using\test_avas_qt\fileld_ciads3"
+    field_path = r"E:\using\test_avas_qt\field"
+    basic_mulp(project_path)
 
-    path = r"C:\Users\shliu\Desktop\eee"
-    plot_cavity_syn_phase(path, 1, None)

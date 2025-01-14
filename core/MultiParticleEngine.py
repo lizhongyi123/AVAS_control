@@ -25,14 +25,13 @@ class MultiParticleEngine():
                 raise ValueError(f"Failed to load so '{self.so_path}'. Reason: {e}")
 
 
-    def get_path(self, inputfilepath, outputfilePath):
-
-
-
+    def get_path(self, inputfilepath, outputfilePath, fieldfilePath):
         if platform.system() == 'Windows':
             inputfilepath = ctypes.c_wchar_p(inputfilepath)
             outputfilePath = ctypes.c_wchar_p(outputfilePath)
-            res = self.library.path(inputfilepath, outputfilePath)
+            print(32, fieldfilePath)
+            fieldfilePath = ctypes.c_wchar_p(fieldfilePath)
+            res = self.library.path(inputfilepath, outputfilePath, fieldfilePath)
         elif platform.system() == "Linux":
             inputfilepath = ctypes.c_char_p(inputfilepath.encode('utf-8'))  # 转为字节并包装为 c_char_p
             outputfilePath = ctypes.c_char_p(outputfilePath.encode('utf-8'))

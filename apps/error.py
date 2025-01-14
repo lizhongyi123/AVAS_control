@@ -35,8 +35,9 @@ class Error():
     """
     该类为误差分析
     """
-    def __init__(self, project_path, seed=50, if_normal=0):
+    def __init__(self, project_path, seed=50, if_normal=0, field_path = None):
         random.seed(seed)
+        self.field_path = field_path
         self.project_path = project_path
         self.if_normal = if_normal
         self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
@@ -553,7 +554,8 @@ class Error():
 
     def run_multiparticle(self, p_path, out_putfile_):
         multiparticle_obj = MultiParticle(p_path)
-        res = multiparticle_obj.run(output_file=out_putfile_)
+
+        res = multiparticle_obj.run(output_file=out_putfile_, field_file=self.field_path)
 
 
     def run_normal(self):
@@ -894,8 +896,8 @@ class Error():
         write_to_txt(err_datas_path, res)
 
 class ErrorDyn(Error):
-    def __init__(self, project_path, seed, if_normal):
-        super().__init__(project_path, seed, if_normal)
+    def __init__(self, project_path, seed, if_normal, field_path):
+        super().__init__(project_path, seed, if_normal, field_path)
 
 
     def run_one_time(self, group, time, lattice_mulp_list):
@@ -974,8 +976,8 @@ class ErrorDyn(Error):
                 self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
-    def __init__(self, project_path, seed, if_normal):
-        super().__init__(project_path, seed, if_normal)
+    def __init__(self, project_path, seed, if_normal, field_path):
+        super().__init__(project_path, seed, if_normal, field_path)
         self.all_error_lattice = []
         # 只优化
         # self.only_adjust_sign = 0
@@ -1594,8 +1596,8 @@ class Errorstat(Error):
 
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path, seed, if_normal):
-        super().__init__(project_path, seed, if_normal)
+    def __init__(self, project_path, seed, if_normal, field_path):
+        super().__init__(project_path, seed, if_normal, field_path)
         self.err_type = 'stat_dyn'
 
 
@@ -1872,13 +1874,15 @@ if __name__ == "__main__":
 
     # start = time.time()
     # print("start", start)
-    for i in range(10):
-        print(f"{i}"*50)
-        file = r"E:\using\test_avas_qt\fileld_ciads\OutputFile"
-        delete_directory(file)
-        os.mkdir(file)
-        obj = ErrorDyn(r"E:\using\test_avas_qt\fileld_ciads",
-                        0, 1)
+    # for i in range(10):
+    #     print(f"{i}"*50)
+    #     file = r"E:\using\test_avas_qt\fileld_ciads\OutputFile"
+    #     delete_directory(file)
 
-        obj.run()
+    #     os.mkdir(file)
+    field = r"E:\using\test_avas_qt\field"
+    obj = ErrorDyn(r"E:\using\test_avas_qt\fileld_ciads",
+                   0, 1, field)
+
+    obj.run()
 

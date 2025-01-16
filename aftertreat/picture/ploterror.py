@@ -2,18 +2,19 @@ from aftertreat.picture.initialplot import PicturePlot_2D, CompoundShape, Pictur
 from utils.readfile import read_txt
 import os
 
+
 class PlotErrout(PicturePlot_2D):
 
-    def __init__(self, project_path, picture_type, ):
+    def __init__(self, file_path, picture_type, ):
         """
         picture_type
         { 1: 发射度增长
         }
         """
         super().__init__()
-        self.project_path = project_path
+        # self.project_path = project_path
         self.picture_type = picture_type
-        self.err_par_path = os.path.join(self.project_path, 'OutputFile', 'errors_par.txt')
+        self.err_par_path = file_path
 
 
     def get_x_y(self):
@@ -192,10 +193,9 @@ class PlotErrout(PicturePlot_2D):
             self.set_legend = 1
 
 class PlotErr_emit_loss(PicturePlot_2ax):
-    def __init__(self, project_path, type_='par'):
+    def __init__(self, file_path, type_='par'):
         super().__init__()
-        self.project_path = project_path
-        self.err_par_path = os.path.join(self.project_path, 'OutputFile', 'errors_par.txt')
+        self.err_par_path = file_path
         self.type_ = type_
 
     def get_x_y(self):

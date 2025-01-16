@@ -12,20 +12,25 @@ class PlotDataSet(PicturePlot_2D):
     """
     dataset文件的可视化
     """
-    def __init__(self, project_path, picture_name, dataset_path=None):
+    def __init__(self, dataset_path, picture_name, project_path=None):
         super().__init__()
         self.picture_name = picture_name
         self.BaseMassInMeV = 0
         self.freq = 0
 
-        self.project_path = project_path
+        if project_path:
+            self.project_path = project_path
+        else:
+            self.project_path = None
+        self.dataset_path = dataset_path
         # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
         # self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
         # self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         # self.dataset_path = os.path.join(self.project_path, "OutputFile", "Dataset.txt" )
-        if dataset_path:
-            self.dataset_path = dataset_path
+        # if dataset_path:
+        #     self.dataset_path = dataset_path
+        # else:
 
 
     def get_mass_freq(self):

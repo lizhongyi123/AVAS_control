@@ -23,14 +23,14 @@ def common_error(message=None):
                                      QMessageBox.No)
 def treat_err(func):
     def inner(self):
-        # try:
-        #     result = func(self)
-        #     return result
-        # except Exception as e:
-        #     QMessageBox.warning(None, 'Error', f'{str(e)}')
-        #     return None
-        result = func(self)
-        return result
+        try:
+            result = func(self)
+            return result
+        except Exception as e:
+            QMessageBox.warning(None, 'Error', f'{str(e)}')
+            return None
+        # result = func(self)
+        # return result
     return inner
 
 def treat_err2(func):

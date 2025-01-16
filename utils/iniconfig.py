@@ -4,6 +4,7 @@ import configparser
 import os
 from utils.tool import format_output
 import copy
+
 class IniConfig():
     def __init__(self):
         self.ini_parameter = \

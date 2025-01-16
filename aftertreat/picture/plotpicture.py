@@ -8,21 +8,22 @@ class PlotCavityVoltage(PicturelBar_2D):
     """
     腔压图
     """
-    def __init__(self, project_path, ratio):
+    def __init__(self, lattiace_mulp_path , ratio):
         super().__init__( )
         self.ratio = ratio
         self.title = 'Cavity Voltage'
         self.xlabel = 'Cavity (Num)'
         self.ylabel = 'Cavity Voltage(MV/M)'
-        self.project_path = project_path
-        self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
-        self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
-        self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        # self.project_path = project_path
+        # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
+        # self.lattice_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
+        # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
+        # self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        self.lattice_mulp_path = lattiace_mulp_path
 
     def get_x_y(self, ):
 
-        all_info = read_txt(self.lattice_path, out='list')
+        all_info = read_txt(self.lattice_mulp_path, out='list')
         x = []
         y = []
         index = 1
@@ -43,21 +44,21 @@ class PlotCavitySynPhase(PicturePlot_2D):
     """
     同步相位图
     """
-    def __init__(self, project_path):
+    def __init__(self, lattice_mulp_path):
         super().__init__()
         self.title = ''
         self.xlabel = 'Cavity (Num)'
         self.ylabel = 'Synchronous phase ( deg )'
 
-        self.project_path = project_path
-        self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
-        self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
-        self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        # self.project_path = project_path
+        # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
+        # self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
+        # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
+        self.lattice_mulp_path = lattice_mulp_path
 
 
     def get_x_y(self,):
-        all_info = read_txt(self.lattice_path, out='list')
+        all_info = read_txt(self.lattice_mulp_path, out='list')
         x = []
         y = []
         index = 1

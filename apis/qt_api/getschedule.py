@@ -28,7 +28,7 @@ class GetSchedule():
         err_mode = ini_info["error"]["error_type"]
         match = ini_info["match"]
 
-        match_mode = 'undefined'
+        match_mode = ''
         if match["cal_input_twiss"] == 1:
             match_mode = 'cal_input_twiss'
         elif match["match_with_twiss"] == 1:
@@ -162,7 +162,7 @@ class GetSchedule():
         match_mode = mode["match_mode"]
         kwargs = {}
 
-        if err_mode == "undefined" and match_mode == "undefined":
+        if err_mode == "" and match_mode == "":
             if base_mode == "mulp":
                 res = self.get_base_mulp_schedule()
 

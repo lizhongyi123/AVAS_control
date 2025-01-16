@@ -404,7 +404,7 @@ class PageInput(QWidget):
                 self.sc_step_beta_checkbox.setChecked(True)
 
 
-    @treat_err2
+
     def generate_input_list(self, ):
 
         res = {}
@@ -472,7 +472,6 @@ class PageInput(QWidget):
 
         return res
 
-    # @treat_err
     def save_input(self, ):
         input_dic = self.generate_input_list()
 

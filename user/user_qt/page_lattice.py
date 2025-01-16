@@ -223,13 +223,11 @@ class PageLattice(QWidget):
     #     print(f"光标位置 - 行: {line_number + 1}")
     #     print(f"行文本: {line}")
 
-    # @treat_err
     def updatePath(self, new_path):
         self.project_path = new_path
         self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
         self.lattice_env_path = os.path.join(self.project_path, "InputFile", "lattice_env.txt")
 
-    # @treat_err
     def fill_parameter(self):
         item = {"projectPath": self.project_path,}
 
@@ -288,7 +286,6 @@ class PageLattice(QWidget):
         if res["code"] == -1:
             raise Exception(str(res["data"]['msg']))
 
-    # @treat_err
     def fill_text_lattice_path(self, path):
         self.text_lattice_path.setText(path)
 

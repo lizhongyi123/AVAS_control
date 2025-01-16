@@ -12,69 +12,15 @@ from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from apis.basic_api.api import plot_error_out, plot_error_emit_loss
 from user.user_qt.user_defined import treat_err
 from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
-from user.user_qt.page_utils.picture_dialog import PictureDialog1
+from user.user_qt.page_utils.picture_dialog import PictureDialog1, PlotOnePicture1
 
 from user.user_qt.user_defined import MyQLineEdit
 from utils.iniconfig import IniConfig
-
-class ErrorEnergyDialog(MyPictureDialog):
-    def __init__(self, project_path, func, picture_type):
-        super().__init__(project_path, func, )
-        self.picture_name = 'energy'
-        self.picture_type = picture_type
-
-    def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, self.picture_type, show_=0, fig=self.fig)
-        self.canvas.draw()
+from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
+from functools import partial
 
 
-class ErrorEnvelopeDialog(EnvelopeDialog):
-    def __init__(self, project_path, func, picture_type):
-        super().__init__(project_path, func)
-        self.picture_name = 'x'
-        self.picture_type = picture_type
 
-    def contextMenuEvent(self, event):
-        cmenu = QMenu(self)
-
-        menu_items = {
-            "x": cmenu.addAction("x"),
-            "y": cmenu.addAction("y"),
-            "rms_x": cmenu.addAction("rms_x"),
-            "rms_y": cmenu.addAction("rms_y"),
-        }
-
-        action = cmenu.exec_(self.mapToGlobal(event.pos()))
-
-        for item_name, menu_item in menu_items.items():
-            if action == menu_item:
-                self.picture_name = item_name
-                break
-        self.fig.clf()
-        self.plot_image()
-
-    def plot_image(self):
-        print(self.picture_name)
-        self.func(self.project_path, self.picture_name, self.picture_type, show_=0, fig = self.fig)
-        self.canvas.draw()
-
-
-class EmitLossDialog(PictureDialog1):
-    def __init__(self, project_path, func, picture_type):
-        super().__init__(project_path, func, )
-        self.picture_type = picture_type
-
-    def plot_image(self, ):
-        self.func(self.project_path, self.picture_type, 0, self.fig)
-
-
-class Plotoutput(PictureDialog1):
-    def __init__(self, project_path, func, picture_type):
-        super().__init__(project_path, func, )
-        self.picture_type = picture_type
-
-    def plot_image(self, ):
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
 
 
 
@@ -87,6 +33,8 @@ class PageError(QWidget):
         self.project_path = project_path
         self.lattice_path = self.project_path + r"\inputFile" + r'\lattice.txt'
 
+        self.error_par_file_path = None
+        self.density_file_path = None
         # 相移meter和oeriod
         self.pahse_advance_mp = ''
         self.output_plot_type = 'average'
@@ -169,19 +117,19 @@ class PageError(QWidget):
 
         layout12 = QHBoxLayout()
         self.button_output_xy = QPushButton("X && Y")
-        self.button_output_xy.clicked.connect(self.plot_output_xy)
+        self.button_output_xy.clicked.connect(partial(self.plot_error_out, "xy"))
 
         self.button_output_x1y1 = QPushButton("X' && Y'")
-        self.button_output_x1y1.clicked.connect(self.plot_output_x1y1)
+        self.button_output_x1y1.clicked.connect(partial(self.plot_error_out, "x1y1"))
 
         self.button_output_rmsxy = QPushButton("rms(X) && rms(Y)")
-        self.button_output_rmsxy.clicked.connect(self.plot_output_rmsxy)
+        self.button_output_rmsxy.clicked.connect(partial(self.plot_error_out, "rmsxy"))
 
         self.button_output_rmsx1y1 = QPushButton("rms(X') && rms(Y')")
-        self.button_output_rmsx1y1.clicked.connect(self.plot_output_rmsx1y1)
+        self.button_output_rmsx1y1.clicked.connect(partial(self.plot_error_out, "rmsx1y1"))
 
         self.button_output_energy_change = QPushButton("Energy change")
-        self.button_output_energy_change.clicked.connect(self.plot_output_energy_change)
+        self.button_output_energy_change.clicked.connect(partial(self.plot_error_out, "ek_change"))
 
 
         layout12.addWidget(self.button_output_xy)
@@ -196,32 +144,27 @@ class PageError(QWidget):
 
         group_box_output.setLayout(layout1)
 
-        #######################################################
+        #############################################################
+        group_box_density = QGroupBox("")
+        layout_density = QVBoxLayout()
 
-        # picture_type_group_box = QGroupBox()
-        # picture_type_layout = QVBoxLayout()
-        #
-        # self.button_error_ek = QPushButton("Energy")
-        # self.button_error_ek.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        # self.button_error_ek.clicked.connect(self.error_ek_dialog)
-        #
-        # self.button_error_envelope = QPushButton("Envelope")
-        # self.button_error_envelope.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        # self.button_error_envelope.clicked.connect(self.error_envelope_dialog)
-        #
-        # picture_type_layout.addWidget(self.button_error_ek)
-        # picture_type_layout.addWidget(self.button_error_envelope)
-        #
-        # picture_type_group_box.setLayout(picture_type_layout)
-        #
-        # picture_layout.addWidget(picture_ar_group_box)
-        # picture_layout.addWidget(picture_type_group_box)
-        # picture_group_box.setLayout(picture_layout)
-        #############
-        #################################################
+        layout_density_0 = QHBoxLayout()
+        self.button_select_density_file = QPushButton(QApplication.style().standardIcon(32),"")
+        self.button_select_density_file.clicked.connect(self.select_density_file)
+        self.text_density_file = MyQLineEdit(" ")
+
+        layout_density_0.addWidget(self.button_select_density_file)
+        layout_density_0.addWidget(self.text_density_file)
+
+        layout_density.addLayout(layout_density_0)
+        group_box_density.setLayout(layout_density)
+
+#####################################################################################
+
         group_box_layout.addWidget(err_type_group_box)
         group_box_layout.addWidget(group_box_seed)
         group_box_layout.addWidget(group_box_output)
+        group_box_layout.addWidget(group_box_density)
 
 
         group_box_layout.addStretch(1)
@@ -247,14 +190,16 @@ class PageError(QWidget):
     #     self.dialog.initUI()
     #     self.dialog.show()
 
-    @treat_err
+
     def plot_error_emit_loss_this(self, ):
         func = plot_error_emit_loss
-        self.dialog = EmitLossDialog(self.project_path, func, 'par')
+        # self.dialog = EmitLossDialog(self.project_path, func, 'par')
 
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
+        self.xy_dialog = PlotOnePicture1(self.error_par_file_path, plot_error_emit_loss, "par")
+
+        self.xy_dialog.initUI()
+        self.xy_dialog.plot_image()
+        self.xy_dialog.show()
 
 
     def text_seed_change(self):
@@ -268,76 +213,39 @@ class PageError(QWidget):
 
 
 
-
-    @treat_err
-    def plot_output_xy(self, ):
-        func = plot_error_out
+    def plot_error_out(self, message):
         if self.output_plot_type == 'average':
-            picture_type = 'av_xy'
-        elif self.output_plot_type == 'rms':
-            picture_type = 'rms_xy'
+            if message == "xy":
+                picture_type = "av_xy"
+            elif message == "x1y1":
+                picture_type = "av_x1y1"
+            elif message == "rmsxy":
+                picture_type = "av_rms_xy"
+            elif message == "rmsx1y1":
+                picture_type = "av_rms_x1y1"
+            elif message == "ek_change":
+                picture_type = "av_ek"
 
-        self.xy_dialog = Plotoutput(self.project_path, func, picture_type)
+
+        elif self.output_plot_type == 'rms':
+            if message == "xy":
+                picture_type = "rms_xy"
+            elif message == "x1y1":
+                picture_type = "rms_x1y1"
+            elif message == "rmsxy":
+                picture_type = "rms_rms_xy"
+            elif message == "rmsx1y1":
+                picture_type = "rms_rms_x1y1"
+            elif message == "ek_change":
+                picture_type = "rms_ek"
+
+        self.xy_dialog = PlotOnePicture1(self.error_par_file_path, plot_error_out, picture_type)
 
         self.xy_dialog.initUI()
         self.xy_dialog.plot_image()
         self.xy_dialog.show()
 
-    @treat_err
-    def plot_output_x1y1(self, ):
-        func = plot_error_out
-        if self.output_plot_type == 'average':
-            picture_type = 'av_x1y1'
-        elif self.output_plot_type == 'rms':
-            picture_type = 'rms_x1y1'
-        self.x1y1_dialog = Plotoutput(self.project_path, func, picture_type)
 
-        self.x1y1_dialog.initUI()
-        self.x1y1_dialog.plot_image()
-        self.x1y1_dialog.show()
-
-    @treat_err
-
-    def plot_output_rmsxy(self, ):
-        func = plot_error_out
-        if self.output_plot_type == 'average':
-            picture_type = 'av_rms_xy'
-        elif self.output_plot_type == 'rms':
-            picture_type = 'rms_rms_xy'
-        self.rms_xy_dialog = Plotoutput(self.project_path, func, picture_type)
-
-        self.rms_xy_dialog.initUI()
-        self.rms_xy_dialog.plot_image()
-        self.rms_xy_dialog.show()
-
-    @treat_err
-
-    def plot_output_rmsx1y1(self, ):
-        func = plot_error_out
-        if self.output_plot_type == 'average':
-            picture_type = 'av_rms_x1y1'
-        elif self.output_plot_type == 'rms':
-            picture_type = 'rms_rms_x1y1'
-        self.rms_x1y1_dialog = Plotoutput(self.project_path, func, picture_type)
-
-        self.rms_x1y1_dialog.initUI()
-        self.rms_x1y1_dialog.plot_image()
-        self.rms_x1y1_dialog.show()
-
-
-    @treat_err
-
-    def plot_output_energy_change(self, ):
-        func = plot_error_out
-        if self.output_plot_type == 'average':
-            picture_type = 'av_ek'
-        elif self.output_plot_type == 'rms':
-            picture_type = 'rms_ek'
-        self.ek_dialog = Plotoutput(self.project_path, func, picture_type)
-
-        self.ek_dialog.initUI()
-        self.ek_dialog.plot_image()
-        self.ek_dialog.show()
 
     def cb_average_change(self, state):
         if state == Qt.Checked:
@@ -403,7 +311,7 @@ class PageError(QWidget):
         elif self.cb_stat_dyn_error.isChecked():
             dic['error_type'] = 'stat_dyn'
         else:
-            dic['error_type'] = "undefined"
+            dic['error_type'] = ""
 
         dic["seed"] = int(self.text_seed.text())
         return dic
@@ -411,13 +319,23 @@ class PageError(QWidget):
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
         default_directory = os.path.join(self.project_path, "OutputFile")
-        error_par_path, _ = QFileDialog.getOpenFileName(self, "Select dst File", directory=default_directory,
+        error_par_path, _ = QFileDialog.getOpenFileName(self, "Select  File", directory=default_directory,
                                                        options=options)
 
         if error_par_path:
             self.text_error_par.setText(error_par_path)
+        self.error_par_file_path = error_par_path
 
+    def select_density_file(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        default_directory = os.path.join(self.project_path, "OutputFile")
+        error_par_path, _ = QFileDialog.getOpenFileName(self, "Select  File", directory=default_directory,
+                                                       options=options)
 
+        if error_par_path:
+            self.text_density_file.setText(error_par_path)
+        self.density_file_path = error_par_path
 
 
 if __name__ == '__main__':

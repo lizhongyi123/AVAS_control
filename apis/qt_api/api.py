@@ -174,7 +174,9 @@ def write_to_file_input_ini(item, param):
     input_param = copy.deepcopy(param)
     del input_param["fieldSource"]
 
-    ini_param = {"project": {"fieldSource": param["fieldSource"]}}
+    ini_param = {"project": {"fieldSource": param["fieldSource"]},
+                 "input": {"sim_type": param["sim_type"]},
+                 }
 
     input_obj = InputConfig()
     input_res = input_obj.set_param(**input_param)

@@ -16,10 +16,8 @@ from PyQt5.QtCore import pyqtSignal
 
 class PictureDialog1(QDialog):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
-    def __init__(self, project_path, func):
+    def __init__(self, ):
         super().__init__()
-        self.func = func
-        self.project_path = project_path
         self.fig_size = (6.4, 4.6)
 
         self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
@@ -81,3 +79,24 @@ class PictureDialog1(QDialog):
 
     def closeEvent(self, event):
         event.accept()
+
+
+
+class PlotOnePicture1(PictureDialog1):
+    # 只有一张图，接收参数为文件路径， 类， 图片类型
+    def __init__(self, file_path, func, picture_type=None):
+        super().__init__()
+        self.picture_type = picture_type
+        self.func = func
+        self.file_path = file_path
+    def plot_image(self, ):
+        if self.picture_type:
+            self.func(self.file_path, self.picture_type, show_=0, fig=self.fig)
+        else:
+            self.func(self.file_path, show_=0, fig=self.fig)
+        # if self.picture_type:
+        #     obj = self.cls(self.file_path, self.picture_type)
+        # else:
+        #     obj = self.cls(self.file_path)
+        # obj.get_x_y()
+        # obj.run( show_=0, fig=self.fig)

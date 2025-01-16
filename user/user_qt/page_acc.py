@@ -157,7 +157,7 @@ class PageAccept(QWidget):
             return False
         else:
             return True
-    @treat_err
+
     def button_run_click(self):
         if self.cb_x.isChecked():
             all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 0)

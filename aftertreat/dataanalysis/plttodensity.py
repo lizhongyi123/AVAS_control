@@ -58,6 +58,7 @@ class PlttoDensity():
         emit = [dataset_obj.emit_x[index], dataset_obj.emit_y[index], dataset_obj.emit_z[index]]
         rms_size = [dataset_obj.rms_x[index], dataset_obj.rms_y[index], dataset_obj.rms_z[index]]
 
+        #同步粒子的质心
         syn_x = dataset_obj.syn_x[index]
         syn_y = dataset_obj.syn_y[index]
 

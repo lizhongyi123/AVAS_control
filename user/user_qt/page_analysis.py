@@ -21,6 +21,11 @@ from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from apis.basic_api.api import plot_env_beam_out
 
 from aftertreat.dataanalysis.plttodst import Plttozcode
+from user.user_qt.page_utils.picture_dialog import PlotOnePicture1, PictureDialog1
+from aftertreat.picture.plotphase import PlotPhase
+from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
+from aftertreat.picture.plotdataset import PlotDataSet
+from functools import partial
 
 
 class MyPictureDialog(QDialog):
@@ -91,54 +96,23 @@ class MyPictureDialog(QDialog):
 
 
 
-class SyncPhaseDialog(MyPictureDialog):
-    def __init__(self, project_path, func):
-        super().__init__(project_path, func)
-        pass
+
+
+
+class PhaseDialog(PictureDialog1, ):
+    def __init__(self, file_path, func):
+        super().__init__()
+        self.file_path = file_path
+        self.func = func
 
 
     def plot_image(self):
-        self.func(self.project_path, show_=0, fig=self.fig)
-        self.canvas.draw()
+        self.func(self.file_path, show_=0, fig=self.fig)
 
 
 
 
 
-
-class PhaseDialog(MyPictureDialog):
-    def __init__(self, project_path, func, dst_path):
-        super().__init__(project_path, func)
-        self.dst_path = dst_path
-        self.figsize=(6.4*2, 4.6*2)
-
-
-    def plot_image(self):
-        self.func(self.dst_path, show_=0, fig=self.fig)
-
-
-
-
-
-
-class LossDialog(MyPictureDialog):
-    def __init__(self, project_path, func):
-        super().__init__(project_path, func)
-        self.picture_name = 'loss'
-
-
-    def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
-
-
-
-class EnergyDialog(MyPictureDialog):
-    def __init__(self, project_path, func):
-        super().__init__(project_path, func)
-        self.picture_name = 'energy'
-
-    def plot_image(self, ):
-        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
 
 
 class BeamPahseAdvanceDialog(MyPictureDialog):
@@ -158,7 +132,7 @@ class EnvelopeDialog(QDialog):
         super().__init__()
         self.func = func
         self.project_path = project_path
-        self.picture_name = 'rms_x'
+        self.picture_type = 'rms_x'
 
         self.fig_size = (6.4,4.6)
         self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
@@ -201,8 +175,11 @@ class EnvelopeDialog(QDialog):
         self.plot_image()
 
     def plot_image(self):
-        # self.fig.clf()
-        self.func(self.project_path, self.picture_name, show_=0, fig=self.fig)
+        self.fig.clf()
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
+        # obj = self.cls(self.file_path, self.picture_type,)
+        # obj.get_x_y()
+        # obj.run( show_=0, fig=self.fig)
         self.canvas.draw()
 
     def resizeEvent(self, event):
@@ -240,7 +217,7 @@ class EnvelopeDialog(QDialog):
 
         for item_name, menu_item in menu_items.items():
             if action == menu_item:
-                self.picture_name = item_name
+                self.picture_type = item_name
                 break
         self.fig.clf()
         self.plot_image()
@@ -267,7 +244,7 @@ class EmittanceDialog(EnvelopeDialog):
 
         for item_name, menu_item in menu_items.items():
             if action == menu_item:
-                self.picture_name = item_name
+                self.picture_type = item_name
                 break
 
         self.fig.clf()
@@ -278,8 +255,8 @@ class CavityVoltageDialog(QDialog):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
     def __init__(self, project_path, func):
         super().__init__()
-        self.func = func
         self.project_path = project_path
+        self.func = func
         self.ratio = {}
         self.field_num = 0
         self.fig = Figure(figsize=(6.4, 4.6))  # 创建figure对象
@@ -359,6 +336,11 @@ class CavityVoltageDialog(QDialog):
     def plot_image(self):
         self.fig.clear()
         self.func(self.project_path, self.ratio, show_=0, fig=self.fig)
+
+        # print(self.ratio)
+        # obj = self.cls(self.project_path, self.ratio)
+        # obj.get_x_y()
+        # obj.run(show_=0, fig=self.fig)
         self.canvas.draw()
 
 
@@ -575,11 +557,11 @@ class PageAnalysis(QWidget):
 
         self.button_loss = QPushButton("loss")
         self.button_loss.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_loss.clicked.connect(self.loss_dialog)
+        self.button_loss.clicked.connect(partial(self.plot_dataset_dialog, "loss"))
 
         self.button_energy = QPushButton("Energy")
         self.button_energy.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_energy.clicked.connect(self.energy_dialog)
+        self.button_energy.clicked.connect(partial(self.plot_dataset_dialog, "energy"))
 
         self.button_emittance = QPushButton("Emittance")
         self.button_emittance.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
@@ -756,7 +738,6 @@ class PageAnalysis(QWidget):
         self.dialog.plot_image()
         self.dialog.show()
 
-    @treat_err
     def env_emit_dialog(self):
         func = plot_env_beam_out
         self.dialog = EnvEmitDialog(self.project_path, func)
@@ -765,67 +746,50 @@ class PageAnalysis(QWidget):
         self.dialog.show()
 
 
-    @treat_err
-    def sync_phase_dialog(self):
-        func = plot_cavity_syn_phase
-        self.dialog = SyncPhaseDialog(self.project_path, func)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
 
-    @treat_err
+    def sync_phase_dialog(self):
+        lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
+        self.syn_phase_dialog = PlotOnePicture1(lattice_mulp_path, plot_cavity_syn_phase)
+        self.syn_phase_dialog.initUI()
+        self.syn_phase_dialog.plot_image()
+        self.syn_phase_dialog.show()
+
     def plot_phase(self):
+
         if self.text_phase_path.text() == '':
             # print('ddd')
             return 0
 
-        func = plot_phase
-        self.phase_dialog = PhaseDialog(self.project_path, func, self.text_phase_path.text())
+        self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
+        self.phase_dialog. fig = Figure(figsize=(6.4*2, 4.6*2))
         self.phase_dialog.initUI()
         self.phase_dialog.plot_image()
         self.phase_dialog.show()
 
-    @treat_err
-    def loss_dialog(self ):
-        func = plot_dataset
-
-        self.loss_dialog = LossDialog(self.project_path, func)
+    def plot_dataset_dialog(self, message ):
+        self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, message)
         self.loss_dialog.initUI()
         self.loss_dialog.plot_image()
         self.loss_dialog.show()
 
-    @treat_err
-    def energy_dialog(self):
-
-        func = plot_dataset
-        self.energy_dialog = EnergyDialog(self.project_path, func)
-        self.energy_dialog.initUI()
-        self.energy_dialog.plot_image()
-        self.energy_dialog.show()
-
-    @treat_err
     def emittance_dialog(self):
-
-        func = plot_dataset
-        self.emittance_dialog = EmittanceDialog(self.project_path, func)
+        self.emittance_dialog = EmittanceDialog(self.project_path, plot_dataset)
         self.emittance_dialog.initUI()
         self.emittance_dialog.plot_image()
         self.emittance_dialog.show()
 
-    @treat_err
     def cavity_voltage_dialog(self):
-        func = plot_cavity_voltage
-        self.cavity_voltage_dialog = CavityVoltageDialog(self.project_path, func)
+        # func = plot_cavity_voltage
+        self.cavity_voltage_dialog = CavityVoltageDialog(self.project_path, plot_cavity_voltage)
         self.cavity_voltage_dialog.initUI()
         self.cavity_voltage_dialog.plot_image()
         self.cavity_voltage_dialog.show()
 
-    @treat_err
     def envelope_dialog(self):
 
-        func = plot_dataset
-        self.envelope_dialog = EnvelopeDialog(self.project_path, func)
-        self.envelope_dialog.fig_size = (12.8, 6.4)
+        # func = plot_dataset
+        dataset_path = os.path.join(self.project_path, "OutputFile", "dataset.txt")
+        self.envelope_dialog = EnvelopeDialog(self.project_path, plot_dataset)
         self.envelope_dialog.initUI()
         self.envelope_dialog.show()
 
@@ -843,7 +807,6 @@ class PageAnalysis(QWidget):
             self.pahse_advance_mp = 'Period'
 
 
-    @treat_err
     def beam_pahse_advance_dialog(self):
         func = plot_phase_advance
 
@@ -868,7 +831,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'C:\Users\shliu\Desktop\eee')
+    main_window = PageAnalysis(r'E:\using\test_avas_qt\fileld_ciads3')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

@@ -422,7 +422,6 @@ class PageBeam(QWidget):
 
         self.clean_prarameter()
 
-    # @treat_err
     def refreshUI(self):
         self.initUI()  # Call initUI to refresh the UI
 
@@ -513,7 +512,6 @@ class PageBeam(QWidget):
             #     self.text_displaceDpos_z.clear()
         # print(self.text_particle_input_file.text())
 
-    # @treat_err
     def generate_beam_list(self):
         res = {}
 
@@ -650,7 +648,6 @@ class PageBeam(QWidget):
         for box in QComboBox_group:
             box.setCurrentIndex(0)
 
-    # @treat_err
     def onParticleInputTextChanged(self):
         text_group = [
         self.text_mass, self.text_current, self.text_current, self.text_particel_number, self.text_frequency,

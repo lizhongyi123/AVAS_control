@@ -34,29 +34,63 @@ from utils.iniconfig import IniConfig
 from apis.qt_api.SimMode import SimMode
 from apis.qt_api.createbasicfile import CreateBasicProject
 from core.MultiParticle import MultiParticle
+from multiprocessing import Process, Queue
 
+import traceback
 
-
+def basic_run(project_path, queue):
+    try:
+        item = {"projectPath": project_path}
+        obj = SimMode(item)
+        obj.run()
+    except Exception as e:
+        queue.put(str(e))
+    finally:
+        queue.close()
 
 class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
+    error_signal = pyqtSignal(str)
 
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
         self.process = None
 
+    # def run(self):
+    #     print("Thread started")
+    #     item = {"projectPath": self.project_path}
+    #
+    #     obj = SimMode(item)
+    #     self.process = multiprocessing.Process(target=obj.run)
+    #
+    #     self.process.start()  # 启动子进程
+    #     self.process.join()   # 等待子进程运行结束
+    #     self.finished.emit()  # 任务完成信号
+    #     print("Thread finished")
+
+
     def run(self):
-        print("Thread started")
-        item = {"projectPath": self.project_path}
+        try:
+            print("Thread started")
+            item = {"projectPath": self.project_path}
 
-        obj = SimMode(item)
-        self.process = multiprocessing.Process(target=obj.run)
+            queue = Queue()  # 创建队列用于传递异常信息
 
-        self.process.start()  # 启动子进程
-        self.process.join()   # 等待子进程运行结束
-        self.finished.emit()  # 任务完成信号
-        print("Thread finished")
+            # 创建进程并传递队列
+            self.process = Process(target=basic_run, args=(self.project_path, queue,))
+            self.process.start()
+            self.process.join()
+
+            # 检查子进程是否有异常
+            if not queue.empty():
+                error_message = queue.get()
+                raise Exception(f"Subprocess Error: {error_message}")
+
+            self.finished.emit()
+            print("Thread finished")
+        except Exception as e:
+            self.error_signal.emit(str(e))
 
     def stop(self):
         if self.process and self.process.is_alive():
@@ -275,8 +309,6 @@ class MainWindow(QMainWindow):
         self.timer1.timeout.connect(self.activate_output)
 
 
-    # @treat_err
-
     def create_project(self):
         desktop_path = QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
         default_folder_path = desktop_path
@@ -305,7 +337,7 @@ class MainWindow(QMainWindow):
 
         self.settings.setValue("lastProjectPath", self.project_path)
 
-    @treat_err
+
     def open_project(self):
         # desktop_path = QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
         # default_folder_path = desktop_path
@@ -326,7 +358,6 @@ class MainWindow(QMainWindow):
             self.page_fill_parameter()
         self.settings.setValue("lastProjectPath", self.project_path)
 
-    # @treat_err
     def refresh_page_project_path(self):
         self.page_beam.updatePath(self.project_path)
         self.page_lattice.updatePath(self.project_path)
@@ -345,7 +376,7 @@ class MainWindow(QMainWindow):
 
 
 
-    @treat_err
+
     def page_fill_parameter(self):
         self.page_beam.fill_parameter()
         self.page_lattice.fill_parameter()
@@ -353,7 +384,7 @@ class MainWindow(QMainWindow):
         # self.page_longdistance.fill_parameter()
         self.page_error.fill_parameter()
 
-    @treat_err
+
     def save_project(self):
         if not self.project_path:
             raise Exception('No project')
@@ -392,15 +423,23 @@ class MainWindow(QMainWindow):
         # res = self.inspect()
         # if not res:
         #     return None
-        self.save_project()
-
+        # raise Exception("fasdf")
+        try:
+            self.save_project()
+        except Exception as e:
+            self.handle_error(str(e))
+            return False
         self.sim_thread = SimThread(self.project_path)
         self.sim_thread.finished.connect(self.on_task_finished)
+        self.sim_thread.error_signal.connect(self.handle_error)
         self.sim_thread.start()
         self.timer1.start(2000)
 
+    def handle_error(self, error_message):
+        # 显示异常消息
+        raise Exception(error_message)
+
     def activate_output(self, ):
-        print(403)
         self.page_output.update_progress()  # @treat_err
         if self.sim_thread:
             pass
@@ -461,11 +500,11 @@ class MainWindow(QMainWindow):
     def refresh_beam(self):
         self.page_beam.fill_parameter()
 
-    @treat_err
+
     def refresh_lattice(self):
         self.page_lattice.fill_parameter()
 
-    @treat_err
+
     def refresh_input(self):
         self.page_input.fill_parameter()
 
@@ -513,7 +552,10 @@ class MainWindow(QMainWindow):
             self.resize(600, 700)  # 恢复到默认尺寸或其他尺寸
 
 if __name__ == '__main__':
+
+
     app = QApplication(sys.argv)
     main_window = MainWindow()
+    # main_window.run()
     sys.exit(app.exec_())
 

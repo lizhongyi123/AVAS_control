@@ -189,7 +189,7 @@ if __name__ == "__main__":
         #"spacechargetype", 'bbb'
     }
     platform = "web"
-    obj = CreateBasicProject(item, platform)
+    obj = CreateBasicProject(item, "qt")
     res = obj.create_project()
     print(res)
 

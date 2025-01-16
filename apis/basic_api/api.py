@@ -154,7 +154,7 @@ def plot_acc(project_path, kind):
 #下列为画图函数
 
 #画dataset中的数据
-def plot_dataset(project_path, picture_name, show_=1, fig=None):
+def plot_dataset(project_path, picture_type, show_=1, fig=None, platform = "qt"):
     """
 
     :param project_path:
@@ -163,18 +163,19 @@ def plot_dataset(project_path, picture_name, show_=1, fig=None):
     :return:
     dataset文件中数据的可视化
     """
-    v = PlotDataSet(project_path, picture_name)
+    dataset_path = os.path.join(project_path, "OutputFile", "dataset.txt")
+    v = PlotDataSet(dataset_path, picture_type)
     v.get_x_y()
     res = v.run(show_, fig)
     return res
 
 #画相图
-def plot_phase(dst_path, show_=1, fig = None):
+def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
     v = PlotPhase(dst_path)
     res = v.run(show_, fig)
     return res
 
-def plot_cavity_voltage(project_path, ratio, show_=1, fig = None):
+def plot_cavity_voltage(project_path, ratio, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -183,12 +184,13 @@ def plot_cavity_voltage(project_path, ratio, show_=1, fig = None):
     :return:
     腔压图
     """
-    v = PlotCavityVoltage(project_path, ratio)
+    lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
+    v = PlotCavityVoltage(lattice_mulp_path, ratio)
     v.get_x_y()
     res = v.run(show_, fig)
     return res
 
-def plot_cavity_syn_phase(project_path, show_=1, fig = None):
+def plot_cavity_syn_phase(project_path, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -201,7 +203,7 @@ def plot_cavity_syn_phase(project_path, show_=1, fig = None):
     res = v.run(show_, fig)
     return res
 
-def plot_phase_advance(project_path, out_type, show_=1, fig = None):
+def plot_phase_advance(project_path, picture_type, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -211,13 +213,13 @@ def plot_phase_advance(project_path, out_type, show_=1, fig = None):
     相移图
     """
     v = PlotPhaseAdvance(project_path)
-    v.get_x_y(out_type)
+    v.get_x_y(picture_type)
     res = v.run(show_, fig)
     return res
 
 
 
-def plot_error_out(project_path, picture_type, show_=1, fig = None):
+def plot_error_out(file_path, picture_type, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -227,12 +229,12 @@ def plot_error_out(project_path, picture_type, show_=1, fig = None):
     :return:
     误差图
     """
-    v = PlotErrout(project_path, picture_type)
+    v = PlotErrout(file_path, picture_type)
     v.get_x_y()
     res = v.run(show_, fig)
     return res
 
-def plot_error_emit_loss(project_path, type_, show_=1, fig = None):
+def plot_error_emit_loss(file_path, type_, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -242,7 +244,7 @@ def plot_error_emit_loss(project_path, type_, show_=1, fig = None):
     :return:
     误差图
     """
-    v = PlotErr_emit_loss(project_path, type_)
+    v = PlotErr_emit_loss(file_path, type_)
     v.get_x_y()
     res = v.run(show_, fig)
     return res

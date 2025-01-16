@@ -53,7 +53,7 @@ class SimMode():
         if base_mode not in ["mulp", "env"]:
             raise exce.ValueRangeError('sim type', ["mulp", "env"], base_mode)
 
-        all_error_type =["stat", "dyn", "stat_dyn", "undefined"]
+        all_error_type =["stat", "dyn", "stat_dyn", ""]
         if err_mode not in all_error_type:
             raise exce.ValueRangeError('error type', all_error_type, err_mode)
 

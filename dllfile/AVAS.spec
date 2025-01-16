@@ -12,7 +12,6 @@ a = Analysis(
      './aftertreat/dataanalysis/out_percentemitt.py',
      './aftertreat/dataanalysis/percentemitt.py',
      './aftertreat/dataanalysis/plttodst.py',
-     './aftertreat/dataanalysis/__init__.py',
 
     './aftertreat/picture/initialplot.py',
     './aftertreat/picture/plotacc.py',
@@ -21,15 +20,6 @@ a = Analysis(
     './aftertreat/picture/ploterror.py',
     './aftertreat/picture/plotphase.py',
     './aftertreat/picture/plotpicture.py',
-    './aftertreat/dataanalysis/__init__.py',
-    './aftertreat/__init__.py',
-
-    './apis/basic_api/api.py',
-    './apis/qt_api/api.py',
-    './apis/qt_api/createbasicfile.py',
-    './apis/qt_api/getschedule.py',
-    './apis/qt_api/SimMode.py',
-
 
     './apps/basicenv.py',
     './apps/calacceptance.py',
@@ -41,27 +31,22 @@ a = Analysis(
     './apps/matchtwiss.py',
     './apps/scan.py',
     './apps/tasks.py',
-    './apps/__init__.py',
 
     './core/MultiParticle.py',
     './core/MultiParticleEngine.py',
     './core/LinacOPTEngine.py',
     './core/LongAcceleratorEngine.py',
-    './core/__init__.py',
-
 
     './dataprovision/beamparameter.py',
     './dataprovision/beamset.py',
     './dataprovision/datasetparameter.py',
     './dataprovision/env_beam_out.py',
     './dataprovision/latticeparameter.py',
-    './dataprovision/__init__.py',
 
 
     './utils/beamconfig.py',
     './utils/change_win_to_linux.py',
     './utils/exception.py',
-    './utils/getinfotools.py',
     './utils/iniconfig.py',
     './utils/initilaconfig.py',
     './utils/inputconfig.py',
@@ -73,13 +58,11 @@ a = Analysis(
     './utils/treat_directory.py',
     './utils/treatfile.py',
     './utils/treatlist.py',
-    './utils/__init__.py',
 
 
+    './user/user_arg/user_argparse.py',
 
     './user/user_qt/lattice_file/lattice_ide.py',
-    './user/user_qt/page_utils/picture_dialog.py',
-
     './user/user_qt/page_acc.py',
     './user/user_qt/page_analysis.py',
     './user/user_qt/page_beam.py',

@@ -56,11 +56,11 @@ class PlotPhase:
     def _plot_density(self, fig, position, x, y, xlabel, ylabel, font):
         ax = fig.add_subplot(position)
         xy = np.vstack([x, y]).T
-        if xlabel == "φ(deg)":
-            bd = np.max(y)/100
-            kde = KernelDensity(kernel='tophat', bandwidth=bd).fit(xy)
-        else:
-            kde = KernelDensity(kernel='tophat', bandwidth='scott').fit(xy)
+        # if xlabel == "φ(deg)":
+        #     bd = np.max(y)/100
+        #     kde = KernelDensity(kernel='tophat', bandwidth=bd).fit(xy)
+        # else:
+        kde = KernelDensity(kernel='epanechnikov', bandwidth='scott').fit(xy)
         log_density = kde.score_samples(xy)
         z = np.exp(log_density)
         z /= max(z)  # 归一化
@@ -72,7 +72,7 @@ class PlotPhase:
         ax.grid(linestyle="--")
 
 if __name__ == "__main__":
-    dst_path = r"C:\Users\shliu\Desktop\t001\inData.dst"
+    dst_path = r"C:\Users\shliu\Desktop\cafe_AVAS\OutputFile\outData_12.529930.dst"
     plot_phase = PlotPhase(dst_path)
     plot_phase.run(show_=True)
 

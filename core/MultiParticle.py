@@ -67,9 +67,9 @@ if __name__ == "__main__":
 
     start = time.time()
     project_path = r"E:\using\test_avas_qt\fileld_ciads3"
-    field_path = r"E:\using\test_avas_qt\field"
-    obj = MultiParticle(project_path)
-    obj.run(field_file=field_path)
+    field_path = r"C:\Users\shliu\Desktop\cafe_AVAS"
+    obj = MultiParticle(field_path)
+    obj.run()
     # process = multiprocessing.Process(target=basic_mulp,
     #                               args=(project_path, ))
     #

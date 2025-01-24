@@ -20,6 +20,8 @@ from utils.tolattice import write_mulp_to_lattice_only_sim
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
+from aftertreat.picture.plotdesnsity import PlotDensity, PlotDensityLevel, PlotDensityProcess
+
 ########################################################################################################################
 import multiprocessing
 
@@ -249,6 +251,35 @@ def plot_error_emit_loss(file_path, type_, show_=1, fig = None, platform = "qt")
     res = v.run(show_, fig)
     return res
 
+def plot_density(file_path, picture_type, show_=1, fig = None, platform = "qt"):
+    v = PlotDensity(file_path)
+    v.get_x_y(picture_type)
+    res = v.run(show_, fig)
+    return res
+
+def plot_density_level(file_path, picture_type, show_=1, fig = None, platform = "qt"):
+    v = PlotDensityLevel(file_path)
+    v.get_x_y(picture_type)
+    res = v.run(show_, fig)
+    return res
+
+
+
+def plot_density_process(file_path, desnity_plane, picture_type, show_=1, fig = None, platform = "qt"):
+    density_plane = ["x", "y", "r", "z"]
+    #picture_type = [
+    #"centroid"
+    #"emit",
+    # rms_size, rms_size_max,
+    #lost, maxlost, minlost,
+
+    # ]
+
+    v = PlotDensityProcess(file_path)
+    v.get_x_y(desnity_plane, picture_type)
+    res = v.run(show_, fig)
+    return res
+
 def plot_env_beam_out(project_path, picture_name, show_=1, fig = None):
     v =PlotEnvBeamOut(project_path)
     v.get_x_y(picture_name)
@@ -283,7 +314,7 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    project_path = r"E:\using\test_avas_qt\fileld_ciads3"
-    field_path = r"E:\using\test_avas_qt\field"
-    basic_mulp(project_path)
+    file_path = r"E:\using\test_avas_qt\test_adjust"
+    # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
+    basic_mulp(file_path)
 

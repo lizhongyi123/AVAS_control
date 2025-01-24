@@ -161,7 +161,6 @@ def create_from_file_input_ini(item):
 
     kwargs.update({'inputiniParams': new_dic})
     output = format_output(**kwargs)
-    print(output)
     return output
 
 def write_to_file_input_ini(item, param):
@@ -170,7 +169,6 @@ def write_to_file_input_ini(item, param):
     #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
     #  'scmethod': 'SPICNIC', 'fieldSource': ''}
     kwargs = {}
-
     input_param = copy.deepcopy(param)
     del input_param["fieldSource"]
 
@@ -196,9 +194,8 @@ def write_to_file_input_ini(item, param):
         output = format_output(code, msg=msg, **kwargs)
         return output
 
-    input_obj.write_to_file(item)
-    ini_obj.write_to_file(item)
-
+    res1 = input_obj.write_to_file(item)
+    res2 = ini_obj.write_to_file(item)
     new_dic = param
     kwargs.update({'inputiniParams': new_dic})
     output = format_output(**kwargs)
@@ -220,9 +217,9 @@ if __name__ == '__main__':
     #
     path = r"E:\using\test_avas_qt\test_ini"
     item = {"projectPath": path}
-    res = create_from_file_input_ini(item)
-    params = {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
-               'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
-               'scmethod': 'SPICNIC', 'fieldSource': None}
-
-    write_to_file_input_ini(item, params)
+    # res = create_from_file_input_ini(item)
+    param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'},
+     'lattice': {'length': 0}, 'input': {'sim_type': 'mulp'},
+     'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
+     'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
+    write_to_file_input_ini(item, param)

@@ -31,7 +31,7 @@ import copy
 
 from utils.tolattice import write_mulp_to_lattice_only_sim
 from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
-
+from apps.err_adjust import Adjust_Error
 class Error():
     """
     该类为误差分析
@@ -1295,6 +1295,82 @@ class Errorstat(Error):
 
         return goal
 
+    def optimize_one_group(self, group, time, error_lattice,
+                           adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num,
+                           adjust_parameter_range, \
+                           adjust_parameter_n, adjust_parameter_use_init):
+
+        error_lattice = copy.deepcopy(error_lattice)
+
+        # lattice中原本的初值
+        # lattice_initial_value =np.array(adjust_parameter_initial_value).reshape(-1)
+
+        lattice_initial_value = flatten_list(adjust_parameter_initial_value)
+
+        # print('lattice_initial_value', lattice_initial_value)
+
+        # 范围
+        parameter_range = np.array(flatten_list(adjust_parameter_range)).reshape(-1, 2)
+        # print('parameter_range', parameter_range)
+
+        # 随机初值
+        random_initial_value = [random.uniform(i[0], i[1]) for i in parameter_range]
+
+        # 是否使用初值
+        # use_initial_value = np.array(adjust_parameter_use_init).reshape(-1)
+        use_initial_value = np.hstack(adjust_parameter_use_init)
+
+        # 最终初值
+        initial_value = random_initial_value
+        for i in range(len(initial_value)):
+            if use_initial_value[i] == 1:
+                initial_value[i] = lattice_initial_value[i]
+
+        print('initial_value', initial_value)
+
+        # 是否使用相同的值
+        # n_ = np.array(adjust_parameter_n).reshape(-1)
+        n_ = flatten_list(adjust_parameter_n)
+        # print('n_', n_)
+
+        unique_elements, unique_indices = np.unique(n_, return_index=True)
+        print(unique_elements, unique_indices)
+
+        indiaces = []
+
+        for i in range(len(unique_elements)):
+            if unique_elements[i] != 0:
+                indiaces.append([index for index, element in enumerate(n_) if element == unique_elements[i]])
+
+
+        constraints = []
+        for i in indiaces:
+            if len(i) == 1:
+                continue
+            for j in range(1, len(i)):
+                # print([i[j]], i[0])
+                initial_value[i[j]] = initial_value[i[0]]
+                constraints.append({'type': 'eq', 'fun': lambda x: x[i[j]] - x[i[0]]})
+
+
+        # for constraint in constraints:
+        #     print('约束条件函数结果:', constraint)
+
+        goal = self.get_goal(error_lattice, adjust_element_num, adjust_parameter_num, group, time)
+
+        options = {'maxiter': 100, 'eps': 10**-1, 'ftol': 10**-4}
+
+        self.ini_this = []
+        self.loss_this = []
+
+        try:
+            result = minimize(fun=goal, x0=initial_value, constraints=constraints, bounds=parameter_range,
+                              method='SLSQP', options=options)
+
+            return result.x, result.fun
+
+        except Exception:
+            return self.ini_this[-1], self.loss_this[-1]
 
     def run_use_corrected_result(self, corrected_result, group, time, error_lattice,
                                  adjust_element_num, adjust_parameter_num):
@@ -1376,82 +1452,6 @@ class Errorstat(Error):
 
         delete_directory(self.error_middle_output0_path)
 
-    def optimize_one_group(self, group, time, error_lattice,
-                           adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num,
-                           adjust_parameter_range, \
-                           adjust_parameter_n, adjust_parameter_use_init):
-
-        error_lattice = copy.deepcopy(error_lattice)
-
-        # lattice中原本的初值
-        # lattice_initial_value =np.array(adjust_parameter_initial_value).reshape(-1)
-
-        lattice_initial_value = flatten_list(adjust_parameter_initial_value)
-
-        # print('lattice_initial_value', lattice_initial_value)
-
-        # 范围
-        parameter_range = np.array(flatten_list(adjust_parameter_range)).reshape(-1, 2)
-        # print('parameter_range', parameter_range)
-
-        # 随机初值
-        random_initial_value = [random.uniform(i[0], i[1]) for i in parameter_range]
-
-        # 是否使用初值
-        # use_initial_value = np.array(adjust_parameter_use_init).reshape(-1)
-        use_initial_value = np.hstack(adjust_parameter_use_init)
-
-        # 最终初值
-        initial_value = random_initial_value
-        for i in range(len(initial_value)):
-            if use_initial_value[i] == 1:
-                initial_value[i] = lattice_initial_value[i]
-
-        print('initial_value', initial_value)
-
-        # 是否使用相同的值
-        # n_ = np.array(adjust_parameter_n).reshape(-1)
-        n_ = flatten_list(adjust_parameter_n)
-        # print('n_', n_)
-
-        unique_elements, unique_indices = np.unique(n_, return_index=True)
-        print(unique_elements, unique_indices)
-
-        indiaces = []
-
-        for i in range(len(unique_elements)):
-            if unique_elements[i] != 0:
-                indiaces.append([index for index, element in enumerate(n_) if element == unique_elements[i]])
-
-
-        constraints = []
-        for i in indiaces:
-            if len(i) == 1:
-                continue
-            for j in range(1, len(i)):
-                # print([i[j]], i[0])
-                initial_value[i[j]] = initial_value[i[0]]
-                constraints.append({'type': 'eq', 'fun': lambda x: x[i[j]] - x[i[0]]})
-
-
-        # for constraint in constraints:
-        #     print('约束条件函数结果:', constraint)
-
-        goal = self.get_goal(error_lattice, adjust_element_num, adjust_parameter_num, group, time)
-
-        options = {'maxiter': 100, 'eps': 10**-1, 'ftol': 10**-4}
-
-        self.ini_this = []
-        self.loss_this = []
-
-        try:
-            result = minimize(fun=goal, x0=initial_value, constraints=constraints, bounds=parameter_range,
-                              method='SLSQP', options=options)
-
-            return result.x, result.fun
-
-        except Exception:
-            return self.ini_this[-1], self.loss_this[-1]
     def run_one_time_opti(self, group, time, lattice_mulp_list):
         self.diag_every.clear()
         """
@@ -1466,9 +1466,9 @@ class Errorstat(Error):
         adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
         adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(lattice_mulp_list)
 
-        # print( 1468, adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
+        # print( adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
         # adjust_parameter_n, adjust_parameter_use_init)
-
+        # sys.exit()
         #进行优化
         opti_res_this, loss_this = self.optimize_one_group(group, time, lattice_mulp_list,
                                             adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num,

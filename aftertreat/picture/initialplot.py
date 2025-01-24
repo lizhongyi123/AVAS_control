@@ -131,7 +131,6 @@ class PicturePlot_2D():
         elif isinstance(self.y[0], list):
             if not isinstance(self.x[0], list):
                 for i in range(len(self.y)):
-                    print()
                     ax1.plot(self.x, self.y[i], color=self.colors[i], marker=self.markers[i], label=self.labels[i])
 
             elif isinstance(self.x[0], list):
@@ -158,6 +157,7 @@ class PicturePlot_2D():
         if len(self.ylim) == 2:
             ax1.set_ylim(self.ylim[0], self.ylim[1])
 
+
         if self.set_legend == 1:
             ax1.legend()
 
@@ -167,7 +167,7 @@ class PicturePlot_2D():
                 for shape in shapes:
                     ax1.gca().add_patch(shape)
 
-        ax1.grid()
+        # ax1.grid()
         if show_:
             plt.show()
             return None

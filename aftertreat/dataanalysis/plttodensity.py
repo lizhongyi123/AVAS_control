@@ -143,6 +143,7 @@ class PlttoDensity():
         # step_list = [i for i in range(0, all_step)]
         v1 = [i for i in range(0, all_step, 20)]
         v2 = [i for i in range(v1[-1] + 1, all_step)]
+
         step_list = v1 + v2
         with Pool(num_workers) as pool:  # 使用上下文管理器
             # 准备每一步的参数
@@ -209,6 +210,7 @@ class PlttoDensity():
             normal_step = len(normal_zg_lis)
 
             if normal_step <= len(zg_lis):
+                #如果这次模拟步数多于正常模拟
                 delta_zg = np.array(zg_lis)[:normal_step] - normal_zg_lis
 
                 emit_lis = emit_lis[0:normal_step]

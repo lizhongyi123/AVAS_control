@@ -83,13 +83,14 @@ class PictureDialog1(QDialog):
 
 
 class PlotOnePicture1(PictureDialog1):
-    # 只有一张图，接收参数为文件路径， 类， 图片类型
+    # 只有一张图，接收参数为文件路径， 函数， 图片类型1
     def __init__(self, file_path, func, picture_type=None):
         super().__init__()
         self.picture_type = picture_type
         self.func = func
         self.file_path = file_path
     def plot_image(self, ):
+
         if self.picture_type:
             self.func(self.file_path, self.picture_type, show_=0, fig=self.fig)
         else:
@@ -100,3 +101,19 @@ class PlotOnePicture1(PictureDialog1):
         #     obj = self.cls(self.file_path)
         # obj.get_x_y()
         # obj.run( show_=0, fig=self.fig)
+
+
+class PlotOnePicture2(PictureDialog1):
+    # 只有一张图，接收参数为文件路径， 函数， 图片类型1， 图片类型2
+
+    def __init__(self, file_path, func, picture_type1=None, picture_type2=None):
+        super().__init__()
+        self.picture_type1 = picture_type1
+        self.picture_type2 = picture_type2
+
+        self.func = func
+        self.file_path = file_path
+
+    def plot_image(self, ):
+        self.func(self.file_path, self.picture_type1, self.picture_type2, show_=0, fig=self.fig)
+

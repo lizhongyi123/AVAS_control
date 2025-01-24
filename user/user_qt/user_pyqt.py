@@ -385,6 +385,7 @@ class MainWindow(QMainWindow):
         self.page_error.fill_parameter()
 
 
+
     def save_project(self):
         if not self.project_path:
             raise Exception('No project')
@@ -394,10 +395,11 @@ class MainWindow(QMainWindow):
         self.page_input.save_input()
         self.save_ini()
 
+
     def save_ini(self):
         item = {"projectPath": self.project_path}
         ini_obj = IniConfig()
-
+        ini_obj.create_from_file(item)
         set_dict = {'input': self.input_signal,
                     'match': self.match_signal,
                     'error': self.error_signal,

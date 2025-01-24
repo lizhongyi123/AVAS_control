@@ -66,15 +66,9 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"E:\using\test_avas_qt\fileld_ciads3"
-    field_path = r"C:\Users\shliu\Desktop\cafe_AVAS"
-    obj = MultiParticle(field_path)
+    project_path = r"E:\using\test_avas_qt\test_adjust"
+    obj = MultiParticle(project_path)
     obj.run()
-    # process = multiprocessing.Process(target=basic_mulp,
-    #                               args=(project_path, ))
-    #
-    # process.start()  # 启动子进程
-    # process.join()  # 等待子进程运行结束
 
     end = time.time()
     print(f"总时间: {end - start}")

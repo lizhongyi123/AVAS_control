@@ -6,6 +6,7 @@ import math
 from global_varible import Pi, c_light
 from dataprovision.latticeparameter import LatticeParameter
 
+import random
 
 class DatasetParameter():
     """
@@ -37,16 +38,20 @@ class DatasetParameter():
         self.num_of_particle = float(dataset_info[0][28])
 
         dataset_info = [[float(j) for j in i] for i in dataset_info]
-        if len(dataset_info[-1]) != 40:
-            print(4111111, dataset_info[-1])
-            print(4111111, dataset_info[-2])
 
 
         self.dataset_index = [int(i[-1]) for i in dataset_info]
 
+        # random.seed(40)
+        # for i in range(1, len(dataset_info)):
+        #     selected_number = random.choice([0,1,2])
+        #     dataset_info[i][35] = selected_number
+        #     # print(i, selected_number)
+
         self.z = []
         sign1 = 0
         sign2 = 0
+        #一旦进入二级铁，sign1就永远=1，
 
         for i in range(len(dataset_info)):
             if (dataset_info[i][35] == 0):
@@ -56,14 +61,31 @@ class DatasetParameter():
                 else:
                     self.z.append(self.z[-1] + dataset_info[i][38])
             elif (dataset_info[i][35] == 1):
+                print(63, dataset_info[i][35])
                 self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
                 sign1 = 1
                 sign2 = 0
+
             elif (sign2 == 0):
+                #条件为2， sign2= 0
+                # 也就是说，如果这一次的标志为2，但是前一次的标志也为0， 1，那么进入这次循环
                 self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
                 sign2 = 1
+
             else:
+                #条件为2， sign2 = 1
+                #也就是说，如果这一次的标志为2，但是前一次的标志也为2，那么进入这次循环
                 continue
+
+        # for i in range(len(dataset_info)):
+        #     if dataset_info[i][35] == 0:
+        #         self.z.append(dataset_info[i][5] + dataset_info[i][33])
+        #
+        #     elif dataset_info[i][35] == 1:
+        #         self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
+        #
+        #     elif dataset_info[i][35] == 2:
+        #         pass
 
 
         self.x = [i[1] + i[29] for i in dataset_info]  # m
@@ -169,11 +191,11 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads\OutputFile\DataSet.txt"
+    path1 = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\error_output\output_0_0\DataSet.txt"
     obj = DatasetParameter(path1)
 
     v = obj.get_parameter()
-    print(obj.z[-1])
+    print(obj.z)
     import numpy as np
     # import time
     # t0 = time.time()

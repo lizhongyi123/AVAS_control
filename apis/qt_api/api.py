@@ -1,3 +1,5 @@
+import sys
+
 from aftertreat.dataanalysis.percentemitt import PercentEmit
 from utils.readfile import read_dst_fast
 import os
@@ -7,6 +9,7 @@ from utils.treat_directory import list_files_in_directory
 
 from utils.iniconfig import IniConfig
 from utils.inputconfig import InputConfig
+import pandas as pd
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
     kwargs = {}
@@ -204,8 +207,77 @@ def write_to_file_input_ini(item, param):
 # def set_input_ini(item):
 #     project_path =
 
+def cal_mass(particletype, nucleonnumber, numofcharge):
+    kwargs = {}
+    if particletype == "e-":
+        kwargs.update({'particlerestmass': 0.511})
+        output = format_output(**kwargs)
+        return output
+    elif particletype == "e+":
+        kwargs.update({'particlerestmass': 0.511})
+        output = format_output(**kwargs)
+        return output
+
+    script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
+    parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
+    parent_directory = os.path.dirname(parent_directory)  # 获取上级目录的路径
+    mass_csv_path = os.path.join(parent_directory, "staticfile", "atomic_masses.csv" )
+    df = pd.read_csv(mass_csv_path, index_col=None)
+    df_filtered = df[(df["Element"] == particletype) & (df["A"] == nucleonnumber)]
+    # print(215, df_filtered)
+    dict_rows = df_filtered.to_dict(orient='records')
+    if len(dict_rows) == 0:
+        #说明用户寻找的同位素不存在
+        code = -1
+        msg = "This particle doesn't exist"
+        kwargs.update({'particlerestmass': ""})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
+
+    dict_rows = dict_rows[0]
+    Mq = 931.4941024
+    Me = 0.511
+    def get_mass(Am, q):
+        mass = Am * Mq - q * Me
+        return mass
+    Am = dict_rows["Am"]
+    q = numofcharge
+    particlerestmass = round(get_mass(Am, q), 5)
+    kwargs.update({'particlerestmass': particlerestmass})
+    output = format_output(**kwargs)
+    return output
+
+def get_atom(mode):
+    kwargs = {}
+    if mode == "common":
+        v = [ "H", "Cr", "Ar", "Ca", "Mn", "e+", "e-"]
+        kwargs.update({'atomList': v})
+        output = format_output(**kwargs)
+        return output
+    else:
+        script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
+        parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
+        parent_directory = os.path.dirname(parent_directory)  # 获取上级目录的路径
+        mass_csv_path = os.path.join(parent_directory, "staticfile", "atomic_masses.csv")
+        df = pd.read_csv(mass_csv_path, index_col=None)
+
+        Element_lis = df["Element"].tolist()
+        unique_lst = list(dict.fromkeys(Element_lis))
+        unique_lst.append("e+")
+        unique_lst.append("e-")
+        kwargs.update({'atomList': unique_lst})
+        output = format_output(**kwargs)
+        return output
+    
+
 
 if __name__ == '__main__':
+    # res = cal_mass("H", 1, 1)
+    # print(res)
+    res = get_atom(mode="all")
+    print(res)
+
+
     # item = {"fieldPath": r"C:\Users\shliu\Desktop\field"}
     # res = get_fieldname(item)
     # print(res)
@@ -215,11 +287,11 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"E:\using\test_avas_qt\test_ini"
-    item = {"projectPath": path}
-    # res = create_from_file_input_ini(item)
-    param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'},
-     'lattice': {'length': 0}, 'input': {'sim_type': 'mulp'},
-     'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
-     'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
-    write_to_file_input_ini(item, param)
+    # path = r"E:\using\test_avas_qt\test_ini"
+    # item = {"projectPath": path}
+    # # res = create_from_file_input_ini(item)
+    # param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'},
+    #  'lattice': {'length': 0}, 'input': {'sim_type': 'mulp'},
+    #  'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
+    #  'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
+    # write_to_file_input_ini(item, param)

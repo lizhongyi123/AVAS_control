@@ -207,7 +207,11 @@ def write_to_file_input_ini(item, param):
 # def set_input_ini(item):
 #     project_path =
 
-def cal_mass(particletype, nucleonnumber, numofcharge):
+def cal_mass(item):
+    particletype = item["particletype"]
+    nucleonnumber = item["nucleonnumber"]
+    numofcharge = item["numofcharge"]
+
     kwargs = {}
     if particletype == "e-":
         kwargs.update({'particlerestmass': 0.511})
@@ -223,16 +227,32 @@ def cal_mass(particletype, nucleonnumber, numofcharge):
     parent_directory = os.path.dirname(parent_directory)  # 获取上级目录的路径
     mass_csv_path = os.path.join(parent_directory, "staticfile", "atomic_masses.csv" )
     df = pd.read_csv(mass_csv_path, index_col=None)
+
+    #检测错误情况
+    if 1:
+        Element_lis = df["Element"].tolist()
+        unique_lst = list(dict.fromkeys(Element_lis))
+        if particletype not in unique_lst:
+            code = -1
+            msg = "This element doesn't exist"
+            kwargs.update({'particlerestmass': ""})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
+
+        df_all_isotope = df[df["Element"] == particletype]
+        all_A = df_all_isotope["A"].tolist()
+
+        if nucleonnumber not in all_A:
+            code = -1
+            msg = (f"{particletype} does not have such an isotope. Its isotopes "
+                   f"only exist with nucleon numbers of {all_A}.")
+            kwargs.update({'particlerestmass': ""})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
+
+
     df_filtered = df[(df["Element"] == particletype) & (df["A"] == nucleonnumber)]
-    # print(215, df_filtered)
     dict_rows = df_filtered.to_dict(orient='records')
-    if len(dict_rows) == 0:
-        #说明用户寻找的同位素不存在
-        code = -1
-        msg = "This particle doesn't exist"
-        kwargs.update({'particlerestmass': ""})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
 
     dict_rows = dict_rows[0]
     Mq = 931.4941024
@@ -248,6 +268,7 @@ def cal_mass(particletype, nucleonnumber, numofcharge):
     return output
 
 def get_atom(mode):
+    #mode的选项， “common”， “all”
     kwargs = {}
     if mode == "common":
         v = [ "H", "Cr", "Ar", "Ca", "Mn", "e+", "e-"]
@@ -272,10 +293,15 @@ def get_atom(mode):
 
 
 if __name__ == '__main__':
-    # res = cal_mass("H", 1, 1)
-    # print(res)
-    res = get_atom(mode="all")
+    item = {
+    "particletype": "H",
+    "nucleonnumber": 10,
+    "numofcharge":1
+    }
+    res = cal_mass(item)
     print(res)
+    # res = get_atom(mode="all")
+    # print(res)
 
 
     # item = {"fieldPath": r"C:\Users\shliu\Desktop\field"}

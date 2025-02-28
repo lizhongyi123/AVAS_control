@@ -50,25 +50,12 @@ def basic_run(project_path, queue):
 
 class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
-    error_signal = pyqtSignal(str)
+    sim_error_signal = pyqtSignal(str)
 
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
         self.process = None
-
-    # def run(self):
-    #     print("Thread started")
-    #     item = {"projectPath": self.project_path}
-    #
-    #     obj = SimMode(item)
-    #     self.process = multiprocessing.Process(target=obj.run)
-    #
-    #     self.process.start()  # 启动子进程
-    #     self.process.join()   # 等待子进程运行结束
-    #     self.finished.emit()  # 任务完成信号
-    #     print("Thread finished")
-
 
     def run(self):
         try:
@@ -90,7 +77,7 @@ class SimThread(QThread):
             self.finished.emit()
             print("Thread finished")
         except Exception as e:
-            self.error_signal.emit(str(e))
+            self.sim_error_signal.emit(str(e))
 
     def stop(self):
         if self.process and self.process.is_alive():
@@ -164,7 +151,7 @@ class MainWindow(QMainWindow):
         run_act.triggered.connect(self.run)
 
         run_stop_act = QAction('stop', self)
-        run_stop_act.triggered.connect(self.stop)
+        run_stop_act.triggered.connect(self.stop_all)
 
 
         runMenu.addAction(run_act)
@@ -415,40 +402,47 @@ class MainWindow(QMainWindow):
             raise Exception(res['data']['msg'])
 
 
-
-    def on_task_finished(self):
-        print("Task finished.")
-
-
     def run(self):
-        self.stop()
-        # res = self.inspect()
-        # if not res:
-        #     return None
-        # raise Exception("fasdf")
+        self.stop_all()
+
         try:
             self.save_project()
         except Exception as e:
             self.handle_error(str(e))
             return False
         self.sim_thread = SimThread(self.project_path)
+
+        #完成
         self.sim_thread.finished.connect(self.on_task_finished)
-        self.sim_thread.error_signal.connect(self.handle_error)
+        #模拟出错
+        self.sim_thread.sim_error_signal.connect(self.handle_error)
+
         self.sim_thread.start()
         self.timer1.start(2000)
 
     def handle_error(self, error_message):
+        self.sim_thread = None
+        self.stop_all()
         # 显示异常消息
         raise Exception(error_message)
 
     def activate_output(self, ):
+        print(445, self.sim_thread)
         self.page_output.update_progress()  # @treat_err
+
+        #如果output
+        self.page_output.schedule_error_signal.connect(self.stop_output)
         if self.sim_thread:
             pass
         else:
             self.timer1.stop()
 
-    def stop(self):
+#停止运行output页面输出
+    def stop_output(self, schedule_error_info):
+        self.timer1.stop()
+
+#停止程序所有的运行
+    def stop_all(self):
 
         if self.sim_thread:
             self.sim_thread.stop()
@@ -461,7 +455,6 @@ class MainWindow(QMainWindow):
     def on_task_finished(self):
         print("Task finished.")
         self.sim_thread = None
-
 
 
 
@@ -498,7 +491,7 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-
+    #
     def refresh_beam(self):
         self.page_beam.fill_parameter()
 

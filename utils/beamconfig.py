@@ -121,6 +121,7 @@ class BeamConfig():
             if self.validate_type(original_dict):
                 for k, v in original_dict.items():
                     self.beam_parameter[k] = original_dict[k]
+
         except Exception as e:
             code = -1
             msg = str(e)

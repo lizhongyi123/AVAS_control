@@ -1,3 +1,4 @@
+import sys
 
 from scipy.optimize import minimize
 
@@ -21,32 +22,70 @@ import multiprocessing
 
 import global_varible
 import copy
+from utils.exception import BaseError
 
 from utils.tolattice import write_mulp_to_lattice_only_sim
 from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
 
 from apps.error_base_function import judge_command_on_element
+from utils.exception import BaseError
 class Adjust_Error():
     """
-    Ó¦¸Ã½ÓÊÕÒ»¸öÁĞ±í
-    µ«ÊÇ·µ»ØÓÅ»¯½á¹ûºÍ
+    åº”è¯¥æ¥æ”¶ä¸€ä¸ªåˆ—è¡¨
+    ä½†æ˜¯è¿”å›ä¼˜åŒ–ç»“æœå’Œ
     """
-    def __init__(self, project_path):
+    def __init__(self, project_path, field_path):
         self.diag_res = {}
         self.project_path = project_path
-        self.lattice_mulp_path = os.ath.join(self.project_path, "InputFile", "lattice_mulp.txt")
-        self.lattice_path = os.ath.join(self.project_path, "InputFile", "lattice_mulp.txt")
+        self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
+        self.lattice_path = os.path.join(self.project_path, "InputFile", "lattice.txt")
+        self.error_elemment_command = global_varible.error_elemment_command
+        self.error_elemment_stat = global_varible.error_elemment_command_stat
+        self.error_elemment_dyn = global_varible.error_elemment_command_dyn
 
+        self.error_beam_command = global_varible.error_beam_command
+        self.error_beam_stat = global_varible.error_beam_stat
+        self.error_beam_dyn = global_varible.error_beam_dyn
+        self.field_path = field_path
+
+        self.input_path = os.path.join(self.project_path, 'InputFile')
+        self.output_path = os.path.join(self.project_path, 'OutputFile')
+
+        self.error_middle_path = os.path.join(self.project_path, 'OutputFile', 'error_middle')
+        self.error_middle_output0_path = os.path.join(self.project_path, 'OutputFile', 'error_middle', 'output_0')
+        self.error_output_path = os.path.join(self.project_path, 'OutputFile', 'error_output')
+        self.normal_out_path = os.path.join(self.error_output_path, 'output_0_0')
+
+        self.errors_par_tot_path = os.path.join(self.output_path, "errors_par_tot.txt")
+        self.errors_par_path = os.path.join(self.output_path, "errors_par.txt")
+        self.err_adjust_path = os.path.join(self.project_path, "OutputFile", "error_adjust")
+
+    def judge_command_on_element(self, lattice, command):
+        #è¿”å›ä¸€ä¸ªå‘½ä»¤å¯¹åº”çš„æ˜¯å“ªä¸ªå…ƒä»¶
+        lattice = copy.deepcopy(lattice)
+
+        command_index = lattice.index(command)
+        command_on_element = None
+        for i in range(command_index, len(lattice)):
+            if lattice[i][0] in global_varible.long_element:
+                command_on_element = int(lattice[i][-1].split("_")[1])
+                break
+        return command_on_element
+
+    def run_multiparticle(self, p_path, out_putfile_):
+        multiparticle_obj = MultiParticle(p_path)
+
+        res = multiparticle_obj.run(output_file=out_putfile_, field_file=self.field_path)
     def generate_adjust_parameter(self, input_lines):
         """
-        ²úÉú¶¨Î»ĞÅÏ¢, adjustÃüÁîÖĞÄÄĞ©²ÎÊıĞèÒªĞŞ¸Ä
+        äº§ç”Ÿå®šä½ä¿¡æ¯, adjustå‘½ä»¤ä¸­å“ªäº›å‚æ•°éœ€è¦ä¿®æ”¹
         """
-        adjust_parameter_lattice_command = []  # Ô­À´µÄÃüÁî
-        adjust_element_num = []  # µÚ¼¸¸öÔª¼şÒª¸Ä
-        adjust_parameter_num = []  # µÚ¼¸¸ö²ÎÊıÒª¸Ä
-        adjust_parameter_range = []  # ²ÎÊıµÄ·¶Î§
-        adjust_parameter_n = []  # ¾ßÓĞÒ»ÑùµÄÖµ
-        adjust_parameter_use_init = []  # ÊÇ·ñÊ¹ÓÃ³õÖµ
+        adjust_parameter_lattice_command = []  # åŸæ¥çš„å‘½ä»¤
+        adjust_element_num = []  # ç¬¬å‡ ä¸ªå…ƒä»¶è¦æ”¹
+        adjust_parameter_num = []  # ç¬¬å‡ ä¸ªå‚æ•°è¦æ”¹
+        adjust_parameter_range = []  # å‚æ•°çš„èŒƒå›´
+        adjust_parameter_n = []  # å…·æœ‰ä¸€æ ·çš„å€¼
+        adjust_parameter_use_init = []  # æ˜¯å¦ä½¿ç”¨åˆå€¼
         adjust_parameter_initial_value = []
 
         adjust_parameter_num_per = []
@@ -56,7 +95,7 @@ class Adjust_Error():
         index = -1
 
         index = 0
-        # ÎªadjustÃüÁîÔö¼Ó±àºÅ
+        # ä¸ºadjustå‘½ä»¤å¢åŠ ç¼–å·
         lattice = copy.deepcopy(input_lines)
         for i in lattice:
             if i[0] == "adjust":
@@ -64,7 +103,7 @@ class Adjust_Error():
                 i.append(add_name)
                 index += 1
 
-        # ÎªÃ¿¸öµ÷ÕûÃüÁîÔö¼Ó×÷ÓÃÔª¼şÊı
+        # ä¸ºæ¯ä¸ªè°ƒæ•´å‘½ä»¤å¢åŠ ä½œç”¨å…ƒä»¶æ•°
         for i in lattice:
             if i[0] == "adjust":
                 adjust_on_element = judge_command_on_element(lattice, i)
@@ -96,106 +135,51 @@ class Adjust_Error():
             for j in lattice:
                 if j[0] in global_varible.long_element and int(j[-1].split("_")[-1]) == adjust_element_num[i]:
                     for k in adjust_parameter_num[i]:
+
+                        #æ£€æŸ¥å‚æ•°æ˜¯å¦è¶…è¿‡ä¼˜åŒ–
+                        if k > len(j[:-1]) -1:
+                            v = BaseError()
+                            command = []
+                            for com in all_adjust_command:
+                                if com[-1] == adjust_element_num[i] and int(com[2]) == k:
+                                    command = com
+                                    break
+                            v.adjust_param_value_error(command[:-2])
+
                         adjust_parameter_initial_value[i].append(float(j[k]))
-        #·µ»Ø ÄÄĞ©Ôª¼şĞèÒªĞŞ¸Ä£¬ ÓÅ»¯µÄ³õÊ¼³õÊ¼Öµ£¬ ÄÄĞ©²ÎÊıĞèÒªĞŞ¸Ä£¬ ,Ã¿¸ö²ÎÊıµÄ·¶Î§£¬¹ØÁªÖµn£¬ÊÇ·ñÊ¹ÓÃ³õÖµ
+                break
+        #è¿”å› å“ªäº›å…ƒä»¶éœ€è¦ä¿®æ”¹ï¼Œ ä¼˜åŒ–çš„åˆå§‹åˆå§‹å€¼ï¼Œ å“ªäº›å‚æ•°éœ€è¦ä¿®æ”¹ï¼Œ ,æ¯ä¸ªå‚æ•°çš„èŒƒå›´ï¼Œå…³è”å€¼nï¼Œæ˜¯å¦ä½¿ç”¨åˆå€¼
         return adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
             adjust_parameter_n, adjust_parameter_use_init
 
-        #[15, 16] [[-38.0], [-0.3, 0.3]] [[6], [5, 4]] [[[-0.5, 0.5]], [[-0.5, 0.5], [-0.5, 0.5]]] [[0], [0, 0]] [[1], [1, 0]]
+        #[15, 16]
+        # [[-38.0], [-0.3, 0.3]]
+        # [[6], [5, 4]]  adjust_parameter_num
+        # [[[-0.5, 0.5]], [[-0.5, 0.5], [-0.5, 0.5]]]
+        # [[0], [0, 0]]
+        # [[1], [1, 0]]
 
-    def optimize_one_group(self, group, time, error_lattice,
-                           adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num,
-                           adjust_parameter_range, \
-                           adjust_parameter_n, adjust_parameter_use_init):
-
-        error_lattice = copy.deepcopy(error_lattice)
-
-        # latticeÖĞÔ­±¾µÄ³õÖµ
-        # lattice_initial_value =np.array(adjust_parameter_initial_value).reshape(-1)
-
-        lattice_initial_value = flatten_list(adjust_parameter_initial_value)
-
-        # print('lattice_initial_value', lattice_initial_value)
-
-        # ·¶Î§
-        parameter_range = np.array(flatten_list(adjust_parameter_range)).reshape(-1, 2)
-        # print('parameter_range', parameter_range)
-
-        # Ëæ»ú³õÖµ
-        random_initial_value = [random.uniform(i[0], i[1]) for i in parameter_range]
-
-        # ÊÇ·ñÊ¹ÓÃ³õÖµ
-        # use_initial_value = np.array(adjust_parameter_use_init).reshape(-1)
-        use_initial_value = np.hstack(adjust_parameter_use_init)
-
-        # ×îÖÕ³õÖµ
-        initial_value = random_initial_value
-        for i in range(len(initial_value)):
-            if use_initial_value[i] == 1:
-                initial_value[i] = lattice_initial_value[i]
-
-        print('initial_value', initial_value)
-
-        # ÊÇ·ñÊ¹ÓÃÏàÍ¬µÄÖµ
-        # n_ = np.array(adjust_parameter_n).reshape(-1)
-        n_ = flatten_list(adjust_parameter_n)
-        # print('n_', n_)
-
-        unique_elements, unique_indices = np.unique(n_, return_index=True)
-        print(unique_elements, unique_indices)
-
-        indiaces = []
-
-        for i in range(len(unique_elements)):
-            if unique_elements[i] != 0:
-                indiaces.append([index for index, element in enumerate(n_) if element == unique_elements[i]])
-
-        constraints = []
-        for i in indiaces:
-            if len(i) == 1:
-                continue
-            for j in range(1, len(i)):
-                # print([i[j]], i[0])
-                initial_value[i[j]] = initial_value[i[0]]
-                constraints.append({'type': 'eq', 'fun': lambda x: x[i[j]] - x[i[0]]})
-
-        # for constraint in constraints:
-        #     print('Ô¼ÊøÌõ¼şº¯Êı½á¹û:', constraint)
-
-        goal = self.get_goal(error_lattice, adjust_element_num, adjust_parameter_num, group, time)
-
-        options = {'maxiter': 100, 'eps': 10 ** -1, 'ftol': 10 ** -4}
-
-
-        try:
-            result = minimize(fun=goal, x0=initial_value, constraints=constraints, bounds=parameter_range,
-                              method='SLSQP', options=options)
-
-            return result.x, result.fun
-
-        except Exception:
-            return self.ini_this[-1], self.loss_this[-1]
 
     def treat_diag(self, group, time, error_lattice):
 
         """
-        µÃµ½loss
+        å¾—åˆ°loss
         :return:
         """
         diag_every_location = []
-        # ¶ÁÈ¡ĞÂµÄlatticeĞÅÏ¢
+        # è¯»å–æ–°çš„latticeä¿¡æ¯
 
 
         input_lines = error_lattice
 
-        # ²úÉúÃ¿Ò»¸ödiagÕë¶ÔµÄÎ»ÖÃ
-        lattice_obj = LatticeParameter(self.lattice_mulp_path)
-        lattice_obj.get_parameter()
+        # äº§ç”Ÿæ¯ä¸€ä¸ªdiagé’ˆå¯¹çš„ä½ç½®
+        lattice_obj = LatticeParameter()
+        lattice_obj.get_parameter(error_lattice)
 
 
         lattice_copy = copy.deepcopy(input_lines)
         index = 0
-        #ÎªdiagÌí¼Ódiag_0
+        #ä¸ºdiagæ·»åŠ diag_0
         for i in lattice_copy:
             if i[0].startswith("diag"):
                 add_name = f'diag_{index}'
@@ -237,8 +221,8 @@ class Adjust_Error():
         # print(diag_index)
         # print(diag)
         # sys.exit()
-
-        dataset_path = os.path.join(self.error_middle_output0_path, 'dataset.txt')
+        error_adjust_output0_path = os.path.join(self.project_path, 'OutputFile', 'error_adjust', 'output_0')
+        dataset_path = os.path.join(error_adjust_output0_path, 'dataset.txt')
 
         dataset_obj = DatasetParameter(dataset_path)
         dataset_obj.get_parameter()
@@ -316,14 +300,15 @@ class Adjust_Error():
                 loss_type.append('diag_energy')
 
 
-
-        self.diag_res[f"{group}_{time}"] = diag_every_location
+        diag_res = {}
+        diag_res[f"{group}_{time}"] = diag_every_location
 
         all_loss = 0
         for i in loss_list:
             all_loss += i
 
-        return all_loss
+        return all_loss, diag_res
+
     def get_goal(self, error_lattice, adjust_element_num, adjust_parameter_num, group, time):
         def goal(x):
             print("--------------------")
@@ -331,18 +316,16 @@ class Adjust_Error():
 
             self.ini_this.append(x)
 
-            x = list_one_two(list(x), adjust_parameter_num)
-
-
-            for i in range(len(adjust_element_num)):
-                for j in range(len(adjust_parameter_num[i])):
+            v1 = 0
+            for i_index, i_value in enumerate(adjust_element_num):
+                for j_index, j_value in enumerate(adjust_parameter_num[i_index]):
                     for com in error_lattice:
-                        if com[-1] == f'element_{adjust_element_num[i]}':
-                            com[adjust_parameter_num[i][j]] = x[i][j]
+                        if com[-1] == f'element_{i_value}':
+                            com[j_value] = x[v1]
                             break
+                    v1 += 1
 
             error_lattice_no_index = self.delete_element_end_index(error_lattice)
-
 
 
             error_lattice_write = copy.deepcopy(error_lattice_no_index)
@@ -365,7 +348,7 @@ class Adjust_Error():
 
                 if i[0] in self.error_elemment_dyn or i[0] in self.error_beam_dyn:
                     i[0] = "!" + i[0]
-                # Èç¹ûÊÇ¾²Ì¬Îó²î£¬±ä³É¶¯Ì¬Îó²î
+                # å¦‚æœæ˜¯é™æ€è¯¯å·®ï¼Œå˜æˆåŠ¨æ€è¯¯å·®
                 elif i[0] == 'err_beam_stat':
                     i[0] = 'err_beam_dyn'
 
@@ -376,7 +359,7 @@ class Adjust_Error():
                     i[0] = 'err_cav_ncpl_dyn'
 
 
-                # ¿ª¹Ø
+                # å¼€å…³
                 elif i[0] in global_varible.error_elemment_dyn_on:
                     i[0] = "!" + i[0]
 
@@ -398,16 +381,21 @@ class Adjust_Error():
 
             # delete_directory(self.error_middle_output0_path)
 
-            self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
-            loss = self.treat_diag(group, time, error_lattice_no_index)
+            err_adjust_output0_path = os.path.join(self.project_path, "OutputFile", "error_adjust", "output_0" )
+            # if os.path.exists(err_adjust_output0_path):
+            #     delete_directory(err_adjust_output0_path)
 
+            self.run_multiparticle(self.project_path, 'OutputFile/error_adjust')
+            loss, diag_res = self.treat_diag(group, time, error_lattice_no_index)
+
+            # delete_directory(err_adjust_output0_path)
 
             print("loss", loss)
             self.loss_this.append(loss)
             print("--------------------")
 
             if loss < 0.05:
-                raise Exception('ÒÑĞ¡ÓÚ0.05')
+                raise Exception('å·²å°äº0.05')
 
             return loss
 
@@ -419,25 +407,25 @@ class Adjust_Error():
 
         error_lattice = copy.deepcopy(error_lattice)
 
-        # latticeÖĞÔ­±¾µÄ³õÖµ
+        # latticeä¸­åŸæœ¬çš„åˆå€¼
         # lattice_initial_value =np.array(adjust_parameter_initial_value).reshape(-1)
 
         lattice_initial_value = flatten_list(adjust_parameter_initial_value)
 
         # print('lattice_initial_value', lattice_initial_value)
 
-        # ·¶Î§
+        # èŒƒå›´
         parameter_range = np.array(flatten_list(adjust_parameter_range)).reshape(-1, 2)
         # print('parameter_range', parameter_range)
 
-        # Ëæ»ú³õÖµ
+        # éšæœºåˆå€¼
         random_initial_value = [random.uniform(i[0], i[1]) for i in parameter_range]
 
-        # ÊÇ·ñÊ¹ÓÃ³õÖµ
+        # æ˜¯å¦ä½¿ç”¨åˆå€¼
         # use_initial_value = np.array(adjust_parameter_use_init).reshape(-1)
         use_initial_value = np.hstack(adjust_parameter_use_init)
 
-        # ×îÖÕ³õÖµ
+        # æœ€ç»ˆåˆå€¼
         initial_value = random_initial_value
         for i in range(len(initial_value)):
             if use_initial_value[i] == 1:
@@ -445,7 +433,7 @@ class Adjust_Error():
 
         print('initial_value', initial_value)
 
-        # ÊÇ·ñÊ¹ÓÃÏàÍ¬µÄÖµ
+        # æ˜¯å¦ä½¿ç”¨ç›¸åŒçš„å€¼
         # n_ = np.array(adjust_parameter_n).reshape(-1)
         n_ = flatten_list(adjust_parameter_n)
         # print('n_', n_)
@@ -471,7 +459,7 @@ class Adjust_Error():
 
 
         # for constraint in constraints:
-        #     print('Ô¼ÊøÌõ¼şº¯Êı½á¹û:', constraint)
+        #     print('çº¦æŸæ¡ä»¶å‡½æ•°ç»“æœ:', constraint)
 
         goal = self.get_goal(error_lattice, adjust_element_num, adjust_parameter_num, group, time)
 
@@ -479,6 +467,11 @@ class Adjust_Error():
 
         self.ini_this = []
         self.loss_this = []
+
+        # result = minimize(fun=goal, x0=initial_value, constraints=constraints, bounds=parameter_range,
+        #                       method='SLSQP', options=options)
+        #
+        # return result.x, result.fun
 
         try:
             result = minimize(fun=goal, x0=initial_value, constraints=constraints, bounds=parameter_range,
@@ -488,17 +481,23 @@ class Adjust_Error():
 
         except Exception:
             return self.ini_this[-1], self.loss_this[-1]
+    def delete_element_end_index(self, error_lattice):
+        error_lattice_copy = copy.deepcopy(error_lattice)
+        for i in error_lattice_copy:
+            if i[0] in global_varible.long_element:
+                i.pop()
+        return error_lattice_copy
 
     def opti_one_time(self, group, time, lattice_mulp_list):
         """
-        ¾²Ì¬Îó²îÍêÕûÅÜÒ»´Î, ĞèÒª½ÃÕı
+        é™æ€è¯¯å·®å®Œæ•´è·‘ä¸€æ¬¡, éœ€è¦çŸ«æ­£
 
         :param group:
         :param time:hg
         :return:
         """
 
-        # µÃµ½latticeµÄ¶¨Î»ĞÅÏ¢
+        # å¾—åˆ°latticeçš„å®šä½ä¿¡æ¯
         adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
             adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(lattice_mulp_list)
 
@@ -511,5 +510,98 @@ class Adjust_Error():
         adjust_info = [adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
             adjust_parameter_n, adjust_parameter_use_init]
 
-        #·µ»Ø½ÃÕı²ÎÊıĞÅÏ¢, ÕâÒ»´ÎÓÅ»¯µÄ½á¹û£¬ Ö»Ò»´ÎÓÅ»¯µÄËğÊ§£¬ ÊøÕï½á¹û
+        #è¿”å›çŸ«æ­£å‚æ•°ä¿¡æ¯, è¿™ä¸€æ¬¡ä¼˜åŒ–çš„ç»“æœï¼Œ åªä¸€æ¬¡ä¼˜åŒ–çš„æŸå¤±ï¼Œ æŸè¯Šç»“æœ
         return adjust_info, opti_res_this, loss_this, self.diag_res
+
+    def opti_one_time_different_group(self, group, time, lattice_mulp_list):
+        print(572)
+        #ä½¿ç”¨ä¸åŒçš„ç»„æ•°è¿›è¡Œä¼˜åŒ–
+        """
+        é™æ€è¯¯å·®å®Œæ•´è·‘ä¸€æ¬¡, éœ€è¦çŸ«æ­£
+
+        :param group:
+        :param time:hg
+        :return:
+        """
+        lattice_mulp_list = copy.deepcopy(lattice_mulp_list)
+
+        all_adjust_N = []
+        all_diag_N = []
+        for i in lattice_mulp_list:
+            if i[0].lower() == "adjust":
+                all_adjust_N.append(i[1])
+            elif i[0].lower().startswith("diag"):
+                all_diag_N.append(i[1])
+
+        common_N = list(set(all_adjust_N) & set(all_diag_N))
+        # print(591, common_N)
+        # print(all_adjust_N)
+        iteration_step = 0
+
+        opti_res_this_dict = {}
+        for i in common_N:
+            t_lattice = copy.deepcopy(lattice_mulp_list)
+            for j in t_lattice:
+                if j[0].lower() == "adjust" and j[1] != i:
+                    j.append(False)
+
+                if j[0].lower().startswith("diag") and j[1] != i:
+                    j.append(False)
+
+            t_lattice = [k for k in t_lattice if k[-1] is not False]
+
+            # å¾—åˆ°latticeçš„å®šä½ä¿¡æ¯
+            adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
+                adjust_parameter_n, adjust_parameter_use_init = self.generate_adjust_parameter(t_lattice)
+
+
+
+            opti_res_this, loss_this = self.optimize_one_group(group, time, t_lattice,
+                                                               adjust_element_num, adjust_parameter_initial_value,
+                                                               adjust_parameter_num,
+                                                               adjust_parameter_range, \
+                                                               adjust_parameter_n, adjust_parameter_use_init)
+
+            # print(618, adjust_element_num, adjust_parameter_initial_value, adjust_parameter_num, adjust_parameter_range, \
+            #     adjust_parameter_n, adjust_parameter_use_init)
+            # print(620, opti_res_this)
+            lattice_mulp_list = self.change_latticae_with_opti_res(opti_res_this, lattice_mulp_list, adjust_element_num, adjust_parameter_num)
+            # for i1 in lattice_mulp_list:
+            #     print(i1)
+
+            v1 = 0
+            for i_index, i_value in enumerate(adjust_element_num):
+                for j_index, j_value in enumerate(adjust_parameter_num[i_index]):
+                    opti_res_this_dict[f"{i_value}_{j_value}"] = opti_res_this[v1]
+                    v1 += 1
+
+        all_loss, diag_res_this = self.treat_diag(group, time, lattice_mulp_list)
+
+    #è¿”å›çŸ«æ­£å‚æ•°ä¿¡æ¯, è¿™ä¸€æ¬¡ä¼˜åŒ–çš„ç»“æœï¼Œ åªä¸€æ¬¡ä¼˜åŒ–çš„æŸå¤±ï¼Œ æŸè¯Šç»“æœ
+        return opti_res_this_dict, diag_res_this
+
+    # sys.exit()
+    # self.run_use_corrected_result(opti_res_this, group, time, lattice_mulp_list,
+    #                               adjust_element_num, adjust_parameter_num)
+
+    def change_latticae_with_opti_res(self,  opti_res_this, error_lattice,
+                                 adjust_element_num, adjust_parameter_num):
+        error_lattice = copy.deepcopy(error_lattice)
+        # x = list_one_two(list(opti_res_this), adjust_parameter_num)
+        # for i in range(len(adjust_element_num)):
+        #     for j in range(len(adjust_parameter_num[i])):
+        #         for com in error_lattice:
+        #             if com[-1] == f'element_{adjust_element_num[i]}':
+        #                 com[adjust_parameter_num[i][j]] = x[i][j]
+        #                 break
+
+        v1 = 0
+        for i_index, i_value in enumerate(adjust_element_num):
+            for j_index, j_value in enumerate(adjust_parameter_num[i_index]):
+                for com in error_lattice:
+                    if com[-1] == f'element_{i_value}':
+                        com[j_value] = opti_res_this[v1]
+                        break
+                v1 += 1
+
+        return error_lattice

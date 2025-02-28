@@ -66,7 +66,7 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"E:\using\test_avas_qt\test_adjust"
+    project_path = r"E:\using\test_avas_qt\test_error"
     obj = MultiParticle(project_path)
     obj.run()
 

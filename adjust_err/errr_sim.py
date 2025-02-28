@@ -83,9 +83,9 @@ if __name__ == '__main__':
 
     write_trace_to_avas1(tracewin_lattiace_path, avas_lattice_path)
 
-    # obj = NewError(project_path, 1, True)
-    #
-    # obj.run()
+    obj = NewError(project_path, 1, True)
+
+    obj.run()
 
     # project_path = r"C:\Users\shliu\Desktop\field_ciads"
     #

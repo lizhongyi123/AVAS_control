@@ -8,6 +8,7 @@ import utils.exception as exce
 from apis.basic_api.api import basic_mulp, basic_env, match_twiss, circle_match, \
     err_dyn, err_stat, err_stat_dyn
 from utils.tool import format_output
+from apis.qt_api.judge_lattice import JudgeLattice
 class SimMode():
     def __init__(self, item):
         self.item = item
@@ -28,9 +29,11 @@ class SimMode():
         beam_config.validate_run(self.item)
 
 
-    def run(self):
 
+    def run(self):
+        #检查
         self.file_check()
+
         #判断模拟类型并进行模拟
         ini_obj = IniConfig()
         ini_info = ini_obj.create_from_file(self.item)
@@ -57,8 +60,6 @@ class SimMode():
         if err_mode not in all_error_type:
             raise exce.ValueRangeError('error type', all_error_type, err_mode)
 
-        with open(self.runsignal, 'w') as f:
-            f.write('1')
 
         field_path = ini_info["project"]["fieldSource"]
 
@@ -66,14 +67,22 @@ class SimMode():
         if not field_path:
             field_path = None
 
+        obj = JudgeLattice(self.lattice_mulp_path)
+
         if base_mode == "mulp":
             if err_mode == "stat":
+                obj.judge_lattice("stat_error")
                 err_stat(self.project_path, err_seed, if_normal=1, field_path=field_path)
+
             elif err_mode == "dyn":
+                obj.judge_lattice("stat_error")
                 err_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
+
             elif err_mode == "stat_dyn":
+                obj.judge_lattice("stat_dyn_error")
                 err_stat_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
             else:
+                obj.judge_lattice("basic_mulp")
                 basic_mulp(self.project_path, field_path=field_path)
 
         elif base_mode == "env":
@@ -85,10 +94,6 @@ class SimMode():
                 match_twiss(self.project_path, 1)
             else:
                 basic_env(self.project_path)
-
-
-        with open(self.runsignal, 'w') as f:
-            f.write('2')
 
         output = format_output()
         return output

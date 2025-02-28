@@ -161,35 +161,26 @@ class GetSchedule():
         err_mode = mode["err_mode"]
         match_mode = mode["match_mode"]
         kwargs = {}
+        try:
+            if err_mode == "" and match_mode == "":
+                if base_mode == "mulp":
+                    res = self.get_base_mulp_schedule()
 
-        if err_mode == "" and match_mode == "":
-            if base_mode == "mulp":
-                res = self.get_base_mulp_schedule()
+            elif err_mode in ["stat", "dyn", "stat_dyn"]:
+                res = self.get_error_schedule()
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            res = {"totalLength": '',
+                   "currentLength": '',
+                   "allStep": '',
+                   "currentStep": '',
+                   }
+            kwargs.update({'schedule': res})
+            output = format_output(code, msg=msg, **kwargs)
+            return output
 
-        elif err_mode in ["stat", "dyn", "stat_dyn"]:
-            res = self.get_error_schedule()
-
-        # try:
-        #     if err_mode == "undefined" and match_mode == "undefined":
-        #         if base_mode == "mulp":
-        #             res = self.get_base_mulp_schedule()
-        #
-        #     elif err_mode in ["stat", "dyn", "stat_dyn"]:
-        #         res = self.get_error_schedule()
-        #
-        #     else:
-        #         res = {"totalLength": "",
-        #         "currentLength": "",
-        #         "allTime": "",
-        #         "currentTime": "",
-        #                }
-        # except Exception as e:
-        #     code = -1
-        #     msg = str(e)
-        #     kwargs.update({'schedule': {}})
-        #     output = format_output(code, msg=msg, **kwargs)
-        #     return output
-
+            # res = {"totalLength": 1,
 
         kwargs.update({'schedule':res})
         output = format_output(**kwargs)

@@ -67,7 +67,7 @@ class DatasetParameter():
                 sign2 = 0
 
             elif (sign2 == 0):
-                #条件为2， sign2= 0
+                #条件为2( 第35个数据为2 )， sign2= 0
                 # 也就是说，如果这一次的标志为2，但是前一次的标志也为0， 1，那么进入这次循环
                 self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
                 sign2 = 1

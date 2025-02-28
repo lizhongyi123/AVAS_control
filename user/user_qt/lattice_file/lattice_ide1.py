@@ -1,13 +1,8 @@
-from PyQt5.QtGui import QTextCharFormat, QColor, QTextDocument, QPainter, QColor
+from PyQt5.QtGui import QTextCharFormat, QColor, QTextDocument
 
 from pyqode.core import api
-from pyqode.core.api import Panel
-from pyqode.core.modes import SymbolMatcherMode
-from pyqode.core.modes import OccurrencesHighlighterMode
 
-from pyqode.core.panels import SearchAndReplacePanel
-
-from PyQt5.QtCore import Qt, QEvent,  QSize
+from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QKeyEvent, QTextCursor
 from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QPushButton, QVBoxLayout, QTextEdit, QApplication
 
@@ -16,12 +11,6 @@ class CustomCodeEdit(api.CodeEdit):
     def __init__(self):
         self.i = 0
         super().__init__()
-        # self.panels.append(CustomNumberPanel())
-        self.panels.append(SearchAndReplacePanel(), api.Panel.Position.TOP)
-
-        # self.modes.append(SymbolMatcherMode())
-        # self.modes.append(OccurrencesHighlighterMode())
-
 
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
@@ -43,12 +32,12 @@ class CustomCodeEdit(api.CodeEdit):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress:
-            # if isinstance(event, QKeyEvent) and event.key() == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
-            #
-            #     # 按下 Ctrl+F，弹出搜索窗口
-            #     search_dialog = SearchDialog(self)
-            #     search_dialog.exec_()
-            #     return True
+            if isinstance(event, QKeyEvent) and event.key() == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
+
+                # 按下 Ctrl+F，弹出搜索窗口
+                search_dialog = SearchDialog(self)
+                search_dialog.exec_()
+                return True
 
 
             #专门处理折叠
@@ -111,7 +100,6 @@ class CustomCodeEdit(api.CodeEdit):
                     return super().eventFilter(obj, event)
         else:
             return super().eventFilter(obj, event)
-
 class SearchDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -190,101 +178,34 @@ class MyFoldDetector(api.FoldDetector):
             return 1  # 二级折叠
         # 默认情况
         return 2
+        # if "fold" in text:
+        #     return 0  # 一级折叠
+        # else:
+        #     return 2
+        # elif "CELL" in text:
+        #     return 1  # 二级折叠
+        # # 默认情况
+        # return 2
+    # def detect_fold_level(self, prev_block, block):
+    #     """
+    #     Detects fold level by looking at the block indentation.
+    #
+    #     :param prev_block: previous text block
+    #     :param block: current block to highlight
+    #     """
+    #     text = block.text()
+    #     # round down to previous indentation guide to ensure contiguous block
+    #     # fold level evolution.
+    #     return (len(text) - len(text.lstrip())) // self.editor.tab_length
 
-
-class CustomNumberPanel(Panel):
-    """
-    自定义的左侧号码 Panel。
-    这里的规则：遍历从文档开头到当前 block，若某行首单词是 drift/field 就计数+1。
-    然后把计算出的“当前计数”绘制到左侧。
-    """
-    def __init__(self):
-        super().__init__()
-        self.setMouseTracking(True)
-
-
-    def sizeHint(self):
-        """
-        这里指定 Panel 的宽度可以稍微固定大一些，以容纳计数。
-        也可以根据编辑器字体来动态计算。
-        """
-        return QSize(50, 0)
-
-    def on_install(self, editor):
-        super().on_install(editor)
-        # 当文档大小变化时，需要更新面板(重绘)
-        editor.blockCountChanged.connect(self._handle_block_count_changed)
-
-    def on_uninstall(self):
-        editor = self.editor
-        if editor:
-            editor.blockCountChanged.disconnect(self._handle_block_count_changed)
-        super().on_uninstall()
-
-    def _handle_block_count_changed(self, new_count):
-        self.editor.repaint()
-
-    def paintEvent(self, event):
-        """
-        在这里遍历可见的 block，并根据规则计算计数值后，绘制在左侧。
-        """
-        painter = QPainter(self)
-        editor = self.editor
-
-        # 获取当前可见区域内的第一个文本块
-        first_block = editor.firstVisibleBlock()
-        block = first_block
-        block_number = block.blockNumber()
-        # 计算可见区域的顶部 y 坐标
-        top = editor.blockBoundingGeometry(block).translated(editor.contentOffset()).top()
-        bottom = top + editor.blockBoundingRect(block).height()
-
-        # 可见区域
-        clip_rect = event.rect()
-
-        while block.isValid() and top <= clip_rect.bottom():
-            # 计算该 block 在面板中的纵向位置
-            # blockBoundingGeometry拿到 block 的矩形，然后再根据 contentOffset() 偏移
-            rect = editor.blockBoundingGeometry(block).translated(editor.contentOffset())
-            # 这里的 rect.top() 就是该 block 的顶部 y
-            # 我们在面板中也用同样的 y 来绘制数字
-            # 以保持与编辑器的行对齐
-            offset = 5  # 数字离左侧的偏移
-            y = round(rect.top())
-
-            # 计算当前 block 对应的“计数值”
-            # 这段代码是最朴素的写法：每次都会从头扫描到这个 block。
-            # 如果文本多，可以做缓存。
-            line_count = self._calculate_counter_up_to_block(block)
-
-            # 在面板上画出 line_count
-            painter.drawText(offset, y, self.width(), editor.fontMetrics().height(),
-                             Qt.AlignLeft | Qt.AlignVCenter,
-                             str(line_count) if line_count > 0 else "")
-
-            block = block.next()
-            block_number += 1
-            top = bottom
-            bottom = top + editor.blockBoundingRect(block).height()
-
-        painter.end()
-
-    def _calculate_counter_up_to_block(self, block):
-        """
-        从文档开头扫描到指定 block，统计「行首是 drift / field」的出现次数。
-        """
-        editor = self.editor
-        doc = editor.document()
-        current = doc.begin()
-
-        count = 0
-        while current.isValid():
-            text = current.text().strip()
-            # 如果行首以 drift / field 开头，那么就加 1
-            # 注意要判断单词边界，这里简化为 startswith。
-            if text.startswith("drift") or text.startswith("field"):
-                count += 1
-            if current == block:
-                break
-            current = current.next()
-        return count
+    # def get_folded_content(self):
+    #     # Find the parent scope of the current cursor position
+    #     cursor = self.editor.textCursor()
+    #     current_block = cursor.block()
+    #     fold_scope = api.folding.FoldScope.parent()
+    #
+    #     if fold_scope:
+    #         # Get the text content of the fold scope
+    #         folded_content = fold_scope.text()
+    #         # Output the folded content or use it as needed
+    #         print(folded_content)

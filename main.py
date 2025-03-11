@@ -3,6 +3,7 @@ import os
 import time
 import traceback
 from PyQt5.QtWidgets import QApplication, QMessageBox
+
 try:
     # 你的代码
     from user.user_qt.user_pyqt import MainWindow

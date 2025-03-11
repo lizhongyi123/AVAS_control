@@ -262,8 +262,8 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\anxin\Desktop\zhuanhuan\2023411_40Cr12_250MeV.dat"
-    avas_lattice_path = r"C:\Users\anxin\Desktop\zhuanhuan\lattice.txt"
+    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\AVAS_0.5\a.dat"
+    avas_lattice_path = r"C:\Users\shliu\Desktop\AVAS_0.5\lattice.txt"
 
 
     # 修改后的lattice

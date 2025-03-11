@@ -35,7 +35,7 @@ from apis.qt_api.SimMode import SimMode
 from apis.qt_api.createbasicfile import CreateBasicProject
 from core.MultiParticle import MultiParticle
 from multiprocessing import Process, Queue
-
+from apis.qt_api.api import judge_if_is_avas_project
 import traceback
 
 def basic_run(project_path, queue):
@@ -97,7 +97,7 @@ class MainWindow(QMainWindow):
         self.error_signal = None
 
         self.sim_thread = None
-        self.settings = QSettings('IMP', 'AVAS')
+        self.settings = QSettings('settings.ini', QSettings.IniFormat)
 
         self.initUI()
 
@@ -307,6 +307,7 @@ class MainWindow(QMainWindow):
 
             self.project_path = new_folder_path
             self.path_text.setText(self.project_path)
+            self.path_text.setText(self.project_path)
             self.refresh_page_project_path()
 
 
@@ -337,6 +338,16 @@ class MainWindow(QMainWindow):
         folder_path = os.path.normpath(folder_path)
 
         if folder_path:
+            item = {"projectPath": folder_path}
+            res = judge_if_is_avas_project(item)
+            # print(343, res)
+            if res['code'] == 0:
+                pass
+            else:
+                raise Exception(res["data"]['msg'])
+
+
+
             self.project_path = folder_path
             self.path_text.setText(self.project_path)
 
@@ -365,12 +376,13 @@ class MainWindow(QMainWindow):
 
 
     def page_fill_parameter(self):
+
         self.page_beam.fill_parameter()
+
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
         # self.page_longdistance.fill_parameter()
         self.page_error.fill_parameter()
-
 
 
     def save_project(self):
@@ -420,6 +432,7 @@ class MainWindow(QMainWindow):
         self.sim_thread.start()
         self.timer1.start(2000)
 
+
     def handle_error(self, error_message):
         self.sim_thread = None
         self.stop_all()
@@ -427,7 +440,7 @@ class MainWindow(QMainWindow):
         raise Exception(error_message)
 
     def activate_output(self, ):
-        print(445, self.sim_thread)
+        # print(445, self.sim_thread)
         self.page_output.update_progress()  # @treat_err
 
         #如果output
@@ -505,22 +518,22 @@ class MainWindow(QMainWindow):
 
     def get_input_signal(self, signal):
         self.input_signal = signal
-        print(self.input_signal)
+        # print(self.input_signal)
     def get_error_signal(self, signal):
         self.error_signal = signal
-        print(self.error_signal)
+        # print(self.error_signal)
     def get_match_signal(self, signal):
         self.match_signal = signal
-        print(self.match_signal)
+        # print(self.match_signal)
 
     def initialize_page(self):
-        print(self.settings.value("lastProjectPath", None))
+        # print(self.settings.value("lastProjectPath", None))
         if self.settings.value("lastProjectPath", None) is None:
             pass
 
         else:
             self.project_path = self.settings.value("lastProjectPath", "")
-            print(self.project_path)
+            # print(self.project_path)
             self.path_text.setText(self.project_path)
 
             if os.path.exists(self.project_path):

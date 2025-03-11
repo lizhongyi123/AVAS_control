@@ -32,7 +32,7 @@ element_param_name_dict = {
     'drift': ['length', 'radius'],
     'field': ['length', 'radius', "plc", 'fieldType', 'frequency', 'Phase',
                                                         'ke', 'kb', 'fieldMap'],
-    'quad': ['length', 'radius', 'plc', 'Gradient'],
+    'quad': ['length', 'radius', 'plc', 'gradient'],
     "solenoid": ['length', 'radius', 'plc', 'gradient'],
     "bend" : ['length', 'radius', 'plc', "curvature Radius", "field gradient index",  "direction"],
     "steer": ['length', 'radius', "plc", r"bx\ex", r"by\ey", "type", "max_value"],
@@ -200,7 +200,6 @@ class JudgeLattice():
         #在最后边添加索引
         lattice_mulp_list_with_index = add_element_end_index(lattice_mulp_list)
         lattice_mulp_list_with_index = self.add_command_end_index(lattice_mulp_list_with_index)
-        print(lattice_mulp_list_with_index)
         element_length_keys = list(element_length_dict.keys())
         command_min_length_keys = list(command_min_length_dict.keys())
 
@@ -261,7 +260,6 @@ class JudgeLattice():
                     if param_index > len(i)-2:
                         break
                     if i[param_index] not in v:
-                        print(i)
                         base_error.fix_value_error(i, param_index, v)
 
 

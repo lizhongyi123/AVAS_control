@@ -92,9 +92,10 @@ class LatticeConfig():
 
 
 if __name__ == "__main__":
-    path = r"C:\Users\shliu\Desktop\1128"
+    path = r"C:\Users\shliu\Desktop\AVAS_0.5\example"
     obj = LatticeConfig()
     item = {"projectPath": path,
             "sim_type": "mulp",
             }
-    res = obj.write_to_file(item)
+    res = obj.create_from_file(item)
+    print(res)

@@ -42,7 +42,9 @@ class MultiParticle():
         if res == 1:
             error = self.check_error_file(errorlog)
             raise Exception(f'{error}')
-
+        # elif res == 2:
+        #     error = self.check_error_file(errorlog)
+        #     raise Exception(f'{error}')
         return res
 
     def check_error_file(self, ErrorLog):
@@ -66,7 +68,7 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"E:\using\test_avas_qt\test_error"
+    project_path = r"C:\Users\shliu\Desktop\chu"
     obj = MultiParticle(project_path)
     obj.run()
 

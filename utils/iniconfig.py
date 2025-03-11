@@ -112,7 +112,6 @@ class IniConfig():
             path = other_path
 
         kwargs = {}
-        print(115, self.ini_parameter)
         try:
             config = configparser.ConfigParser()
             config.optionxform = str

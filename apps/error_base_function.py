@@ -2,7 +2,7 @@ import copy
 import global_varible
 
 def judge_command_on_element(lattice, command):
-    # ·µ»ØÒ»¸öÃüÁî¶ÔÓ¦µÄÊÇÄÄ¸öÔª¼ş
+    # è¿”å›ä¸€ä¸ªå‘½ä»¤å¯¹åº”çš„æ˜¯å“ªä¸ªå…ƒä»¶
     lattice = copy.deepcopy(lattice)
 
     command_index = lattice.index(command)

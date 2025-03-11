@@ -703,6 +703,8 @@ class PageBeam(QWidget):
             #复制后的文件
             target_dst_file = os.path.join(self.project_path, "InputFile", relative_dst_file_path)
 
+            print(file_in_directory(source_file, target_folder))
+            return 0
             #如果文件已经文件夹中
             if file_in_directory(source_file, target_folder):
                 self.text_particle_input_file.setText(relative_dst_file_path)
@@ -735,7 +737,7 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'C:\Users\shliu\Desktop\eee')
+    main_window = PageBeam(r'C:\Users\shliu\Desktop\chu')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")

@@ -95,7 +95,7 @@ class PageLattice(QWidget):
 
 ########################################################
         layout.addLayout(hbox_control)
-        layout.addLayout(hbox_cut)
+        # layout.addLayout(hbox_cut)
         layout.addWidget(self.stacked_widget)
 
         self.setLayout(layout)
@@ -121,6 +121,7 @@ class PageLattice(QWidget):
         self.lattice_env_path = os.path.join(self.project_path, "InputFile", "lattice_env.txt")
 
     def fill_parameter(self):
+
         item = {"projectPath": self.project_path,}
 
         self.stacked_widget.setCurrentWidget(self.text_mulp_lattice)
@@ -128,9 +129,9 @@ class PageLattice(QWidget):
         # print(self.lattice_path)
         self.text_file_path.setText(self.lattice_mulp_path)
 
-
         obj = LatticeConfig()
         res = obj.create_from_file(item)
+
 
         if res["code"] == -1:
             raise Exception(str(res["data"]['msg']))
@@ -141,19 +142,19 @@ class PageLattice(QWidget):
 
 
 
-        self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-        self.text_file_path.setText(self.lattice_env_path)
-
-        obj = LatticeConfig()
-        res = obj.create_from_file(item)
-        if res["code"] == -1:
-            raise Exception(str(res["data"]['msg']))
-        file_contents = res["data"]["latticeParams"]
-
-        self.text_env_lattice.setPlainText(file_contents)
-
-        self.button_mulp_lattice.setChecked(True)
-        self.button_state()
+        # self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
+        # self.text_file_path.setText(self.lattice_env_path)
+        #
+        # obj = LatticeConfig()
+        # res = obj.create_from_file(item)
+        # if res["code"] == -1:
+        #     raise Exception(str(res["data"]['msg']))
+        # file_contents = res["data"]["latticeParams"]
+        #
+        # self.text_env_lattice.setPlainText(file_contents)
+        #
+        # self.button_mulp_lattice.setChecked(True)
+        # self.button_state()
 
 
 
@@ -171,12 +172,12 @@ class PageLattice(QWidget):
 
 
         #如果路径为空, 那么不保存
-        item["sim_type"] = "env"
-        obj = LatticeConfig()
-        res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
-        res = obj.write_to_file(item)
-        if res["code"] == -1:
-            raise Exception(str(res["data"]['msg']))
+        # item["sim_type"] = "env"
+        # obj = LatticeConfig()
+        # res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
+        # res = obj.write_to_file(item)
+        # if res["code"] == -1:
+        #     raise Exception(str(res["data"]['msg']))
 
     def fill_text_lattice_path(self, path):
         self.text_lattice_path.setText(path)
@@ -266,7 +267,7 @@ if __name__ == '__main__':
 
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-    main_window.updatePath(r'C:\Users\shliu\Desktop\test1113\test1')
+    main_window.updatePath(r'C:\Users\shliu\Desktop\AVAS_0.5\example')
     main_window.fill_parameter()
     main_window.show()
     sys.exit(app.exec_())

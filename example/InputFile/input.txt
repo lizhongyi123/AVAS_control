@@ -1,8 +1,0 @@
-!simtype   mulp
-SCMethod   FFT
-numofgrid   64   64   64
-MeshRms   6.5   6.5   6.5
-MultiThreading   1
-ScanPhase   1
-SpaceCharge   1
-StepPerCycle   100

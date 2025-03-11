@@ -241,7 +241,7 @@ class SyntaxHighlighter(QSyntaxHighlighter):
 
         # 如果上一行已经是 "end" 状态，则整行置灰
         if self.previousBlockState() == 1:
-            print(self.previousBlockState())
+            # print(self.previousBlockState())
             self.setFormat(0, len(text), self.gray_format)
             # 当前行依然保持 "end" 之后的状态
             self.setCurrentBlockState(1)

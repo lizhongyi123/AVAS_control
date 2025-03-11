@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QPlainTextEdit, QWidget, QVBoxLayout, QTextEdit,
                              QHBoxLayout, QFrame, QApplication,
                              QCompleter, QInputDialog)
-from PyQt5.QtGui import QPainter, QColor, QTextFormat, QSyntaxHighlighter, QTextCharFormat, QFont, QTextDocument, QTextCursor
+from PyQt5.QtGui import QPainter, QColor, QTextFormat, QSyntaxHighlighter, QTextCharFormat, QFont, QTextDocument, QTextCursor, QIcon
 from PyQt5.QtCore import Qt, QRect, QRegExp, QSize, QPoint
 import sys
 from PyQt5.QtWidgets import QPushButton, QDialog, QLineEdit, QVBoxLayout
@@ -75,8 +75,13 @@ class CodeEditor(QPlainTextEdit):
 
         self.keywords = [
             "drift length radius",
-            "drift2",
-            "field length radius 0 fieldType frequency phase ke kb fieldMap"
+            "field length radius 0 fieldType frequency phase ke kb fieldMap",
+            'quad length radius 0 gradient',
+            'solenoid length radius 0 gradient',
+            "bend length radius plc radius gradient direction",
+            "steer length radius plc bx\ex by\ey type max_value",
+            'edge 0 radius 0 angle radius gap k1 k2 direction'
+
         ]
 
         # 初始化 QCompleter
@@ -438,7 +443,7 @@ class CodeEditorWithLineNumbers(QWidget):
         # 搜索按钮
         self.search_button = QPushButton("find", self)
         self.search_button.clicked.connect(self.open_search_dialog)
-        self.search_button.setFixedSize(25, 25)
+        self.search_button.setFixedSize(50, 25)
 
         # 添加注释按钮
         self.comment_button = QPushButton("!", self)
@@ -462,7 +467,7 @@ class CodeEditorWithLineNumbers(QWidget):
 
         self.replace_button = QPushButton("replace", self)
         self.replace_button.clicked.connect(self.open_replace_dialog)
-        self.replace_button.setFixedSize(25, 25)
+        self.replace_button.setFixedSize(50, 25)
 
         self.editor = CodeEditor()
 
@@ -493,13 +498,13 @@ class CodeEditorWithLineNumbers(QWidget):
         if self.current_font_size < 18:  # 设置最小字体大小
             self.current_font_size += 3
             self.editor.set_font_size(self.current_font_size)
-        print(self.current_font_size)
+        # print(self.current_font_size)
     def decrease_font_size(self):
         """ 减小字体大小 """
         if self.current_font_size > 9:  # 设置最小字体大小
             self.current_font_size -= 3
             self.editor.set_font_size(self.current_font_size)
-        print(self.current_font_size)
+        # print(self.current_font_size)
     def open_search_dialog(self):
         dialog = SearchDialog(self.editor)
         dialog.exec_()
@@ -513,7 +518,6 @@ class CodeEditorWithLineNumbers(QWidget):
         self.editor.remove_comment()
     def setPlainText(self, text):
         self.editor.setPlainText(text)
-
     def toPlainText(self):
         return self.editor.toPlainText()
 

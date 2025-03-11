@@ -71,8 +71,9 @@ class PlotPhase:
         ax.set_ylabel(ylabel, fontdict=font)
         ax.grid(linestyle="--")
 
+
 if __name__ == "__main__":
-    dst_path = r"C:\Users\shliu\Desktop\cafe_AVAS\OutputFile\outData_12.529930.dst"
+    dst_path = r"C:\Users\shliu\Desktop\chu\chu2\OutputFile\inData.dst"
     plot_phase = PlotPhase(dst_path)
     plot_phase.run(show_=True)
 

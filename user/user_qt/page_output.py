@@ -105,7 +105,6 @@ class PageOutput(QWidget):
 
 
     def update_progress(self):
-        print(106)
         self.schedule_thread = ScheduleThread(self.project_path)
         self.schedule_thread.start()
         self.schedule_thread.schedule_signal.connect(self.update_progress1)

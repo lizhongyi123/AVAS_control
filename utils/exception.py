@@ -140,6 +140,9 @@ class BaseError():
     #     raise Exception(f"Format or Syntax error at adjust command, :"
     #                     f"line { }")
 
+    # def is_not_avas_project_error(self, directory):
+    #     raise Exception(f"{directory} is not a  AVAS project")
+
 
 
 

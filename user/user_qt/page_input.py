@@ -223,13 +223,21 @@ class PageInput(QWidget):
         #####################################################
         group_box_field_source = QGroupBox()
 
-        layout_field_source = QHBoxLayout()
+        layout_field_source = QVBoxLayout()
+
+        label_field_source = QLabel("Field Source")
+
+        layout_field_source_choose = QHBoxLayout()
         self.button_select_field_source = QPushButton(QApplication.style().standardIcon(32),"")
         self.button_select_field_source.clicked.connect(self.select_field_source)
         self.text_field_source = MyQLineEdit(" ")
 
-        layout_field_source.addWidget(self.button_select_field_source)
-        layout_field_source.addWidget(self.text_field_source)
+        layout_field_source_choose.addWidget(self.button_select_field_source)
+        layout_field_source_choose.addWidget(self.text_field_source)
+
+        layout_field_source.addWidget(label_field_source)
+        layout_field_source.addLayout(layout_field_source_choose)
+
         group_box_field_source.setLayout(layout_field_source)
 
 

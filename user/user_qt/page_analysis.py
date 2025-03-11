@@ -229,7 +229,7 @@ class EnvelopeDialog(QDialog):
 class EmittanceDialog(EnvelopeDialog):
     def __init__(self, project_path, func):
         super().__init__(project_path, func)
-        self.picture_name = 'emittance_x'
+        self.picture_type = 'emittance_x'
 
     def contextMenuEvent(self, event):
         cmenu = QMenu(self)
@@ -462,6 +462,7 @@ class EnvEmitDialog(EnvelopeDialog):
 
         self.fig.clf()
         self.plot_image()
+
 class PageAnalysis(QWidget):
     def __init__(self, project_path):
         super().__init__()

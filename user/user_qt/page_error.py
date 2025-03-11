@@ -334,8 +334,8 @@ class PageError(QWidget):
         self.xy_dialog.show()
 
     def plot_density_process_this(self):
-        print(self.density_file_path)
-        print(self.density_picture_type)
+        # print(self.density_file_path)
+        # print(self.density_picture_type)
         diaglog = None
         # plot_density(self.density_file_path, self.density_plane_choose, show_=1, fig=None, platform="qt")
         if self.density_picture_type == "density":
@@ -445,14 +445,13 @@ class PageError(QWidget):
             self.density_picture_type = "rms_size"
         elif self.cb_density_rms_size_max.isChecked():
             self.density_picture_type = "rms_size_max"
-        print(self.density_picture_type)
+        # print(self.density_picture_type)
 
 
 
     def fill_parameter(self):
         item = {"projectPath": self.project_path}
         ini_dict = self.ini_obj.create_from_file(item)
-        print(380, ini_dict)
         if ini_dict['code'] == -1:
             raise Exception(ini_dict['data']['msg'])
 

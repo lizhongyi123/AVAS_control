@@ -115,7 +115,7 @@ def get_bimap_name(item):
 def get_fieldfile(item):
     kwargs = {}
     fieldpath = item["fieldPath"]
-    all_files = list_files_in_directory(fieldpath)
+    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
     suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
                    "bsx", "bsy", "bsz"
                    ]
@@ -290,7 +290,31 @@ def get_atom(mode):
         output = format_output(**kwargs)
         return output
     
+def judge_if_is_avas_project(item):
+    #item = {"projectPath": }
+    #这是一个初步的判断， 判断是否存在inputfile和outputfile
+    project_path = item["projectPath"]
+    inputfile_path = os.path.join(project_path, "InputFile")
+    outputfile_path = os.path.join(project_path, "OutputFile")
 
+
+    inputfile_exist = False
+    outputfile_exist = False
+    if os.path.exists(inputfile_path):
+        inputfile_exist = True
+    if os.path.exists(outputfile_path):
+        outputfile_exist = True
+
+    kwargs = {}
+    if all([inputfile_exist, outputfile_exist]):
+        kwargs.update({'projectPath': project_path})
+        output = format_output(**kwargs)
+    else:
+        code = -1
+        msg = f"{project_path} is not a  AVAS project"
+        kwargs.update({'projectPath': project_path})
+        output = format_output(code=code, msg=msg, **kwargs)
+    return output
 
 if __name__ == '__main__':
     item = {
@@ -298,8 +322,13 @@ if __name__ == '__main__':
     "nucleonnumber": 10,
     "numofcharge":1
     }
-    res = cal_mass(item)
+    # res = cal_mass(item)
+    # print(res)
+    item = {"projectPath": r"E:\using\test_avas_qt\test_ini"}
+    res = judge_if_is_avas_project(item)
     print(res)
+
+
     # res = get_atom(mode="all")
     # print(res)
 

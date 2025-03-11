@@ -86,7 +86,7 @@ def get_upload_path(item):
 def get_fieldname(item):
     kwargs = {}
     fieldpath = item["fieldPath"]
-    all_files = list_files_in_directory(fieldpath)
+    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
     suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
                    "bsx", "bsy", "bsz"
                    ]
@@ -128,7 +128,7 @@ def get_fieldfile(item):
 def get_allfile_relative_path(item):
     kwargs = {}
     fieldpath = item["filePath"]
-    all_files = list_files_in_directory(fieldpath)
+    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
     v = [i.split("\\")[-1] for i in all_files]
     kwargs.update({'allFile': v})
     output = format_output(**kwargs)
@@ -327,6 +327,7 @@ if __name__ == '__main__':
     item = {"projectPath": r"E:\using\test_avas_qt\test_ini"}
     res = judge_if_is_avas_project(item)
     print(res)
+
 
 
     # res = get_atom(mode="all")

@@ -20,7 +20,6 @@ from utils.tool import write_to_txt, calculate_mean, calculate_rms, add_to_txt
 
 import os
 
-
 import random
 from core.MultiParticle import MultiParticle
 from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
@@ -33,12 +32,18 @@ from utils.tolattice import write_mulp_to_lattice_only_sim
 from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
 from apps.err_adjust import Adjust_Error
 from utils.exception import MissingcommandError
+
 class Error():
     """
     该类为误差分析
     """
-    def __init__(self, project_path, seed=50, if_normal=0, field_path = None):
+    def __init__(self, project_path, seed=50, if_normal=0, field_path=None,
+                 generate_density_file=0):
+
         random.seed(seed)
+
+        self.generate_density_file = generate_density_file
+
         self.field_path = field_path
         self.project_path = project_path
         self.if_normal = if_normal
@@ -122,7 +127,7 @@ class Error():
         """
 
 
-        input_lines = read_txt(self.lattice_mulp_path, out='list')
+        input_lines = read_lattice_mulp(self.lattice_mulp_path)
 
         for i in input_lines:
             if i[0] == 'err_step':
@@ -737,8 +742,8 @@ class Error():
 
             dataset_obj = DatasetParameter(dataset_path, self.project_path)
             dataset_obj.get_parameter()
-
             normal_ek = dataset_obj.ek[-1]
+
         if self.if_normal == 0:
             normal_ek = 0
 
@@ -784,7 +789,7 @@ class Error():
             add_to_txt(self.errors_par_path, [t1_lis])
 
         elif time == self.all_time:
-            errors_par_tot_list = read_txt(self.errors_par_tot_path, out = "list")
+            errors_par_tot_list = read_lattice_mulp(self.errors_par_tot_path)
 
             t_lis = [j for j in errors_par_tot_list[1:] if int(j[0].split("_")[0]) == group]
 
@@ -835,6 +840,10 @@ class Error():
 
 
     def write_density_every_time(self, group, time):
+        if self.if_normal == 1 and self.generate_density_file == 1:
+            pass
+        else:
+            return 0
 
         is_normal = 0
         if group == 0:
@@ -884,7 +893,7 @@ class Error():
 
         err_datas_path = os.path.join(self.output_path, f"Error_Datas_{group}_{time}.txt")
         lattice_path = self.lattice_path
-        input = read_txt(lattice_path, out="list")
+        input = read_lattice_mulp(lattice_path)
         # print(input)
         # 为每个元件加编号
         index = 0
@@ -939,8 +948,8 @@ class Error():
             raise Exception("Missing error on command")
 
 class ErrorDyn(Error):
-    def __init__(self, project_path, seed, if_normal, field_path):
-        super().__init__(project_path, seed, if_normal, field_path)
+    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
 
 
     def run_one_time(self, group, time, lattice_mulp_list):
@@ -984,8 +993,8 @@ class ErrorDyn(Error):
         # process.start()  # 启动子进程
         # process.join()  # 等待子进程运行结束
         self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
-        if self.if_normal == 1:
-            self.write_density_every_time(group, time)
+
+        self.write_density_every_time(group, time)
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
@@ -1023,8 +1032,8 @@ class ErrorDyn(Error):
                 self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
-    def __init__(self, project_path, seed, if_normal, field_path):
-        super().__init__(project_path, seed, if_normal, field_path)
+    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
         self.all_error_lattice = []
         # 只优化
         # self.only_adjust_sign = 0
@@ -1110,6 +1119,7 @@ class Errorstat(Error):
         # process.join()  # 等待子进程运行结束
 
         self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
+
 
 
         self.write_density_every_time(group, time)
@@ -1235,8 +1245,8 @@ class Errorstat(Error):
 
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path, seed, if_normal, field_path):
-        super().__init__(project_path, seed, if_normal, field_path)
+    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
         self.err_type = 'stat_dyn'
 
 
@@ -1398,6 +1408,7 @@ class Errorstatdyn(Errorstat):
 
         copy_file(self.lattice_path, self.error_middle_output0_path)
 
+
         self.write_density_every_time(group, time)
 
         new_name = f'output_{group}_{time}'
@@ -1491,7 +1502,7 @@ class OnlyAdjust(Errorstat):
 
         # self.only_adjust_sign = 1
         self.err_type = 'only_adjust'
-        input_lines = read_txt(self.lattice_mulp_path, out='list')
+        input_lines = read_lattice_mulp(self.lattice_mulp_path)
         index = 0
         for i in input_lines:
             if i[0] in global_varible.long_element:
@@ -1537,11 +1548,11 @@ if __name__ == "__main__":
     field = r"E:\using\test_avas_qt\field"
     path = r"E:\using\test_avas_qt\test_error"
     obj = ErrorDyn(path,
-                   0, 0, field_path= None)
+                   50, 0, field_path=None, generate_density_file = None)
 
     #
     obj = Errorstat(path,
-                   0, 1, field_path= None)
+                   0, 1, field_path=None, )
 
     # obj = Errorstatdyn(path,
     #                0, 1, field_path= None)

@@ -1,7 +1,6 @@
 import sys
 # sys.path.append(r'C:\Users\anxin\Desktop\AVAS_control')
 
-
 from dataprovision.datasetparameter import DatasetParameter
 from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
 
@@ -312,7 +311,7 @@ class EA():
 
         err_datas_path = os.path.join(self.output_path, f"EA_Error_Datas_{time}.txt")
         lattice_path = self.lattice_path
-        input = read_txt(lattice_path, out ="list")
+        input = read_txt(lattice_path, out = "list")
         # 为每个元件加编号
         index = 0
         for i in input:

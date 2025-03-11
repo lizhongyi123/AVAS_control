@@ -92,36 +92,37 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed, if_normal=1, field_path = None):
+def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-    v = ErrorDyn(project_path, seed, if_normal, field_path)
+
+    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed, if_normal=1, field_path = None):
+def err_stat(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path, seed, if_normal, field_path)
+    v = Errorstat(project_path, seed, if_normal, field_path, generate_density_file)
     v.run()
     
 
-def err_stat_dyn(project_path, seed, if_normal=1, field_path = None):
+def err_stat_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path, seed, if_normal, field_path)
+    v = Errorstatdyn(project_path, seed, if_normal, field_path, generate_density_file)
     v.run()
     return None
 
@@ -178,14 +179,15 @@ def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
     return res
 
 def plot_cavity_voltage(project_path, ratio, show_=1, fig = None, platform = "qt"):
-    """
 
+    """
     :param project_path:
     :param ratio: {} 场名：比例
     :param show_:
     :return:
     腔压图
     """
+
     lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     v = PlotCavityVoltage(lattice_mulp_path, ratio)
     v.get_x_y()

@@ -7,7 +7,7 @@ import numpy as np
 from dataprovision.latticeparameter import LatticeParameter
 from dataprovision.datasetparameter import DatasetParameter
 
-from utils.readfile import read_txt
+from utils.readfile import read_txt, read_lattice_mulp
 from utils.treatlist import flatten_list, list_one_two
 from utils.treatfile import copy_file, split_file
 from utils.tool import write_to_txt, calculate_mean, calculate_rms, add_to_txt

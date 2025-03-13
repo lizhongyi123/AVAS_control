@@ -134,7 +134,7 @@ class EnvelopeDialog(QDialog):
         self.project_path = project_path
         self.picture_type = 'rms_x'
 
-        self.fig_size = (6.4,4.6)
+        self.fig_size = (6.4, 4.6)
         self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
 
     def initUI(self):
@@ -348,7 +348,7 @@ class CavityVoltageDialog(QDialog):
         event.accept()
 
     def get_feld(self):
-        lattice_path = os.path.join(self.project_path, "InputFile", "lattice.txt")
+        lattice_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
         all_info = read_txt(lattice_path, out='list')
 
         for i in all_info:
@@ -439,6 +439,7 @@ class EnvBetaTwissDialog(EnvelopeDialog):
 
         self.fig.clf()
         self.plot_image()
+
 class EnvEmitDialog(EnvelopeDialog):
     def __init__(self, project_path, func):
         super().__init__(project_path, func)
@@ -558,11 +559,11 @@ class PageAnalysis(QWidget):
 
         self.button_loss = QPushButton("loss")
         self.button_loss.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_loss.clicked.connect(partial(self.plot_dataset_dialog, "loss"))
+        self.button_loss.clicked.connect(self.plot_loss_dialog)
 
         self.button_energy = QPushButton("Energy")
         self.button_energy.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_energy.clicked.connect(partial(self.plot_dataset_dialog, "energy"))
+        self.button_energy.clicked.connect(self.plot_energy_dialog)
 
         self.button_emittance = QPushButton("Emittance")
         self.button_emittance.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
@@ -762,16 +763,29 @@ class PageAnalysis(QWidget):
             return 0
 
         self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
-        self.phase_dialog. fig = Figure(figsize=(6.4*2, 4.6*2))
+        self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
         self.phase_dialog.initUI()
         self.phase_dialog.plot_image()
         self.phase_dialog.show()
 
-    def plot_dataset_dialog(self, message ):
-        self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, message)
+    # def plot_dataset_dialog(self, message ):
+    #     self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, message)
+    #     self.loss_dialog.initUI()
+    #     self.loss_dialog.plot_image()
+    #     self.loss_dialog.show()
+
+    def plot_energy_dialog(self, ):
+        self.energy_dialog = PlotOnePicture1(self.project_path, plot_dataset, "energy")
+        self.energy_dialog.initUI()
+        self.energy_dialog.plot_image()
+        self.energy_dialog.show()
+
+    def plot_loss_dialog(self, ):
+        self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, "loss")
         self.loss_dialog.initUI()
         self.loss_dialog.plot_image()
         self.loss_dialog.show()
+
 
     def emittance_dialog(self):
         self.emittance_dialog = EmittanceDialog(self.project_path, plot_dataset)
@@ -832,7 +846,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'E:\using\test_avas_qt\fileld_ciads3')
+    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test_ini')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

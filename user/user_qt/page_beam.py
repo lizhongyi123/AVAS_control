@@ -17,8 +17,13 @@ from utils.treat_directory import list_files_in_directory
 from utils.treatfile import split_file, file_in_directory
 from utils.beamconfig import BeamConfig
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from user.user_qt.page_utils.fourpicture import FourPlotDialog
+
+
 gray240 = "rgb(240, 240, 240)"
 from apis.qt_api.api import cal_beam_parameter
+from apis.basic_api.api import plot_dataset
+
 class PageBeam(QWidget):
     def __init__(self, project_path):
         super().__init__()
@@ -375,8 +380,10 @@ class PageBeam(QWidget):
 
 ####################################################################################
 
-
+        self.button_phase_ellipse = QPushButton("Visuallize preview of rms values")
+        self.button_phase_ellipse.clicked.connect(self.plot_phase_ellipse)
         vertical_layout2.addLayout(hbox_distribution)
+        vertical_layout2.addWidget(self.button_phase_ellipse)
         # vertical_layout2.addLayout(hbox_displacePos)
         # vertical_layout2.addLayout(hbox_displaceDpos)
         vertical_layout2.addStretch(1)
@@ -511,6 +518,13 @@ class PageBeam(QWidget):
             #     self.text_displaceDpos_y.clear()
             #     self.text_displaceDpos_z.clear()
         # print(self.text_particle_input_file.text())
+
+    def plot_phase_ellipse(self):
+        self.obj_plt_ellipse = FourPlotDialog()
+        self.obj_plt_ellipse.initUI()
+        self.obj_plt_ellipse.plot_image1(self.project_path, plot_dataset, "loss", 0)
+        self.obj_plt_ellipse.show()
+
 
     def generate_beam_list(self):
         res = {}
@@ -686,6 +700,7 @@ class PageBeam(QWidget):
             return True
 
     def select_dst_file(self):
+        print(703)
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
         default_directory = os.path.join(self.project_path, "InputFile")
@@ -693,7 +708,6 @@ class PageBeam(QWidget):
                                                        options=options)
 
         if dst_file_path:
-            # print(dst_file_path)
             #复制前的文件
             source_file = dst_file_path
 
@@ -703,8 +717,8 @@ class PageBeam(QWidget):
             #复制后的文件
             target_dst_file = os.path.join(self.project_path, "InputFile", relative_dst_file_path)
 
-            print(file_in_directory(source_file, target_folder))
-            return 0
+            # print(file_in_directory(source_file, target_folder))
+
             #如果文件已经文件夹中
             if file_in_directory(source_file, target_folder):
                 self.text_particle_input_file.setText(relative_dst_file_path)
@@ -737,7 +751,7 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'C:\Users\shliu\Desktop\chu')
+    main_window = PageBeam(r'C:\Users\anxin\Desktop\test_ini')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")

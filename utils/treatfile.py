@@ -20,8 +20,8 @@ def split_file(file_path):
 def file_in_directory(file, directory):
     file_list = os.path.normpath(file)
     directory_list = [os.path.normpath(i) for i in list_files_in_directory(directory)]
-    print(file)
-    print(directory_list)
+    # print(file)
+    # print(directory_list)
     if file_list in directory_list:
         return True
     else:

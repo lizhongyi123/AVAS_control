@@ -73,7 +73,6 @@ class PageLongdistance(QWidget):
         self.text_dstfile = MyQLineEdit("")
 
 
-
         dstfile_layout.addWidget(label_dstfile)
         dstfile_layout.addWidget(self.text_dstfile)
         groupbox_1_layout.addLayout(dstfile_layout)

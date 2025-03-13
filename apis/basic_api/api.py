@@ -316,7 +316,6 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    file_path = r"E:\using\test_avas_qt\test_error"
+    project_path = r"C:\Users\anxin\Desktop\test_ini"
     # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
-    basic_mulp(file_path)
-
+    basic_mulp(project_path)

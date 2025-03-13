@@ -95,12 +95,7 @@ class PlotOnePicture1(PictureDialog1):
             self.func(self.file_path, self.picture_type, show_=0, fig=self.fig)
         else:
             self.func(self.file_path, show_=0, fig=self.fig)
-        # if self.picture_type:
-        #     obj = self.cls(self.file_path, self.picture_type)
-        # else:
-        #     obj = self.cls(self.file_path)
-        # obj.get_x_y()
-        # obj.run( show_=0, fig=self.fig)
+
 
 
 class PlotOnePicture2(PictureDialog1):
@@ -117,3 +112,7 @@ class PlotOnePicture2(PictureDialog1):
     def plot_image(self, ):
         self.func(self.file_path, self.picture_type1, self.picture_type2, show_=0, fig=self.fig)
 
+if __name__ == "__main__":
+    obj = PictureDialog1()
+    obj.initUI()
+    obj.exec_()

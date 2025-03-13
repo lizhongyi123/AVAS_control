@@ -6,8 +6,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction,\
 import sys
 import os
 
-from user.user_qt.lattice_file.lattice_ide import CustomCodeEdit, MySyntaxHighlighter, MyFoldDetector
-from pyqode.core import api, modes, panels
 from user.user_qt.user_defined import treat_err
 from utils.latticeconfig import LatticeConfig
 

@@ -21,7 +21,7 @@ from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from apis.basic_api.api import plot_env_beam_out
 
 from aftertreat.dataanalysis.plttodst import Plttozcode
-from user.user_qt.page_utils.picture_dialog import PlotOnePicture1, PictureDialog1
+from user.user_qt.page_utils.picture_dialog import PictureDialog1, MulpEnvelopeDialog
 from aftertreat.picture.plotphase import PlotPhase
 from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
 from aftertreat.picture.plotdataset import PlotDataSet
@@ -489,23 +489,23 @@ class PageAnalysis(QWidget):
 
         self.button_env_gamma= QPushButton("Gamma")
         self.button_env_gamma.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_env_gamma.clicked.connect(self.env_gamma_dialog)
+        # self.button_env_gamma.clicked.connect(self.env_gamma_dialog)
 
         self.button_env_beta= QPushButton("Beta")
         self.button_env_beta.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_env_beta.clicked.connect(self.env_beta_dialog)
+        # self.button_env_beta.clicked.connect(self.env_beta_dialog)
 
         self.button_env_alpha= QPushButton("Alpha")
         self.button_env_alpha.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_env_alpha.clicked.connect(self.env_alpha_dialog)
+        # self.button_env_alpha.clicked.connect(self.env_alpha_dialog)
 
         self.button_env_twiss_beta= QPushButton("Beta(twiss)")
         self.button_env_twiss_beta.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_env_twiss_beta.clicked.connect(self.env_twiss_beta_dialog)
+        # self.button_env_twiss_beta.clicked.connect(self.env_twiss_beta_dialog)
 
         self.button_env_emit= QPushButton("Emittance")
         self.button_env_emit.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_env_emit.clicked.connect(self.env_emit_dialog)
+        # self.button_env_emit.clicked.connect(self.env_emit_dialog)
 
         vbox_env.addWidget(self.button_env_gamma)
         vbox_env.addWidget(self.button_env_beta)
@@ -571,7 +571,8 @@ class PageAnalysis(QWidget):
 
         self.button_cavity_voltage= QPushButton("cavity_voltage")
         self.button_cavity_voltage.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_cavity_voltage.clicked.connect(self.cavity_voltage_dialog)
+        # self.button_cavity_voltage.clicked.connect(self.cavity_voltage_dialog)
+
         vbox_picture.addWidget(phase_advance_group_box)
         vbox_picture.addWidget(self.button_beam_pahse_advance)
         vbox_picture.addWidget(self.button_sync_phase)
@@ -625,7 +626,7 @@ class PageAnalysis(QWidget):
 
         self.button_plot_phase = QPushButton("Plot")
         self.button_plot_phase.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        self.button_plot_phase.clicked.connect(self.plot_phase)  # 连接按钮的点击事件到绘图函数
+        # self.button_plot_phase.clicked.connect(self.plot_phase)  # 连接按钮的点击事件到绘图函数
 
         vbox_phase.addWidget(self.button_import_dst_file)
         vbox_phase.addWidget(self.text_phase_path)
@@ -699,7 +700,7 @@ class PageAnalysis(QWidget):
         pass
 
 
-    @treat_err
+
     def convert_plt_to_dst(self):
         beamset_path = os.path.join(self.project_path, "OutputFile", "BeamSet.plt")
         print(beamset_path)
@@ -707,66 +708,66 @@ class PageAnalysis(QWidget):
         print(685, int(self.step_of_plt_line.text()))
         obj.write_to_dst(int(self.step_of_plt_line.text()))
 
-    @treat_err
-    def env_gamma_dialog(self):
-        picture_name = 'gamma'
-        func = plot_env_beam_out
-        self.dialog = EnvBeamOutDialog(self.project_path, func, picture_name)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
+    if 1:
+        def env_gamma_dialog(self):
+            picture_name = 'gamma'
+            func = plot_env_beam_out
+            self.dialog = EnvBeamOutDialog(self.project_path, func, picture_name)
+            self.dialog.initUI()
+            self.dialog.plot_image()
+            self.dialog.show()
 
-    @treat_err
-    def env_beta_dialog(self):
-        picture_name = 'beta'
-        func = plot_env_beam_out
-        self.dialog = EnvBeamOutDialog(self.project_path, func, picture_name)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
-    @treat_err
-    def env_alpha_dialog(self):
-        func = plot_env_beam_out
-        self.dialog = EnvAlphaDialog(self.project_path, func)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
 
-    @treat_err
-    def env_twiss_beta_dialog(self):
-        func = plot_env_beam_out
-        self.dialog = EnvBetaTwissDialog(self.project_path, func)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
+        def env_beta_dialog(self):
+            picture_name = 'beta'
+            func = plot_env_beam_out
+            self.dialog = EnvBeamOutDialog(self.project_path, func, picture_name)
+            self.dialog.initUI()
+            self.dialog.plot_image()
+            self.dialog.show()
 
-    def env_emit_dialog(self):
-        func = plot_env_beam_out
-        self.dialog = EnvEmitDialog(self.project_path, func)
-        self.dialog.initUI()
-        self.dialog.plot_image()
-        self.dialog.show()
+        def env_alpha_dialog(self):
+            func = plot_env_beam_out
+            self.dialog = EnvAlphaDialog(self.project_path, func)
+            self.dialog.initUI()
+            self.dialog.plot_image()
+            self.dialog.show()
 
+
+        def env_twiss_beta_dialog(self):
+            func = plot_env_beam_out
+            self.dialog = EnvBetaTwissDialog(self.project_path, func)
+            self.dialog.initUI()
+            self.dialog.plot_image()
+            self.dialog.show()
+
+        def env_emit_dialog(self):
+            func = plot_env_beam_out
+            self.dialog = EnvEmitDialog(self.project_path, func)
+            self.dialog.initUI()
+            self.dialog.plot_image()
+            self.dialog.show()
 
 
     def sync_phase_dialog(self):
         lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
-        self.syn_phase_dialog = PlotOnePicture1(lattice_mulp_path, plot_cavity_syn_phase)
+
+        self.syn_phase_dialog = PictureDialog1()
         self.syn_phase_dialog.initUI()
-        self.syn_phase_dialog.plot_image()
+        self.syn_phase_dialog.plot_image1(lattice_mulp_path, plot_cavity_syn_phase,)
         self.syn_phase_dialog.show()
 
-    def plot_phase(self):
-
-        if self.text_phase_path.text() == '':
-            # print('ddd')
-            return 0
-
-        self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
-        self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
-        self.phase_dialog.initUI()
-        self.phase_dialog.plot_image()
-        self.phase_dialog.show()
+    # def plot_phase(self):
+    #
+    #     if self.text_phase_path.text() == '':
+    #         # print('ddd')
+    #         return 0
+    #
+    #     self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
+    #     self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
+    #     self.phase_dialog.initUI()
+    #     self.phase_dialog.plot_image()
+    #     self.phase_dialog.show()
 
     # def plot_dataset_dialog(self, message ):
     #     self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, message)
@@ -775,15 +776,17 @@ class PageAnalysis(QWidget):
     #     self.loss_dialog.show()
 
     def plot_energy_dialog(self, ):
-        self.energy_dialog = PlotOnePicture1(self.project_path, plot_dataset, "energy")
+
+        self.energy_dialog = PictureDialog1()
         self.energy_dialog.initUI()
-        self.energy_dialog.plot_image()
+        self.energy_dialog.plot_image1(self.project_path, plot_dataset, "energy")
         self.energy_dialog.show()
 
+
     def plot_loss_dialog(self, ):
-        self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, "loss")
+        self.loss_dialog = PictureDialog1()
         self.loss_dialog.initUI()
-        self.loss_dialog.plot_image()
+        self.loss_dialog.plot_image1(self.project_path, plot_dataset, "loss")
         self.loss_dialog.show()
 
 
@@ -803,8 +806,7 @@ class PageAnalysis(QWidget):
     def envelope_dialog(self):
 
         # func = plot_dataset
-        dataset_path = os.path.join(self.project_path, "OutputFile", "dataset.txt")
-        self.envelope_dialog = EnvelopeDialog(self.project_path, plot_dataset)
+        self.envelope_dialog = MulpEnvelopeDialog(self.project_path, plot_dataset)
         self.envelope_dialog.initUI()
         self.envelope_dialog.show()
 

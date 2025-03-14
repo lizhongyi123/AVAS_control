@@ -238,7 +238,7 @@ def plot_error_out(file_path, picture_type, show_=1, fig = None, platform = "qt"
     res = v.run(show_, fig)
     return res
 
-def plot_error_emit_loss(file_path, type_, show_=1, fig = None, platform = "qt"):
+def plot_error_emit_loss(file_path, picture_type, show_=1, fig = None, platform = "qt"):
     """
 
     :param project_path:
@@ -248,7 +248,7 @@ def plot_error_emit_loss(file_path, type_, show_=1, fig = None, platform = "qt")
     :return:
     误差图
     """
-    v = PlotErr_emit_loss(file_path, type_)
+    v = PlotErr_emit_loss(file_path, picture_type)
     v.get_x_y()
     res = v.run(show_, fig)
     return res
@@ -316,6 +316,7 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    project_path = r"C:\Users\anxin\Desktop\test_ini"
+    project_path = r"E:\using\test_avas_qt\test_ini"
     # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
-    basic_mulp(project_path)
+    plot_phase_advance(project_path, "Period")
+    plot_phase_advance(project_path, "Meter")

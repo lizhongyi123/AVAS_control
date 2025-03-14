@@ -103,7 +103,6 @@ class PlotPhaseAdvance(PicturePlot_2D):
         lattice_obj = LatticeParameter(self.lattice_path)
         lattice_obj.get_parameter()
         v_start_end = lattice_obj.v_start_end
-        print(v_start_end)
 
         z = dataset_obj.z ##
 

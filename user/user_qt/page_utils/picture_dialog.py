@@ -183,14 +183,6 @@ class Picturewidgetrightkey(QWidget):
         self.setLayout(layout)
         self.plot_image()
 
-    def plot_image(self):
-        self.fig.clf()
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
-        # obj = self.cls(self.file_path, self.picture_type,)
-        # obj.get_x_y()
-        # obj.run( show_=0, fig=self.fig)
-        self.canvas.draw()
-
     def resizeEvent(self, event):
         # 当窗口被拉伸时，发出自定义信号
         self.resize_signal.emit()
@@ -201,10 +193,17 @@ class Picturewidgetrightkey(QWidget):
         self.fig.tight_layout()
         # plt.subplots_adjust(top=0.8 )
 
+    def plot_image(self):
+        self.fig.clf()
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
+        self.canvas.draw()
+
+    def custom_context_menu(self, event):
+        pass
 
 
-
-class MulpEnvelopeDialog(QDialog):
+#用来处理只有一张图片，但是需要邮件
+class OnePicyureRightkeys():
     def __init__(self, project_path, func, parent=None):
         super().__init__(parent)
         self.project_path = project_path
@@ -221,18 +220,40 @@ class MulpEnvelopeDialog(QDialog):
         self.picture_widget.contextMenuEvent = self.custom_context_menu
         self.picture_widget.initUI()
 
-        # # 监听 Picturewidgetrightkey 的 resize 信号
-        # self.picture_widget.resize_signal.connect(self.on_picture_resize)
+
+        # 添加多个按钮，每个按钮绑定不同的槽函数
+        self.toolbar.add_tool_button("刷新", self.refresh)
+        self.toolbar.add_tool_button("打开", self.open_file)
+        self.toolbar.add_tool_button("保存", self.save_file)
+        #############
+
+        self.layout.addWidget(self.toolbar)
 
         # 添加到布局
         self.layout.addWidget(self.picture_widget)
 
         self.setLayout(self.layout)
 
-    def on_picture_resize(self):
-        """当 Picturewidgetrightkey 调整大小时更新布局"""
-        self.picture_widget.fig.tight_layout()
+    def refresh(self):
+        print("刷新按钮被点击！")
 
+    def open_file(self):
+        print("打开文件！")
+
+    def save_file(self):
+        print("保存文件！")
+
+
+
+class MulpEnvelopeDialog(OnePicyureRightkeys):
+    def __init__(self, project_path, func, parent=None):
+        super().__init__(parent)
+        self.picture_widget.contextMenuEvent = self.custom_context_menu
+        self.picture_widget.plo
+    def plot_image(self):
+        self.fig.clf()
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
+        self.canvas.draw()
 
     def custom_context_menu(self, event):
         cmenu = QMenu(self)
@@ -259,6 +280,63 @@ class MulpEnvelopeDialog(QDialog):
                 break
         self.picture_widget.fig.clf()
         self.picture_widget.plot_image()
+
+
+# class MulpEnvelopeDialog(QDialog):
+#     def __init__(self, project_path, func, parent=None):
+#         super().__init__(parent)
+#         self.project_path = project_path
+#         self.func = func
+#     def initUI(self):
+#         self.setWindowTitle("Envelope Dialog")
+#         self.setGeometry(100, 100, 800, 600)
+#
+#         self.layout = QVBoxLayout()
+#
+#         # 创建 Picturewidgetrightkey 组件
+#         self.picture_widget = Picturewidgetrightkey(self.project_path, self.func)
+#         # 绑定新的 contextMenuEvent 方法
+#         self.picture_widget.contextMenuEvent = self.custom_context_menu
+#         self.picture_widget.initUI()
+#
+#         # # 监听 Picturewidgetrightkey 的 resize 信号
+#         # self.picture_widget.resize_signal.connect(self.on_picture_resize)
+#
+#         # 添加到布局
+#         self.layout.addWidget(self.picture_widget)
+#
+#         self.setLayout(self.layout)
+#
+#     def on_picture_resize(self):
+#         """当 Picturewidgetrightkey 调整大小时更新布局"""
+#         self.picture_widget.fig.tight_layout()
+#
+#
+#     def custom_context_menu(self, event):
+#         cmenu = QMenu(self)
+#
+#         menu_items = {
+#             "rms_x": cmenu.addAction("rms_x"),
+#             "rms_y": cmenu.addAction("rms_y"),
+#             "phi": cmenu.addAction("phi"),
+#             "rms_xy": cmenu.addAction("rms_xy"),
+#             "max_x": cmenu.addAction("max_x"),
+#             "max_y": cmenu.addAction("max_y"),
+#             "max_xy": cmenu.addAction("max_xy"),
+#             "beta_x": cmenu.addAction("beta_x"),
+#             "beta_y": cmenu.addAction("beta_y"),
+#             "beta_z": cmenu.addAction("beta_z"),
+#             "beta_xyz": cmenu.addAction("beta_xyz"),
+#         }
+#
+#         action = cmenu.exec_(self.mapToGlobal(event.pos()))
+#
+#         for item_name, menu_item in menu_items.items():
+#             if action == menu_item:
+#                 self.picture_widget.picture_type = item_name
+#                 break
+#         self.picture_widget.fig.clf()
+#         self.picture_widget.plot_image()
 
 class MulpEmittanceDialog(QDialog):
     def __init__(self, project_path, func, parent=None):

@@ -76,7 +76,7 @@ def delete_directory(path):
     # shutil.rmtree(path)
 if __name__ == "__main__":
 
-    path = r"C:\Users\shliu\Desktop\test_time"
+    path = r"C:\Users\shliu\Desktop\InputFile"
     res = list_files_in_directory(path, reverse=True)
     print(res)
 

@@ -86,52 +86,78 @@ def get_upload_path(item):
 def get_fieldname(item):
     kwargs = {}
     fieldpath = item["fieldPath"]
-    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
-    suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
-                   "bsx", "bsy", "bsz"
-                   ]
-    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-    v = [i.split("\\")[-1] for i in all_files]
-    v= [i.split(".")[0] for i in v]
-    field_name = list(set(v))
-    kwargs.update({'fieldName': field_name})
-    output = format_output(**kwargs)
+    if os.path.exists(fieldpath):
+        all_files = list_files_in_directory(fieldpath, sort_by="mtime")
+        suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
+                       "bsx", "bsy", "bsz"
+                       ]
+        all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+        v = [i.split("\\")[-1] for i in all_files]
+        v= [i.split(".")[0] for i in v]
+        field_name = list(set(v))
+        kwargs.update({'fieldName': field_name})
+        output = format_output(**kwargs)
+    else:
+        code = -1
+        msg = f"FileNotFoundError: {fieldpath}"
+        kwargs.update({'fieldName': []})
+        output = format_output(code, msg=msg, **kwargs)
     return output
 
 def get_bimap_name(item):
     kwargs = {}
     fieldpath = item["filePath"]
-    all_files = list_files_in_directory(fieldpath)
-    suffix_list = ["csv"
-                   ]
-    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-    v = [i.split("\\")[-1] for i in all_files]
-    v = [i.split(".")[0] for i in v]
-    bimap_name = list(set(v))
-    kwargs.update({'bimapName': bimap_name})
-    output = format_output(**kwargs)
+    if os.path.exists(fieldpath):
+        all_files = list_files_in_directory(fieldpath)
+        suffix_list = ["csv"
+                       ]
+        all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+        v = [i.split("\\")[-1] for i in all_files]
+        v = [i.split(".")[0] for i in v]
+        bimap_name = list(set(v))
+        kwargs.update({'bimapName': bimap_name})
+        output = format_output(**kwargs)
+    else:
+        code = -1
+        msg = f"FileNotFoundError: {fieldpath}"
+        kwargs.update({'bimapName': []})
+        output = format_output(code, msg=msg, **kwargs)
     return output
 
 def get_fieldfile(item):
     kwargs = {}
     fieldpath = item["fieldPath"]
-    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
-    suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
-                   "bsx", "bsy", "bsz"
-                   ]
-    all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-    v = [i.split("\\")[-1] for i in all_files]
-    kwargs.update({'fieldFile': v})
-    output = format_output(**kwargs)
+    if os.path.exists(fieldpath):
+        all_files = list_files_in_directory(fieldpath, sort_by="mtime")
+        suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
+                       "bsx", "bsy", "bsz"
+                       ]
+        all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
+        v = [i.split("\\")[-1] for i in all_files]
+        kwargs.update({'fieldFile': v})
+        output = format_output(**kwargs)
+    else:
+        code = -1
+        msg = f"FileNotFoundError: {fieldpath}"
+        kwargs.update({'fieldFile': []})
+        output = format_output(code, msg=msg, **kwargs)
+
     return output
 
 def get_allfile_relative_path(item):
     kwargs = {}
     fieldpath = item["filePath"]
-    all_files = list_files_in_directory(fieldpath, sort_by="mtime")
-    v = [i.split("\\")[-1] for i in all_files]
-    kwargs.update({'allFile': v})
-    output = format_output(**kwargs)
+    if os.path.exists(fieldpath):
+        all_files = list_files_in_directory(fieldpath, sort_by="mtime")
+        v = [i.split("\\")[-1] for i in all_files]
+        kwargs.update({'allFile': v})
+        output = format_output(**kwargs)
+    else:
+        code = -1
+        msg = f"FileNotFoundError: {fieldpath}"
+        kwargs.update({'allFile': []})
+        output = format_output(code, msg=msg, **kwargs)
+
     return output
 
 def create_from_file_input_ini(item):
@@ -317,16 +343,16 @@ def judge_if_is_avas_project(item):
     return output
 
 if __name__ == '__main__':
-    item = {
-    "particletype": "H",
-    "nucleonnumber": 10,
-    "numofcharge":1
-    }
-    # res = cal_mass(item)
+    # item = {
+    # "particletype": "H",
+    # "nucleonnumber": 10,
+    # "numofcharge":1
+    # }
+    # # res = cal_mass(item)
+    # # print(res)
+    # item = {"projectPath": r"E:\using\test_avas_qt\test_ini"}
+    # res = judge_if_is_avas_project(item)
     # print(res)
-    item = {"projectPath": r"E:\using\test_avas_qt\test_ini"}
-    res = judge_if_is_avas_project(item)
-    print(res)
 
 
 
@@ -351,3 +377,7 @@ if __name__ == '__main__':
     #  'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
     #  'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
     # write_to_file_input_ini(item, param)
+    path = r"C:\Users\shliu\Desktop\InputFile\3"
+    item = {"filePath": path }
+    res = get_allfile_relative_path(item)
+    print(res)

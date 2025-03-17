@@ -11,9 +11,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from apis.basic_api.api import plot_error_out, plot_error_emit_loss, plot_density, plot_density_level, plot_density_process
 from user.user_qt.user_defined import treat_err
-from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
-from user.user_qt.page_utils.picture_dialog import PictureDialog1, PlotOnePicture1, PlotOnePicture2
 
+from user.user_qt.page_utils.picture_dialog import PictureDialog1
 from user.user_qt.user_defined import MyQLineEdit
 from utils.iniconfig import IniConfig
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
@@ -283,10 +282,10 @@ class PageError(QWidget):
         func = plot_error_emit_loss
         # self.dialog = EmitLossDialog(self.project_path, func, 'par')
 
-        self.xy_dialog = PlotOnePicture1(self.error_par_file_path, plot_error_emit_loss, "par")
+        self.xy_dialog = PictureDialog1()
 
         self.xy_dialog.initUI()
-        self.xy_dialog.plot_image()
+        self.xy_dialog.plot_image1(self.error_par_file_path, plot_error_emit_loss, "par")
         self.xy_dialog.show()
 
 
@@ -327,55 +326,57 @@ class PageError(QWidget):
             elif message == "ek_change":
                 picture_type = "rms_ek"
 
-        self.xy_dialog = PlotOnePicture1(self.error_par_file_path, plot_error_out, picture_type)
+        self.xy_dialog = PictureDialog1()
 
         self.xy_dialog.initUI()
-        self.xy_dialog.plot_image()
+        self.xy_dialog.plot_image1(self.error_par_file_path, plot_error_out, picture_type)
         self.xy_dialog.show()
 
     def plot_density_process_this(self):
         # print(self.density_file_path)
         # print(self.density_picture_type)
         diaglog = None
+
         # plot_density(self.density_file_path, self.density_plane_choose, show_=1, fig=None, platform="qt")
+
         if self.density_picture_type == "density":
-            self.density_dialog = PlotOnePicture1(self.density_file_path, plot_density, self.density_plane_choose)
+            self.density_dialog = PictureDialog1()
             self.density_dialog.initUI()
-            self.density_dialog.plot_image()
+            self.density_dialog.plot_image1(self.density_file_path, plot_density, self.density_plane_choose)
             self.density_dialog.show()
 
         elif self.density_picture_type == "density_level":
-            self.density_level_dialog = PlotOnePicture1(self.density_file_path, plot_density_level, self.density_plane_choose)
+            self.density_level_dialog = PictureDialog1()
             self.density_level_dialog.initUI()
-            self.density_level_dialog.plot_image()
+            self.density_level_dialog.plot_image1(self.density_file_path, plot_density_level, self.density_plane_choose)
             self.density_level_dialog.show()
 
         elif self.density_picture_type == "centroid":
-            self.density_centroid_dialog = PlotOnePicture2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            self.density_centroid_dialog = PictureDialog1()
             self.density_centroid_dialog.initUI()
-            self.density_centroid_dialog.plot_image()
+            self.density_centroid_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
+                                     self.density_picture_type)
             self.density_centroid_dialog.show()
 
         elif self.density_picture_type == "emit":
-            self.density_emit_dialog = PlotOnePicture2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            self.density_emit_dialog = PictureDialog1()
             self.density_emit_dialog.initUI()
-            self.density_emit_dialog.plot_image()
+            self.density_emit_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
+                                     self.density_picture_type)
             self.density_emit_dialog.show()
 
         elif self.density_picture_type == "rms_size":
-            self.density_rms_size_dialog = PlotOnePicture2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            self.density_rms_size_dialog = PictureDialog1()
             self.density_rms_size_dialog.initUI()
-            self.density_rms_size_dialog.plot_image()
+            self.density_rms_size_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
+                                     self.density_picture_type)
             self.density_rms_size_dialog.show()
 
         elif self.density_picture_type == "rms_size_max":
-            self.density_rms_size_max_dialog = PlotOnePicture2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            self.density_rms_size_max_dialog = PictureDialog1()
             self.density_rms_size_max_dialog.initUI()
-            self.density_rms_size_max_dialog.plot_image()
+            self.density_rms_size_max_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
+                                     self.density_picture_type)
             self.density_rms_size_max_dialog.show()
 
 
@@ -504,11 +505,11 @@ class PageError(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageError(r'C:\Users\shliu\Desktop\test_new_avas\test913')
+    main_window = PageError(r'C:\Users\anxin\Desktop\test_err')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()
-    main_window.updatePath(r'E:\using\test_avas_qt\fileld_ciads')
+    main_window.updatePath(r'C:\Users\anxin\Desktop\test_err')
     sys.exit(app.exec_())
 
 

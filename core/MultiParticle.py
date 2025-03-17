@@ -68,7 +68,10 @@ def basic_mulp(project_path):
 if __name__ == "__main__":
 
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test314tian\AVAS"
+    project_path = r"C:\Users\anxin\Desktop\314"
+
+
+
     obj = MultiParticle(project_path)
     obj.run()
 

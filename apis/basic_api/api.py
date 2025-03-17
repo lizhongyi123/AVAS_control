@@ -24,6 +24,7 @@ from aftertreat.picture.plotdesnsity import PlotDensity, PlotDensityLevel, PlotD
 
 ########################################################################################################################
 import multiprocessing
+from apis.qt_api.judge_lattice import JudgeLattice
 
 #下列为功能函数
 #基础运行
@@ -49,6 +50,7 @@ def basic_mulp(project_path, field_path = None):
     lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
     write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
+
     res = multiparticle_obj.run(field_file=field_path)
     print('模拟结束')
     return res
@@ -99,7 +101,7 @@ def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density
     :return:
     """
 
-    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file)
+    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file =1)
     res = v.run()
     print('动态误差结束')
 
@@ -316,7 +318,12 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    project_path = r"E:\using\test_avas_qt\test_ini"
-    # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
-    plot_phase_advance(project_path, "Period")
-    plot_phase_advance(project_path, "Meter")
+    project_path = r"C:\Users\anxin\Desktop\314"
+    # # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
+    # plot_phase_advance(project_path, "Period")
+    # plot_phase_advance(project_path, "Meter")
+    lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
+    v = JudgeLattice(lattice_mulp_path)
+    res = v.judge_lattice(1)
+
+    basic_mulp(project_path)

@@ -1,12 +1,21 @@
-import sys
-import numpy as np
-import matplotlib.pyplot as plt
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
+    QStackedWidget, QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox, \
+    QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
+
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from apis.basic_api.api import plot_dataset
 
+from PyQt5.QtCore import Qt
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use("Qt5Agg")
+from PyQt5.QtCore import pyqtSignal
+from utils.readfile import read_lattice_mulp
+import os
 from user.user_qt.page_utils.picture_dialog import Picturewidgetrightkey
+from apis.basic_api.api import plot_dataset
+import sys
 # class FourPlotDialog(QDialog):
 #     """ 主窗口（QDialog），包含四个散点图 """
 #
@@ -45,23 +54,66 @@ from user.user_qt.page_utils.picture_dialog import Picturewidgetrightkey
 #         project_path = r"C:\Users\anxin\Desktop\test_ini"
 #         func(file_path, picture_type1, show_=0, fig=self.figures[index])
 
+class PhaseEllipseWidget(Picturewidgetrightkey):
+    resize_signal = pyqtSignal()  # 正确初始化自定义信号
+    def __init__(self, project_path, func, ):
+        super().__init__()
+
+        self.fig_size = (6.4, 4.6)
+        self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
+
+        self.func = func
+        self.project_path = project_path
+        self.picture_type = "rms_x"
+
+    def plot_image(self):
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
+        self.canvas.draw()
+
+
+    def contextMenuEvent(self, event):
+        cmenu = QMenu(self)
+
+        menu_items = {
+            "rms_x": cmenu.addAction("rms_x"),
+            "rms_y": cmenu.addAction("rms_y"),
+            "phi": cmenu.addAction("phi"),
+            "rms_xy": cmenu.addAction("rms_xy"),
+            "max_x": cmenu.addAction("max_x"),
+            "max_y": cmenu.addAction("max_y"),
+            "max_xy": cmenu.addAction("max_xy"),
+            "beta_x": cmenu.addAction("beta_x"),
+            "beta_y": cmenu.addAction("beta_y"),
+            "beta_z": cmenu.addAction("beta_z"),
+            "beta_xyz": cmenu.addAction("beta_xyz"),
+        }
+
+        action = cmenu.exec_(self.mapToGlobal(event.pos()))
+
+        for item_name, menu_item in menu_items.items():
+            if action == menu_item:
+                self.picture_type = item_name
+                break
+        self.fig.clf()
+        self.plot_image()
+
+
 
 
 class FourPlotDialog(QDialog):
-    def __init__(self, project_path, func, parent=None):
-        super().__init__(parent)
+    def __init__(self, project_path, func):
+        super().__init__()
+        self.project_path = project_path
+        self.func = func
         self.setWindowTitle("Picture Viewer")
 
         # 创建 4 个 Picturewidgetrightkey 实例
         self.widgets = [
-            Picturewidgetrightkey(project_path, func),
-            Picturewidgetrightkey(project_path, func),
-            Picturewidgetrightkey(project_path, func),
-            Picturewidgetrightkey(project_path, func),
+            PhaseEllipseWidget(self.project_path, func),
+            PhaseEllipseWidget(self.project_path, func),
+            PhaseEllipseWidget(self.project_path, func),
+            PhaseEllipseWidget(self.project_path, func),
         ]
-
-        # 初始化 UI
-        self.initUI()
 
     def initUI(self):
         layout = QGridLayout()
@@ -75,8 +127,11 @@ class FourPlotDialog(QDialog):
         # 初始化所有 widget
         for widget in self.widgets:
             widget.initUI()
-
         self.setLayout(layout)
+    def plot_image(self, parameter):
+        index = 0
+        self.widgets[index].plot_image()
+
 
 
 if __name__ == "__main__":
@@ -93,4 +148,5 @@ if __name__ == "__main__":
 
     # 传入 project_path 和 func 作为参数
     dialog = FourPlotDialog(project_path=project_path, func=plot_dataset)
-    dialog.show()
+    dialog.initUI()
+    dialog.exec_()

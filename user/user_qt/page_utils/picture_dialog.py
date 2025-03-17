@@ -137,50 +137,33 @@ class PictureDialog1(QDialog):
 #这是一个带有右键的组件
 class Picturewidgetrightkey(QWidget):
     resize_signal = pyqtSignal()  # 正确初始化自定义信号
-    def __init__(self, project_path, func):
+    def __init__(self):
         super().__init__()
-        self.func = func
-        self.project_path = project_path
-        self.picture_type = 'rms_x'
 
         self.fig_size = (6.4, 4.6)
         self.fig = Figure(figsize=self.fig_size)  # 创建figure对象
 
     def initUI(self):
-        winflags = Qt.Dialog
-        # 添加最小化按钮
-        winflags |= Qt.WindowMinimizeButtonHint
-        # 添加最大化按钮
-        winflags |= Qt.WindowMaximizeButtonHint
-        # 添加关闭按钮
-        winflags |= Qt.WindowCloseButtonHint
-        # 设置到窗体上
-        self.setWindowFlags(winflags)
-        self.setWindowTitle('弹出窗口')
         # self.setGeometry(200, 200, 400, 300)
 ################################
         self.canvas = FigureCanvas(self.fig)  # 创建figure画布
         self.figtoolbar = NavigationToolbar(self.canvas, self)  # 创建figure工具栏
 ###############################
+        layout = QVBoxLayout()
 
         # 创建一个容纳工具栏和图像的 QWidget
         container_widget = QWidget(self)
-
-        layout = QVBoxLayout()
-        container_widget.setLayout(layout)
-
-        toolbar = QToolBar()
-        layout.addWidget(toolbar)
-
-
         # 将右键上下文菜单与 self.image_label 绑定
         container_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         container_widget.customContextMenuRequested.connect(self.contextMenuEvent)
 
-        layout.addWidget(self.figtoolbar)  # 工具栏添加到窗口布局中
-        layout.addWidget(self.canvas)  # 画布添加到窗口布局中
+        layout_container = QVBoxLayout(container_widget)  # 让 container_widget 成为布局容器
+        layout_container.addWidget(self.figtoolbar)
+        layout_container.addWidget(self.canvas)
 
-        self.setLayout(layout)
+
+
+        self.setLayout(layout_container)
         self.plot_image()
 
     def resizeEvent(self, event):
@@ -194,33 +177,30 @@ class Picturewidgetrightkey(QWidget):
         # plt.subplots_adjust(top=0.8 )
 
     def plot_image(self):
-        self.fig.clf()
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
-        self.canvas.draw()
+        # self.fig.clf()
+        # self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
+        # self.canvas.draw()
+        pass
 
-    def custom_context_menu(self, event):
+    def contextMenuEvent(self, pos):
         pass
 
 
 #用来处理只有一张图片，但是需要邮件
-class OnePicyureRightkeys():
-    def __init__(self, project_path, func, parent=None):
-        super().__init__(parent)
+class OnePicyureRightkeys(QDialog):
+    def __init__(self, project_path, func):
+        super().__init__()
         self.project_path = project_path
         self.func = func
+        self.picture_widget = Picturewidgetrightkey()
+
     def initUI(self):
         self.setWindowTitle("Envelope Dialog")
         self.setGeometry(100, 100, 800, 600)
 
         self.layout = QVBoxLayout()
 
-        # 创建 Picturewidgetrightkey 组件
-        self.picture_widget = Picturewidgetrightkey(self.project_path, self.func)
-        # 绑定新的 contextMenuEvent 方法
-        self.picture_widget.contextMenuEvent = self.custom_context_menu
-        self.picture_widget.initUI()
-
-
+        self.toolbar = CustomToolBar()
         # 添加多个按钮，每个按钮绑定不同的槽函数
         self.toolbar.add_tool_button("刷新", self.refresh)
         self.toolbar.add_tool_button("打开", self.open_file)
@@ -231,6 +211,7 @@ class OnePicyureRightkeys():
 
         # 添加到布局
         self.layout.addWidget(self.picture_widget)
+        self.picture_widget.initUI()
 
         self.setLayout(self.layout)
 
@@ -245,17 +226,22 @@ class OnePicyureRightkeys():
 
 
 
-class MulpEnvelopeDialog(OnePicyureRightkeys):
-    def __init__(self, project_path, func, parent=None):
-        super().__init__(parent)
-        self.picture_widget.contextMenuEvent = self.custom_context_menu
-        self.picture_widget.plo
-    def plot_image(self):
-        self.fig.clf()
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.fig)
-        self.canvas.draw()
 
-    def custom_context_menu(self, event):
+
+class MulpEnvelopeDialog(OnePicyureRightkeys):
+    def __init__(self, project_path, func):
+        super().__init__(project_path, func)
+
+        self.picture_widget = Picturewidgetrightkey()
+        self.picture_widget.contextMenuEvent = self.contextMenuEvent
+        self.picture_widget.plot_image = self.plot_image
+        self.picture_type = "rms_x"
+
+    def plot_image(self):
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        self.picture_widget.canvas.draw()
+
+    def contextMenuEvent(self, event):
         cmenu = QMenu(self)
 
         menu_items = {
@@ -276,101 +262,25 @@ class MulpEnvelopeDialog(OnePicyureRightkeys):
 
         for item_name, menu_item in menu_items.items():
             if action == menu_item:
-                self.picture_widget.picture_type = item_name
+                self.picture_type = item_name
                 break
         self.picture_widget.fig.clf()
         self.picture_widget.plot_image()
 
 
-# class MulpEnvelopeDialog(QDialog):
-#     def __init__(self, project_path, func, parent=None):
-#         super().__init__(parent)
-#         self.project_path = project_path
-#         self.func = func
-#     def initUI(self):
-#         self.setWindowTitle("Envelope Dialog")
-#         self.setGeometry(100, 100, 800, 600)
-#
-#         self.layout = QVBoxLayout()
-#
-#         # 创建 Picturewidgetrightkey 组件
-#         self.picture_widget = Picturewidgetrightkey(self.project_path, self.func)
-#         # 绑定新的 contextMenuEvent 方法
-#         self.picture_widget.contextMenuEvent = self.custom_context_menu
-#         self.picture_widget.initUI()
-#
-#         # # 监听 Picturewidgetrightkey 的 resize 信号
-#         # self.picture_widget.resize_signal.connect(self.on_picture_resize)
-#
-#         # 添加到布局
-#         self.layout.addWidget(self.picture_widget)
-#
-#         self.setLayout(self.layout)
-#
-#     def on_picture_resize(self):
-#         """当 Picturewidgetrightkey 调整大小时更新布局"""
-#         self.picture_widget.fig.tight_layout()
-#
-#
-#     def custom_context_menu(self, event):
-#         cmenu = QMenu(self)
-#
-#         menu_items = {
-#             "rms_x": cmenu.addAction("rms_x"),
-#             "rms_y": cmenu.addAction("rms_y"),
-#             "phi": cmenu.addAction("phi"),
-#             "rms_xy": cmenu.addAction("rms_xy"),
-#             "max_x": cmenu.addAction("max_x"),
-#             "max_y": cmenu.addAction("max_y"),
-#             "max_xy": cmenu.addAction("max_xy"),
-#             "beta_x": cmenu.addAction("beta_x"),
-#             "beta_y": cmenu.addAction("beta_y"),
-#             "beta_z": cmenu.addAction("beta_z"),
-#             "beta_xyz": cmenu.addAction("beta_xyz"),
-#         }
-#
-#         action = cmenu.exec_(self.mapToGlobal(event.pos()))
-#
-#         for item_name, menu_item in menu_items.items():
-#             if action == menu_item:
-#                 self.picture_widget.picture_type = item_name
-#                 break
-#         self.picture_widget.fig.clf()
-#         self.picture_widget.plot_image()
+class MulpEmittanceDialog(OnePicyureRightkeys):
+    def __init__(self, project_path, func):
+        super().__init__(project_path, func)
+        self.picture_widget = Picturewidgetrightkey()
+        self.picture_widget.contextMenuEvent = self.contextMenuEvent
+        self.picture_widget.plot_image = self.plot_image
+        self.picture_type = "emittance_x"
 
-class MulpEmittanceDialog(QDialog):
-    def __init__(self, project_path, func, parent=None):
-        super().__init__(parent)
-        self.project_path = project_path
-        self.func = func
-    def initUI(self):
-        self.setWindowTitle("Envelope Dialog")
-        self.setGeometry(100, 100, 800, 600)
+    def plot_image(self):
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        self.picture_widget.canvas.draw()
 
-        self.layout = QVBoxLayout()
-
-        # 创建 Picturewidgetrightkey 组件
-        self.picture_widget = Picturewidgetrightkey(self.project_path, self.func)
-        # 绑定新的 contextMenuEvent 方法
-        self.picture_widget.contextMenuEvent = self.custom_context_menu
-        self.picture_widget.initUI()
-
-        # # 监听 Picturewidgetrightkey 的 resize 信号
-        # self.picture_widget.resize_signal.connect(self.on_picture_resize)
-
-        # 添加到布局
-        self.layout.addWidget(self.picture_widget)
-
-
-
-        self.setLayout(self.layout)
-
-    def on_picture_resize(self):
-        """当 Picturewidgetrightkey 调整大小时更新布局"""
-        self.picture_widget.fig.tight_layout()
-
-
-    def custom_context_menu(self, event):
+    def contextMenuEvent(self, event):
         cmenu = QMenu(self)
 
         menu_items = {
@@ -383,42 +293,26 @@ class MulpEmittanceDialog(QDialog):
 
         for item_name, menu_item in menu_items.items():
             if action == menu_item:
-                self.picture_widget.picture_type = item_name
+                self.picture_type = item_name
                 break
         self.picture_widget.fig.clf()
         self.picture_widget.plot_image()
 
-class BeamPahseAdvance(QDialog):
-    def __init__(self, project_path, func, parent=None):
-        super().__init__(parent)
-        self.project_path = project_path
-        self.func = func
-    def initUI(self):
-        self.setWindowTitle("Envelope Dialog")
-        self.setGeometry(100, 100, 800, 600)
 
-        self.layout = QVBoxLayout()
-
-        # 创建 Picturewidgetrightkey 组件
-        self.picture_widget = Picturewidgetrightkey(self.project_path, self.func)
-        # 绑定新的 contextMenuEvent 方法
-        self.picture_widget.contextMenuEvent = self.custom_context_menu
-        self.picture_widget.initUI()
-
-        # # 监听 Picturewidgetrightkey 的 resize 信号
-        # self.picture_widget.resize_signal.connect(self.on_picture_resize)
-
-        # 添加到布局
-        self.layout.addWidget(self.picture_widget)
-
-        self.setLayout(self.layout)
-
-    def on_picture_resize(self):
-        """当 Picturewidgetrightkey 调整大小时更新布局"""
-        self.picture_widget.fig.tight_layout()
+class BeamPahseAdvance(OnePicyureRightkeys):
+    def __init__(self, project_path, func):
+        super().__init__(project_path, func)
+        self.picture_widget = Picturewidgetrightkey()
+        self.picture_widget.contextMenuEvent = self.contextMenuEvent
+        self.picture_widget.plot_image = self.plot_image
+        self.picture_type = "Meter"
 
 
-    def custom_context_menu(self, event):
+    def plot_image(self):
+        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        self.picture_widget.canvas.draw()
+
+    def contextMenuEvent(self, event):
         cmenu = QMenu(self)
 
         menu_items = {
@@ -430,9 +324,10 @@ class BeamPahseAdvance(QDialog):
 
         for item_name, menu_item in menu_items.items():
             if action == menu_item:
-                self.picture_widget.picture_type = item_name
+                self.picture_type = item_name
                 break
         self.picture_widget.fig.clf()
+
         self.picture_widget.plot_image()
 
 

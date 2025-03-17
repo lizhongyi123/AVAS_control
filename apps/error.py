@@ -38,11 +38,11 @@ class Error():
     该类为误差分析
     """
     def __init__(self, project_path, seed=50, if_normal=0, field_path=None,
-                 generate_density_file=0):
+                 if_generate_density_file=0):
 
         random.seed(seed)
 
-        self.generate_density_file = generate_density_file
+        self.if_generate_density_file = if_generate_density_file
 
         self.field_path = field_path
         self.project_path = project_path
@@ -840,7 +840,7 @@ class Error():
 
 
     def write_density_every_time(self, group, time):
-        if self.if_normal == 1 and self.generate_density_file == 1:
+        if self.if_normal == 1 and self.if_generate_density_file == 1:
             pass
         else:
             return 0
@@ -948,8 +948,8 @@ class Error():
             raise Exception("Missing error on command")
 
 class ErrorDyn(Error):
-    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
+    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
 
 
     def run_one_time(self, group, time, lattice_mulp_list):
@@ -1032,8 +1032,8 @@ class ErrorDyn(Error):
                 self.write_err_par_every_time(i, j)
 
 class Errorstat(Error):
-    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
+    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
         self.all_error_lattice = []
         # 只优化
         # self.only_adjust_sign = 0
@@ -1245,8 +1245,8 @@ class Errorstat(Error):
 
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path, seed, if_normal, field_path, generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, generate_density_file)
+    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
+        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
         self.err_type = 'stat_dyn'
 
 
@@ -1546,13 +1546,13 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
     field = r"E:\using\test_avas_qt\field"
-    path = r"E:\using\test_avas_qt\test_error"
+    path = r"C:\Users\anxin\Desktop\test_ini"
     obj = ErrorDyn(path,
-                   50, 0, field_path=None, generate_density_file = None)
+                   50, 1, field_path=None, if_generate_density_file = 1)
 
     #
-    obj = Errorstat(path,
-                   0, 1, field_path=None, )
+    # obj = Errorstat(path,
+    #                0, 1, field_path=None, )
 
     # obj = Errorstatdyn(path,
     #                0, 1, field_path= None)

@@ -36,6 +36,8 @@ from user.user_qt.page_utils.picture_dialog import (PictureDialog1, MulpEnvelope
 
 
 
+
+
 class PhaseDialog(PictureDialog1, ):
     def __init__(self, file_path, func):
         super().__init__()
@@ -531,7 +533,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'E:\using\test_avas_qt\test_ini')
+    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test_ini')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

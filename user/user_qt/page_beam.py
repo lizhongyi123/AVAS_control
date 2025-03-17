@@ -527,7 +527,7 @@ class PageBeam(QWidget):
 
 
         self.obj_plt_ellipse = FourPlotDialog(project_path=self.project_path, func=plot_dataset)
-        # self.obj_plt_ellipse.initUI()
+        self.obj_plt_ellipse.initUI()
         # self.obj_plt_ellipse.plot_image1(self.project_path, plot_dataset, "loss", 0)
         self.obj_plt_ellipse.show()
 

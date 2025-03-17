@@ -382,6 +382,7 @@ class MainWindow(QMainWindow):
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
         # self.page_longdistance.fill_parameter()
+        self.page_data.fill_parameter()
         self.page_error.fill_parameter()
 
 

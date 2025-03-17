@@ -119,10 +119,10 @@ class PageData(QWidget):
         else:
             return round(num, self.decimals)
 
-# if __name__ == '__main__':
-#     app = QApplication(sys.argv)
-#     main_window = PageData(r'C:\Users\anxin\Desktop\test2')
-#     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-#     main_window.show()
-#     main_window.fill_parameter()
-#     sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = PageData(r'C:\Users\anxin\Desktop\test_ini')
+    main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
+    main_window.show()
+    main_window.fill_parameter()
+    sys.exit(app.exec_())

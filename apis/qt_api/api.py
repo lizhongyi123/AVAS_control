@@ -58,8 +58,57 @@ def cal_beam_parameter(item):
     output = format_output(**kwargs)
     return output
 
+def cal_beam_parameter(item):
+    dst_path = item["dstPath"]
+    kwargs = {}
+
+    beam_parameter = {}
+    try:
+        if os.path.exists(dst_path):
+            dst_res = read_dst_fast(dst_path)
+            beam_parameter['particlerestmass'] = dst_res['basemassinmev']
+            beam_parameter['current'] = dst_res['ib']
+            beam_parameter['particlenumber'] = dst_res['number']
+            beam_parameter['frequency'] = dst_res['freq']
+            beam_parameter['kneticenergy'] = dst_res['kneticenergy']
+
+            obj = PercentEmit(dst_path)
+            res = obj.get_percent_emit(1)
+
+            alpha_xx1, beta_xx1, epsi_xx1, _, _ = res[0]
+            alpha_yy1, beta_yy1, epsi_yy1, _, _ = res[1]
+            alpha_zz1, beta_zz1, epsi_zz1, _, _ = res[2]
+
+            beam_parameter['alpha_x'] = alpha_xx1
+            beam_parameter['beta_x'] = beta_xx1
+            beam_parameter['emit_x'] = epsi_xx1
+
+            beam_parameter['alpha_y'] = alpha_yy1
+            beam_parameter['beta_y'] = beta_yy1
+            beam_parameter['emit_y'] = epsi_yy1
+
+            beam_parameter['alpha_z'] = alpha_zz1
+            beam_parameter['beta_z'] = beta_zz1
+            beam_parameter['emit_z'] = epsi_zz1
+
+            beam_parameter["readparticledistribution"] = ""
+            beam_parameter["distribution_x"] = ""
+            beam_parameter["distribution_y"] = ""
+            beam_parameter["numofcharge"] = ""
+    except Exception as e:
+        code = -1
+        msg = str(e)
+        kwargs.update({'beamParams': {}})
+        output = format_output(code, msg=msg, **kwargs)
+        return output
+
+    kwargs.update({'beamParams': copy.deepcopy(beam_parameter)})
+    output = format_output(**kwargs)
+    return output
+
+
 def get_inputfile_path(item):
-    #item = {"projectPath": "fdasf" }
+    # item = {"projectPath": "fdasf" }
     kwargs = {}
     input_path = os.path.join(item["projectPath"], "InputFile")
     kwargs.update({'inputFilePath': input_path})
@@ -67,9 +116,9 @@ def get_inputfile_path(item):
     return output
 
 
-#获取上传位置
+# 获取上传位置
 def get_upload_path(item):
-    #item = {"projectPath": "fdasf", fileType, " "}
+    # item = {"projectPath": "fdasf", fileType, " "}
     kwargs = {}
     projectPath = item["projectPath"]
     fileType = item["fileType"]
@@ -81,34 +130,36 @@ def get_upload_path(item):
     output = format_output(**kwargs)
     return output
 
-#得到模拟进度
+
+# 得到模拟进度
 
 def get_fieldname(item):
     kwargs = {}
-    fieldpath = item["fieldPath"]
-    if os.path.exists(fieldpath):
-        all_files = list_files_in_directory(fieldpath, sort_by="mtime")
+    fieldPath = item["filePath"]
+    if os.path.exists(fieldPath):
+        all_files = list_files_in_directory(fieldPath, sort_by="mtime")
         suffix_list = ["edx", "edy", "edz", "bdx", "bdy", "bdz",
                        "bsx", "bsy", "bsz"
                        ]
         all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
         v = [i.split("\\")[-1] for i in all_files]
-        v= [i.split(".")[0] for i in v]
+        v = [i.split(".")[0] for i in v]
         field_name = list(set(v))
         kwargs.update({'fieldName': field_name})
         output = format_output(**kwargs)
     else:
         code = -1
-        msg = f"FileNotFoundError: {fieldpath}"
+        msg = f"FileNotFoundError: {fieldPath}"
         kwargs.update({'fieldName': []})
         output = format_output(code, msg=msg, **kwargs)
     return output
 
+
 def get_bimap_name(item):
     kwargs = {}
-    fieldpath = item["filePath"]
-    if os.path.exists(fieldpath):
-        all_files = list_files_in_directory(fieldpath)
+    bimapPath = item["filePath"]
+    if os.path.exists(bimapPath):
+        all_files = list_files_in_directory(bimapPath)
         suffix_list = ["csv"
                        ]
         all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
@@ -119,10 +170,11 @@ def get_bimap_name(item):
         output = format_output(**kwargs)
     else:
         code = -1
-        msg = f"FileNotFoundError: {fieldpath}"
+        msg = f"FileNotFoundError: {bimapPath}"
         kwargs.update({'bimapName': []})
         output = format_output(code, msg=msg, **kwargs)
     return output
+
 
 def get_fieldfile(item):
     kwargs = {}
@@ -144,6 +196,7 @@ def get_fieldfile(item):
 
     return output
 
+
 def get_allfile_relative_path(item):
     kwargs = {}
     fieldpath = item["filePath"]
@@ -159,6 +212,7 @@ def get_allfile_relative_path(item):
         output = format_output(code, msg=msg, **kwargs)
 
     return output
+
 
 def create_from_file_input_ini(item):
     # item的格式{“projectPath”： “path”}
@@ -187,10 +241,10 @@ def create_from_file_input_ini(item):
     fieldSource_dic = {'fieldSource': ini_res["data"]["iniParams"]["project"]["fieldSource"]}
     new_dic.update(fieldSource_dic)
 
-
     kwargs.update({'inputiniParams': new_dic})
     output = format_output(**kwargs)
     return output
+
 
 def write_to_file_input_ini(item, param):
     # item的格式{“projectPath”： “path”}
@@ -230,6 +284,7 @@ def write_to_file_input_ini(item, param):
     output = format_output(**kwargs)
     return output
 
+
 # def set_input_ini(item):
 #     project_path =
 
@@ -251,10 +306,10 @@ def cal_mass(item):
     script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
     parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
     parent_directory = os.path.dirname(parent_directory)  # 获取上级目录的路径
-    mass_csv_path = os.path.join(parent_directory, "staticfile", "atomic_masses.csv" )
+    mass_csv_path = os.path.join(parent_directory, "staticfile", "atomic_masses.csv")
     df = pd.read_csv(mass_csv_path, index_col=None)
 
-    #检测错误情况
+    # 检测错误情况
     if 1:
         Element_lis = df["Element"].tolist()
         unique_lst = list(dict.fromkeys(Element_lis))
@@ -276,16 +331,17 @@ def cal_mass(item):
             output = format_output(code, msg=msg, **kwargs)
             return output
 
-
     df_filtered = df[(df["Element"] == particletype) & (df["A"] == nucleonnumber)]
     dict_rows = df_filtered.to_dict(orient='records')
 
     dict_rows = dict_rows[0]
     Mq = 931.4941024
     Me = 0.511
+
     def get_mass(Am, q):
         mass = Am * Mq - q * Me
         return mass
+
     Am = dict_rows["Am"]
     q = numofcharge
     particlerestmass = round(get_mass(Am, q), 5)
@@ -293,11 +349,12 @@ def cal_mass(item):
     output = format_output(**kwargs)
     return output
 
+
 def get_atom(mode):
-    #mode的选项， “common”， “all”
+    # mode的选项， “common”， “all”
     kwargs = {}
     if mode == "common":
-        v = [ "H", "Cr", "Ar", "Ca", "Mn", "e+", "e-"]
+        v = ["H", "Cr", "Ar", "Ca", "Mn", "e+", "e-"]
         kwargs.update({'atomList': v})
         output = format_output(**kwargs)
         return output
@@ -315,14 +372,14 @@ def get_atom(mode):
         kwargs.update({'atomList': unique_lst})
         output = format_output(**kwargs)
         return output
-    
+
+
 def judge_if_is_avas_project(item):
-    #item = {"projectPath": }
-    #这是一个初步的判断， 判断是否存在inputfile和outputfile
+    # item = {"projectPath": }
+    # 这是一个初步的判断， 判断是否存在inputfile和outputfile
     project_path = item["projectPath"]
     inputfile_path = os.path.join(project_path, "InputFile")
     outputfile_path = os.path.join(project_path, "OutputFile")
-
 
     inputfile_exist = False
     outputfile_exist = False
@@ -341,6 +398,7 @@ def judge_if_is_avas_project(item):
         kwargs.update({'projectPath': project_path})
         output = format_output(code=code, msg=msg, **kwargs)
     return output
+
 
 if __name__ == '__main__':
     # item = {

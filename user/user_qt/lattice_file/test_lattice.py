@@ -98,7 +98,7 @@ class CodeEditor(QPlainTextEdit):
         font = self.font()  # 获取当前字体
         font.setPointSize(size)  # 设置新的字体大小
         self.setFont(font)  # 应用新的字体大小
-        self.line_number_area.update()
+        self.line_number_area.setFont(font)
 
     def update_line_number_area_width(self):
         self.setViewportMargins(50, 0, 0, 0)
@@ -376,62 +376,6 @@ class CodeEditor(QPlainTextEdit):
 
 
 
-    # def add_comment(self):
-    #     """在选中的每一行前添加 !"""
-    #     cursor = self.textCursor()
-    #     if not cursor.hasSelection():
-    #         return
-    #
-    #     start = cursor.selectionStart()
-    #     end = cursor.selectionEnd()
-    #     print(194, start, end)
-    #     cursor.beginEditBlock()  # 开始批量编辑，避免多次撤销操作
-    #
-    #     cursor.setPosition(start)
-    #     cursor.movePosition(cursor.StartOfBlock)
-    #
-    #     block = cursor.block()
-    #
-    #     while cursor.position() <= end:
-    #         print(191, cursor.position())
-    #
-    #         cursor.movePosition(cursor.StartOfBlock)
-    #         # cursor.insertText("! ")
-    #         cursor.movePosition(cursor.NextBlock)
-    #     # #
-    #         if not cursor.block().next().isValid():
-    #             break
-    #     cursor.endEditBlock()  # 结束批量编辑
-
-    # def remove_comment(self):
-    #     """在选中的每一行前，如果有 ! 则删除"""
-    #     cursor = self.textCursor()
-    #     if not cursor.hasSelection():
-    #         return
-    #
-    #     start = cursor.selectionStart()
-    #     end = cursor.selectionEnd()
-    #
-    #     cursor.beginEditBlock()  # 开始批量编辑
-    #
-    #     cursor.setPosition(start)
-    #     cursor.movePosition(cursor.StartOfBlock)
-    #
-    #     while cursor.position() <= end:
-    #         print(cursor.position(), end)
-    #         cursor.movePosition(cursor.StartOfBlock)
-    #         block_text = cursor.block().text()
-    #
-    #         if block_text.startswith("! "):  # 只有当行首是 "! " 时才移除
-    #             cursor.movePosition(cursor.NextCharacter, cursor.KeepAnchor, 2)
-    #             cursor.removeSelectedText()
-    #
-    #         if not cursor.block().next().isValid():  # 如果已经是最后一个 block，则终止循环
-    #             break
-    #
-    #         cursor.movePosition(cursor.NextBlock)
-    #
-    #     cursor.endEditBlock()  # 结束批量编辑
 
 
 

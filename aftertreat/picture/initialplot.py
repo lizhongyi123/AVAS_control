@@ -315,7 +315,7 @@ class Picturedensity():
         self.xlabel = ''
         self.ylabel = ''
         self.fontsize = 14
-        self.fig_size = (6.4 , 4.8)
+        self.fig_size = (6.4, 4.8)
         self.x = []
         self.y = []
         self.colors = ['r', 'b', 'g']

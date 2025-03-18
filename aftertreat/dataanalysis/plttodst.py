@@ -141,7 +141,7 @@ class Plttozcode():
         pass
 if __name__ == "__main__":
 
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
+    project_path = r"C:\Users\anxin\Desktop\314\cafe_avas"
     # project_path = r"C:\Users\anxin\Desktop\test_mulp"
     beamset_path = os.path.join(project_path, "OutputFile", "BeamSet.plt")
 

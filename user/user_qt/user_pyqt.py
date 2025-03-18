@@ -39,15 +39,17 @@ from apis.qt_api.api import judge_if_is_avas_project
 import traceback
 
 def basic_run(project_path, queue):
-    try:
-        item = {"projectPath": project_path}
-        obj = SimMode(item)
-        obj.run()
-    except Exception as e:
-        queue.put(str(e))
-    finally:
-        queue.close()
-
+#     try:
+#         item = {"projectPath": project_path}
+#         obj = SimMode(item)
+#         obj.run()
+#     except Exception as e:
+#         queue.put(str(e))
+#     finally:
+#         queue.close()
+    item = {"projectPath": project_path}
+    obj = SimMode(item)
+    obj.run()
 class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
     sim_error_signal = pyqtSignal(str)
@@ -382,7 +384,6 @@ class MainWindow(QMainWindow):
         self.page_lattice.fill_parameter()
         self.page_input.fill_parameter()
         # self.page_longdistance.fill_parameter()
-        self.page_data.fill_parameter()
         self.page_error.fill_parameter()
 
 
@@ -423,8 +424,11 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.handle_error(str(e))
             return False
-        self.sim_thread = SimThread(self.project_path)
 
+        self.page_data.fill_parameter()
+
+
+        self.sim_thread = SimThread(self.project_path)
         #完成
         self.sim_thread.finished.connect(self.on_task_finished)
         #模拟出错

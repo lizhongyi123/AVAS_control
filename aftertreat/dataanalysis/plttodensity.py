@@ -141,11 +141,12 @@ class PlttoDensity():
         # 使用进程池并行处理每一步的数据
         num_workers = max(cpu_count() - 3, 1)  # 根据 CPU 核心数动态调整
         # step_list = [i for i in range(0, all_step)]
-        v1 = [i for i in range(0, all_step, 20)]
-        v2 = [i for i in range(v1[-1] + 1, all_step)]
+        v1 = [i for i in range(0, all_step-1)]
 
-        step_list = v1 + v2
-
+        # v2 = [i for i in range(v1[-1] + 1, all_step)]
+        #
+        # step_list = v1 + v2
+        step_list = v1
         with Pool(num_workers) as pool:  # 使用上下文管理器
             # 准备每一步的参数
             args = [(dataset_obj, i, dataset_index_list) for i in step_list]

@@ -85,20 +85,20 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
+def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
 
-    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file =1)
+    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
+def err_stat(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
     """
     :param project_path:
     :return:
@@ -108,7 +108,7 @@ def err_stat(project_path, seed, if_normal=1, field_path = None, generate_densit
     v.run()
     
 
-def err_stat_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 0):
+def err_stat_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file=1):
     """
 
     :param project_path:

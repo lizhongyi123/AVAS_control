@@ -850,6 +850,8 @@ class Error():
             is_normal = 1
 
         beamset_path = os.path.join(self.error_middle_output0_path, "BeamSet.plt")
+        # if not os.path.exists(beamset_path):
+        #     return 0
 
         dataset_path = os.path.join(self.error_middle_output0_path, "DataSet.txt")
         target_density_path = os.path.join(self.output_path,  f"density_par_{group}_{time}.dat")

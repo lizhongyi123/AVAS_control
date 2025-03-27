@@ -345,10 +345,6 @@ class CodeEditor(QPlainTextEdit):
 
 
 
-
-
-
-
 class CodeEditorWithLineNumbers(QWidget):
     def __init__(self):
         super().__init__()

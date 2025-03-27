@@ -8,7 +8,7 @@ class MultiParticleEngine():
     def __init__(self):
         script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
         parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
-        self.dll_path = os.path.join(parent_directory, 'dllfile', 'libAVAS.dll')  # 使用绝对路径连接得到完整的路径
+        self.dll_path = os.path.join(parent_directory, 'dllfile', 'AVAS.dll')  # 使用绝对路径连接得到完整的路径
         self.so_path = os.path.join(parent_directory, 'dllfile', 'libAVAS.so')  # 使用绝对路径连接得到完整的路径
         try:
             if platform.system() == 'Windows':

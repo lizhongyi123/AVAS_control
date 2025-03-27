@@ -4,18 +4,9 @@ import time
 import traceback
 from PyQt5.QtWidgets import QApplication, QMessageBox
 import multiprocessing
-# try:
-#     # 你的代码
-#     from user.user_qt.user_pyqt import MainWindow
-#     import multiprocessing
-#     from PyQt5.QtWidgets import QApplication
-#
-# except Exception as e:
-#     # 打印详细的错误堆栈信息
-#     with open("errli.txt", "w") as f:
-#         f.write(str(e))
-#     print("发生错误，详细信息如下：")
-#     traceback.print_exc()
+from user.user_qt.user_pyqt import MainWindow
+import multiprocessing
+from PyQt5.QtWidgets import QApplication
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
@@ -30,9 +21,6 @@ if __name__ == "__main__":
     # 将全局异常处理器设置为自定义的函数
     sys.excepthook = exception_handler
 
-    from user.user_qt.user_pyqt import MainWindow
-    import multiprocessing
-    from PyQt5.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
     main_window = MainWindow()

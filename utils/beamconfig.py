@@ -165,7 +165,7 @@ class BeamConfig():
                 v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
             elif use_dst == 0:
                 v_dic['readparticledistribution'] = "unknown"
-
+        
             v_dic['numofcharge'] = self.beam_parameter['numofcharge']
 
             v_dic["twissx"] = [self.beam_parameter["alpha_x"], self.beam_parameter["beta_x"], self.beam_parameter["emit_x"]]
@@ -268,6 +268,16 @@ class BeamConfig():
             if beam_params[k] is None:
                 raise Exception(f"missing parameter {k}")
 
+        #当所有输入符合
+        # if beam_params["readparticledistribution"] is not None:
+        #     for k in self.with_dst_keys:
+        #         if beam_params[k] is None:
+        #             raise Exception(f"missing parameter {k}")
+        #
+        # else:
+        #     for k in self.no_dst_keys:
+        #         if beam_params[k] is None:
+        #             raise Exception(f"missing parameter {k}")
 
 
 if __name__ == "__main__":

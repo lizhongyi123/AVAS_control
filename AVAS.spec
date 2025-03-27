@@ -101,7 +101,7 @@ a = Analysis(
     './utils/__init__.py',
     ],
 
-    pathex=[r"C:\Users\anxin\Desktop\AVAS_control"],
+    pathex=[r'E:\AVAS_CONTROL\AVAS_control'],
     binaries=[],
     datas=[('./dllfile/AVAS.dll', 'dllfile'),
     ('./dllfile/AVAS.lib', 'dllfile'),

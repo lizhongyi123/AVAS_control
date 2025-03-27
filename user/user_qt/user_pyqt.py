@@ -39,17 +39,16 @@ from apis.qt_api.api import judge_if_is_avas_project
 import traceback
 from utils.exception import BaseError
 def basic_run(project_path, queue):
-#     try:
-#         item = {"projectPath": project_path}
-#         obj = SimMode(item)
-#         obj.run()
-#     except Exception as e:
-#         queue.put(str(e))
-#     finally:
-#         queue.close()
-    item = {"projectPath": project_path}
-    obj = SimMode(item)
-    obj.run()
+    try:
+        item = {"projectPath": project_path}
+        obj = SimMode(item)
+        obj.run()
+    except Exception as e:
+        queue.put(str(e))
+    finally:
+        queue.close()
+
+
 class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
     sim_error_signal = pyqtSignal(str)
@@ -210,7 +209,7 @@ class MainWindow(QMainWindow):
         page_beam_action = QAction("beam", self)
         page_lattice_action = QAction("lattice", self)
         page_analysis_action = QAction('analysis', self)
-        page_input_action = QAction('input', self)
+        page_input_action = QAction('setting', self)
         # page_function_action = QAction('function', self)
         page_match_action = QAction('match', self)
         page_others_action = QAction('others', self)
@@ -487,6 +486,7 @@ class MainWindow(QMainWindow):
         self.sim_thread = None
         self.stop_all()
         # 显示异常消息
+
         raise Exception(error_message)
 
     def activate_output(self, ):

@@ -252,8 +252,8 @@ class CodeEditor(QPlainTextEdit):
             cursor.setPosition(start_block.position())
             cursor.movePosition(cursor.EndOfBlock, cursor.KeepAnchor)
             original_text = cursor.selectedText()
-            if original_text.endswith(" ..."):  # 防止重复添加
-                cursor.insertText(original_text[:-4])
+            if original_text.endswith("..."):  # 防止重复添加
+                cursor.insertText(original_text[:-3])
             cursor.endEditBlock()
         else:
             # 计算折叠范围, 进行折叠

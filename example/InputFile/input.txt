@@ -1,0 +1,6 @@
+scanphase 1
+spacecharge 1
+steppercycle 50
+dumpperiodicity 0
+scmethod FFT
+!sim_type mulp

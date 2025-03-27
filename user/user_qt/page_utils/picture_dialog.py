@@ -115,10 +115,8 @@ class PictureDialog1(QDialog):
     def plot_image1(self, file_path, func, picture_type=None):
 
         if picture_type:
-            print(118)
             func(file_path, picture_type, show_=0, fig=self.fig)
         else:
-            print(121)
             func(file_path, show_=0, fig=self.fig)
 
     def plot_image2(self, file_path, func, picture_type1=None, picture_type2=None):

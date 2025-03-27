@@ -191,7 +191,7 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\error_output\output_0_0\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\maxi\test_m\OutputFile\DataSet.txt"
     obj = DatasetParameter(path1)
 
     v = obj.get_parameter()

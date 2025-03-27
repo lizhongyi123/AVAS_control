@@ -63,6 +63,12 @@ class BeamConfig():
             elif i[0] == "distribution":
                 beam_lis[index] = i + (3 - len(i)) * [None]
 
+            elif i[0] == "readparticledistribution":
+                if len(i) == 2 and i[1] == "unknown":
+                    beam_lis[index][1] = ""
+                elif len(i) == 1:
+                    beam_lis[index].append("")
+
 
         res = {}
         for i in beam_lis:
@@ -137,10 +143,15 @@ class BeamConfig():
     def write_to_file(self, item):
         # item = {"projectPath": ,
         #         "otherPath":
+        #        "use_dst",
         #
         #
         # }
+        use_dst = item.get("use_dst", 1)
+
+
         other_path = item.get("otherPath")
+
         if other_path is None:
             path = os.path.join(item.get("projectPath"), "InputFile", "beam.txt")
         else:
@@ -149,20 +160,24 @@ class BeamConfig():
         kwargs = {}
         try:
             v_dic = {}
-            if self.beam_parameter["readparticledistribution"] is not None:
+            v_dic = copy.deepcopy(self.beam_parameter)
+            if use_dst == 1:
                 v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
-                v_dic['numofcharge'] = self.beam_parameter['numofcharge']
-            else:
-                v_dic = copy.deepcopy(self.beam_parameter)
-                v_dic["twissx"] = [self.beam_parameter["alpha_x"], self.beam_parameter["beta_x"], self.beam_parameter["emit_x"]]
-                v_dic["twissy"] = [self.beam_parameter["alpha_y"], self.beam_parameter["beta_y"], self.beam_parameter["emit_y"]]
-                v_dic["twissz"] = [self.beam_parameter["alpha_z"], self.beam_parameter["beta_z"], self.beam_parameter["emit_z"]]
-                v_dic["distribution"] = [self.beam_parameter["distribution_x"], self.beam_parameter["distribution_y"]]
-                v_key = ["alpha_x", "beta_x", "emit_x",
-                               "alpha_y", "beta_y", "emit_y",
-                               "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y", 'readparticledistribution']
-                for i in v_key:
-                    del v_dic[i]
+            elif use_dst == 0:
+                v_dic['readparticledistribution'] = "unknown"
+
+            v_dic['numofcharge'] = self.beam_parameter['numofcharge']
+
+            v_dic["twissx"] = [self.beam_parameter["alpha_x"], self.beam_parameter["beta_x"], self.beam_parameter["emit_x"]]
+            v_dic["twissy"] = [self.beam_parameter["alpha_y"], self.beam_parameter["beta_y"], self.beam_parameter["emit_y"]]
+            v_dic["twissz"] = [self.beam_parameter["alpha_z"], self.beam_parameter["beta_z"], self.beam_parameter["emit_z"]]
+            v_dic["distribution"] = [self.beam_parameter["distribution_x"], self.beam_parameter["distribution_y"]]
+
+            v_key = ["alpha_x", "beta_x", "emit_x",
+                           "alpha_y", "beta_y", "emit_y",
+                           "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y" ]
+            for i in v_key:
+                del v_dic[i]
 
             v_lis = convert_dic2lis(v_dic)
             for index, i in enumerate(v_lis):
@@ -180,7 +195,7 @@ class BeamConfig():
         output = format_output(**kwargs)
         return output
 
-    def set_param(self, **kwargs):
+    def set_param(self,  **kwargs):
         for k, v in kwargs.items():
             if v == '':
                 kwargs[k] = None
@@ -248,27 +263,27 @@ class BeamConfig():
             raise Exception(res["data"]["msg"])
         beam_params = res["data"]["beamParams"]
         #当所有输入符合
-        if beam_params["readparticledistribution"] is not None:
-            for k in self.with_dst_keys:
-                if beam_params[k] is None:
-                    raise Exception(f"missing parameter {k}")
 
-        else:
-            for k in self.no_dst_keys:
-                if beam_params[k] is None:
-                    raise Exception(f"missing parameter {k}")
+        for k in self.beam_parameter_keys:
+            if beam_params[k] is None:
+                raise Exception(f"missing parameter {k}")
 
 
 
 if __name__ == "__main__":
-    beam_path = r"C:\Users\shliu\Desktop\test1113\test1\InputFile\beam.txt"
+    beam_path = r"C:\Users\shliu\Desktop\maxi\test_m\325\InputFile\beam.txt"
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads"
+        "projectPath": r"C:\Users\shliu\Desktop\maxi\test_m\325"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
-    # print(1, res)
-    # obj.validate_run(path)
-    res = obj.set_param(distribution_x='')
+    # # print(1, res)
+    # # obj.validate_run(path)
+    # res = obj.set_param(readparticledistribution='91')
+    # item = {
+    #     "projectPath": r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads",
+    #     "use_dst": 1,
+    #     }
+    # obj.write_to_file(item)
     print(res)

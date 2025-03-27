@@ -111,7 +111,6 @@ class PageOutput(QWidget):
 
     def update_progress1(self, signal):
         res = signal
-        # print(res)
 
         if res["code"] == -1:
             error_msg = res["data"]["msg"]

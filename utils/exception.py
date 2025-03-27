@@ -136,6 +136,13 @@ class BaseError():
     def adjust_param_value_error(self, command):
         raise Exception(f"The adjust parameter exceed the parameters of element: "
                         f"line {' '.join(map(str, command[:-1]))}")
+
+    def project_not_exist(self, project):
+        raise Exception(f"{project} not exist")
+
+    def is_not_project(self, project):
+        raise Exception(f"{project} is not a project")
+
     # def adjust_param_error(self, command):
     #     raise Exception(f"Format or Syntax error at adjust command, :"
     #                     f"line { }")

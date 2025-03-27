@@ -82,7 +82,7 @@ command_param_type_dict = {
 
 #该字典用于标记某些命令或元件的固定值选项
 command_param_fixed_dict = {
-    "adjust": {"e6": [0, 1]},
+    "adjust": {"e_6": [0, 1]},
     'err_quad_ncpl_stat': {"e_2": [0, 1, 2]},
     'err_quad_ncpl_dyn': {"e_2": [0, 1, 2]},
     'err_cav_ncpl_stat': {"e_2": [0, 1, 2]},
@@ -101,7 +101,7 @@ command_param_fixed_dict = {
     "err_beam_stat_on": {f"e_{i}": [0, 1] for i in range(1, 14)},
 }
 element_param_fixed_dict = {
-    'field': {"e_4": [1, 3]},
+    # 'field': {"e_4": [1, 3]},
     "bend": {"e_7": [0, 1]},
     "steer": {"e_6": [0,1]},
     "edge": {"e_9": [0, 1]},

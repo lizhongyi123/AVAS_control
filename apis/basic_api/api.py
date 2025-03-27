@@ -25,7 +25,7 @@ from aftertreat.picture.plotdesnsity import PlotDensity, PlotDensityLevel, PlotD
 ########################################################################################################################
 import multiprocessing
 from apis.qt_api.judge_lattice import JudgeLattice
-
+from aftertreat.picture.plotphaseellipse import PlotPhaseEllipse
 #下列为功能函数
 #基础运行
 def basic_mulp(project_path, field_path = None):
@@ -34,16 +34,7 @@ def basic_mulp(project_path, field_path = None):
     :return:
     多粒子模拟
     """
-    # latice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
-    # res = read_txt(latice_mulp_path, out = 'list')
-    #
-    # opti = judge_opti(res)
-    #
-    # if opti:
-    #     v = OnlyAdjust(project_path)
-    #     v.run()
-    #
-    # #如果不需要矫正，则进行简单模拟
+
     # else:
     multiparticle_obj = MultiParticle(project_path)
 
@@ -268,7 +259,6 @@ def plot_density_level(file_path, picture_type, show_=1, fig = None, platform = 
     return res
 
 
-
 def plot_density_process(file_path, desnity_plane, picture_type, show_=1, fig = None, platform = "qt"):
     density_plane = ["x", "y", "r", "z"]
     #picture_type = [
@@ -283,6 +273,16 @@ def plot_density_process(file_path, desnity_plane, picture_type, show_=1, fig = 
     v.get_x_y(desnity_plane, picture_type)
     res = v.run(show_, fig)
     return res
+
+
+def plot_phase_ellipse(parameter_item, picture_type, show_=1, fig = None, platform = "qt"):
+    obj = PlotPhaseEllipse()
+    obj.get_x_y(picture_type, parameter_item)
+    res = obj.run(show_, fig)
+    return res
+
+
+
 
 def plot_env_beam_out(project_path, picture_name, show_=1, fig = None):
     v =PlotEnvBeamOut(project_path)

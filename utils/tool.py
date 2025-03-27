@@ -111,6 +111,13 @@ def convert_to_othertype(s: str, target_type) -> bool:
         v1 = str(s)
     return v1
 
+def safe_to_float(text, default=0.0):
+    try:
+        return float(text)
+    except ValueError:
+        return 0
+
+
 if __name__ == '__main__':
     # code = 1
     # msg = "s"

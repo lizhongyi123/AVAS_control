@@ -170,7 +170,7 @@ if __name__ == "__main__":
     # res = read_dst(path)
     # print(res['phase'][0])
     # read_runsignal(0)
-    path = r"E:\using\test_avas_qt\test_error\InputFile\lattice_mulp.txt"
+    path = r"C:\Users\shliu\Desktop\maxi\test_m"
     res = read_lattice_mulp(path)
     for i in res:
         print(i)

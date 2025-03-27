@@ -14,7 +14,7 @@ from PyQt5.QtGui import (
 )
 from PyQt5.QtCore import QRegExp
 from user.user_qt.lattice_file. latticeideuseclass import FindReplaceDialog, SearchDialog, SyntaxHighlighter
-
+import global_varible
 
 
 
@@ -38,7 +38,7 @@ class LineNumberArea(QWidget):
 
         while block.isValid():
             text = block.text().strip()
-            if text.startswith("fold{"):  # 检测折叠标记
+            if text.startswith("section"):  # 检测折叠标记
                 symbol_rect = QRect(5, int(top), self.width() - 10, self.code_editor.fontMetrics().height())
                 if symbol_rect.contains(event.pos()):  # 仅在折叠符号区域点击
                     self.code_editor.toggle_fold(block)
@@ -98,7 +98,7 @@ class CodeEditor(QPlainTextEdit):
         font = self.font()  # 获取当前字体
         font.setPointSize(size)  # 设置新的字体大小
         self.setFont(font)  # 应用新的字体大小
-        self.line_number_area.update()
+        self.line_number_area.setFont(font)
 
     def update_line_number_area_width(self):
         self.setViewportMargins(50, 0, 0, 0)
@@ -127,6 +127,7 @@ class CodeEditor(QPlainTextEdit):
             extra_selections.append(selection)
         self.setExtraSelections(extra_selections)
 
+    #计算数字区域的号码
     def update_line_numbers(self):
         """扫描整个文档，重新计算行号"""
         self.line_number_map.clear()
@@ -135,7 +136,8 @@ class CodeEditor(QPlainTextEdit):
         block = self.document().firstBlock()  # 获取文档的第一行
         while block.isValid():
             text = block.text().strip()
-            if text.startswith("drift") or text.startswith("field"):
+            # if text.startswith("drift") or text.startswith("field"):
+            if any(text.startswith(prefix) for prefix in global_varible.long_element):
                 logical_number += 1  # 递增编号
                 self.line_number_map[block.blockNumber()] = logical_number
             elif text.startswith("end"):
@@ -158,7 +160,7 @@ class CodeEditor(QPlainTextEdit):
             text = block.text().strip()
 
             # 绘制折叠标记
-            if text.startswith("fold{"):
+            if text.startswith("section"):
                 painter.setPen(Qt.red)
                 painter.drawText(5, int(top), self.line_number_area.width() - 10,
                                  int(self.fontMetrics().height()), Qt.AlignmentFlag.AlignLeft, "▶")
@@ -232,44 +234,7 @@ class CodeEditor(QPlainTextEdit):
             self.completer.popup().sizeHintForColumn(0) + self.completer.popup().verticalScrollBar().sizeHint().width())
         self.completer.complete(rect)
 
-    # def line_number_area_paint_event(self, event):
-    #     """绘制行号（按 `drift` 或 `field` 递增）"""
-    #     painter = QPainter(self.line_number_area)
-    #     painter.fillRect(event.rect(), Qt.lightGray)
-    #
-    #     block = self.firstVisibleBlock()
-    #     top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
-    #     bottom = top + self.blockBoundingRect(block).height()
-    #
-    #     logical_number = -1  # 默认不显示行号
-    #     v1 = -1  # 计数器
-    #
-    #     while block.isValid() and top <= event.rect().bottom():
-    #         text = block.text().strip()
-    #
-    #         # 绘制折叠标记
-    #         if text.startswith("fold{"):
-    #             painter.setPen(Qt.red)
-    #             painter.drawText(5, int(top), self.line_number_area.width() - 10,
-    #                              int(self.fontMetrics().height()), Qt.AlignmentFlag.AlignLeft, "▶")
-    #
-    #         #计算 logical_number
-    #         if text.startswith("drift") or text.startswith("field"):
-    #             v1 += 1
-    #             logical_number = v1  # 递增编号
-    #         else:
-    #             logical_number = -1  # 非 `drift` / `field` 行不显示行号
-    #
-    #         if block.isVisible():
-    #         # if block.isVisible() and logical_number != -1:
-    #             painter.setPen(Qt.black)
-    #             painter.drawText(0, int(top), self.line_number_area.width() - 5,
-    #                              int(self.fontMetrics().height()), Qt.AlignmentFlag.AlignRight, str(logical_number))
-    #
-    #         # 继续遍历下一个 block
-    #         block = block.next()
-    #         top = bottom
-    #         bottom = top + self.blockBoundingRect(block).height()
+
 
     def toggle_fold(self, start_block):
         """折叠或展开 fold{ } 代码块"""
@@ -286,7 +251,9 @@ class CodeEditor(QPlainTextEdit):
             cursor.beginEditBlock()
             cursor.setPosition(start_block.position())
             cursor.movePosition(cursor.EndOfBlock, cursor.KeepAnchor)
-            cursor.insertText("fold{")  # 显示占位符
+            original_text = cursor.selectedText()
+            if original_text.endswith(" ..."):  # 防止重复添加
+                cursor.insertText(original_text[:-4])
             cursor.endEditBlock()
         else:
             # 计算折叠范围, 进行折叠
@@ -308,7 +275,9 @@ class CodeEditor(QPlainTextEdit):
             cursor.beginEditBlock()
             cursor.setPosition(start_block.position())
             cursor.movePosition(cursor.EndOfBlock, cursor.KeepAnchor)
-            cursor.insertText("fold{...")  # 显示占位符
+            original_text = cursor.selectedText()
+            if not original_text.endswith("..."):  # 防止重复添加
+                cursor.insertText(original_text + "...")
             cursor.endEditBlock()
 
         self.updateGeometry()
@@ -376,62 +345,7 @@ class CodeEditor(QPlainTextEdit):
 
 
 
-    # def add_comment(self):
-    #     """在选中的每一行前添加 !"""
-    #     cursor = self.textCursor()
-    #     if not cursor.hasSelection():
-    #         return
-    #
-    #     start = cursor.selectionStart()
-    #     end = cursor.selectionEnd()
-    #     print(194, start, end)
-    #     cursor.beginEditBlock()  # 开始批量编辑，避免多次撤销操作
-    #
-    #     cursor.setPosition(start)
-    #     cursor.movePosition(cursor.StartOfBlock)
-    #
-    #     block = cursor.block()
-    #
-    #     while cursor.position() <= end:
-    #         print(191, cursor.position())
-    #
-    #         cursor.movePosition(cursor.StartOfBlock)
-    #         # cursor.insertText("! ")
-    #         cursor.movePosition(cursor.NextBlock)
-    #     # #
-    #         if not cursor.block().next().isValid():
-    #             break
-    #     cursor.endEditBlock()  # 结束批量编辑
 
-    # def remove_comment(self):
-    #     """在选中的每一行前，如果有 ! 则删除"""
-    #     cursor = self.textCursor()
-    #     if not cursor.hasSelection():
-    #         return
-    #
-    #     start = cursor.selectionStart()
-    #     end = cursor.selectionEnd()
-    #
-    #     cursor.beginEditBlock()  # 开始批量编辑
-    #
-    #     cursor.setPosition(start)
-    #     cursor.movePosition(cursor.StartOfBlock)
-    #
-    #     while cursor.position() <= end:
-    #         print(cursor.position(), end)
-    #         cursor.movePosition(cursor.StartOfBlock)
-    #         block_text = cursor.block().text()
-    #
-    #         if block_text.startswith("! "):  # 只有当行首是 "! " 时才移除
-    #             cursor.movePosition(cursor.NextCharacter, cursor.KeepAnchor, 2)
-    #             cursor.removeSelectedText()
-    #
-    #         if not cursor.block().next().isValid():  # 如果已经是最后一个 block，则终止循环
-    #             break
-    #
-    #         cursor.movePosition(cursor.NextBlock)
-    #
-    #     cursor.endEditBlock()  # 结束批量编辑
 
 
 

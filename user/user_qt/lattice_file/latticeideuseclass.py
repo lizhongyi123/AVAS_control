@@ -212,8 +212,16 @@ class SyntaxHighlighter(QSyntaxHighlighter):
 
         # 定义不同命令的颜色
         self.command_formats = {
-            'drift': QColor("blue"),
+            'drift': QColor("black"),
+
             'field': QColor("green"),
+
+            "steerer": QColor("blue"),
+            "quad": QColor("blue"),
+            "edge": QColor("blue"),
+            "solenoid": QColor("blue"),
+            "bend": QColor("blue"),
+
             "start": QColor("red"),
             "end": QColor("red"),
         }

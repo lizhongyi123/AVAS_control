@@ -1031,6 +1031,7 @@ class ErrorDyn(Error):
                 self.write_err_datas(i, j)
                 self.write_err_par_every_time(i, j)
 
+
 class Errorstat(Error):
     def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
         super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)

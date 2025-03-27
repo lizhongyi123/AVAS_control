@@ -14,8 +14,10 @@ a = Analysis(
     './aftertreat/picture/plotenvbeamout.py',
     './aftertreat/picture/ploterror.py',
     './aftertreat/picture/plotphase.py',
+    './aftertreat/picture/plotphaseellipse.py',
     './aftertreat/picture/plotpicture.py',
     './aftertreat/picture/__init__.py',
+
     './aftertreat/dataanalysis/caltwiss.py',
     './aftertreat/dataanalysis/EAanalysis.py',
     './aftertreat/dataanalysis/out_percentemitt.py',
@@ -23,12 +25,14 @@ a = Analysis(
     './aftertreat/dataanalysis/plttodensity.py',
     './aftertreat/dataanalysis/plttodst.py',
     './aftertreat/dataanalysis/__init__.py',
+
     './apis/basic_api/api.py',
     './apis/qt_api/api.py',
     './apis/qt_api/createbasicfile.py',
     './apis/qt_api/getschedule.py',
     './apis/qt_api/judge_lattice.py',
     './apis/qt_api/SimMode.py',
+
     './apps/basicenv.py',
     './apps/calacceptance.py',
     './apps/changeNp.py',
@@ -42,11 +46,13 @@ a = Analysis(
     './apps/scan.py',
     './apps/tasks.py',
     './apps/__init__.py',
+
     './core/LinacOPTEngine.py',
     './core/LongAcceleratorEngine.py',
     './core/MultiParticle.py',
     './core/MultiParticleEngine.py',
     './core/__init__.py',
+
     './dataprovision/beamparameter.py',
     './dataprovision/beamset.py',
     './dataprovision/datasetparameter.py',
@@ -54,6 +60,7 @@ a = Analysis(
     './dataprovision/env_beam_out.py',
     './dataprovision/latticeparameter.py',
     './dataprovision/__init__.py',
+
     './otherdemand/listpackagefiles.py',
     './otherdemand/zhuanhuan.py',
 
@@ -73,9 +80,8 @@ a = Analysis(
     './user/user_qt/user_pyqt.py',
 
     './user/user_qt/lattice_file/latticeideuseclass.py',
-    './user/user_qt/lattice_file/lattice_ide.py',
-    './user/user_qt/lattice_file/lattice_ide1.py',
     './user/user_qt/lattice_file/test_lattice.py',
+    './user/user_qt/page_utils/phaseellipse_dialog.py',
     './user/user_qt/page_utils/picture_dialog.py',
 
     './utils/beamconfig.py',
@@ -95,7 +101,7 @@ a = Analysis(
     './utils/__init__.py',
     ],
 
-    pathex=[r'E:\AVAS_CONTROL\AVAS_control'],
+    pathex=[r"C:\Users\anxin\Desktop\AVAS_control"],
     binaries=[],
     datas=[('./dllfile/AVAS.dll', 'dllfile'),
     ('./dllfile/AVAS.lib', 'dllfile'),

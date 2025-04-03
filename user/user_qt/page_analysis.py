@@ -310,7 +310,7 @@ class PageAnalysis(QWidget):
 
         self.button_plot_phase = QPushButton("Plot")
         self.button_plot_phase.setStyleSheet("background-color: rgb(240, 240, 240); border: 1px solid black;")
-        # self.button_plot_phase.clicked.connect(self.plot_phase)  # 连接按钮的点击事件到绘图函数
+        self.button_plot_phase.clicked.connect(self.plot_phase)  # 连接按钮的点击事件到绘图函数
 
         vbox_phase.addWidget(self.button_import_dst_file)
         vbox_phase.addWidget(self.text_phase_path)
@@ -441,17 +441,17 @@ class PageAnalysis(QWidget):
         self.syn_phase_dialog.plot_image1(lattice_mulp_path, plot_cavity_syn_phase,)
         self.syn_phase_dialog.show()
 
-    # def plot_phase(self):
-    #
-    #     if self.text_phase_path.text() == '':
-    #         # print('ddd')
-    #         return 0
-    #
-    #     self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
-    #     self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
-    #     self.phase_dialog.initUI()
-    #     self.phase_dialog.plot_image()
-    #     self.phase_dialog.show()
+    def plot_phase(self):
+
+        if self.text_phase_path.text() == '':
+            # print('ddd')
+            return 0
+
+        self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
+        self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
+        self.phase_dialog.initUI()
+        self.phase_dialog.plot_image()
+        self.phase_dialog.show()
 
     # def plot_dataset_dialog(self, message ):
     #     self.loss_dialog = PlotOnePicture1(self.project_path, plot_dataset, message)

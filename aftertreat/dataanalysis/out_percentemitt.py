@@ -66,7 +66,7 @@ def treat_one_file(dst_path, ratio):
 
 if __name__ == "__main__":
     # 计算某一个dst文件的参数
-    dst_path = r"C:\Users\shliu\Desktop\shutuan81\12_5.dst"
+    dst_path = r"C:\Users\shliu\Desktop\test42\zuhui_test1.dst"
 
     res = treat_one_file(dst_path, 1)
     for i in res:

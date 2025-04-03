@@ -1,8 +1,10 @@
-﻿from utils.readfile import read_dst
+﻿import sys
+
+from utils.readfile import read_dst
 import math
 import numpy as np
 from dataprovision.beamparameter import DstParameter
-
+import matplotlib.pyplot as plt
 class PercentEmit():
     """
     本类为计算发射度及百分比发射度
@@ -58,8 +60,9 @@ class PercentEmit():
         self.energy = dst_obj.energy
         self.gamma = dst_obj.gamma
         self.beta = dst_obj.beta
-
-
+        # plt.scatter(self.z_list, self.z1_list,s=30)
+        # plt.show()
+        # sys.exit()
         #
         # data = read_dst(self.dst_path)
         # self.number = data.get('number')
@@ -240,12 +243,13 @@ class PercentEmit():
 
 
 if __name__ == '__main__':
-    dst_path = r"C:\Users\anxin\Desktop\314\cafe_trace\part_rfq.dst"
+    dst_path = r"C:\Users\shliu\Desktop\test422\result\part_dtl1.dst"
+    dst_path = r"C:\Users\shliu\Desktop\test42\zuhui_test1.dst"
+    # dst_path = r"C:\Users\shliu\Desktop\test42\part_rfq.dst"
+
     # dst_path = r"C:\Users\anxin\Desktop\tace_test\result\part_dtl1.dst"
     # dst_path = r"D:\重要程序\lizituijinzongjie\75\butongliuqiang\OutputFile\outData_100000.000000.dst"
     v = PercentEmit(dst_path)
     res1 = v.get_percent_emit(1)
     print(res1)
-    # res2 = v.get_100_emit()
-    # print(res1)
-    # print(res2)
+    # res = v.get_data()

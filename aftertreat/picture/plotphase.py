@@ -63,7 +63,7 @@ class PlotPhase:
         #     bd = np.max(y)/100
         #     kde = KernelDensity(kernel='tophat', bandwidth=bd).fit(xy)
         # else:
-        kde = KernelDensity(kernel='epanechnikov', bandwidth=0.07).fit(xy)
+        kde = KernelDensity(kernel='epanechnikov', bandwidth="scott").fit(xy)
         # kde = KernelDensity(kernel='gaussian', bandwidth='scott').fit(xy)
 
         log_density = kde.score_samples(xy)

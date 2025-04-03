@@ -1,4 +1,5 @@
 ﻿import os.path
+import time
 
 from utils.readfile import read_dst, read_txt
 import math
@@ -191,11 +192,13 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\maxi\test_m\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\test327\OutputFile\DataSet.txt"
     obj = DatasetParameter(path1)
+    for i in range(1000):
+        v = obj.get_parameter()
+        print(obj.z[-1])
+        time.sleep(2)
 
-    v = obj.get_parameter()
-    print(obj.z)
     import numpy as np
     # import time
     # t0 = time.time()

@@ -286,7 +286,7 @@ class Error():
                                       'err_quad_ncpl_dyn', 'err_quad_cpl_dyn', ]:
 
                 for j in lattice:
-                    if j[0] == 'field' and j[4] == '3':
+                    if j[0] == 'field' and int(float(j[4])) == 3:
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
                     elif j[0] == "quad":
@@ -297,13 +297,12 @@ class Error():
                                       'err_cav_ncpl_dyn', 'err_cav_cpl_dyn', ]:
 
                 for j in lattice:
-                    if j[0] == 'field' and j[4] == '1':
+                    if j[0] == 'field' and int(float(j[4])) == 1:
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
 
         lattice = self.delete_element_end_index(lattice)
-        # for i in lattice:
-        #     print(i)
+
         return lattice
 
 
@@ -1549,13 +1548,13 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
     field = r"E:\using\test_avas_qt\field"
-    path = r"C:\Users\anxin\Desktop\test_ini"
-    obj = ErrorDyn(path,
-                   50, 1, field_path=None, if_generate_density_file = 1)
+    path = r"C:\Users\shliu\Desktop\test_43"
+    # obj = ErrorDyn(path,
+    #                50, 1, field_path=None, if_generate_density_file = 1)
 
     #
-    # obj = Errorstat(path,
-    #                0, 1, field_path=None, )
+    obj = Errorstat(path,
+                   0, 0, field_path=None, if_generate_density_file=0)
 
     # obj = Errorstatdyn(path,
     #                0, 1, field_path= None)

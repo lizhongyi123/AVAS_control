@@ -64,7 +64,8 @@ def delete_file(path):
     """
     send2trash(path)
 if __name__ == "__main__":
-    path1 = r"C:\Users\shliu\Desktop\test_time\SC-in-50w.dst"
+    path1 = r"C:\Users\shliu\Desktop\111"
     path2 = r"C:\Users\shliu\Desktop\test_time"
-    res = file_in_directory(path1, path2)
-    print(res)
+    # res = file_in_directory(path1, path2)
+    # print(res)
+    delete_file(path1)

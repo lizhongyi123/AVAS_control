@@ -318,12 +318,16 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    project_path = r"C:\Users\anxin\Desktop\314"
+    project_path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
+    item = {
+        "filePath": project_path
+    }
     # # plot_density(file_path, "x", show_=1, fig=None, platform = "qt")
     # plot_phase_advance(project_path, "Period")
     # plot_phase_advance(project_path, "Meter")
-    lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
-    v = JudgeLattice(lattice_mulp_path)
-    res = v.judge_lattice(1)
-
-    basic_mulp(project_path)
+    # lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
+    # v = JudgeLattice(lattice_mulp_path)
+    # res = v.judge_lattice(1)
+    #
+    # basic_mulp(project_path)
+    # res = get_fieldname()

@@ -142,7 +142,7 @@ def get_fieldname(item):
                        "bsx", "bsy", "bsz"
                        ]
         all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-        v = [i.split("\\")[-1] for i in all_files]
+        v = [i.split(r"/")[-1] for i in all_files]
         v = [i.split(".")[0] for i in v]
         field_name = list(set(v))
         kwargs.update({'fieldName': field_name})
@@ -157,13 +157,13 @@ def get_fieldname(item):
 
 def get_bimap_name(item):
     kwargs = {}
-    bimapPath = item["filePath"]
+    bimapPath = item["filePath"] 
     if os.path.exists(bimapPath):
         all_files = list_files_in_directory(bimapPath)
         suffix_list = ["csv"
                        ]
         all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-        v = [i.split("\\")[-1] for i in all_files]
+        v = [i.split(r"/")[-1] for i in all_files]
         v = [i.split(".")[0] for i in v]
         bimap_name = list(set(v))
         kwargs.update({'bimapName': bimap_name})
@@ -185,7 +185,7 @@ def get_fieldfile(item):
                        "bsx", "bsy", "bsz"
                        ]
         all_files = [i for i in all_files if i.split(".")[-1] in suffix_list]
-        v = [i.split("\\")[-1] for i in all_files]
+        v = [i.split(r"/")[-1] for i in all_files]
         kwargs.update({'fieldFile': v})
         output = format_output(**kwargs)
     else:
@@ -202,7 +202,7 @@ def get_allfile_relative_path(item):
     fieldpath = item["filePath"]
     if os.path.exists(fieldpath):
         all_files = list_files_in_directory(fieldpath, sort_by="mtime")
-        v = [i.split("\\")[-1] for i in all_files]
+        v = [i.split(r"/")[-1] for i in all_files]
         kwargs.update({'allFile': v})
         output = format_output(**kwargs)
     else:
@@ -435,7 +435,12 @@ if __name__ == '__main__':
     #  'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
     #  'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
     # write_to_file_input_ini(item, param)
-    path = r"C:\Users\shliu\Desktop\InputFile\3"
+    path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
     item = {"filePath": path }
-    res = get_allfile_relative_path(item)
+    res = get_bimap_name(item)
+    print(res)
+
+    #
+    item = {"fieldPath": path }
+    res = get_fieldfile(item)
     print(res)

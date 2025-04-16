@@ -24,6 +24,7 @@ def get_timestep(project_path):
     input_obj = InputConfig()
     item = {"projectPath": project_path,}
     input = input_obj.create_from_file(item)
+    print(27, input)
     steppercycle = input["data"]["inputParams"]['steppercycle']
     timestep = 1 / freq / steppercycle
     return timestep

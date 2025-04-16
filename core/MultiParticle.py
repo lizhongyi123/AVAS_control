@@ -42,10 +42,14 @@ class MultiParticle():
         if res == 1:
             error = self.check_error_file(errorlog)
             raise Exception(f'{error}')
-
+        elif res == 2:
+            error = self.check_error_file(errorlog)
+            raise Exception(f'{error}')
+        print(48, res)
         return res
 
     def check_error_file(self, ErrorLog):
+        return 0
         with open(ErrorLog, 'r') as file:
             text = file.read()
 
@@ -54,6 +58,8 @@ class MultiParticle():
         print(42, error_parts)
         return error_parts
 
+    def stop(self):
+        self.multiparticle_engine.stop_function()
 
 
 
@@ -64,17 +70,12 @@ def basic_mulp(project_path):
 
 
 if __name__ == "__main__":
-
     start = time.time()
-    project_path = r"E:\using\test_avas_qt\fileld_ciads3"
-    field_path = r"C:\Users\shliu\Desktop\cafe_AVAS"
-    obj = MultiParticle(field_path)
+    project_path = r"D:\using\test_avas_qt\cafe_avas3"
+
+
+    obj = MultiParticle(project_path)
     obj.run()
-    # process = multiprocessing.Process(target=basic_mulp,
-    #                               args=(project_path, ))
-    #
-    # process.start()  # 启动子进程
-    # process.join()  # 等待子进程运行结束
 
     end = time.time()
     print(f"总时间: {end - start}")

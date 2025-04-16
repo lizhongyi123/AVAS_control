@@ -20,6 +20,8 @@ def split_file(file_path):
 def file_in_directory(file, directory):
     file_list = os.path.normpath(file)
     directory_list = [os.path.normpath(i) for i in list_files_in_directory(directory)]
+    # print(file)
+    # print(directory_list)
     if file_list in directory_list:
         return True
     else:
@@ -62,7 +64,8 @@ def delete_file(path):
     """
     send2trash(path)
 if __name__ == "__main__":
-    path1 = r"C:\Users\shliu\Desktop\eee\part_rfq.dst"
-    path2 = r"C:\Users\shliu\Desktop\eee\InputFile"
-    res = file_in_directory(path1, path2)
-    print(res)
+    path1 = r"C:\Users\shliu\Desktop\111"
+    path2 = r"C:\Users\shliu\Desktop\test_time"
+    # res = file_in_directory(path1, path2)
+    # print(res)
+    delete_file(path1)

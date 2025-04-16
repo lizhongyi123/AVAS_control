@@ -5,9 +5,9 @@ import time
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
-    QApplication
+    QApplication, QGroupBox
 import os
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QStandardPaths, pyqtSignal, QSettings, QThread
 
 from utils.readfile import read_txt, read_dst
@@ -35,9 +35,9 @@ from apis.qt_api.SimMode import SimMode
 from apis.qt_api.createbasicfile import CreateBasicProject
 from core.MultiParticle import MultiParticle
 from multiprocessing import Process, Queue
-
+from apis.qt_api.api import judge_if_is_avas_project
 import traceback
-
+from utils.exception import BaseError
 def basic_run(project_path, queue):
     try:
         item = {"projectPath": project_path}
@@ -48,27 +48,15 @@ def basic_run(project_path, queue):
     finally:
         queue.close()
 
+
 class SimThread(QThread):
     finished = pyqtSignal()  # 任务完成信号
-    error_signal = pyqtSignal(str)
+    sim_error_signal = pyqtSignal(str)
 
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
         self.process = None
-
-    # def run(self):
-    #     print("Thread started")
-    #     item = {"projectPath": self.project_path}
-    #
-    #     obj = SimMode(item)
-    #     self.process = multiprocessing.Process(target=obj.run)
-    #
-    #     self.process.start()  # 启动子进程
-    #     self.process.join()   # 等待子进程运行结束
-    #     self.finished.emit()  # 任务完成信号
-    #     print("Thread finished")
-
 
     def run(self):
         try:
@@ -89,8 +77,9 @@ class SimThread(QThread):
 
             self.finished.emit()
             print("Thread finished")
+
         except Exception as e:
-            self.error_signal.emit(str(e))
+            self.sim_error_signal.emit(str(e))
 
     def stop(self):
         if self.process and self.process.is_alive():
@@ -99,6 +88,8 @@ class SimThread(QThread):
             self.process.join()       # 等待子进程结束
             print("Process stopped")
 
+        self.quit()  # 让 QThread 退出
+        self.wait()  # 确保线程彻底结束
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -110,7 +101,7 @@ class MainWindow(QMainWindow):
         self.error_signal = None
 
         self.sim_thread = None
-        self.settings = QSettings('IMP', 'AVAS')
+        self.settings = QSettings('settings.ini', QSettings.IniFormat)
 
         self.initUI()
 
@@ -158,23 +149,47 @@ class MainWindow(QMainWindow):
         refreshMenu.addAction(refresh_lattice_act)
 
 ########################
-        runMenu = menubar.addMenu('run')
+        # runMenu = menubar.addMenu('run')
+        #
+        # run_act = QAction('run', self)
+        # run_act.triggered.connect(self.run)
+        #
+        # run_stop_act = QAction('stop', self)
+        # run_stop_act.triggered.connect(self.stop_all)
+        #
+        #
+        # runMenu.addAction(run_act)
+        #
+        # runMenu.addAction(run_stop_act)
+        # runMenu.addAction(run_stop_act)
 
-        run_act = QAction('run', self)
-        run_act.triggered.connect(self.run)
+        self.run_control_groupbox = QGroupBox()
+        layout = QHBoxLayout()
 
-        run_stop_act = QAction('stop', self)
-        run_stop_act.triggered.connect(self.stop)
+        run_btn_size = 20
+        # ▶ Run 按钮
+        self.run_btn = QPushButton('▶')
+        self.run_btn.setFixedSize(run_btn_size, run_btn_size)
+        self.run_btn.setFont(QFont('Arial', 14))
+        self.run_btn.setStyleSheet("background-color: lightgreen;")
+        self.run_btn.clicked.connect(self.run)
 
+        # ■ Stop 按钮
+        self.stop_btn = QPushButton('■')
+        self.stop_btn.setFixedSize(run_btn_size, run_btn_size)
+        self.stop_btn.setFont(QFont('Arial', 14))
+        self.stop_btn.setStyleSheet("background-color: lightgray;")
+        self.stop_btn.clicked.connect(self.stop_all)
+        self.stop_btn.setEnabled(False)
 
-        runMenu.addAction(run_act)
-
-        runMenu.addAction(run_stop_act)
-        runMenu.addAction(run_stop_act)
+        layout.addWidget(self.run_btn)
+        layout.addStretch(1)
+        layout.addWidget(self.stop_btn)
+        layout.addStretch(20)
+        self.run_control_groupbox.setLayout(layout)
 
 ########################
         toolbar = QToolBar("工具栏标题")
-        self.addToolBar(toolbar)
 
         self.page_beam = PageBeam(self.project_path)
         self.page_lattice = PageLattice(self.project_path)
@@ -191,11 +206,10 @@ class MainWindow(QMainWindow):
         self.page_accept = PageAccept(self.project_path)
 
 
-
         page_beam_action = QAction("beam", self)
         page_lattice_action = QAction("lattice", self)
         page_analysis_action = QAction('analysis', self)
-        page_input_action = QAction('input', self)
+        page_input_action = QAction('setting', self)
         # page_function_action = QAction('function', self)
         page_match_action = QAction('match', self)
         page_others_action = QAction('others', self)
@@ -285,6 +299,8 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()  # 创建一个中央部件
 
         central_layout = QVBoxLayout()  # 在中央部件上设置一个垂直布局
+        central_layout.addWidget(self.run_control_groupbox)
+        central_layout.addWidget(toolbar)
         central_layout.addLayout(hbox)  # 将带有边框的框架添加到布局中
         central_layout.addWidget(line_frame)  # 将表示线的框架添加到布局中
         central_layout.addWidget(self.stacked_widget)  # 将堆叠小部件添加到布局中
@@ -320,6 +336,7 @@ class MainWindow(QMainWindow):
 
             self.project_path = new_folder_path
             self.path_text.setText(self.project_path)
+            self.path_text.setText(self.project_path)
             self.refresh_page_project_path()
 
 
@@ -350,13 +367,26 @@ class MainWindow(QMainWindow):
         folder_path = os.path.normpath(folder_path)
 
         if folder_path:
+            item = {"projectPath": folder_path}
+            res = judge_if_is_avas_project(item)
+            # print(343, res)
+            if res['code'] == 0:
+                pass
+            else:
+                raise Exception(res["data"]['msg'])
+
+
+
             self.project_path = folder_path
             self.path_text.setText(self.project_path)
 
             # self.create_backup_file()
             self.refresh_page_project_path()
             self.page_fill_parameter()
-        self.settings.setValue("lastProjectPath", self.project_path)
+            self.settings.setValue("lastProjectPath", self.project_path)
+
+
+
 
     def refresh_page_project_path(self):
         self.page_beam.updatePath(self.project_path)
@@ -394,10 +424,11 @@ class MainWindow(QMainWindow):
         self.page_input.save_input()
         self.save_ini()
 
+
     def save_ini(self):
         item = {"projectPath": self.project_path}
         ini_obj = IniConfig()
-
+        ini_obj.create_from_file(item)
         set_dict = {'input': self.input_signal,
                     'match': self.match_signal,
                     'error': self.error_signal,
@@ -413,53 +444,85 @@ class MainWindow(QMainWindow):
             raise Exception(res['data']['msg'])
 
 
-
-    def on_task_finished(self):
-        print("Task finished.")
-
+    def run_btn_state(self, runing):
+        if runing == 1:
+            # 运行时，run变灰，stop变绿
+            self.run_btn.setStyleSheet("background-color: lightgray;")
+            self.stop_btn.setStyleSheet("background-color: lightgreen;")
+            self.run_btn.setEnabled(False)
+            self.stop_btn.setEnabled(True)
+        #停止
+        elif runing == 0:
+            self.run_btn.setStyleSheet("background-color: lightgreen;")
+            self.stop_btn.setStyleSheet("background-color: lightgray;")
+            self.run_btn.setEnabled(True)
+            self.stop_btn.setEnabled(False)
 
     def run(self):
-        self.stop()
-        # res = self.inspect()
-        # if not res:
-        #     return None
-        # raise Exception("fasdf")
+        self.stop_all()
+        self.run_btn_state(1)
+
+
         try:
             self.save_project()
         except Exception as e:
             self.handle_error(str(e))
             return False
+
+        self.page_data.fill_parameter()
+
+
         self.sim_thread = SimThread(self.project_path)
+        #完成
         self.sim_thread.finished.connect(self.on_task_finished)
-        self.sim_thread.error_signal.connect(self.handle_error)
+        #模拟出错
+        self.sim_thread.sim_error_signal.connect(self.handle_error)
+
         self.sim_thread.start()
         self.timer1.start(2000)
 
+
     def handle_error(self, error_message):
+        self.sim_thread = None
+        self.stop_all()
         # 显示异常消息
+
         raise Exception(error_message)
 
     def activate_output(self, ):
+        # print(445, self.sim_thread)
         self.page_output.update_progress()  # @treat_err
+
+        #如果output
+        self.page_output.schedule_error_signal.connect(self.stop_output)
         if self.sim_thread:
             pass
         else:
             self.timer1.stop()
 
-    def stop(self):
-
-        if self.sim_thread:
-            self.sim_thread.stop()
-            self.sim_thread.wait()  # 等待线程安全停止
-        self.on_task_finished()
-
+#停止运行output页面输出
+    def stop_output(self, schedule_error_info):
         self.timer1.stop()
-        print('结束进程')
+
+#停止程序所有的运行
+    def stop_all(self):
+        #改变按钮状态
+        self.run_btn_state(0)
+
+        try:
+            if self.sim_thread and self.sim_thread.isRunning():
+                self.sim_thread.stop()
+        except Exception as e:
+            raise Exception(f"QT thread stop Error {e}")
+        finally:
+            self.sim_thread = None
+            self.timer1.stop()
+            print('结束进程')
 
     def on_task_finished(self):
         print("Task finished.")
+        self.run_btn_state(0)
         self.sim_thread = None
-
 
 
 
@@ -496,7 +559,7 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-
+    #
     def refresh_beam(self):
         self.page_beam.fill_parameter()
 
@@ -510,28 +573,30 @@ class MainWindow(QMainWindow):
 
     def get_input_signal(self, signal):
         self.input_signal = signal
-        print(self.input_signal)
+        # print(self.input_signal)
     def get_error_signal(self, signal):
         self.error_signal = signal
-        print(self.error_signal)
+        # print(self.error_signal)
     def get_match_signal(self, signal):
         self.match_signal = signal
-        print(self.match_signal)
+        # print(self.match_signal)
 
     def initialize_page(self):
-        print(self.settings.value("lastProjectPath", None))
+        # print(self.settings.value("lastProjectPath", None))
         if self.settings.value("lastProjectPath", None) is None:
             pass
 
         else:
             self.project_path = self.settings.value("lastProjectPath", "")
-            print(self.project_path)
-            self.path_text.setText(self.project_path)
+            # print(self.project_path)
 
             if os.path.exists(self.project_path):
-
+                self.path_text.setText(self.project_path)
                 self.refresh_page_project_path()
                 self.page_fill_parameter()
+
+            else:
+                print(f"{self.project_path} not exist")
 
     def inspect(self):
         r1 = self.page_beam.inspect()
@@ -552,8 +617,6 @@ class MainWindow(QMainWindow):
             self.resize(600, 700)  # 恢复到默认尺寸或其他尺寸
 
 if __name__ == '__main__':
-
-
     app = QApplication(sys.argv)
     main_window = MainWindow()
     # main_window.run()

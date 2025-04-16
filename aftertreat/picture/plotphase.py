@@ -1,4 +1,5 @@
 """此文件为画相图"""
+import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -9,6 +10,8 @@ from utils.readfile import read_dst_fast
 from sklearn.neighbors import KernelDensity
 import global_varible
 import time
+matplotlib.use("TkAgg")
+
 class PlotPhase:
     def __init__(self, dst_path):
         self.dst_path = dst_path
@@ -60,7 +63,9 @@ class PlotPhase:
         #     bd = np.max(y)/100
         #     kde = KernelDensity(kernel='tophat', bandwidth=bd).fit(xy)
         # else:
-        kde = KernelDensity(kernel='epanechnikov', bandwidth='scott').fit(xy)
+        kde = KernelDensity(kernel='epanechnikov', bandwidth="scott").fit(xy)
+        # kde = KernelDensity(kernel='gaussian', bandwidth='scott').fit(xy)
+
         log_density = kde.score_samples(xy)
         z = np.exp(log_density)
         z /= max(z)  # 归一化
@@ -71,8 +76,9 @@ class PlotPhase:
         ax.set_ylabel(ylabel, fontdict=font)
         ax.grid(linestyle="--")
 
+
 if __name__ == "__main__":
-    dst_path = r"C:\Users\shliu\Desktop\cafe_AVAS\OutputFile\outData_12.529930.dst"
+    dst_path = r"C:\Users\anxin\Desktop\test_ini\OutputFile\outData_12.529930.dst"
     plot_phase = PlotPhase(dst_path)
     plot_phase.run(show_=True)
 

@@ -209,6 +209,7 @@ class InputConfig():
             for k in self.env_keys:
                 if input_params[k] is None:
                     raise MisskeywordError(f"{k}")
+
 if __name__ == "__main__":
     import json
 

@@ -4,12 +4,13 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxL
     QComboBox, QSizePolicy, QCheckBox, QMessageBox
 
 import os
+from user.user_qt.user_defined import MyQLineEdit
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from utils.readfile import read_txt, read_dst
 from user.user_qt.user_defined import treat_err, treat_err2, gray240
 from utils.inputconfig import InputConfig
-
+from apis.qt_api.api import create_from_file_input_ini, write_to_file_input_ini
 class PageInput(QWidget):
     input_signal = pyqtSignal(dict)
 
@@ -17,6 +18,7 @@ class PageInput(QWidget):
         super().__init__()
         self.project_path = project_path
         # self.multithreading_num = -1
+        self.field_source_path = None
 
         self.initUI()
 
@@ -219,6 +221,29 @@ class PageInput(QWidget):
         group_box_sc_use.setLayout(hbox_sc_use)
 
         #####################################################
+        group_box_field_source = QGroupBox()
+
+        layout_field_source = QVBoxLayout()
+
+        label_field_source = QLabel("Field Source")
+
+        layout_field_source_choose = QHBoxLayout()
+        self.button_select_field_source = QPushButton(QApplication.style().standardIcon(32),"")
+        self.button_select_field_source.clicked.connect(self.select_field_source)
+        self.text_field_source = MyQLineEdit(" ")
+
+        layout_field_source_choose.addWidget(self.button_select_field_source)
+        layout_field_source_choose.addWidget(self.text_field_source)
+
+        layout_field_source.addWidget(label_field_source)
+        layout_field_source.addLayout(layout_field_source_choose)
+
+        group_box_field_source.setLayout(layout_field_source)
+
+
+
+        ###################################
+
         group_box_sc_step = QGroupBox()
         vbox_sc_step = QVBoxLayout()
 
@@ -283,6 +308,8 @@ class PageInput(QWidget):
         vertical_layout_main.addWidget(group_box_step_per_period)
         vertical_layout_main.addWidget(group_box_dumpPeriodicity)
         vertical_layout_main.addWidget(group_box_sc_use)
+        vertical_layout_main.addWidget(group_box_field_source)
+
         vertical_layout_main.addWidget(group_box_sc_step)
 
 
@@ -292,6 +319,25 @@ class PageInput(QWidget):
         layout.addWidget(vertical_group_box_main)
         self.setLayout(layout)
 
+    def select_field_source(self):
+        # options = QFileDialog.Options()
+        # options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        # default_directory = self.project_path
+        # field_source_path, _ = QFileDialog.getOpenFileName(self, "Select  File", directory=default_directory,
+        #                                                options=options)
+        #
+        # if field_source_path:
+        #     self.text_field_source.setText(field_source_path)
+        # self.field_source_path = field_source_path
+        options = QFileDialog.Options()
+        options |= QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
+        default_directory = self.project_path
+        field_source_path = QFileDialog.getExistingDirectory(self, "Select Directory", directory=default_directory,options=options)
+        field_source_path = os.path.normpath(field_source_path)
+
+        if field_source_path:
+            self.text_field_source.setText(field_source_path)
+        self.field_source_path = field_source_path
     def cb_basic_change(self, state):
         sender_checkbox = self.sender()  # 获取发送信号的复选框对象
         if sender_checkbox == self.cb_mulp:  # 如果发送信号的对象是 cb_mulp 复选框
@@ -328,163 +374,157 @@ class PageInput(QWidget):
     def fill_parameter(self):
 
         item = {"projectPath": self.project_path}
-        input_obj = InputConfig()
-        input_res = input_obj.create_from_file(item)
+        input_ini_res = create_from_file_input_ini(item)
 
-        if input_res["code"] == -1:
-            raise Exception(input_res['data']["msg"])
+        if input_ini_res["code"] == -1:
+            raise Exception(input_ini_res['data']["msg"])
 
-        input_res = input_res['data']["inputParams"]
+        input_ini_res = input_ini_res['data']["inputiniParams"]
 
 
-        if input_res.get('sim_type') == "mulp":
+        if input_ini_res.get('sim_type') == "mulp":
             self.cb_mulp.setChecked(True)
-            if input_res.get('scmethod') == "FFT":
-                self.cb_fft.setChecked(True)
-                # if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
-                #     self.fft_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
-                #     self.fft_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
-                #     self.fft_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
-                #
-                # if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
-                #     self.fft_meshrms_x_text.setText(input_res.get('meshrms')[0])
-                #     self.fft_meshrms_y_text.setText(input_res.get('meshrms')[1])
-                #     self.fft_meshrms_z_text.setText(input_res.get('meshrms')[2])
+        elif input_ini_res.get('sim_type') == "env":
+                self.cb_env.setChecked(True)
 
-
-            elif input_res.get('scmethod') == "SPICNIC":
+        if input_ini_res.get('scmethod') == "FFT":
+            self.cb_fft.setChecked(True)
+        elif input_ini_res.get('scmethod') == "SPICNIC":
                 self.cb_picnic.setChecked(True)
-                # if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
-                #     self.picnic_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
-                #     self.picnic_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
-                #     self.picnic_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
-                #
-                # if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
-                #     self.picnic_meshrms_x_text.setText(input_res.get('meshrms')[0])
-                #     self.picnic_meshrms_y_text.setText(input_res.get('meshrms')[1])
-                #     self.picnic_meshrms_z_text.setText(input_res.get('meshrms')[2])
 
 
-            # self.multithreading_num = int(input_res.get('multithreading', 0))
+        self.scan_phase_num = int(input_ini_res.get('scanphase', 1))
+        self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
 
-            # if self.multithreading_num == 0:
-            #     self.multithreading_checkbox.setChecked(False)
-            #
-            # elif self.multithreading_num == 1:
-            #     self.multithreading_checkbox.setChecked(True)
+        self.sc_use_num = int(input_ini_res.get('spacecharge', 0))
+        if self.sc_use_num == 0:
+            self.sc_use_checkbox.setChecked(False)
+        elif self.sc_use_num == 1:
+            self.sc_use_checkbox.setChecked(True)
 
-            self.scan_phase_num = int(input_res.get('scanphase', 1))
-            self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
+        self.step_per_period_text.setText(str(input_ini_res.get('steppercycle', '100')))
 
-            self.sc_use_num = int(input_res.get('spacecharge', 0))
-            if self.sc_use_num == 0:
-                self.sc_use_checkbox.setChecked(False)
-            elif self.sc_use_num == 1:
-                self.sc_use_checkbox.setChecked(True)
-
-            self.step_per_period_text.setText(str(input_res.get('steppercycle', '100')))
-
-            self.dumpPeriodicity_text.setText(str(input_res.get('dumpperiodicity', '1')))
+        self.dumpPeriodicity_text.setText(str(input_ini_res.get('dumpperiodicity', '1')))
 
         # 对于包络模型的输入
-        if input_res.get('sim_type') == "env":
-            self.cb_env.setChecked(True)
-            self.sc_use_num_env = int(input_res.get('isspacecharge', 3))
-            if self.sc_use_num_env == 0:
-                self.sc_use_checkbox.setChecked(False)
-            elif self.sc_use_num_env == 1:
-                self.sc_use_checkbox.setChecked(True)
+        self.text_field_source.setText(str(input_ini_res["fieldSource"]))
 
-            self.sc_step_text.setText(input_res.get('spacechargelong'))
+        if input_ini_res.get('spacechargelong') is not None:
+            self.sc_step_text.setText(input_ini_res.get('spacechargelong'))
 
-            sc_step_type = int(input_res.get('spacechargetype', 0))
+        sc_step_type = input_ini_res.get('scsteptype')
+        if sc_step_type is not None:
             if int(sc_step_type) == 0:
                 self.sc_step_meter_checkbox.setChecked(True)
             elif int(sc_step_type) == 1:
                 self.sc_step_beta_checkbox.setChecked(True)
 
 
+# if input_ini_res.get('scmethod') == "FFT":
+#     self.cb_fft.setChecked(True)
+#     # if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
+#     #     self.fft_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
+#     #     self.fft_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
+#     #     self.fft_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
+#     #
+#     # if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
+#     #     self.fft_meshrms_x_text.setText(input_res.get('meshrms')[0])
+#     #     self.fft_meshrms_y_text.setText(input_res.get('meshrms')[1])
+#     #     self.fft_meshrms_z_text.setText(input_res.get('meshrms')[2])
+#
+#
+# elif input_ini_res.get('scmethod') == "SPICNIC":
+#     self.cb_picnic.setChecked(True)
+#     # if isinstance(input_res.get("numofgrid"), list) and len(input_res.get("numofgrid")) == 3:
+#     #     self.picnic_numofgrid_x_text.setText(input_res.get("numofgrid")[0])
+#     #     self.picnic_numofgrid_y_text.setText(input_res.get("numofgrid")[1])
+#     #     self.picnic_numofgrid_z_text.setText(input_res.get("numofgrid")[2])
+#     #
+#     # if isinstance(input_res.get('meshrms'), list) and len(input_res.get('meshrms')) == 3:
+#     #     self.picnic_meshrms_x_text.setText(input_res.get('meshrms')[0])
+#     #     self.picnic_meshrms_y_text.setText(input_res.get('meshrms')[1])
+#     #     self.picnic_meshrms_z_text.setText(input_res.get('meshrms')[2])
+#
+#
+# # self.multithreading_num = int(input_res.get('multithreading', 0))
+#
+# # if self.multithreading_num == 0:
+# #     self.multithreading_checkbox.setChecked(False)
+# #
+# # elif self.multithreading_num == 1:
+# #     self.multithreading_checkbox.setChecked(True)
+
 
     def generate_input_list(self, ):
 
         res = {}
         if self.cb_mulp.isChecked():
-            # res.append(["!simtype",  "mulp"])
             res["sim_type"] = "mulp"
-            if self.cb_fft.isChecked():
-                # res.append(['SCMethod', "FFT"])
-                res["scmethod"] = "FFT"
-                # res.append(['numofgrid', self.fft_numofgrid_x_text.text(), self.fft_numofgrid_y_text.text(),
-                #             self.fft_numofgrid_z_text.text()])
-                # res.append(['MeshRms', self.fft_meshrms_x_text.text(), self.fft_meshrms_y_text.text(),
-                #             self.fft_meshrms_z_text.text()])
-
-            elif self.cb_picnic.isChecked():
-                # res.append(['SCMethod', "PICNIC"])
-                res["scmethod"] = "SPICNIC"
-                # res.append(['numofgrid', self.picnic_numofgrid_x_text.text(), self.picnic_numofgrid_y_text.text(),
-                #             self.picnic_numofgrid_z_text.text()])
-                # res.append(['MeshRms', self.picnic_meshrms_x_text.text(), self.picnic_meshrms_y_text.text(),
-                #             self.picnic_meshrms_z_text.text()])
-
-            # if self.multithreading_checkbox.isChecked():
-            #     res.append(['MultiThreading', '1'])
-            # elif not self.multithreading_checkbox.isChecked():
-            #     res.append(['MultiThreading', '0'])
-
-
-            # res.append(['ScanPhase', str(self.scan_phase_combo.currentIndex())])
-            res["scanphase"] =self.scan_phase_combo.currentIndex()
-            if self.sc_use_checkbox.isChecked():
-                # res.append(['SpaceCharge', '1'])
-                res["spacecharge"] = 1
-            else:
-                # res.append(['SpaceCharge', '0'])
-                res["spacecharge"] = 1
-
-            # res.append(['StepPerCycle', self.step_per_period_text.text()])
-            res['steppercycle'] = int(self.step_per_period_text.text())
-            if self.dumpPeriodicity_text.text():
-                # res.append(['dumpPeriodicity', self.dumpPeriodicity_text.text()])
-                res["dumpperiodicity"] = int(self.dumpPeriodicity_text.text())
-
         elif self.cb_env.isChecked():
             # res.append(["!simtype",  "env"])
             res["sim_type"] = "env"
-            if self.sc_use_checkbox.isChecked():
-                # res.append(['ISSPACECHARGE', '1'])
-                res["isspacecharge"] = 1
-            else:
-                # res.append(['ISSPACECHARGE', '0'])
-                res["isspacecharge"] = 0
+
+        if self.cb_fft.isChecked():
+            res["scmethod"] = "FFT"
+        elif self.cb_picnic.isChecked():
+
+            res["scmethod"] = "SPICNIC"
+
+        res["scanphase"] =self.scan_phase_combo.currentIndex()
+
+        if self.sc_use_checkbox.isChecked():
+            res["spacecharge"] = 1
+        else:
+            res["spacecharge"] = 0
+
+        res['steppercycle'] = int(self.step_per_period_text.text())
+
+        if self.dumpPeriodicity_text.text():
+            res["dumpperiodicity"] = int(self.dumpPeriodicity_text.text())
 
 
-            res.append(['SPACECHARGELONG', self.sc_step_text.text()])
-
+        res["fieldSource"] = self.text_field_source.text()
+        if self.sc_step_text.text():
             res['spacechargelong'] = int(self.sc_step_text.text())
+        else:
+            res['spacechargelong'] = None
 
-            if self.sc_step_meter_checkbox.isChecked():
-                # res.append(['SPACECHARGETYPE', "0"])
-                res['spacechargetype'] == 0
-            elif self.sc_step_beta_checkbox.isChecked():
-                # res.append(['SPACECHARGETYPE', "1"])
-                res['spacechargetype'] == 1
+
+        if self.sc_step_meter_checkbox.isChecked():
+            res['spacechargetype'] == 0
+        elif self.sc_step_beta_checkbox.isChecked():
+            res['spacechargetype'] == 1
 
         return res
 
+    #     # res.append(['SCMethod', "FFT"])
+    #     res["scmethod"] = "FFT"
+    #     # res.append(['numofgrid', self.fft_numofgrid_x_text.text(), self.fft_numofgrid_y_text.text(),
+    #     #             self.fft_numofgrid_z_text.text()])
+    #     # res.append(['MeshRms', self.fft_meshrms_x_text.text(), self.fft_meshrms_y_text.text(),
+    #     #             self.fft_meshrms_z_text.text()])
+    #
+    # elif self.cb_picnic.isChecked():
+    # # res.append(['SCMethod', "PICNIC"])
+    # res["scmethod"] = "SPICNIC"
+    #
+    # # res.append(['numofgrid', self.picnic_numofgrid_x_text.text(), self.picnic_numofgrid_y_text.text(),
+    # #             self.picnic_numofgrid_z_text.text()])
+    # # res.append(['MeshRms', self.picnic_meshrms_x_text.text(), self.picnic_meshrms_y_text.text(),
+    # #             self.picnic_meshrms_z_text.text()])
+    #
+    # # if self.multithreading_checkbox.isChecked():
+    # #     res.append(['MultiThreading', '1'])
+    # # elif not self.multithreading_checkbox.isChecked():
+    # #     res.append(['MultiThreading', '0'])
     def save_input(self, ):
-        input_dic = self.generate_input_list()
-
-        input_path = os.path.join(self.project_path, 'InputFile', 'input.txt')
+        input_ini_dic = self.generate_input_list()
         item = {"projectPath": self.project_path}
-        obj = InputConfig()
-        res = obj.set_param(**input_dic)
+
+        res = write_to_file_input_ini(item, input_ini_dic)
         if res["code"] == -1:
             raise Exception(res['data']['msg'])
 
-        res = obj.write_to_file(item)
-        if res["code"] == -1:
-            raise Exception(res['data']['msg'])
 
         # # 打开文件以写入数据
         # with open(input_path, 'w', encoding='utf-8') as file:
@@ -578,7 +618,7 @@ class PageInput(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'C:\Users\shliu\Desktop\AVAS20240923\test')
+    main_window = PageInput(r'E:\using\test_avas_qt\test_ini')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

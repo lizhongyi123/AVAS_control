@@ -11,7 +11,6 @@ from PyQt5.QtCore import Qt, QSize
 from api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
      plot_phase, plot_phase_advance
 from user.user_qt.user_defined import treat_err
-from user.user_qt.page_analysis import MyPictureDialog, EnvelopeDialog
 
 from user.user_qt.user_defined import MyQLineEdit
 from utils.readfile import read_txt, read_dst
@@ -71,7 +70,6 @@ class PageLongdistance(QWidget):
         label_dstfile.setAlignment(Qt.AlignCenter)  # 设置水平和垂直居中
 
         self.text_dstfile = MyQLineEdit("")
-
 
 
         dstfile_layout.addWidget(label_dstfile)

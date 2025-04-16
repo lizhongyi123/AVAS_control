@@ -5,6 +5,7 @@ from aftertreat.picture.initialplot import PicturePlot_2D, CompoundShape
 from utils.readfile import read_txt, read_dst
 from dataprovision.datasetparameter import DatasetParameter
 from dataprovision.latticeparameter import LatticeParameter
+from utils.tool import get_list_interval
 import os
 # [ 'emittance_x', 'emittance_y', 'emittance_z',
 # 'longitudinal_phase', ]
@@ -12,9 +13,10 @@ class PlotDataSet(PicturePlot_2D):
     """
     dataset文件的可视化
     """
-    def __init__(self, dataset_path, picture_name, project_path=None):
+    def __init__(self, dataset_path, picture_name, sample_interval, project_path=None):
         super().__init__()
         self.picture_name = picture_name
+        self.sample_interval = sample_interval
         self.BaseMassInMeV = 0
         self.freq = 0
 
@@ -153,7 +155,6 @@ class PlotDataSet(PicturePlot_2D):
 
             self.colors = ['r', 'r']
             self.ylim = [ -2 * np.max(np.array(rms_x)),  2 * np.max(np.array(rms_x)) ]
-            print(self.ylim)
 
         elif self.picture_name == 'rms_y':
             self.x = z
@@ -260,6 +261,19 @@ class PlotDataSet(PicturePlot_2D):
 
             self.labels = [r"$\beta_{x}$", r"$\beta_{y}$", r"$\beta_{z}$"]
             self.set_legend = 1
+
+        self.x = get_list_interval(self.x, self.sample_interval)
+        self.y = get_list_interval(self.y, self.sample_interval)
+        #根据sample_interval
+
+        #判断是否需要对y再嵌套一层
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
+        if not isinstance(self.x[0], list):
+            self.x = [self.x]
+
+        if len(self.x) != len(self.y):
+            self.x = self.x * len(self.y)
 
         return self.x, self.y
 

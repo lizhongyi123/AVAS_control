@@ -76,6 +76,6 @@ class PlotAcc(Acceptance):
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
+    project_path = r"C:\Users\shliu\Desktop\chu\chu2"
     obj = PlotAcc(project_path)
     obj.run(1)

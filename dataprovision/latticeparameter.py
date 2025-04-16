@@ -9,7 +9,7 @@ class LatticeParameter():
     """
     对lattice文件进行解析
     """
-    def __init__(self, lattice_mulp_path):
+    def __init__(self, lattice_mulp_path=None):
         """
         self.v_start_end: 每个周期的起点和终点
         self.v_start: 每个元件的起点
@@ -25,8 +25,12 @@ class LatticeParameter():
         self.aperture = []
         self.total_length = 0
 
-    def get_parameter(self):
-        lattice_info_ini = read_txt(self.lattice_path, out='list')
+    def get_parameter(self, lattice_list=None):
+        if not lattice_list:
+            lattice_info_ini = read_txt(self.lattice_path, out='list')
+        elif lattice_list:
+            lattice_info_ini = lattice_list
+
         lattice_info_before_end = []
         for i in lattice_info_ini:
             if i[0] == 'end':

@@ -69,8 +69,8 @@ class PlotCavitySynPhase(PicturePlot_2D):
                 index += 1
             if i[0] == "end":
                 break
-        self.x = x
-        self.y = y
+        self.x = [x]
+        self.y = [y]
         self.markers = ['o']
 
         return self.x, self.y
@@ -79,7 +79,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
     """
     束流相移
     """
-    def __init__(self, project_path):
+    def __init__(self, project_path, picture_type):
         super().__init__()
         self.xlabel = "Position( m )"
         self.labels = [r"$\sigma_{x}$", r"$\sigma_{y}$", r"$\sigma_{z}$"]
@@ -89,11 +89,13 @@ class PlotPhaseAdvance(PicturePlot_2D):
         self.lattice_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        self.picture_type = picture_type
 
-    def get_x_y(self, out_type):
-        if out_type == 'Period':
+    def get_x_y(self):
+        out_type = self.picture_type
+        if out_type == 'period':
             self.ylabel = "Phase advance( deg )"
-        elif out_type == "Meter":
+        elif out_type == "meter":
             self.ylabel = "Phase advance( deg/m )"
 
         dataset_obj = DatasetParameter(self.dataset_path)
@@ -103,7 +105,6 @@ class PlotPhaseAdvance(PicturePlot_2D):
         lattice_obj = LatticeParameter(self.lattice_path)
         lattice_obj.get_parameter()
         v_start_end = lattice_obj.v_start_end
-        print(v_start_end)
 
         z = dataset_obj.z ##
 
@@ -142,7 +143,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
         period_pa_z = [i * 180 / np.pi / 1000 for i in period_pa_z]
 
         period_length = [i[1] - i[0] for i in v_start_end]
-        if out_type == "Meter":
+        if out_type == "meter":
             period_pa_x = [period_pa_x[i] / period_length[i] for i in range(len(period_pa_x))]
             period_pa_y = [period_pa_y[i] / period_length[i] for i in range(len(period_pa_y))]
             period_pa_z = [period_pa_z[i] / period_length[i] for i in range(len(period_pa_z))]
@@ -160,6 +161,16 @@ class PlotPhaseAdvance(PicturePlot_2D):
         self.markers = ['o', 'o', 'o']
         self.set_legend = 1
         # self.labels = ['x', 'y', 'z']
+
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
+        if not isinstance(self.x[0], list):
+            self.x = [self.x]
+
+        if len(self.x) != len(self.y):
+            self.x = self.x * len(self.y)
+
+
         return self.x, self.y
 
 

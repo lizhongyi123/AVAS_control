@@ -188,8 +188,8 @@ def process_and_write(input_file, output_file, sample_size=10000):
 
 
 # if __name__ == "__main__":
-#     inFileName = r"C:\Users\anxin\Desktop\test\jinwusuo zhenshi.dst"
-#     outFileName = r"C:\Users\anxin\Desktop\test\jinwusuo zhenshi1.dst"
+#     inFileName = r"C:\Users\anxin\Desktop\test1\jinwusuo zhenshi.dst"
+#     outFileName = r"C:\Users\anxin\Desktop\test1\jinwusuo zhenshi1.dst"
 #     a = ChangeNp(inFileName, outFileName, 20)
 #     a.run()
 #     input_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq.dst"

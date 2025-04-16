@@ -102,6 +102,57 @@ class CustomFileNotFoundError(Exception):
     def __str__(self):
         return f"FileNotFoundError: {self.file_path}"
 
+class MissingcommandError(Exception):
+    def __init__(self, command, message=None):
+        super().__init__(message)
+        self.command = command
+    def __str__(self):
+        return f"Missing command: {self.command}"
+
+class BaseError():
+    def __init__(self, ):
+        pass
+
+    def element_length_error(self, element_command):
+        raise Exception(f"Format or Syntax error at element  {element_command[-1].split('_')[-1]} : "
+                                f"line {' '.join(map(str, element_command[:-1]))}")
+    def command_length_error(self, command):
+        raise Exception(f"Format or Syntax error at command : "
+                        f"line {' '.join(map(str, command[:-1]))}")
+    def miss_superposeend_error(self, command):
+        raise Exception(f"Command superposeend or superposeout is missing below element {command[-1].split('_')[-1]}. : "
+                        f"line {' '.join(map(str, command[:-1]))}")
+
+    def miss_end_error(self, ):
+        raise Exception(f"Missing command end")
+
+    def miss_start_error(self, ):
+        raise Exception(f"Missing command start")
+
+    def fix_value_error(self, command, err_param_index, target_value):
+        raise Exception(f"The parameter {err_param_index} of ommand {command[0]} can only accept parameters {target_value}: "
+                        f"line {' '.join(map(str, command[:-1]))}")
+
+    def adjust_param_value_error(self, command):
+        raise Exception(f"The adjust parameter exceed the parameters of element: "
+                        f"line {' '.join(map(str, command[:-1]))}")
+
+    def project_not_exist(self, project):
+        raise Exception(f"{project} not exist")
+
+    def is_not_project(self, project):
+        raise Exception(f"{project} is not a project")
+
+    # def adjust_param_error(self, command):
+    #     raise Exception(f"Format or Syntax error at adjust command, :"
+    #                     f"line { }")
+
+    # def is_not_avas_project_error(self, directory):
+    #     raise Exception(f"{directory} is not a  AVAS project")
+
+
+
+
 if __name__ == "__main__":
     def process_data(data):
         if not data:

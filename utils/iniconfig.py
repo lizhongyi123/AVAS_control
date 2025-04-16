@@ -158,14 +158,11 @@ if __name__ == '__main__':
     cfg = IniConfig()
     cfg.write_to_file(item)
 
-    # res = cfg.create_from_file(item)
-    # print(res)
-    # print(res)
-    # param = {"project": {"project_path": ""},
-    # "lattice": {"length": 100},
-    # "match": {"use_initial_value": 1}}
-    #
-    #
-    # res = cfg.set_param(**param)
-    # print(res)
-    # # cfg.write_to_file(item)
+    res = cfg.create_from_file(item)
+    print(res)
+
+    param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'}}
+    res = cfg.set_param(**param)
+    print(res)
+    res = cfg.write_to_file(item)
+    print(res)

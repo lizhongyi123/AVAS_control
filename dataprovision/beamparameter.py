@@ -8,6 +8,7 @@ from global_varible import c_light
 
 from global_varible import Pi
 
+
 class DstParameter():
     """
     对dst文件进行解析
@@ -35,6 +36,7 @@ class DstParameter():
         self.z_speed_list = []
 
     def get_parameter(self):
+
         data = read_dst_fast(self.dst_path)
 
         self.number = data.get('number')
@@ -56,13 +58,17 @@ class DstParameter():
 
         self.phi_list_deg = [i[4] * 180 / Pi for i in data]
 
-        for i in data:
+
+
+        times = []
+        for index, i in enumerate(data):
             tmp_gamma = 1 + i[5] / self.BaseMassInMeV
             tmp_beta = math.sqrt(1 - 1.0 / tmp_gamma / tmp_gamma)
             tmp_speed = tmp_beta * c_light  # 总速度
-
             speedz = math.sqrt(pow(tmp_speed, 2) / (pow(i[1], 2) + pow(i[3], 2) + 1))
+
             tmp_t0 = i[4] / (2 * math.pi * self.freq)
+            times.append(tmp_t0)
 
             self.z_list.append(-1 * tmp_t0 * speedz * 1000)  # mm
 
@@ -70,19 +76,24 @@ class DstParameter():
             # 使用z方向的速度
             # self.z_speed_list.append(speedz)
             # 总速度
-            self.z_speed_list.append(tmp_speed)
+            self.z_speed_list.append(speedz)
             #############################################
 
-        average_z_speend = np.mean(self.z_speed_list)
+        average_z_speed = np.mean(self.z_speed_list)
 
-        self.z1_list = [(i - average_z_speend) / i * 1000 for i in self.z_speed_list]
+        self.z1_list = [(i - average_z_speed) / average_z_speed * 1000 for i in self.z_speed_list]
 
+
+
+        # sys.exit()
         # 平均能量,gamma, beta
         self.energy = np.mean(self.E_list)
 
         self.gamma = 1 + self.energy / self.BaseMassInMeV
-        self.beta = math.sqrt(1 - 1.0 / self.gamma / self.gamma)
 
+        self.beta = math.sqrt(1 - 1.0 / self.gamma / self.gamma)
+        print(self.beta, self.gamma)
+        # sys.exit()
         #中心x
         self.center_x = np.mean(self.x_list)
 

@@ -1,7 +1,9 @@
 ﻿import sys
+import time
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox,\
-    QComboBox, QSizePolicy, QMessageBox,QPushButton
+    QComboBox, QSizePolicy, QMessageBox,QPushButton, QCheckBox
 import os
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QStandardPaths
@@ -17,13 +19,21 @@ from utils.treat_directory import list_files_in_directory
 from utils.treatfile import split_file, file_in_directory
 from utils.beamconfig import BeamConfig
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from user.user_qt.page_utils.phaseellipse_dialog import PhaseEllipseWidget
+
+
 gray240 = "rgb(240, 240, 240)"
 from apis.qt_api.api import cal_beam_parameter
+from apis.basic_api.api import plot_dataset
+from utils.tool import safe_to_float
+
 class PageBeam(QWidget):
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
         self.decimals = 5
+        self.obj_plt_ellipse = None
+        self.cb_use_dst_num = 0
         self.initUI()
 
     def initUI(self):
@@ -300,7 +310,6 @@ class PageBeam(QWidget):
 
 #横向
         self.distribution_combo_trans = QComboBox(self)
-        self.distribution_combo_trans.addItem("")
         self.distribution_combo_trans.addItem("GS")
         self.distribution_combo_trans.addItem("WB")
         self.distribution_combo_trans.addItem("PB")
@@ -315,7 +324,6 @@ class PageBeam(QWidget):
 
 #纵向
         self.distribution_combo_longi= QComboBox(self)
-        self.distribution_combo_longi.addItem("")
         self.distribution_combo_longi.addItem("GS")
         self.distribution_combo_longi.addItem("WB")
         self.distribution_combo_longi.addItem("PB")
@@ -374,9 +382,26 @@ class PageBeam(QWidget):
 
 
 ####################################################################################
+        group_use_dst = QGroupBox("")  # GroupBox标题可自定义
+        layout_use_dst = QHBoxLayout()
 
+        label_use_dst = QLabel("Use particle file")
+        self.cb_use_dst = QCheckBox('', self)
+        self.cb_use_dst.stateChanged.connect(self.cb_use_dst_change)
+        self.cb_use_dst.setChecked(True)  # 设置默认选中
 
+        layout_use_dst.addWidget(label_use_dst)
+        layout_use_dst.addWidget(self.cb_use_dst)
+
+        group_use_dst.setLayout(layout_use_dst)
+
+        ###################################################
+
+        self.button_phase_ellipse = QPushButton("Visuallize preview of rms values")
+        self.button_phase_ellipse.clicked.connect(self.plot_phase_ellipse)
         vertical_layout2.addLayout(hbox_distribution)
+        vertical_layout2.addWidget(group_use_dst)
+        vertical_layout2.addWidget(self.button_phase_ellipse)
         # vertical_layout2.addLayout(hbox_displacePos)
         # vertical_layout2.addLayout(hbox_displaceDpos)
         vertical_layout2.addStretch(1)
@@ -416,7 +441,78 @@ class PageBeam(QWidget):
 
         self.setLayout(layout)
 
-        self.text_particle_input_file.textChanged.connect(self.onParticleInputTextChanged)
+
+        # self.text_particle_input_file.textChanged.connect(self.onParticleInputTextChanged)
+
+        # text_float_group = [
+        # self.text_mass, self.text_current, self.text_current, self.text_frequency,
+        # self.text_energy, self.alpha_xx_text, self.beta_xx_text, self.alpha_yy_text, self.beta_yy_text, self.alpha_zz_text, self.beta_zz_text,
+        # self.varepsilon_xx_text, self.varepsilon_yy_text, self.varepsilon_zz_text
+        # ]
+        # for i in text_float_group:
+        #     i.setText("0.1")
+        # self.text_particel_number.setText("10")
+
+        self.twiss_button_group = [self.alpha_xx_text, self.beta_xx_text, self.alpha_yy_text,
+                                   self.beta_yy_text, self.alpha_zz_text, self.beta_zz_text,
+                          self.varepsilon_xx_text, self.varepsilon_yy_text, self.varepsilon_zz_text
+        ]
+        # for widget in self.twiss_button_group:
+        #     widget.textChanged.connect(self.twiss_changed)
+
+        for widget in self.twiss_button_group:
+            widget.editingFinished.connect(self.twiss_changed)
+
+
+
+        self.time0 = time.time()
+    def cb_use_dst_change(self, state):
+        if state == Qt.Checked:
+            self.cb_use_dst_num = 1
+        else:
+            self.cb_use_dst_num = 0
+
+        # print(self.cb_use_dst_num)
+
+
+
+    def twiss_changed(self):
+        # print("Twiss 参数改变了！")
+        # time0 = time.time()
+        self.twiss_parameter = {
+            "alpha_x": safe_to_float(self.alpha_xx_text.text()),
+            "beta_x": safe_to_float(self.beta_xx_text.text()),
+            "rms_emit_x": safe_to_float(self.varepsilon_xx_text.text()),
+
+            "alpha_y": safe_to_float(self.alpha_yy_text.text()),
+            "beta_y": safe_to_float(self.beta_yy_text.text()),
+            "rms_emit_y": safe_to_float(self.varepsilon_yy_text.text()),
+
+            "alpha_z": safe_to_float(self.alpha_zz_text.text()),
+            "beta_z": safe_to_float(self.beta_zz_text.text()),
+            "rms_emit_z": safe_to_float(self.varepsilon_zz_text.text()),
+        }
+        time1 = time.time()
+        if self.obj_plt_ellipse is not None:
+            self.obj_plt_ellipse.parameter_changed(self.twiss_parameter)
+
+        # print(474, time1 - self.time0)
+
+    def plot_phase_ellipse(self):
+        # self.obj_plt_ellipse = FourPlotDialog()
+        # self.obj_plt_ellipse.initUI()
+        # self.obj_plt_ellipse.plot_image1(self.project_path, plot_dataset, "loss", 0)
+        # self.obj_plt_ellipse.show()
+
+        self.obj_plt_ellipse = PhaseEllipseWidget()
+        self.obj_plt_ellipse.initUI()
+        self.obj_plt_ellipse.show()
+        self.twiss_changed()
+        self.obj_plt_ellipse.closed.connect(self.on_ellipse_closed)
+
+    def on_ellipse_closed(self):
+        self.obj_plt_ellipse = None
+
     def updatePath(self, new_path):
         self.project_path = new_path
 
@@ -448,49 +544,42 @@ class PageBeam(QWidget):
 
         beam_obj = BeamConfig()
         beam_res = beam_obj.create_from_file(item)
+
         if beam_res["code"] == -1:
             raise Exception(beam_res["data"]["msg"])
+
 
         beam_res = beam_res["data"]['beamParams']
         for k, v in beam_res.items():
             if v is not None:
                 beam_res[k] = str(v)
 
-        if beam_res.get("readparticledistribution") is not None:
-            self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
+        self.text_particle_input_file.setText(beam_res.get("readparticledistribution"))
 
-            self.text_charge.setText(beam_res.get('numofcharge'))
-
-        else:
-            self.text_particle_input_file.clear()
-            self.text_charge.setText(beam_res.get('numofcharge'))
-            self.text_mass.setText(beam_res.get('particlerestmass'))
-            self.text_current.setText(beam_res.get('current'))
-            self.text_particel_number.setText(beam_res.get('particlenumber'))
-            self.text_frequency.setText(beam_res.get('frequency'))
-            self.text_energy.setText(beam_res.get('kneticenergy'))
+        self.text_charge.setText(beam_res.get('numofcharge'))
+        self.text_charge.setText(beam_res.get('numofcharge'))
+        self.text_mass.setText(beam_res.get('particlerestmass'))
+        self.text_current.setText(beam_res.get('current'))
+        self.text_particel_number.setText(beam_res.get('particlenumber'))
+        self.text_frequency.setText(beam_res.get('frequency'))
+        self.text_energy.setText(beam_res.get('kneticenergy'))
 
 
-            self.alpha_xx_text.setText(beam_res.get('alpha_x'))
-            self.beta_xx_text.setText(beam_res.get('beta_x'))
-            self.varepsilon_xx_text.setText(beam_res.get('emit_x'))
+        self.alpha_xx_text.setText(beam_res.get('alpha_x'))
+        self.beta_xx_text.setText(beam_res.get('beta_x'))
+        self.varepsilon_xx_text.setText(beam_res.get('emit_x'))
+
+        self.alpha_yy_text.setText(beam_res.get('alpha_y'))
+        self.beta_yy_text.setText(beam_res.get('beta_y'))
+        self.varepsilon_yy_text.setText(beam_res.get('emit_y'))
 
 
+        self.alpha_zz_text.setText(beam_res.get('alpha_z'))
+        self.beta_zz_text.setText(beam_res.get('beta_z'))
+        self.varepsilon_zz_text.setText(beam_res.get('emit_z'))
 
-
-            self.alpha_yy_text.setText(beam_res.get('alpha_y'))
-            self.beta_yy_text.setText(beam_res.get('beta_y'))
-            self.varepsilon_yy_text.setText(beam_res.get('emit_y'))
-
-
-
-
-            self.alpha_zz_text.setText(beam_res.get('alpha_z'))
-            self.beta_zz_text.setText(beam_res.get('beta_z'))
-            self.varepsilon_zz_text.setText(beam_res.get('emit_z'))
-
-            self.distribution_combo_trans.setCurrentText(beam_res.get('distribution_x'))
-            self.distribution_combo_longi.setCurrentText(beam_res.get('distribution_y'))
+        self.distribution_combo_trans.setCurrentText(beam_res.get('distribution_x'))
+        self.distribution_combo_longi.setCurrentText(beam_res.get('distribution_y'))
 
 
             # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:
@@ -512,40 +601,40 @@ class PageBeam(QWidget):
             #     self.text_displaceDpos_z.clear()
         # print(self.text_particle_input_file.text())
 
+
+
+
     def generate_beam_list(self):
         res = {}
 
-        if self.text_particle_input_file.text():
-            res['readparticledistribution'] = self.text_particle_input_file.text()
 
-            res['numofcharge'] = self.text_charge.text()
+        res['readparticledistribution'] = self.text_particle_input_file.text()
 
+        res['numofcharge'] = self.text_charge.text()
 
+        res['numofcharge'] = self.text_charge.text()
+        res['particlerestmass'] = self.text_mass.text()
+        res['current'] = self.text_current.text()
+        res['particlenumber'] = self.text_particel_number.text()
 
-        else:
-            res['numofcharge'] = self.text_charge.text()
-            res['particlerestmass'] = self.text_mass.text()
-            res['current'] = self.text_current.text()
-            res['particlenumber'] = self.text_particel_number.text()
+        res['frequency'] = self.text_frequency.text()
 
-            res['frequency'] = self.text_frequency.text()
+        res['kneticenergy'] = self.text_energy.text()
 
-            res['kneticenergy'] = self.text_energy.text()
+        res['alpha_x'] = self.alpha_xx_text.text()
+        res['alpha_y'] = self.alpha_yy_text.text()
+        res['alpha_z'] = self.alpha_zz_text.text()
 
-            res['alpha_x'] = self.alpha_xx_text.text()
-            res['alpha_y'] = self.alpha_yy_text.text()
-            res['alpha_z'] = self.alpha_zz_text.text()
+        res['beta_x'] = self.beta_xx_text.text()
+        res['beta_y'] = self.beta_yy_text.text()
+        res['beta_z'] = self.beta_yy_text.text()
 
-            res['beta_x'] = self.beta_xx_text.text()
-            res['beta_y'] = self.beta_yy_text.text()
-            res['beta_z'] = self.beta_yy_text.text()
+        res['emit_x'] = self.varepsilon_xx_text.text()
+        res['emit_y'] = self.varepsilon_yy_text.text()
+        res['emit_z'] = self.varepsilon_zz_text.text()
 
-            res['emit_x'] = self.varepsilon_xx_text.text()
-            res['emit_y'] = self.varepsilon_yy_text.text()
-            res['emit_z'] = self.varepsilon_zz_text.text()
-
-            res["distribution_x"] = self.distribution_combo_trans.currentText()
-            res["distribution_y"] = self.distribution_combo_longi.currentText()
+        res["distribution_x"] = self.distribution_combo_trans.currentText()
+        res["distribution_y"] = self.distribution_combo_longi.currentText()
 
         return res
 
@@ -596,7 +685,9 @@ class PageBeam(QWidget):
 
 
 
-        item = {"projectPath": self.project_path}
+        item = {"projectPath": self.project_path,
+                "use_dst": self.cb_use_dst_num,
+                }
         beam_obj = BeamConfig()
         try:
             for k, v in beam_dict.items():
@@ -693,7 +784,6 @@ class PageBeam(QWidget):
                                                        options=options)
 
         if dst_file_path:
-            # print(dst_file_path)
             #复制前的文件
             source_file = dst_file_path
 
@@ -702,6 +792,8 @@ class PageBeam(QWidget):
 
             #复制后的文件
             target_dst_file = os.path.join(self.project_path, "InputFile", relative_dst_file_path)
+
+            # print(file_in_directory(source_file, target_folder))
 
             #如果文件已经文件夹中
             if file_in_directory(source_file, target_folder):
@@ -735,12 +827,12 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'C:\Users\shliu\Desktop\eee')
+    main_window = PageBeam(r'C:\Users\shliu\Desktop\maxi\test_m\325')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
 
     main_window.show()
-    main_window.fill_parameter()
+    # main_window.fill_parameter()
     main_window.save_beam()
     sys.exit(app.exec_())

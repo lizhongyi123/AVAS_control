@@ -3,13 +3,19 @@ from aftertreat.picture.initialplot import PicturePlot_2D, Picturedensity
 from dataprovision.densityparameter import DensityParameter
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.tool import get_list_interval, generate_web_picture_param
 class PlotDensity(Picturedensity):
-    def __init__(self, path):
+    def __init__(self, path, picture_type, sample_interval):
         super(PlotDensity, self).__init__()
         self.path = path
         self.bins = 300
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
 
-    def get_data(self, picture_type):
+    def get_x_y(self, ):
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
+
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         # print(data["tab_lis"])
@@ -21,6 +27,7 @@ class PlotDensity(Picturedensity):
         self.y = []
         self.density = []
         for i in range(len(self.z)):
+            #获取最大值最小值
             v = [data["minb_lis"][i][index] * 1000, data["maxb_lis"][i][index] * 1000]
             self.y.append(v)
             this_density = np.array(data["tab_lis"][i][index])
@@ -48,14 +55,42 @@ class PlotDensity(Picturedensity):
         elif picture_type == 'z':
             self.ylabel = "Z (mm)"
 
-        self.ylim = [-10, 10]
+        #根据参数生成矩阵
+        self.z_m = np.tile(self.z, (self.bins, 1))
+
+        self.y_m = np.zeros((self.bins, len(self.z)))
+        self.density_m = np.zeros((self.bins, len(self.z)))
+
+        for i in range(len(self.z)):
+            min_edge = self.y[i][0]
+            max_edge = self.y[i][1]
+
+
+
+            bin_edges = np.linspace(min_edge, max_edge, self.bins + 1)
+
+            self.y_m[:, i] = bin_edges[:-1]
+
+
+            self.density_m[:, i] = self.density[i] / np.max(self.density[i])
+            #
+
+        self.z_m = self.z_m[:,::sample_interval]
+        self.y_m = self.y_m[:,::sample_interval]
+        self.density_m = self.density_m[:,::sample_interval]
 
 class PlotDensityLevel(PicturePlot_2D):
-    def __init__(self, path):
+    def __init__(self, path, picture_type, sample_interval):
         super().__init__()
         self.bins = 300
         self.path = path
-    def get_x_y(self, picture_type):
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
+
+    def get_x_y(self):
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
+
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         # print(data["tab_lis"])
@@ -169,7 +204,6 @@ class PlotDensityLevel(PicturePlot_2D):
                     edge_max_9999,
                 ]
         # self.xlim = [0.5, 0.75]
-        self.ylim = [-20, 20]
         self.colors = ['r', 'b', 'blueviolet', 'g'] * 2
 
         self.xlabel = "Position(m)"
@@ -190,6 +224,18 @@ class PlotDensityLevel(PicturePlot_2D):
         self.labels = labels
         self.set_legend = True
 
+        self.x = get_list_interval(self.x, self.sample_interval)
+        self.y = get_list_interval(self.y, self.sample_interval)
+
+        self.y = [[float(x) for x in row] for row in self.y]
+
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
+        if not isinstance(self.x[0], list):
+            self.x = [self.x]
+
+        if len(self.x) != len(self.y):
+            self.x = self.x * len(self.y)
         # print(len(self.x))
         # print(len(edge_max_90))
 
@@ -198,75 +244,170 @@ class PlotDensityProcess(PicturePlot_2D):
     """
     用来将density文件中其他数据可视化
     """
-    def __init__(self, path):
+    def __init__(self, path, density_plane, picture_type, sample_interval):
         super().__init__()
         self.path = path
-    def get_x_y(self, picture_name):
+        self.density_plane = density_plane
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
+
+    def get_x_y(self,):
+        density_plane = self.density_plane
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         self.x = data["zg_lis"]
         emit = data["emit_lis"]
-        if picture_name == 'emit_x':
-            self.y = [i[0] *10**6 for i in emit]
+        moy = data["moy_lis"]
+        rms_size_lis = data["rms_size_lis"]
+        maxb_lis = data["maxb_lis"]
+        minb_lis = data["minb_lis"]
+        maxr_lis = data["maxr_lis"]
+        minr_lis = data["minr_lis"]
+        lost_lis = data["lost_lis"]
+        maxlost_lis = data["maxlost_lis"]
+        minlost_lis = data["minlost_lis"]
 
+        if picture_type == "centroid":
+            if density_plane == "x":
+                self.y = [i[0] for i in moy]
+            elif density_plane == "y":
+                self.y = [i[1] for i in moy]
+            elif density_plane == "r":
+                self.y = [i[2] for i in moy]
+            elif density_plane == "z":
+                self.y = [i[3] for i in moy]
+            self.y = np.array(self.y) * 1000
+            self.ylabel = f"Residual orbit  {density_plane.upper()} (mm)"
             self.xlabel = "z(m)"
-            self.ylabel = "Average Emit_x(pi*mm*mrad)"
 
-        elif picture_name == 'lost':
-            self.y = data["lost_lis"]
-
-
+        elif picture_type == "rms_size":
+            if density_plane == "x":
+                self.y = [i[0] for i in rms_size_lis]
+            elif density_plane == "y":
+                self.y = [i[1] for i in rms_size_lis]
+            elif density_plane == "r":
+                self.y = [i[2] for i in rms_size_lis]
+            elif density_plane == "z":
+                self.y = [i[3] for i in rms_size_lis]
+            self.y = np.array(self.y) * 1000
+            self.ylabel = f"Rms size  {density_plane.upper()} (mm)"
             self.xlabel = "z(m)"
-            self.ylabel = "Average Loss(pi*mm*mrad)"
 
+        elif picture_type == "rms_size_max":
+            if density_plane == "x":
+                y0 = [i[0] for i in maxb_lis]
+                y1 = [i[0] for i in minb_lis]
+            elif density_plane == "y":
+                y0 = [i[1] for i in maxb_lis]
+                y1 = [i[1] for i in minb_lis]
+            elif density_plane == "r":
+                y0 = [i[2] for i in maxb_lis]
+                y1 = [i[2] for i in minb_lis]
 
-        elif picture_name == 'rms_x':
-            rms_size_lis = data["rms_size_lis"]
-            rmsx = [i[0]*10**3 for i in rms_size_lis]
+            elif density_plane == "z":
+                y0 = [i[3] for i in maxb_lis]
+                y1 = [i[3] for i in minb_lis]
+            y0 = np.array(y0) * 1000
+            y1 = np.array(y1) * 1000
 
-            self.y = rmsx
+            self.y = [list(y0), list(y1)]
+            # self.y = np.array(self.y) * 1000
+            # self.ylim = [-5, 5]
+            self.ylabel = f"Max rms size  {density_plane.upper()} (mm)"
             self.xlabel = "z(m)"
-            self.ylabel = "Average Rms_x(mm)"
 
-        elif picture_name == 'av_xy':
-            moy_lis = data["moy_lis"]
-            x = [i[0]*10**3 for i in moy_lis]
-            y = [i[1]*10**3 for i in moy_lis]
-            self.y = [x, y]
-            self.labels = ['x', 'y',]
+        elif picture_type == "emit":
+            y0 = [i[0] * 10**6 for i in emit]
+            y1 = [i[1] * 10**6 for i in emit]
+            y2 = [i[2] * 10**6 for i in emit]
+            self.y = [y0, y1, y2]
+            self.labels = [r"$\varepsilon_{xx'}$", r"$\varepsilon_{yy'}$", r"$\varepsilon_{zz'}$"]
+            self.ylabel = r"$Rms emittanace (\pi.mm.mrad)$"
             self.xlabel = "z(m)"
-            self.ylabel = "Average Position(mm)"
             self.set_legend = 1
-
-
-        elif picture_name == 'rms_xy':
-            rms_size_lis = data["rms_size_lis"]
-
-            rmsx = [i[0]*10**3 for i in rms_size_lis]
-            rmsy = [i[1]*10**3 for i in rms_size_lis]
-
-            self.y = [rmsx, rmsy]
+        elif picture_type == "lost":
+            self.y = lost_lis
+            self.ylabel = f"Lost"
             self.xlabel = "z(m)"
-            self.ylabel = "Average Rms size(mm)"
-            self.labels = ['x', 'y',]
-            self.set_legend = 1
+        elif picture_type == "maxlost":
+            self.y = lost_lis
+            self.ylabel = f"Max lost"
+            self.xlabel = "z(m)"
+        elif picture_type == "minlost":
+            self.y = lost_lis
+            self.ylabel = f"Min lost"
+            self.xlabel = "z(m)"
+
+        self.x = get_list_interval(self.x, self.sample_interval)
+        self.y = get_list_interval(self.y, self.sample_interval)
+
+        self.y = list(self.y)
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
+
+        # if picture_name == 'emit_x':
+        #     self.y = [i[0] *10**6 for i in emit]
+        #
+        #     self.xlabel = "z(m)"
+        #     self.ylabel = "Average Emit_x(pi*mm*mrad)"
+        #
+        # elif picture_name == 'lost':
+        #     self.y = data["lost_lis"]
+        #
+        #
+        #     self.xlabel = "z(m)"
+        #     self.ylabel = "Average Loss(pi*mm*mrad)"
+        #
+        #
+        # elif picture_name == 'rms_x':
+        #     rms_size_lis = data["rms_size_lis"]
+        #     rmsx = [i[0]*10**3 for i in rms_size_lis]
+        #
+        #     self.y = rmsx
+        #     self.xlabel = "z(m)"
+        #     self.ylabel = "Average Rms_x(mm)"
+        #
+        # elif picture_name == 'av_xy':
+        #     moy_lis = data["moy_lis"]
+        #     x = [i[0]*10**3 for i in moy_lis]
+        #     y = [i[1]*10**3 for i in moy_lis]
+        #     self.y = [x, y]
+        #     self.labels = ['x', 'y',]
+        #     self.xlabel = "z(m)"
+        #     self.ylabel = "Average Position(mm)"
+        #     self.set_legend = 1
+        #
+        #
+        # elif picture_name == 'rms_xy':
+        #     rms_size_lis = data["rms_size_lis"]
+        #
+        #     rmsx = [i[0]*10**3 for i in rms_size_lis]
+        #     rmsy = [i[1]*10**3 for i in rms_size_lis]
+        #
+        #     self.y = [rmsx, rmsy]
+        #     self.xlabel = "z(m)"
+        #     self.ylabel = "Average Rms size(mm)"
+        #     self.labels = ['x', 'y',]
+        #     self.set_legend = 1
 if __name__ == "__main__":
     # path1 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_par_2_2.dat"
     # path2 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_tot_par_2.dat"
     # path3 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_tot_par.dat"
 
     # path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\density_par_1_98.dat"
-    path1 = r"E:\using\test_avas_qt\fileld_ciads\density_par_1_1.dat"
-    v = PlotDensity(path1)
-    v.get_data('x')
-    v.ylim = [-50, 50]
+    path1 = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_1_1.dat"
+    # v = PlotDensity(path1)
+    # v.get_data('x')
+    # v.ylim = [-50, 50]
+    # v.run(show_=1, fig=None)
+    #
+    #
+    # # v = PlotDensityLevel(path1)
+    # # v.get_x_y(picture_type='r')
+    # # v.ylim = [0, 50]
+    # # v.run(show_=1, fig=None)
+    v = PlotDensityProcess(path1)
+    v.get_x_y('x', 'emit')
     v.run(show_=1, fig=None)
-
-
-    # v = PlotDensityLevel(path1)
-    # v.get_x_y(picture_type='r')
-    # v.ylim = [0, 50]
-    # v.run(show_=1, fig=None)
-    # v = PlotDensityProcess(path1)
-    # v.get_x_y('rms_xy')
-    # v.run(show_=1, fig=None)

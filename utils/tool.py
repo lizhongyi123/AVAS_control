@@ -1,6 +1,8 @@
 import math
-
-
+import copy
+import global_varible
+import os
+import uuid
 def write_to_txt(path, lis):
     with open(path, 'w') as f:
         for i in lis:
@@ -54,10 +56,108 @@ def format_output(code=0, msg="success", **kwargs):
             **kwargs
         }
     }
+
+
+def judge_command_on_element(lattice, command):
+    # 返回一个命令对应的是哪个元件
+    lattice = copy.deepcopy(lattice)
+
+    command_index = lattice.index(command)
+    command_on_element = None
+    for i in range(command_index, len(lattice)):
+        if lattice[i][0] in global_varible.long_element:
+            command_on_element = int(lattice[i][-1].split("_")[1])
+            break
+    return command_on_element
+
+def delete_element_end_index(error_lattice):
+    error_lattice_copy = copy.deepcopy(error_lattice)
+    for i in error_lattice_copy:
+        if i[0] in global_varible.long_element:
+            i.pop()
+    return error_lattice_copy
+
+def add_element_end_index(error_lattice):
+    error_lattice = copy.deepcopy(error_lattice)
+    index = 0
+    for i in error_lattice:
+        if i[0] in global_varible.long_element:
+            add_name = f'element_{index}'
+            i.append(add_name)
+            index += 1
+    return error_lattice
+
+
+#判断一个数能否转化成其他类型
+def can_convert_to_othertype(s: str, target_type) -> bool:
+    try:
+        if target_type == int:
+            v1 = float(s)
+            if not v1.is_integer():  # 用 `is_integer()` 避免浮点数精度问题
+                raise ValueError("Cannot convert to an integer")
+        elif target_type == float:
+            float(s)
+        elif target_type == str:
+            str(s)
+        return True
+    except ValueError:
+        return False
+
+def convert_to_othertype(s: str, target_type) -> bool:
+    if target_type == int:
+        v1 = int(float(s))
+    elif target_type == float:
+        v1 = float(s)
+    if target_type == str:
+        v1 = str(s)
+    return v1
+
+def safe_to_float(text, default=0.0):
+    try:
+        return float(text)
+    except ValueError:
+        return 0
+
+
+def get_list_interval(data, interval):
+    #该函数是为了间隔获取数据，如果是一个一维列表，就直接操作，如果是多维列表，
+    #就分别获取每个列表的间隔数据
+
+    if isinstance(data[0], list):
+        new_data = [i[::interval] for i in data]
+    else:
+        new_data = data[::interval]
+    return new_data
+
+def generate_web_picture_param(obj, ):
+    pictureParam = {
+        "labelx": "",
+        "labely": "",
+        "datax": [],
+        "datay": [],
+        "legends": [],
+    }
+
+    pictureParam["labelx"] = obj.xlabel
+    pictureParam["labely"] = obj.ylabel
+    pictureParam["datax"] = obj.x
+    pictureParam["datay"] = obj.y
+    pictureParam["legends"] = obj.labels[: len(obj.y)]
+    return pictureParam
+
+def generate_web_picture_path(project_path):
+    picture_save_directory = os.path.join(project_path, "OutputFile", "Picture")
+    os.makedirs(picture_save_directory, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}.png"
+    save_path = os.path.join(picture_save_directory, filename)
+    return save_path
+
 if __name__ == '__main__':
-    code = 1
-    msg = "s"
-    kwargs = {"x": [1, 2, 3],
-              "y": [1, 2, 3]}
-    value = format_output(msg ="dad")
-    print(value)
+    # code = 1
+    # msg = "s"
+    # kwargs = {"x": [1, 2, 3],
+    #           "y": [1, 2, 3]}
+    # value = format_output(msg ="dad")
+    # print(value)
+    v = "10.0"
+    print(can_convert_to_othertype(v, float))

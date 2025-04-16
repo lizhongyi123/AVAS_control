@@ -141,7 +141,7 @@ class PageAccept(QWidget):
     def cb_xyz_change(self, state):
         sender_checkbox = self.sender()  # 获取发送信号的复选框对象
 
-        print(sender_checkbox)
+        # print(sender_checkbox)
         cb_xyz = [self.cb_x, self.cb_y, self.cb_z, self.cb_phie]
         if sender_checkbox in cb_xyz:
             if sender_checkbox.isChecked():

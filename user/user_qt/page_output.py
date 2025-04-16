@@ -31,6 +31,8 @@ class ScheduleThread(QThread):
 
 
 class PageOutput(QWidget):
+    schedule_error_signal = pyqtSignal(str)
+
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
@@ -109,10 +111,10 @@ class PageOutput(QWidget):
 
     def update_progress1(self, signal):
         res = signal
-        # print(res)
 
         if res["code"] == -1:
-            raise Exception(res["data"]["msg"])
+            error_msg = res["data"]["msg"]
+            self.schedule_error_signal.emit(error_msg)
         else:
             currentLength = res["data"]["schedule"]["currentLength"]
             totalLength = res["data"]["schedule"]["totalLength"]

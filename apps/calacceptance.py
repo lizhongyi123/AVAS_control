@@ -153,7 +153,7 @@ class Acceptance():
 
         in_dis = self.get_para(0)
         out_dis = self.get_para(-1)
-
+        print(156, out_dis)
 
         # pd.set_option('display.max_columns', None)
         in_dis = pd.DataFrame(in_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
@@ -168,10 +168,13 @@ class Acceptance():
         btgm = gamma * beta
 
         in_dis["E"] -= w
+        # print(in_dis)
+        print(out_dis)
 
         #丢失的粒子
         loss_particles = in_dis[out_dis["loss"] == 1].copy()
-
+        print(loss_particles)
+        breakpoint()
         loss_particles_rows, _ = loss_particles.shape
 
         if loss_particles_rows == 0:
@@ -297,6 +300,6 @@ class Acceptance():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
+    project_path = r"C:\Users\shliu\Desktop\chu\chu2"
     obj = Acceptance(project_path)
     obj.cal_accptance(3)

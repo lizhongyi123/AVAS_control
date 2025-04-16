@@ -7,6 +7,7 @@ from utils.exception import CustomFileNotFoundError
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
+    #目前这个函数无法处理包含重复的情况
     """
     :param input: 需要读取的txt文件
     :out:结果返回的类型，可选参数为dict， list
@@ -42,9 +43,7 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
         #如果大小写不敏感，全都变成小写，如果敏感
         input_lines = [[word.lower() for word in line] for line in input_lines]
 
-    for i in input_lines:
-        if i[0] == 'bend':
-            i[1] =np.abs(float(i[4])/180 * np.pi * float(i[5]))
+
 
     if out == 'list':
         return input_lines
@@ -52,6 +51,7 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
 
     res = {}
     for i in input_lines:
+
         tmp_dict = {}
         if len(i) == 1:
             res[i[0]] = None
@@ -62,6 +62,20 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
     return res
 
     # return input_lines
+def read_lattice_mulp(lattice_mulp_path):
+    res = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
+
+    new_lattice_list = []
+    for i in res:
+        i[0] = i[0].lower()
+        if i[0] == 'bend':
+            i[1] =np.abs(float(i[4])/180 * np.pi * float(i[5]))
+
+        new_lattice_list.append(i)
+        if i[0] == "end":
+            break
+    return new_lattice_list
+
 
 def read_dst(input):
     """
@@ -158,6 +172,7 @@ if __name__ == "__main__":
     # res = read_dst(path)
     # print(res['phase'][0])
     # read_runsignal(0)
-    path = r"C:\Users\shliu\Desktop\duibi925\926ciads\beam_end.dst"
-    res = read_dst_fast(path)
-    print(res)
+    path = r"C:\Users\shliu\Desktop\maxi\test_m"
+    res = read_lattice_mulp(path)
+    for i in res:
+        print(i)

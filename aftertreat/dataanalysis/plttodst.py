@@ -98,8 +98,8 @@ class Plttozcode():
                 else:
                     all_part_dstform_one_step.append([])
 
-        for i in exist_part_dstform_one_step[:10]:
-            print(i)
+        # for i in exist_part_dstform_one_step[:10]:
+        #     print(i)
         return exist_part_dstform_one_step, all_part_dstform_one_step, part_dict
     def write_to_dst(self, num):
         exist_part_dstform_one_step, all_part_dstform_one_step, part_dict_one_step = self.to_z_form_onestep(num)
@@ -141,7 +141,7 @@ class Plttozcode():
         pass
 if __name__ == "__main__":
 
-    project_path = r"C:\Users\anxin\Desktop\test_acct"
+    project_path = r"C:\Users\anxin\Desktop\314\cafe_avas"
     # project_path = r"C:\Users\anxin\Desktop\test_mulp"
     beamset_path = os.path.join(project_path, "OutputFile", "BeamSet.plt")
 

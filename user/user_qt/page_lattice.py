@@ -6,10 +6,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction,\
 import sys
 import os
 
-from user.user_qt.lattice_file.lattice_ide import CustomCodeEdit, MySyntaxHighlighter, MyFoldDetector
-from pyqode.core import api, modes, panels
 from user.user_qt.user_defined import treat_err
 from utils.latticeconfig import LatticeConfig
+
+from user.user_qt.lattice_file.test_lattice import CodeEditorWithLineNumbers
 class PageLattice(QWidget):
     def __init__(self, project_path):
         super().__init__()
@@ -66,7 +66,7 @@ class PageLattice(QWidget):
         self.button_input_twiss.setCheckable(True)
 
 ###########################################################
-        self.text_mulp_lattice = CustomCodeEdit()
+        self.text_mulp_lattice = CodeEditorWithLineNumbers()
         self.text_env_lattice = QTextEdit()
         # self.text_match_result = QTextEdit()
         # self.text_match_twiss = QTextEdit()
@@ -93,7 +93,7 @@ class PageLattice(QWidget):
 
 ########################################################
         layout.addLayout(hbox_control)
-        layout.addLayout(hbox_cut)
+        # layout.addLayout(hbox_cut)
         layout.addWidget(self.stacked_widget)
 
         self.setLayout(layout)
@@ -104,124 +104,14 @@ class PageLattice(QWidget):
         self.ignore_text_changed = False
 
 
-        if True:
-            self.text_mulp_lattice.modes.append(modes.CodeCompletionMode())
-            sh_text_lattice = self.text_mulp_lattice.modes.append(MySyntaxHighlighter(self.text_mulp_lattice.document()))
-            sh_text_lattice.fold_detector = MyFoldDetector()
-            self.text_mulp_lattice.panels.append(panels.FoldingPanel())
+        # if True:
+        #     self.text_mulp_lattice.modes.append(modes.CodeCompletionMode())
+        #     sh_text_lattice = self.text_mulp_lattice.modes.append(MySyntaxHighlighter(self.text_mulp_lattice.document()))
+        #     sh_text_lattice.fold_detector = MyFoldDetector()
+        #     self.text_mulp_lattice.panels.append(panels.FoldingPanel())
 
 
 
-
-        # 连接光标位置改变事件
-        # self.text_lattice.cursorPositionChanged.connect(self.cursorPositionChanged)
-        # self.text_lattice.wheelEvent = self.wheelEvent1
-        # self.text_lattice.installEventFilter(self)  # 安装事件过滤器
-    #     self.text_lattice.keyPressEvent = self.keyPressEvent
-    #
-    # def keyPressEvent(self, event):
-    #     if event.key()==(Qt.Key_Control and Qt.Key_Z):
-    #         cursor = self.text_lattice.textCursor()
-    #         cursor.movePosition(QTextCursor.StartOfBlock)  # 移动到当前行的开头
-    #         cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)  # 选中整个行
-    #         cursor.removeSelectedText()
-    #
-    #         cursor.movePosition(QTextCursor.Up)  # 移动到上一行
-    #         cursor.movePosition(QTextCursor.EndOfBlock)  # 移动到上一行的末尾
-    #         self.text_lattice.setTextCursor(cursor)
-    #     else:
-    #         super().keyPressEvent(event)
-        #To get the remaining functionality back (e.g. without this, typing would not work):
-
-
-    # def wheelEvent1(self, event):
-    #     if event.modifiers() & Qt.ControlModifier:  # 检测是否按下了 Ctrl 键
-    #         font = self.text_lattice.font()
-    #         font_size = font.pointSize()  # 获取当前字体大小
-    #
-    #         delta = event.angleDelta().y()  # 获取滚轮滚动的垂直距离
-    #         if delta > 0:
-    #             font_size += 1  # 增加字体大小
-    #         else:
-    #             font_size -= 1  # 减小字体大小
-    #
-    #         font.setPointSize(font_size)  # 设置新的字体大小
-    #         self.text_lattice.setFont(font)  # 应用新的字体
-    #     else:
-    #         print(101)
-    #         delta = event.angleDelta().y()  # 获取滚轮滚动的垂直距离
-    #         scroll_bar = self.text_lattice.verticalScrollBar()
-    #         scroll_bar.setValue(scroll_bar.value() - (delta-10))
-
-
-
-    # def eventFilter(self, obj, event):
-    #     if event.type() == QEvent.KeyPress:  # 使用QEvent.KeyPress
-    #         if event.key() == Qt.Key_Control:
-    #             self.ctrl_pressed = True
-    #     elif event.type() == QEvent.KeyRelease:  # 使用QEvent.KeyRelease
-    #         if event.key() == Qt.Key_Control:
-    #             self.ctrl_pressed = False
-    #     # print(self.ctrl_pressed)
-    #     return super().eventFilter(obj, event)
-
-
-    # def colorize_text(self):
-    #     cursor = QTextCursor(self.text_lattice.document())
-    #
-    #     # 逐行着色
-    #     cursor.movePosition(QTextCursor.Start)
-    #
-    #     while not cursor.atEnd():
-    #         cursor.movePosition(QTextCursor.StartOfLine)
-    #
-    #         # 它将光标移动到当前行的结尾，并使用 QTextCursor.KeepAnchor参数将该行的文本内容选中，
-    #         # 以便后续操作可以应用于选中的文本。
-    #         cursor.movePosition(QTextCursor.EndOfLine, QTextCursor.KeepAnchor)
-    #         line = cursor.selectedText().strip()  # 获取当前行文本，并移除前导和尾随空格
-    #
-    #         # 使用正则表达式匹配首个单词
-    #         match = re.match(r'\w+', line)
-    #         if match:
-    #             first_word = match.group(0)
-    #             char_format = QTextCharFormat()
-    #
-    #             if first_word == "field":
-    #                 char_format.setForeground(QColor("red"))
-    #             elif first_word == "drift":
-    #                 char_format.setForeground(QColor("blue"))
-    #             # 将char_format中定义的文本格式应用到文本游标(cursor)当前选中的文本部分。在这种情况下，您使用char_format设置了文本的颜色。
-    #             else:
-    #                 char_format.setForeground(QColor("black"))
-    #             cursor.mergeCharFormat(char_format)
-    #         cursor.movePosition(QTextCursor.NextBlock)
-    #
-    # def cursorPositionChanged(self):
-    #     cursor = self.text_lattice.textCursor()
-    #     line_number = cursor.blockNumber()  # 获取当前行号
-    #     column_number = cursor.columnNumber()  # 获取当前列号
-    #
-    #     # 获取光标所在行的文本
-    #     cursor.movePosition(QTextCursor.StartOfBlock)  # 移动到当前行的开头
-    #     cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)  # 选中整个行
-    #     line = cursor.selectedText().strip()   # 获取整行文本
-    #
-    #     match = re.match(r'\w+', line)
-    #     if match:
-    #         first_word = match.group(0)
-    #         char_format = QTextCharFormat()
-    #
-    #         if first_word == "field":
-    #             char_format.setForeground(QColor("red"))
-    #         elif first_word == "drift":
-    #             char_format.setForeground(QColor("blue"))
-    #         else:
-    #             char_format.setForeground(QColor("black"))
-    #         # 将char_format中定义的文本格式应用到文本游标(cursor)当前选中的文本部分。在这种情况下，您使用char_format设置了文本的颜色。
-    #         cursor.mergeCharFormat(char_format)
-    #
-    #     print(f"光标位置 - 行: {line_number + 1}")
-    #     print(f"行文本: {line}")
 
     def updatePath(self, new_path):
         self.project_path = new_path
@@ -229,6 +119,7 @@ class PageLattice(QWidget):
         self.lattice_env_path = os.path.join(self.project_path, "InputFile", "lattice_env.txt")
 
     def fill_parameter(self):
+
         item = {"projectPath": self.project_path,}
 
         self.stacked_widget.setCurrentWidget(self.text_mulp_lattice)
@@ -236,32 +127,32 @@ class PageLattice(QWidget):
         # print(self.lattice_path)
         self.text_file_path.setText(self.lattice_mulp_path)
 
-
         obj = LatticeConfig()
         res = obj.create_from_file(item)
+
 
         if res["code"] == -1:
             raise Exception(str(res["data"]['msg']))
         file_contents = res["data"]["latticeParams"]
 
-        self.text_mulp_lattice.setPlainText(file_contents, mime_type="text/plain", encoding='utf-8')
+        self.text_mulp_lattice.setPlainText(file_contents, )
 
 
 
 
-        self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
-        self.text_file_path.setText(self.lattice_env_path)
-
-        obj = LatticeConfig()
-        res = obj.create_from_file(item)
-        if res["code"] == -1:
-            raise Exception(str(res["data"]['msg']))
-        file_contents = res["data"]["latticeParams"]
-
-        self.text_env_lattice.setPlainText(file_contents)
-
-        self.button_mulp_lattice.setChecked(True)
-        self.button_state()
+        # self.lattice_env_path = os.path.join(self.project_path, 'InputFile', 'lattice_env.txt')
+        # self.text_file_path.setText(self.lattice_env_path)
+        #
+        # obj = LatticeConfig()
+        # res = obj.create_from_file(item)
+        # if res["code"] == -1:
+        #     raise Exception(str(res["data"]['msg']))
+        # file_contents = res["data"]["latticeParams"]
+        #
+        # self.text_env_lattice.setPlainText(file_contents)
+        #
+        # self.button_mulp_lattice.setChecked(True)
+        # self.button_state()
 
 
 
@@ -279,12 +170,12 @@ class PageLattice(QWidget):
 
 
         #如果路径为空, 那么不保存
-        item["sim_type"] = "env"
-        obj = LatticeConfig()
-        res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
-        res = obj.write_to_file(item)
-        if res["code"] == -1:
-            raise Exception(str(res["data"]['msg']))
+        # item["sim_type"] = "env"
+        # obj = LatticeConfig()
+        # res = obj.set_param({"latticeInfo": self.text_env_lattice.toPlainText()})
+        # res = obj.write_to_file(item)
+        # if res["code"] == -1:
+        #     raise Exception(str(res["data"]['msg']))
 
     def fill_text_lattice_path(self, path):
         self.text_lattice_path.setText(path)
@@ -374,7 +265,7 @@ if __name__ == '__main__':
 
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-    main_window.updatePath(r'C:\Users\shliu\Desktop\test1113\test1')
+    main_window.updatePath(r'C:\Users\shliu\Desktop\AVAS_0.5\example')
     main_window.fill_parameter()
     main_window.show()
     sys.exit(app.exec_())

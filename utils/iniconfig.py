@@ -12,11 +12,12 @@ class IniConfig():
                      "fieldSource": "",
                      },
         "lattice":{"length": 0},
-         "input": {"sim_type": "mulp"},
+         "input": {"sim_type": "mulp", "device": "cpu"},
          "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
-         "error": {"error_type": "", "seed": 0, "if_normal": 0},
+         "error": {"error_type": "", "seed": 0, "if_normal": 1},
          }
-        self.str_keys = ["sim_type", "project_path", "fieldSource",  "error_type", ]
+
+        self.str_keys = ["sim_type", "project_path", "fieldSource",  "error_type",  "device"]
     # def initialize_ini(self):
 
 
@@ -153,15 +154,15 @@ if __name__ == '__main__':
     # print(cfg.ini_dict)
     # ini_dict = cfg.initialize()
     # cfg.write_ini(ini_dict)
-    item = {"projectPath": r"E:\using\test_avas_qt\test_ini"
+    item = {"projectPath": r"D:\using\test_avas_qt\test_ini"
     }
     cfg = IniConfig()
-    cfg.write_to_file(item)
+    # cfg.write_to_file(item)
 
     res = cfg.create_from_file(item)
-    print(res)
+    # print(res)
 
-    param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'}}
+    param = {'project': {'device': "cpu", }}
     res = cfg.set_param(**param)
     print(res)
     res = cfg.write_to_file(item)

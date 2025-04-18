@@ -164,6 +164,7 @@ class Error():
                     self.err_quad_dyn_on[j-1] = int(i[j])
 
             elif i[0] == 'err_cav_dyn_on':
+                print(167)
                 for j in range(1, len(i)):
                     self.err_cav_dyn_on[j-1] = int(i[j])
 
@@ -1015,6 +1016,7 @@ class ErrorDyn(Error):
         self.judge_dyn_on()
 
 
+
         self.write_err_par_title()
         self.write_err_par_tot_title()
 
@@ -1547,13 +1549,13 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
     field = r"E:\using\test_avas_qt\field"
-    path = r"D:\using\test_avas_qt\cafe_avas"
+    path = r"C:\Users\shliu\Desktop\test_half\HLAF\half_avas"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
     #
     obj = ErrorDyn(path,
-                   0, 0, field_path=None, if_generate_density_file=1)
+                   0, 1, field_path=None, if_generate_density_file=1)
 
     # obj = Errorstatdyn(path,
     #                0, 1, field_path= None)

@@ -46,7 +46,16 @@ class PhaseDialog(PictureDialog1, ):
 
 
     def plot_image(self):
-        self.func(self.file_path, show_=0, fig=self.fig)
+        item = {
+            "filePath": self.file_path,
+            "pictureType": "xx1",
+            "platform": "qt",
+            "show_": 0,
+            "sampleInterval": 1,
+            "needData": False,
+            "projectPath": r"D:\using\test_avas_qt\cafe_avas"
+        }
+        self.func(**item)
 
 
 
@@ -451,10 +460,21 @@ class PageAnalysis(QWidget):
             # print('ddd')
             return 0
 
-        self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
+        self.phase_dialog = PictureDialog1()
         self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
         self.phase_dialog.initUI()
-        self.phase_dialog.plot_image()
+        item = {
+            "filePath": self.text_phase_path.text() ,
+            "pictureType": "xx1",
+            "platform": "qt",
+            "show_": 0,
+            "sampleInterval": 1,
+            "needData": False,
+            "projectPath": r"D:\using\test_avas_qt\cafe_avas"
+        }
+
+
+        self.phase_dialog.plot_image1(item, plot_phase,)
         self.phase_dialog.show()
 
     # def plot_dataset_dialog(self, message ):

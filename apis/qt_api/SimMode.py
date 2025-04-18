@@ -75,7 +75,7 @@ class SimMode():
                 err_stat(self.project_path, err_seed, if_normal=1, field_path=field_path)
 
             elif err_mode == "dyn":
-                obj.judge_lattice("stat_error")
+                obj.judge_lattice("dyn_error")
                 err_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
 
             elif err_mode == "stat_dyn":
@@ -100,7 +100,7 @@ class SimMode():
 
 
 if __name__ == '__main__':
-    path = r"C:\Users\shliu\Desktop\new_project"
+    path = r"C:\Users\shliu\Desktop\test_half\HLAF\half_avas"
     item = {"projectPath": path}
     obj = SimMode(item)
     obj.run()

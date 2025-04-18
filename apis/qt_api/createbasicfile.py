@@ -31,7 +31,7 @@ class CreatBasicFile():
             "lattice":{"length": 0},
              "input": {"sim_type": "mulp"},
              "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
-             "error": {"error_type": "undefined", "seed": 0, "if_normal": 0},
+             "error": {"error_type": "undefined", "seed": 0, "if_normal": 1},
              }
 
     def create_basic_beam_file(self):

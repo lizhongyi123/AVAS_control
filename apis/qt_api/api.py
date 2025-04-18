@@ -1,4 +1,7 @@
+import re
 import sys
+
+from fontTools.feaLib import location
 
 from aftertreat.dataanalysis.percentemitt import PercentEmit
 from utils.readfile import read_dst_fast
@@ -134,6 +137,7 @@ def get_upload_path(item):
 # 得到模拟进度
 
 def get_fieldname(item):
+    #相对路径，没有后缀名， 去重
     kwargs = {}
     fieldPath = item["filePath"]
     if os.path.exists(fieldPath):
@@ -156,6 +160,7 @@ def get_fieldname(item):
 
 
 def get_bimap_name(item):
+    #相对路径，没有后缀
     kwargs = {}
     bimapPath = item["filePath"] 
     if os.path.exists(bimapPath):
@@ -177,6 +182,7 @@ def get_bimap_name(item):
 
 
 def get_fieldfile(item):
+    #相对路径，有后缀
     kwargs = {}
     fieldpath = item["fieldPath"]
     if os.path.exists(fieldpath):
@@ -198,6 +204,7 @@ def get_fieldfile(item):
 
 
 def get_allfile_relative_path(item):
+    #带后缀
     kwargs = {}
     fieldpath = item["filePath"]
     if os.path.exists(fieldpath):
@@ -238,7 +245,9 @@ def create_from_file_input_ini(item):
 
     new_dic = {}
     new_dic.update(input_res["data"]["inputParams"])
-    fieldSource_dic = {'fieldSource': ini_res["data"]["iniParams"]["project"]["fieldSource"]}
+    fieldSource_dic = {'fieldSource': ini_res["data"]["iniParams"]["project"]["fieldSource"],
+                       "device": ini_res["data"]["iniParams"]["input"]["device"]
+                       }
     new_dic.update(fieldSource_dic)
 
     kwargs.update({'inputiniParams': new_dic})
@@ -255,8 +264,11 @@ def write_to_file_input_ini(item, param):
     input_param = copy.deepcopy(param)
     del input_param["fieldSource"]
 
+    if input_param.get("device"):
+        del input_param["device"]
+
     ini_param = {"project": {"fieldSource": param["fieldSource"]},
-                 "input": {"sim_type": param["sim_type"]},
+                 "input": {"sim_type": param["sim_type"], "device": param.get("device")},
                  }
 
     input_obj = InputConfig()
@@ -399,8 +411,58 @@ def judge_if_is_avas_project(item):
         output = format_output(code=code, msg=msg, **kwargs)
     return output
 
+def get_file_choose_type(item):
+    #item = {"ProjectPath":, "file_type"}
+    default_item = {"projectPath": None, "fileType": None, "location": "out", "other_directory": None}
+    default_item.update(item)
+
+    file_type = default_item.get("fileType")
+    project_path = default_item.get("projectPath")
+    location = default_item.get("location")
+    other_directory = default_item.get("other_directory")
+
+    if location == "out":
+        target_directory = os.path.join(project_path, "OutputFile")
+    elif location == "in":
+        target_directory = os.path.join(project_path, "InputFile")
+    elif location == "other":
+        target_directory = other_directory
+
+    all_files = list_files_in_directory(target_directory)
+
+    # print(all_files)
+    can_choose_files = []
+    if file_type.lower() == "errors_par":
+        for i in all_files:
+            v1 = re.findall("errors_par.txt", i)
+            if len(v1)!= 0:
+                can_choose_files.append(i)
+
+    elif file_type.lower() == "density":
+        for i in all_files:
+            v1 = re.findall("density", i)
+            if len(v1)!= 0:
+                can_choose_files.append(i)
+
+
+    elif file_type.lower() == "dst":
+        for i in all_files:
+            v1 = re.findall("dst", i)
+            if len(v1)!= 0:
+                can_choose_files.append(i)
+
+    can_choose_files_relative = [i.split(r"/")[-1] for i in can_choose_files]
+
+    kwargs = {}
+    kwargs.update({'filesName': can_choose_files_relative})
+    output = format_output(**kwargs)
+    return output
+
+
+
 
 if __name__ == '__main__':
+    pass
     # item = {
     # "particletype": "H",
     # "nucleonnumber": 10,
@@ -435,12 +497,30 @@ if __name__ == '__main__':
     #  'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
     #  'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
     # write_to_file_input_ini(item, param)
-    path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
-    item = {"filePath": path }
-    res = get_bimap_name(item)
-    print(res)
-
+    # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
+    # item = {"filePath": path }
+    # res = get_bimap_name(item)
+    # print(res)
     #
-    item = {"fieldPath": path }
-    res = get_fieldfile(item)
+    # #
+    # item = {"fieldPath": path }
+    # res = get_fieldfile(item)
+    # print(res)
+    # projectPath = r"D:\using\test_avas_qt\cafe_avas"
+    # #
+    # # item = {"projectPath": projectPath, "fileType": "errors_par"}
+    # # item = {"projectPath": projectPath, "fileType": "density"}
+    # item = {"projectPath": projectPath, "fileType": "dst"}
+    #
+    # res = get_file_choose_type(item)
+    # print(res)
+    project_path = r"D:\using\test_avas_qt\test_ini"
+    item = {
+        "projectPath": project_path,
+    }
+    res = create_from_file_input_ini(item)
     print(res)
+    # param = {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
+    #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
+    #  'scmethod': 'SPICNIC', 'fieldSource': '', "device": "cpu"}
+    # res = write_to_file_input_ini(item, param)

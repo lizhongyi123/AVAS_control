@@ -219,10 +219,49 @@ def plot_dataset(**item):
 
 
 #画相图
-def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
-    v = PlotPhase(dst_path)
-    res = v.run(show_, fig)
-    return res
+# def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
+#     v = PlotPhase(dst_path)
+#     res = v.run(show_, fig)
+#     return res
+
+def plot_phase(**item):
+
+    default_item = {"filePath": None, "pictureType": "xx1", "show_": 0, "fig": None, "platform": "qt",
+                    "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out"}
+
+    default_item.update(item)
+    platform = default_item.get("platform")
+    project_path = default_item.get("projectPath")
+    fig = default_item.get("fig")
+    sample_interval = default_item.get("sampleInterval")
+    location = default_item.get("location")
+    show_ = default_item.get("show_")
+
+    if platform == "qt":
+        file_path = default_item.get("filePath")
+    elif platform == "web":
+        if location == "out":
+            file_path = os.path.join(project_path, "OutputFile", default_item.get("filePath"))
+        elif location == "in":
+            file_path = os.path.join(project_path, "InputFile", default_item.get("filePath"))
+
+
+    v = PlotPhase(file_path)
+
+    if platform == "qt":
+        output = v.run(show_, fig)
+    elif platform == "web":
+        try:
+            save_path = generate_web_picture_path(project_path)
+            v.run(show_, fig, save_path)
+            picture_param = {"picturePath": save_path}
+            output = format_output(**picture_param)
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            picture_param = {"picturePath": ""}
+            output = format_output(code, msg=msg, **picture_param)
+    return output
 
 def plot_cavity_voltage(project_path, ratio, show_=1, fig = None, platform = "qt"):
 
@@ -358,7 +397,7 @@ def plot_error_out(**item):
 
     default_item.update(item)
 
-    file_path = default_item.get("filePath")
+
     stat_method = default_item.get("statMethod")
     picture_type = default_item.get("pictureType")
     show_ = default_item.get("show_")
@@ -366,6 +405,10 @@ def plot_error_out(**item):
     platform = default_item.get("platform")
     need_data = default_item.get("needData")
     project_path = default_item.get("projectPath")
+    if platform == "qt":
+        file_path = default_item.get("filePath")
+    elif platform == "web":
+        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
 
     v = PlotErrout(file_path, stat_method, picture_type)
     v.get_x_y()
@@ -402,14 +445,19 @@ def plot_error_emit_loss(**item):
     default_item = {"filePath": None, "pictureType": "par", "show_": 0, "fig": None,
                     "platform": "qt", "needData":False, "projectPath": None}
     default_item.update(item)
-    file_path = default_item.get("filePath")
+
     picture_type = default_item.get("pictureType")
     show_ = default_item.get("show_")
     fig = default_item.get("fig")
     platform = default_item.get("platform")
     need_data = default_item.get("needData")
     project_path = default_item.get("projectPath")
-    
+
+    if platform == "qt":
+        file_path = default_item.get("filePath")
+    elif platform == "web":
+        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
+
     v = PlotErr_emit_loss(file_path, picture_type)
     v.get_x_y()
 
@@ -491,7 +539,7 @@ def plot_density(**item):
 
 
 def plot_density_level(**item):
-    default_item = {"filetPath": None, "desnityPlane": "x", "show_": 0, "fig": None, "platform": "qt",
+    default_item = {"filetath": None, "desnityPlane": "x", "show_": 0, "fig": None, "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None}
 
     default_item.update(item)
@@ -539,7 +587,7 @@ def plot_density_process(**item):
     #lost, maxlost, minlost,
     # ]
 
-    default_item = {"filetPath": None, "desnityPlane": "x", "pictureType": "centroid", "show_": 0, "fig": None, "platform": "qt",
+    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "centroid", "show_": 0, "fig": None, "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None}
 
     default_item.update(item)
@@ -579,10 +627,17 @@ def plot_density_process(**item):
     return res
 
 def plot_density_transport(**item):
-    default_item = {"filetPath": None, "desnityPlane": "x", "pictureType": "density", "show_": 0, "fig": None, "platform": "qt",
+    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "density", "show_": 0, "fig": None, "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None}
 
     default_item.update(item)
+
+    project_path = default_item.get("projectPath")
+    platform = default_item.get("platform")
+    if platform == "qt":
+        file_path = default_item.get("filePath")
+    elif platform == "web":
+        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
 
     picture_type = default_item.get("pictureType")
     process_type = ["centroid", "emit", "rms_size", "rms_size_max"]
@@ -638,8 +693,8 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    path = r"D:\using\test_avas_qt\cafe_avas3"
-    res = basic_mulp(path)
+    # path = r"D:\using\test_avas_qt\cafe_avas3"
+    # res = basic_mulp(path)
 
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {
@@ -678,7 +733,7 @@ if __name__ == '__main__':
 
 
     # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\errors_par.txt",
+    #     "filePath": r"errors_par.txt",
     #     "platform": "web",
     #     "show_": 0,
     #     "needData": False,
@@ -689,7 +744,7 @@ if __name__ == '__main__':
 
 
     # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\errors_par.txt",
+    #     "filePath": r"errors_par.txt",
     #     "statMethod": "average",
     #     "pictureType": "xy",
     #     "platform": "web",
@@ -746,10 +801,22 @@ if __name__ == '__main__':
     #     "platform": "web",
     #     "show_": 0,
     #     "sampleInterval": 1,
-    #     "needData": True,
+    #     "needData": False,
     #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
     # }
     #
     #
     # res = plot_density_transport(**item)
     # print(res)
+    # "filePath": r"inData.dst",
+    #"filePath": r"part_rfq.dst",
+    item = {
+        "filePath": r"inData.dst",
+        "platform": "web",
+        "projectPath": r"D:\using\test_avas_qt\cafe_avas",
+        "location": "out"
+    }
+
+
+    res = plot_phase(**item)
+    print(res)

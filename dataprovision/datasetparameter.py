@@ -130,8 +130,16 @@ class DatasetParameter():
         self.rms_z = [i[20] for i in dataset_info]
         self.rms_zz = [-1 * i[20] for i in dataset_info]
 
+        self.rms_z1 = [i[21] for i in dataset_info]
+
+
         self.max_x = [i[22] for i in dataset_info]  # m
         self.max_xx = [-1 * i[22] for i in dataset_info]
+
+        self.max_x1 = [i[23] for i in dataset_info]  # m
+        self.max_z = [i[26] for i in dataset_info]  # m
+        self.max_z1 = [i[27] for i in dataset_info]  # m
+
 
         self.max_y = [i[24] for i in dataset_info]
         self.max_yy = [-1 * i[24] for i in dataset_info]
@@ -140,6 +148,8 @@ class DatasetParameter():
         self.loss = [self.num_of_particle - i[28] for i in dataset_info]  ##
         self.number_exist = [i[28] for i in dataset_info]
 
+        self.sync_pz = [i[34] for i in dataset_info]
+        self.v5 = [i[5] for i in dataset_info]
         if self.project_path:
             self.get_phi()
 

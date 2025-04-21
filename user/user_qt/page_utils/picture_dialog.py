@@ -112,12 +112,10 @@ class PictureDialog1(QDialog):
 
 
     # 只有一张图，接收参数为文件路径， 函数， 图片类型1
-    def plot_image1(self, file_path, func, picture_type=None):
+    def plot_image1(self, item, func):
 
-        if picture_type:
-            func(file_path, picture_type, show_=0, fig=self.fig)
-        else:
-            func(file_path, show_=0, fig=self.fig)
+        item.update({"fig": self.fig})
+        func(**item)
 
     def plot_image2(self, file_path, func, picture_type1=None, picture_type2=None):
         func(file_path, picture_type1, picture_type2, show_=0, fig=self.fig)
@@ -236,7 +234,10 @@ class MulpEnvelopeDialog(OnePicyureRightkeys):
         self.picture_type = "rms_x"
 
     def plot_image(self):
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        item = {"projectPath": self.project_path, "pictureType": self.picture_type, "show_": 0,
+                "fig": self.picture_widget.fig, "platform": "qt", "sampleInterval": 1}
+
+        self.func(**item)
         self.picture_widget.canvas.draw()
 
     def contextMenuEvent(self, event):
@@ -275,7 +276,10 @@ class MulpEmittanceDialog(OnePicyureRightkeys):
         self.picture_type = "emittance_x"
 
     def plot_image(self):
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        item = {"projectPath": self.project_path, "pictureType": self.picture_type, "show_": 0,
+                "fig": self.picture_widget.fig, "platform": "qt", "sampleInterval": 1}
+
+        self.func(**item)
         self.picture_widget.canvas.draw()
 
     def contextMenuEvent(self, event):
@@ -303,19 +307,23 @@ class BeamPahseAdvance(OnePicyureRightkeys):
         self.picture_widget = Picturewidgetrightkey()
         self.picture_widget.contextMenuEvent = self.contextMenuEvent
         self.picture_widget.plot_image = self.plot_image
-        self.picture_type = "Meter"
+        self.picture_type = "meter"
 
 
     def plot_image(self):
-        self.func(self.project_path, self.picture_type, show_=0, fig=self.picture_widget.fig)
+        print(self.picture_type)
+        item = {
+            "projectPath": self.project_path, "pictureType": self.picture_type, "show_": 0, "fig": self.picture_widget.fig, "platform": "qt"}
+
+        self.func(**item)
         self.picture_widget.canvas.draw()
 
     def contextMenuEvent(self, event):
         cmenu = QMenu(self)
 
         menu_items = {
-            "Meter": cmenu.addAction("Meter"),
-            "Period": cmenu.addAction("Period"),
+            "meter": cmenu.addAction("Meter"),
+            "period": cmenu.addAction("Period"),
         }
 
         action = cmenu.exec_(self.mapToGlobal(event.pos()))

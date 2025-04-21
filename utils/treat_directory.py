@@ -72,8 +72,18 @@ def delete_directory(path):
     :param path:
     :return:
     """
-    send2trash(path)
-    # shutil.rmtree(path)
+    p = Path(path)
+    if not p.exists():
+        print("路径不存在")
+        return
+
+    if p.is_file():
+        p.unlink()  # 删除文件
+    elif p.is_dir():
+        shutil.rmtree(p)  # 删除整个文件夹
+    else:
+        print("不是文件也不是文件夹")
+
 if __name__ == "__main__":
 
     path = r"C:\Users\shliu\Desktop\InputFile"

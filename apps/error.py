@@ -164,6 +164,7 @@ class Error():
                     self.err_quad_dyn_on[j-1] = int(i[j])
 
             elif i[0] == 'err_cav_dyn_on':
+                print(167)
                 for j in range(1, len(i)):
                     self.err_cav_dyn_on[j-1] = int(i[j])
 
@@ -1015,6 +1016,7 @@ class ErrorDyn(Error):
         self.judge_dyn_on()
 
 
+
         self.write_err_par_title()
         self.write_err_par_tot_title()
 
@@ -1031,7 +1033,6 @@ class ErrorDyn(Error):
                 self.run_one_time(i, j, lattice_mulp_list)
                 self.write_err_datas(i, j)
                 self.write_err_par_every_time(i, j)
-
 
 class Errorstat(Error):
     def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
@@ -1548,13 +1549,13 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
     field = r"E:\using\test_avas_qt\field"
-    path = r"C:\Users\shliu\Desktop\test_43"
+    path = r"C:\Users\shliu\Desktop\test_half\HLAF\half_avas"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
     #
-    obj = Errorstat(path,
-                   0, 0, field_path=None, if_generate_density_file=0)
+    obj = ErrorDyn(path,
+                   0, 1, field_path=None, if_generate_density_file=1)
 
     # obj = Errorstatdyn(path,
     #                0, 1, field_path= None)

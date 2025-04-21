@@ -25,7 +25,7 @@ class BeamConfig():
 
 
         self.str_keys = ['readparticledistribution', 'distribution_x', "distribution_y"]
-        self.int_keys = ['numofcharge', 'particlenumber']
+        self.int_keys = ['numofcharge', 'particlenumber', "use_dst"]
         self.float_keys = ['particlerestmass', 'current', 'frequency', 'kneticenergy'
                             "alpha_x", "beta_x", "emit_x",
                            "alpha_y", "beta_y", "emit_y",
@@ -40,7 +40,7 @@ class BeamConfig():
                         "alpha_x": None, "beta_x": None, "emit_x": None,
                         "alpha_y": None, "beta_y": None, "emit_y": None,
                         "alpha_z": None, "beta_z": None, "emit_z": None,
-                        "distribution_x": None, "distribution_y": None
+                        "distribution_x": None, "distribution_y": None, "use_dst":None
                 }
 
 
@@ -65,9 +65,8 @@ class BeamConfig():
 
             elif i[0] == "readparticledistribution":
                 if len(i) == 2 and i[1] == "unknown":
-                    beam_lis[index][1] = ""
-                elif len(i) == 1:
-                    beam_lis[index].append("")
+                    beam_lis[index][1] = None
+
 
 
         res = {}
@@ -88,11 +87,11 @@ class BeamConfig():
 
 
         kwargs = {}
+
         try:
             original_dict = self.read_beam_txt(path)
             #处理twiss参数和distribution
             #检查twiss和distribution的长度是否正常
-
 
             if "twissx" in original_dict.keys():
                 original_dict["alpha_x"] = original_dict["twissx"][0]
@@ -115,9 +114,9 @@ class BeamConfig():
                 del original_dict["distribution"]
 
             #验证是否存在未知元素
-            for k, v in original_dict.items():
-                if k not in self.beam_parameter_keys:
-                    raise UnknownkeywordError(message=None, key=k)
+            # for k, v in original_dict.items():
+            #     if k not in self.beam_parameter_keys:
+            #         raise UnknownkeywordError(message=None, key=k)
 
             #如果不存在未知元素, 转换类型
             for k, v in original_dict.items():
@@ -127,6 +126,7 @@ class BeamConfig():
             if self.validate_type(original_dict):
                 for k, v in original_dict.items():
                     self.beam_parameter[k] = original_dict[k]
+
 
         except Exception as e:
             code = -1
@@ -147,10 +147,11 @@ class BeamConfig():
         #
         #
         # }
-        use_dst = item.get("use_dst", 1)
 
 
         other_path = item.get("otherPath")
+
+        use_dst = self.beam_parameter.get("use_dst")
 
         if other_path is None:
             path = os.path.join(item.get("projectPath"), "InputFile", "beam.txt")
@@ -252,8 +253,8 @@ class BeamConfig():
                 if v not in ["WB", "PB", "GS", "KV"]:
                     raise ValueChooseError(k, ["WB", "PB", "GS", "KV"], v)
 
-            elif k not in self.beam_parameter_keys:
-                raise UnknownkeywordError(k)
+            # elif k not in self.beam_parameter_keys:
+            #     raise UnknownkeywordError(k)
 
         return True
 
@@ -264,36 +265,38 @@ class BeamConfig():
         beam_params = res["data"]["beamParams"]
         #当所有输入符合
 
-        for k in self.beam_parameter_keys:
-            if beam_params[k] is None:
-                raise Exception(f"missing parameter {k}")
+        # for k in self.beam_parameter_keys:
+        #     if beam_params[k] is None:
+        #         raise Exception(f"missing parameter {k}")
 
         #当所有输入符合
-        # if beam_params["readparticledistribution"] is not None:
-        #     for k in self.with_dst_keys:
-        #         if beam_params[k] is None:
-        #             raise Exception(f"missing parameter {k}")
-        #
-        # else:
-        #     for k in self.no_dst_keys:
-        #         if beam_params[k] is None:
-        #             raise Exception(f"missing parameter {k}")
+        use_dst = self.beam_parameter.get("use_dst")
+        # if
+        if use_dst == 1:
+            for k in self.with_dst_keys:
+                if beam_params[k] is None:
+                    raise Exception(f"missing parameter {k}")
+
+        else:
+            for k in self.no_dst_keys:
+                if beam_params[k] is None:
+                    raise Exception(f"missing parameter {k}")
 
 
 if __name__ == "__main__":
-    beam_path = r"C:\Users\shliu\Desktop\maxi\test_m\325\InputFile\beam.txt"
+    beam_path = r"D:\using\test_avas_qt\cafe_avas3"
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\maxi\test_m\325"
+        "projectPath": r"C:\Users\shliu\Desktop\test421"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
     # # print(1, res)
     # # obj.validate_run(path)
-    # res = obj.set_param(readparticledistribution='91')
+    print(res)
     # item = {
     #     "projectPath": r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads",
     #     "use_dst": 1,
     #     }
-    # obj.write_to_file(item)
+    obj.write_to_file(item)
     print(res)

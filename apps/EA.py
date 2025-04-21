@@ -580,5 +580,5 @@ class EA():
 
 if __name__ == "__main__":
     obj = EA(r"C:\Users\anxin\Desktop\test_mulp")
-    # obj.test()
+    # obj.test1()
     obj.set_max_err_run()

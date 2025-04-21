@@ -44,7 +44,6 @@ class DstParameter():
         self.BaseMassInMeV = data.get('basemassinmev')
         self.Ib = data.get('ib')
 
-        print(self.BaseMassInMeV)
         data = data.get('partran_dist')
 
         self.x_list = [i[0] * 10 for i in data]   #mm
@@ -59,10 +58,7 @@ class DstParameter():
 
         self.phi_list_deg = [i[4] * 180 / Pi for i in data]
 
-        # if 1:
-        #     tmp_gamma = 1 + 300*10**-3 /self.BaseMassInMeV
-        #     tmp_beta = math.sqrt(1 - 1.0 / tmp_gamma / tmp_gamma)
-        #     tmp_speed = tmp_beta * c_light  # 总速度
+
 
         times = []
         for index, i in enumerate(data):
@@ -87,12 +83,7 @@ class DstParameter():
 
         self.z1_list = [(i - average_z_speed) / average_z_speed * 1000 for i in self.z_speed_list]
 
-        print(self.z_list[464], self.z1_list[464],
-              self.phi_list_deg[464], times[464],
-              self.E_list[464]
-              )
-        index, value = max(enumerate(self.z_list), key=lambda x: x[1])
-        print(f"最大值是 {value}，索引是 {index}")
+
 
         # sys.exit()
         # 平均能量,gamma, beta

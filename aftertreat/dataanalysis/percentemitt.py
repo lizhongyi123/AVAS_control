@@ -123,6 +123,7 @@ class PercentEmit():
         return alpha_x, beta_x, gamma_x, epsilon_x, norm_epsilon_x
 
     def get_size(self, x, x1, alpha_x, beta_x, gamma_x):
+        #计算全发射度
         return gamma_x * x ** 2 + 2 * alpha_x * x * x1 + beta_x * x1 ** 2
 
     # 得到任意一个平面的百分比发射度
@@ -147,24 +148,23 @@ class PercentEmit():
         any_y_list = [y[i] for i in indices]
         # print(len(any_x_list))
         # 根据百分比的例子计算rms的twiss参数
-        res = list(self.cal_twiss_emitt(any_x_list, any_y_list))
+        alpha, beta, gamma, epsilon, norm_epsilon = list(self.cal_twiss_emitt(any_x_list, any_y_list))
         ###########################################################
         # 根据全twiss参数，计算的全发射度
         all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, alpha_x, beta_x, gamma_x)
 
         ###########################################################
         # 根据百分比twiss参数，计算全发射度
-        percent_all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, res[0], res[1], res[2])
+        percent_all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, alpha, beta, gamma)
 
         ###########################################################
-        res.append(float(all_epsilon))
-        res.append(float(percent_all_epsilon))
+        res = [alpha, beta, gamma, epsilon, norm_epsilon, all_epsilon, percent_all_epsilon]
 
         return res
 
     # 得到任意一个平面的全发射度
     def get_all_epsilon(self, x, x1, alpha_x, beta_x, gamma_x):
-
+        #计算最大全发射度
         all_size = []
         for i in range(len(x)):
             all_size.append(self.get_size(x[i], x1[i], alpha_x, beta_x, gamma_x))
@@ -244,12 +244,12 @@ class PercentEmit():
 
 if __name__ == '__main__':
     dst_path = r"C:\Users\shliu\Desktop\test422\result\part_dtl1.dst"
-    dst_path = r"C:\Users\shliu\Desktop\test42\zuhui_test1.dst"
+    dst_path = r"D:\using\cafe_parent\part_rfq.dst"
     # dst_path = r"C:\Users\shliu\Desktop\test42\part_rfq.dst"
 
     # dst_path = r"C:\Users\anxin\Desktop\tace_test\result\part_dtl1.dst"
     # dst_path = r"D:\重要程序\lizituijinzongjie\75\butongliuqiang\OutputFile\outData_100000.000000.dst"
     v = PercentEmit(dst_path)
-    res1 = v.get_percent_emit(1)
+    res1 = v.get_100_emit()
     print(res1)
     # res = v.get_data()

@@ -115,7 +115,7 @@ class PicturePlot_2D():
         self.y = []
         return self.x, self.y
 
-    def run(self, show_, fig=None):
+    def run(self, show_, fig=None, save_path=None ):
         # print(self.x, self.y)
         # print(fig)
         if not fig:
@@ -171,9 +171,11 @@ class PicturePlot_2D():
         if show_:
             plt.show()
             return None
-
         else:
-            return None
+            if save_path:  # 如果指定了保存路径，就保存图像
+                fig.savefig(save_path)
+            plt.close(fig)  # 释放资源，防止内存堆积
+            return fig  # 返回 fig 方便外部进一步处理（可选）
 
 
 class CompoundShape():
@@ -257,7 +259,7 @@ class PicturePlot_2ax():
                      }
         return self.xy
 
-    def run(self, show_, fig=None):
+    def run(self, show_, fig=None, save_path=None):
         if not fig:
             fig, ax1 = plt.subplots(figsize=self.fig_size)
         elif fig:
@@ -301,10 +303,11 @@ class PicturePlot_2ax():
         if show_:
             plt.show()
             return None
-
         else:
-            return None
-
+            if save_path:  # 如果指定了保存路径，就保存图像
+                fig.savefig(save_path)
+            plt.close(fig)  # 释放资源，防止内存堆积
+            return fig  # 返回 fig 方便外部进一步处理（可选）
 
 class Picturedensity():
     """
@@ -331,9 +334,12 @@ class Picturedensity():
         self.z = []
         self.y = []
         self.density = []
+        self.z_m = []
+        self.y_m = []
+        self.density_m = []
         return self.z, self.y, self.density
 
-    def run(self, show_, fig):
+    def run(self, show_, fig, save_path=None):
         # print(self.z, self.y)
         # print(fig)
         # print(self.density)
@@ -342,31 +348,12 @@ class Picturedensity():
         elif fig:
             ax1 = fig.add_subplot(111)
 
-        z_m = np.tile(self.z, (self.bins, 1))
-
-        y_m = np.zeros((self.bins, len(self.z)))
-        density_m = np.zeros((self.bins, len(self.z)))
-
-        for i in range(len(self.z)):
-            min_edge = self.y[i][0]
-            max_edge = self.y[i][1]
-
-
-
-            bin_edges = np.linspace(min_edge, max_edge, self.bins + 1)
-
-            y_m[:, i] = bin_edges[:-1]
-
-
-            density_m[:, i] = self.density[i] / np.max(self.density[i])
-            #
-
 
         colors = [(1, 1, 1), *plt.cm.jet(np.linspace(0, 1, 256))]  # 第一个颜色为白色，其余为 'jet'
         custom_cmap = LinearSegmentedColormap.from_list('custom_jet', colors)
 
         # 使用pcolormesh绘制密度图
-        mesh = ax1.pcolormesh(z_m, y_m, density_m, cmap=custom_cmap, shading='auto')
+        mesh = ax1.pcolormesh(self.z_m, self.y_m,self.density_m, cmap=custom_cmap, shading='auto')
 
         # 为图像添加颜色条，并设置标签
         colorbar = fig.colorbar(mesh, ax=ax1)
@@ -393,9 +380,11 @@ class Picturedensity():
         if show_:
             plt.show()
             return None
-
         else:
-            return None
+            if save_path:  # 如果指定了保存路径，就保存图像
+                fig.savefig(save_path)
+            plt.close(fig)  # 释放资源，防止内存堆积
+            return fig  # 返回 fig 方便外部进一步处理（可选）
 
 # if __name__ == "__main__":
 #     v = PicturelBar_2D()

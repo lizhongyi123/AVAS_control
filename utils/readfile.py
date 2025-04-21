@@ -7,6 +7,7 @@ from utils.exception import CustomFileNotFoundError
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
+    #目前这个函数无法处理包含重复的情况
     """
     :param input: 需要读取的txt文件
     :out:结果返回的类型，可选参数为dict， list
@@ -50,6 +51,7 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
 
     res = {}
     for i in input_lines:
+
         tmp_dict = {}
         if len(i) == 1:
             res[i[0]] = None

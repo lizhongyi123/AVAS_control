@@ -465,7 +465,7 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 if __name__ == "__main__":
     tracewin_lattiace_path =r"C:\Users\shliu\Desktop\tr\full_sc_template.dat"
-    # in_put = "test.txt"
+    # in_put = "test1.txt"
     avas_lattice_path =r'"C:\Users\shliu\Desktop\tr\latticae_mulp.txt"'
     adjust_file = r"C:\Users\shliu\Desktop\test_yiman\test3\result\Adjusted_Values.txt_0"
     # error_file = r"E:\AVAS_CONTROL\相关程序\lattice转换\adjust_err\Error_Datas.txt_3"

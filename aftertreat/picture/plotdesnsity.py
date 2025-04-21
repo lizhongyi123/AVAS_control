@@ -3,13 +3,19 @@ from aftertreat.picture.initialplot import PicturePlot_2D, Picturedensity
 from dataprovision.densityparameter import DensityParameter
 import matplotlib.pyplot as plt
 import numpy as np
+from utils.tool import get_list_interval, generate_web_picture_param
 class PlotDensity(Picturedensity):
-    def __init__(self, path):
+    def __init__(self, path, picture_type, sample_interval):
         super(PlotDensity, self).__init__()
         self.path = path
         self.bins = 300
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
 
-    def get_x_y(self, picture_type):
+    def get_x_y(self, ):
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
+
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         # print(data["tab_lis"])
@@ -21,6 +27,7 @@ class PlotDensity(Picturedensity):
         self.y = []
         self.density = []
         for i in range(len(self.z)):
+            #获取最大值最小值
             v = [data["minb_lis"][i][index] * 1000, data["maxb_lis"][i][index] * 1000]
             self.y.append(v)
             this_density = np.array(data["tab_lis"][i][index])
@@ -48,14 +55,42 @@ class PlotDensity(Picturedensity):
         elif picture_type == 'z':
             self.ylabel = "Z (mm)"
 
-        self.ylim = [-10, 10]
+        #根据参数生成矩阵
+        self.z_m = np.tile(self.z, (self.bins, 1))
+
+        self.y_m = np.zeros((self.bins, len(self.z)))
+        self.density_m = np.zeros((self.bins, len(self.z)))
+
+        for i in range(len(self.z)):
+            min_edge = self.y[i][0]
+            max_edge = self.y[i][1]
+
+
+
+            bin_edges = np.linspace(min_edge, max_edge, self.bins + 1)
+
+            self.y_m[:, i] = bin_edges[:-1]
+
+
+            self.density_m[:, i] = self.density[i] / np.max(self.density[i])
+            #
+
+        self.z_m = self.z_m[:,::sample_interval]
+        self.y_m = self.y_m[:,::sample_interval]
+        self.density_m = self.density_m[:,::sample_interval]
 
 class PlotDensityLevel(PicturePlot_2D):
-    def __init__(self, path):
+    def __init__(self, path, picture_type, sample_interval):
         super().__init__()
         self.bins = 300
         self.path = path
-    def get_x_y(self, picture_type):
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
+
+    def get_x_y(self):
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
+
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         # print(data["tab_lis"])
@@ -169,7 +204,6 @@ class PlotDensityLevel(PicturePlot_2D):
                     edge_max_9999,
                 ]
         # self.xlim = [0.5, 0.75]
-        self.ylim = [-20, 20]
         self.colors = ['r', 'b', 'blueviolet', 'g'] * 2
 
         self.xlabel = "Position(m)"
@@ -190,6 +224,18 @@ class PlotDensityLevel(PicturePlot_2D):
         self.labels = labels
         self.set_legend = True
 
+        self.x = get_list_interval(self.x, self.sample_interval)
+        self.y = get_list_interval(self.y, self.sample_interval)
+
+        self.y = [[float(x) for x in row] for row in self.y]
+
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
+        if not isinstance(self.x[0], list):
+            self.x = [self.x]
+
+        if len(self.x) != len(self.y):
+            self.x = self.x * len(self.y)
         # print(len(self.x))
         # print(len(edge_max_90))
 
@@ -198,10 +244,17 @@ class PlotDensityProcess(PicturePlot_2D):
     """
     用来将density文件中其他数据可视化
     """
-    def __init__(self, path):
+    def __init__(self, path, density_plane, picture_type, sample_interval):
         super().__init__()
         self.path = path
-    def get_x_y(self, density_plane, picture_type):
+        self.density_plane = density_plane
+        self.picture_type = picture_type
+        self.sample_interval = sample_interval
+
+    def get_x_y(self,):
+        density_plane = self.density_plane
+        picture_type = self.picture_type
+        sample_interval = self.sample_interval
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
         self.x = data["zg_lis"]
@@ -286,6 +339,13 @@ class PlotDensityProcess(PicturePlot_2D):
             self.y = lost_lis
             self.ylabel = f"Min lost"
             self.xlabel = "z(m)"
+
+        self.x = get_list_interval(self.x, self.sample_interval)
+        self.y = get_list_interval(self.y, self.sample_interval)
+
+        self.y = list(self.y)
+        if not isinstance(self.y[0], list):
+            self.y = [self.y]
 
         # if picture_name == 'emit_x':
         #     self.y = [i[0] *10**6 for i in emit]

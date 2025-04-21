@@ -18,12 +18,8 @@ class PlotPhase:
         self.fig_size = (12.8, 9.2)
         self.fontsize = 14
 
-    def run(self, show_, fig=None):
-        try:
-            res = read_dst_fast(self.dst_path)
-        except Exception as e:
-            print(f"Error reading file: {e}")
-            return
+    def run(self, show_, fig=None, save_path=None):
+        res = read_dst_fast(self.dst_path)
 
         partran_dist = np.array(res['partran_dist'])
 
@@ -53,8 +49,12 @@ class PlotPhase:
 
         if show_:
             plt.show()
+            return None
         else:
-            return fig
+            if save_path:  # 如果指定了保存路径，就保存图像
+                fig.savefig(save_path)
+            plt.close(fig)  # 释放资源，防止内存堆积
+            return fig  # 返回 fig 方便外部进一步处理（可选）
 
     def _plot_density(self, fig, position, x, y, xlabel, ylabel, font):
         ax = fig.add_subplot(position)

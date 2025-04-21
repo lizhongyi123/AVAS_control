@@ -1,4 +1,5 @@
 ﻿import os.path
+import sys
 import time
 
 from utils.readfile import read_dst, read_txt
@@ -129,15 +130,26 @@ class DatasetParameter():
         self.rms_z = [i[20] for i in dataset_info]
         self.rms_zz = [-1 * i[20] for i in dataset_info]
 
+        self.rms_z1 = [i[21] for i in dataset_info]
+
+
         self.max_x = [i[22] for i in dataset_info]  # m
         self.max_xx = [-1 * i[22] for i in dataset_info]
+
+        self.max_x1 = [i[23] for i in dataset_info]  # m
+        self.max_z = [i[26] for i in dataset_info]  # m
+        self.max_z1 = [i[27] for i in dataset_info]  # m
+
 
         self.max_y = [i[24] for i in dataset_info]
         self.max_yy = [-1 * i[24] for i in dataset_info]
 
         self.ek = [i[0] for i in dataset_info]  ##MeV
         self.loss = [self.num_of_particle - i[28] for i in dataset_info]  ##
+        self.number_exist = [i[28] for i in dataset_info]
 
+        self.sync_pz = [i[34] for i in dataset_info]
+        self.v5 = [i[5] for i in dataset_info]
         if self.project_path:
             self.get_phi()
 
@@ -192,12 +204,14 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\test327\OutputFile\DataSet.txt"
+    path1 = r"D:\using\test_avas_qt\cafe_avas\OutputFile\output_0\DataSet.txt"
     obj = DatasetParameter(path1)
-    for i in range(1000):
-        v = obj.get_parameter()
-        print(obj.z[-1])
-        time.sleep(2)
+    v = obj.get_parameter()
+    z = obj.z
+    # for i in range(1000):
+    #     v = obj.get_parameter()
+    #     print(obj.z[-1])
+    #     time.sleep(2)
 
     import numpy as np
     # import time

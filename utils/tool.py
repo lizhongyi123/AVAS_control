@@ -1,7 +1,8 @@
 import math
 import copy
 import global_varible
-
+import os
+import uuid
 def write_to_txt(path, lis):
     with open(path, 'w') as f:
         for i in lis:
@@ -117,6 +118,39 @@ def safe_to_float(text, default=0.0):
     except ValueError:
         return 0
 
+
+def get_list_interval(data, interval):
+    #该函数是为了间隔获取数据，如果是一个一维列表，就直接操作，如果是多维列表，
+    #就分别获取每个列表的间隔数据
+
+    if isinstance(data[0], list):
+        new_data = [i[::interval] for i in data]
+    else:
+        new_data = data[::interval]
+    return new_data
+
+def generate_web_picture_param(obj, ):
+    pictureParam = {
+        "labelx": "",
+        "labely": "",
+        "datax": [],
+        "datay": [],
+        "legends": [],
+    }
+
+    pictureParam["labelx"] = obj.xlabel
+    pictureParam["labely"] = obj.ylabel
+    pictureParam["datax"] = obj.x
+    pictureParam["datay"] = obj.y
+    pictureParam["legends"] = obj.labels[: len(obj.y)]
+    return pictureParam
+
+def generate_web_picture_path(project_path):
+    picture_save_directory = os.path.join(project_path, "OutputFile", "Picture")
+    os.makedirs(picture_save_directory, exist_ok=True)
+    filename = f"{uuid.uuid4().hex}.png"
+    save_path = os.path.join(picture_save_directory, filename)
+    return save_path
 
 if __name__ == '__main__':
     # code = 1

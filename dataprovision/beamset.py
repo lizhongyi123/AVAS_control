@@ -217,7 +217,7 @@ class BeamsetParameter():
 if __name__ == "__main__":
     import os
     import numpy as np
-    beamset_pasth = r"C:\Users\anxin\Desktop\314\cafe_avas\OutputFile\BeamSet.plt"
+    beamset_pasth = r"D:\using\test_avas_qt\cafe_avas\OutputFile\BeamSet.plt"
     obj = BeamsetParameter(beamset_pasth)
     # all_step = obj.get_parameter()
     # print(obj.allstep_dict)
@@ -227,12 +227,14 @@ if __name__ == "__main__":
     # obj.get_parameter()
     all = obj.get_step()
     print(all)
-    v1, v2 = obj.get_one_parameter(585)
+    v1, v2 = obj.get_one_parameter(1258)
+    print(v1)
+    v1, v2 = obj.get_one_parameter(1257)
     print(v1)
 
 
-    v1, v2 = obj.get_one_parameter(586)
-    print(v1)
-
-    v1, v2 = obj.get_one_parameter(587)
-    print(v1)
+    # v1, v2 = obj.get_one_parameter(586)
+    # print(v1)
+    #
+    # v1, v2 = obj.get_one_parameter(587)
+    # print(v1)

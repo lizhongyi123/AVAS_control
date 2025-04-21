@@ -46,7 +46,16 @@ class PhaseDialog(PictureDialog1, ):
 
 
     def plot_image(self):
-        self.func(self.file_path, show_=0, fig=self.fig)
+        item = {
+            "filePath": self.file_path,
+            "pictureType": "xx1",
+            "platform": "qt",
+            "show_": 0,
+            "sampleInterval": 1,
+            "needData": False,
+            "projectPath": r"D:\using\test_avas_qt\cafe_avas"
+        }
+        self.func(**item)
 
 
 
@@ -438,7 +447,11 @@ class PageAnalysis(QWidget):
 
         self.syn_phase_dialog = PictureDialog1()
         self.syn_phase_dialog.initUI()
-        self.syn_phase_dialog.plot_image1(lattice_mulp_path, plot_cavity_syn_phase,)
+
+        item = {
+            "projectPath": self.project_path,  "show_": 0, "platform": "qt"}
+
+        self.syn_phase_dialog.plot_image1(item, plot_cavity_syn_phase,)
         self.syn_phase_dialog.show()
 
     def plot_phase(self):
@@ -447,10 +460,21 @@ class PageAnalysis(QWidget):
             # print('ddd')
             return 0
 
-        self.phase_dialog = PhaseDialog(self.text_phase_path.text(), plot_phase)
+        self.phase_dialog = PictureDialog1()
         self.phase_dialog.fig = Figure(figsize=(6.4*2, 4.6*2))
         self.phase_dialog.initUI()
-        self.phase_dialog.plot_image()
+        item = {
+            "filePath": self.text_phase_path.text() ,
+            "pictureType": "xx1",
+            "platform": "qt",
+            "show_": 0,
+            "sampleInterval": 1,
+            "needData": False,
+            "projectPath": r"D:\using\test_avas_qt\cafe_avas"
+        }
+
+
+        self.phase_dialog.plot_image1(item, plot_phase,)
         self.phase_dialog.show()
 
     # def plot_dataset_dialog(self, message ):
@@ -463,14 +487,20 @@ class PageAnalysis(QWidget):
 
         self.energy_dialog = PictureDialog1()
         self.energy_dialog.initUI()
-        self.energy_dialog.plot_image1(self.project_path, plot_dataset, "energy")
+        item = {
+            "projectPath": self.project_path, "pictureType":"energy",  "show_": 0, "platform": "qt"}
+
+        self.energy_dialog.plot_image1(item, plot_dataset)
         self.energy_dialog.show()
 
 
     def plot_loss_dialog(self, ):
         self.loss_dialog = PictureDialog1()
         self.loss_dialog.initUI()
-        self.loss_dialog.plot_image1(self.project_path, plot_dataset, "loss")
+        item = {
+            "projectPath": self.project_path, "pictureType":"loss",  "show_": 0, "platform": "qt"}
+
+        self.loss_dialog.plot_image1(item, plot_dataset)
         self.loss_dialog.show()
 
 

@@ -33,18 +33,22 @@ class MultiParticle():
 
         self.multiparticle_engine = MultiParticleEngine()
 
-        print(36, fielfilepath)
+
         res_tmp = self.multiparticle_engine.get_path(inputfilepath, outputfilePath, fielfilepath)
 
 
 
         res = self.multiparticle_engine.main_agent(1)
         if res == 1:
-            error = self.check_error_file(errorlog)
-            raise Exception(f'{error}')
+            raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
+
+            # raise Exception(f'{error}')
+            # error = self.check_error_file(errorlog)
+            # raise Exception(f'{error}')
         elif res == 2:
-            error = self.check_error_file(errorlog)
-            raise Exception(f'{error}')
+            raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
+            # error = self.check_error_file(errorlog)
+            # raise Exception(f'{error}')
         return res
 
     def check_error_file(self, ErrorLog):
@@ -69,7 +73,7 @@ def basic_mulp(project_path):
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\test_43"
+    project_path = r"D:\using\test_avas_qt\cafe_avas3"
 
 
     obj = MultiParticle(project_path)

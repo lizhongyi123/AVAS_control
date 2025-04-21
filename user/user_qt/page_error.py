@@ -125,13 +125,13 @@ class PageError(QWidget):
         self.button_output_x1y1.clicked.connect(partial(self.plot_error_out, "x1y1"))
 
         self.button_output_rmsxy = QPushButton("rms(X) && rms(Y)")
-        self.button_output_rmsxy.clicked.connect(partial(self.plot_error_out, "rmsxy"))
+        self.button_output_rmsxy.clicked.connect(partial(self.plot_error_out, "rms_xy"))
 
         self.button_output_rmsx1y1 = QPushButton("rms(X') && rms(Y')")
-        self.button_output_rmsx1y1.clicked.connect(partial(self.plot_error_out, "rmsx1y1"))
+        self.button_output_rmsx1y1.clicked.connect(partial(self.plot_error_out, "rms_x1y1"))
 
         self.button_output_energy = QPushButton("Energy change")
-        self.button_output_energy.clicked.connect(partial(self.plot_error_out, "ek_change"))
+        self.button_output_energy.clicked.connect(partial(self.plot_error_out, "ek"))
 
 
         layout12.addWidget(self.button_output_xy)
@@ -285,7 +285,9 @@ class PageError(QWidget):
         self.xy_dialog = PictureDialog1()
 
         self.xy_dialog.initUI()
-        self.xy_dialog.plot_image1(self.error_par_file_path, plot_error_emit_loss, "par")
+        item = {"filePath": self.error_par_file_path, "pictureType": "par"}
+
+        self.xy_dialog.plot_image1(item, plot_error_emit_loss)
         self.xy_dialog.show()
 
 
@@ -301,35 +303,16 @@ class PageError(QWidget):
 
 
     def plot_error_out(self, message):
-        if self.output_plot_type == 'average':
-            if message == "xy":
-                picture_type = "av_xy"
-            elif message == "x1y1":
-                picture_type = "av_x1y1"
-            elif message == "rmsxy":
-                picture_type = "av_rms_xy"
-            elif message == "rmsx1y1":
-                picture_type = "av_rms_x1y1"
-            elif message == "ek_change":
-                picture_type = "av_ek"
-
-
-        elif self.output_plot_type == 'rms':
-            if message == "xy":
-                picture_type = "rms_xy"
-            elif message == "x1y1":
-                picture_type = "rms_x1y1"
-            elif message == "rmsxy":
-                picture_type = "rms_rms_xy"
-            elif message == "rmsx1y1":
-                picture_type = "rms_rms_x1y1"
-            elif message == "ek_change":
-                picture_type = "rms_ek"
 
         self.xy_dialog = PictureDialog1()
 
         self.xy_dialog.initUI()
-        self.xy_dialog.plot_image1(self.error_par_file_path, plot_error_out, picture_type)
+        item = {"filePath": self.error_par_file_path,
+                    "statMethod": self.output_plot_type,
+                    "pictureType": message,
+                    "show_": 0,
+        }
+        self.xy_dialog.plot_image1(item, plot_error_out,)
         self.xy_dialog.show()
 
     def plot_density_process_this(self):
@@ -338,45 +321,48 @@ class PageError(QWidget):
         diaglog = None
 
         # plot_density(self.density_file_path, self.density_plane_choose, show_=1, fig=None, platform="qt")
+        item = {"filePath": self.density_file_path, "desnityPlane": self.density_plane_choose,
+                "sampleInterval": 1}
 
         if self.density_picture_type == "density":
             self.density_dialog = PictureDialog1()
             self.density_dialog.initUI()
-            self.density_dialog.plot_image1(self.density_file_path, plot_density, self.density_plane_choose)
+
+            self.density_dialog.plot_image1(item, plot_density, )
             self.density_dialog.show()
 
         elif self.density_picture_type == "density_level":
             self.density_level_dialog = PictureDialog1()
             self.density_level_dialog.initUI()
-            self.density_level_dialog.plot_image1(self.density_file_path, plot_density_level, self.density_plane_choose)
+            self.density_level_dialog.plot_image1(item, plot_density_level,)
             self.density_level_dialog.show()
 
         elif self.density_picture_type == "centroid":
             self.density_centroid_dialog = PictureDialog1()
             self.density_centroid_dialog.initUI()
-            self.density_centroid_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            item.update({"pictureType":"centroid"})
+            self.density_centroid_dialog.plot_image1(item, plot_density_process)
             self.density_centroid_dialog.show()
 
         elif self.density_picture_type == "emit":
             self.density_emit_dialog = PictureDialog1()
             self.density_emit_dialog.initUI()
-            self.density_emit_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            item.update({"pictureType":"emit"})
+            self.density_emit_dialog.plot_image1(item, plot_density_process)
             self.density_emit_dialog.show()
 
         elif self.density_picture_type == "rms_size":
             self.density_rms_size_dialog = PictureDialog1()
             self.density_rms_size_dialog.initUI()
-            self.density_rms_size_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            item.update({"pictureType":"rms_size"})
+            self.density_rms_size_dialog.plot_image1(item, plot_density_process)
             self.density_rms_size_dialog.show()
 
         elif self.density_picture_type == "rms_size_max":
             self.density_rms_size_max_dialog = PictureDialog1()
             self.density_rms_size_max_dialog.initUI()
-            self.density_rms_size_max_dialog.plot_image2(self.density_file_path, plot_density_process, self.density_plane_choose,
-                                     self.density_picture_type)
+            item.update({"pictureType":"rms_size_max"})
+            self.density_rms_size_max_dialog.plot_image1(item, plot_density_process)
             self.density_rms_size_max_dialog.show()
 
 

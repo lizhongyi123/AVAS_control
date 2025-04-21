@@ -147,10 +147,11 @@ class BeamConfig():
         #
         #
         # }
-        use_dst = item.get("use_dst", 1)
 
 
         other_path = item.get("otherPath")
+
+        use_dst = self.beam_parameter.get("use_dst")
 
         if other_path is None:
             path = os.path.join(item.get("projectPath"), "InputFile", "beam.txt")
@@ -269,7 +270,7 @@ class BeamConfig():
         #         raise Exception(f"missing parameter {k}")
 
         #当所有输入符合
-        use_dst = item.get("use_dst", 1)
+        use_dst = self.beam_parameter.get("use_dst")
         # if
         if use_dst == 1:
             for k in self.with_dst_keys:
@@ -285,17 +286,17 @@ class BeamConfig():
 if __name__ == "__main__":
     beam_path = r"D:\using\test_avas_qt\cafe_avas3"
     item = {
-        "projectPath": r"D:\using\test_avas_qt\cafe_avas3"
+        "projectPath": r"C:\Users\shliu\Desktop\test421"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
     # # print(1, res)
     # # obj.validate_run(path)
-    res = obj.set_param(use_dst=1)
+    print(res)
     # item = {
     #     "projectPath": r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads",
     #     "use_dst": 1,
     #     }
-    # obj.write_to_file(item)
+    obj.write_to_file(item)
     print(res)

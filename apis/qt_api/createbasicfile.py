@@ -19,7 +19,7 @@ class CreatBasicFile():
             "alpha_x": 0, "beta_x": 1, "emit_x": 0.1,
             "alpha_y": 0, "beta_y": 1, "emit_y": 0.1,
             "alpha_z": 0, "beta_z": 1, "emit_z": 0.1,
-            "distribution_x": "GS", "distribution_y": "GS"
+            "distribution_x": "GS", "distribution_y": "GS", "use_dst": 0
         }
 
         self.input_info = {
@@ -29,7 +29,7 @@ class CreatBasicFile():
         self.ini_info = \
             {"project": {"project_path": "undefined"},
             "lattice":{"length": 0},
-             "input": {"sim_type": "mulp"},
+             "input": {"sim_type": "mulp", "device": "cpu"},
              "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
              "error": {"error_type": "undefined", "seed": 0, "if_normal": 1},
              }
@@ -103,6 +103,7 @@ class CreateBasicProject():
             "inputExtra": list(input_extra_keys),
             "inputMissing": list(input_missing_keys)
         }
+        print(106, msg)
         return msg
 
     def create_project(self):
@@ -168,7 +169,7 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\p1\P1"
+    project_path = r"C:\Users\shliu\Desktop\test4213"
 
 
 
@@ -189,7 +190,7 @@ if __name__ == "__main__":
         #"spacechargetype", 'bbb'
     }
     platform = "web"
-    obj = CreateBasicProject(item, "qt")
+    obj = CreateBasicProject(item, "web")
     res = obj.create_project()
     print(res)
 

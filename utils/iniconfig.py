@@ -154,7 +154,7 @@ if __name__ == '__main__':
     # print(cfg.ini_dict)
     # ini_dict = cfg.initialize()
     # cfg.write_ini(ini_dict)
-    item = {"projectPath": r"D:\using\test_avas_qt\test_ini"
+    item = {"projectPath": r"C:\Users\shliu\Desktop\test4212"
     }
     cfg = IniConfig()
     # cfg.write_to_file(item)
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     res = cfg.create_from_file(item)
     # print(res)
 
-    param = {'project': {'device': "cpu", }}
+    param = {'project': {'fieldSource': "thisProject", }}
     res = cfg.set_param(**param)
     print(res)
     res = cfg.write_to_file(item)

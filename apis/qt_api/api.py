@@ -229,7 +229,7 @@ def create_from_file_input_ini(item):
     input_res = input_obj.create_from_file(item)
     if input_res["code"] == -1:
         code = -1
-        msg = input_res["data"]["message"]
+        msg = input_res["data"]["msg"]
         kwargs.update({'inputiniParams': {}})
         output = format_output(code, msg=msg, **kwargs)
         return output
@@ -238,7 +238,7 @@ def create_from_file_input_ini(item):
     ini_res = ini_obj.create_from_file(item)
     if input_res["code"] == -1:
         code = -1
-        msg = input_res["data"]["message"]
+        msg = input_res["data"]["msg"]
         kwargs.update({'inputiniParams': {}})
         output = format_output(code, msg=msg, **kwargs)
         return output
@@ -261,11 +261,15 @@ def write_to_file_input_ini(item, param):
     #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
     #  'scmethod': 'SPICNIC', 'fieldSource': ''}
     kwargs = {}
-    input_param = copy.deepcopy(param)
-    del input_param["fieldSource"]
+    if param.get("fieldSource") == "thisProject":
+        param["fieldSource"] = ""
 
+    input_param = copy.deepcopy(param)
+
+    del input_param["fieldSource"]
     if input_param.get("device"):
         del input_param["device"]
+
 
     ini_param = {"project": {"fieldSource": param["fieldSource"]},
                  "input": {"sim_type": param["sim_type"], "device": param.get("device")},
@@ -275,7 +279,7 @@ def write_to_file_input_ini(item, param):
     input_res = input_obj.set_param(**input_param)
     if input_res["code"] == -1:
         code = -1
-        msg = input_res["data"]["message"]
+        msg = input_res["data"]["msg"]
         kwargs.update({'inputiniParams': {}})
         output = format_output(code, msg=msg, **kwargs)
         return output
@@ -284,7 +288,7 @@ def write_to_file_input_ini(item, param):
     ini_res = ini_obj.set_param(**ini_param)
     if ini_res["code"] == -1:
         code = -1
-        msg = ini_res["data"]["message"]
+        msg = ini_res["data"]["msg"]
         kwargs.update({'inputiniParams': {}})
         output = format_output(code, msg=msg, **kwargs)
         return output
@@ -489,14 +493,15 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    # path = r"E:\using\test_avas_qt\test_ini"
-    # item = {"projectPath": path}
-    # # res = create_from_file_input_ini(item)
-    # param = {'project': {'project_path': '', 'fieldSource': 'E:\\using\\test_avas_qt\\test_ini\\field'},
-    #  'lattice': {'length': 0}, 'input': {'sim_type': 'mulp'},
-    #  'match': {'cal_input_twiss': 0, 'match_with_twiss': 0, 'use_initial_value': 0},
-    #  'error': {'error_type': '', 'seed': 0, 'if_normal': 0}}
-    # write_to_file_input_ini(item, param)
+    path = r"C:\Users\shliu\Desktop\test4212"
+    item = {"projectPath": path}
+    # res = create_from_file_input_ini(item)
+    # print(res)
+    param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
+             'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'cafe'}
+    # param = {'fieldSource': r'E:\\using\\test_avas_qt\\test_ini\\field'}
+    write_to_file_input_ini(item, param)
+
     # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
     # item = {"filePath": path }
     # res = get_bimap_name(item)
@@ -514,12 +519,12 @@ if __name__ == '__main__':
     #
     # res = get_file_choose_type(item)
     # print(res)
-    project_path = r"D:\using\test_avas_qt\test_ini"
-    item = {
-        "projectPath": project_path,
-    }
-    res = create_from_file_input_ini(item)
-    print(res)
+    # project_path = r"D:\using\test_avas_qt\test_ini"
+    # item = {
+    #     "projectPath": project_path,
+    # }
+    # res = create_from_file_input_ini(item)
+    # print(res)
     # param = {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
     #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
     #  'scmethod': 'SPICNIC', 'fieldSource': '', "device": "cpu"}

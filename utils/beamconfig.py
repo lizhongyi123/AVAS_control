@@ -14,7 +14,7 @@ class BeamConfig():
                                     'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
                                     "alpha_y", "beta_y", "emit_y",
                                     "alpha_z", "beta_z", "emit_z",
-                                    'distribution_x', 'distribution_y']
+                                    'distribution_x', 'distribution_y', "use_dst"]
 
         self.with_dst_keys = ['readparticledistribution', 'numofcharge']
 
@@ -114,9 +114,9 @@ class BeamConfig():
                 del original_dict["distribution"]
 
             #验证是否存在未知元素
-            # for k, v in original_dict.items():
-            #     if k not in self.beam_parameter_keys:
-            #         raise UnknownkeywordError(message=None, key=k)
+            for k, v in original_dict.items():
+                if k not in self.beam_parameter_keys:
+                    raise UnknownkeywordError(message=None, key=k)
 
             #如果不存在未知元素, 转换类型
             for k, v in original_dict.items():
@@ -253,8 +253,8 @@ class BeamConfig():
                 if v not in ["WB", "PB", "GS", "KV"]:
                     raise ValueChooseError(k, ["WB", "PB", "GS", "KV"], v)
 
-            # elif k not in self.beam_parameter_keys:
-            #     raise UnknownkeywordError(k)
+            elif k not in self.beam_parameter_keys:
+                raise UnknownkeywordError(k)
 
         return True
 

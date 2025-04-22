@@ -262,7 +262,7 @@ def write_to_file_input_ini(item, param):
     #  'scmethod': 'SPICNIC', 'fieldSource': ''}
     kwargs = {}
     if param.get("fieldSource") == "thisProject":
-        param["fieldSource"] = os.path.join(item["projectPath"], "field")
+        param["fieldSource"] = os.path.join(item["projectPath"], "InputFile", "field")
 
     input_param = copy.deepcopy(param)
 

@@ -104,7 +104,7 @@ class PercentEmit():
 
 
     # 计算任意一个twiss参数和发射度
-    def cal_twiss_emitt(self, x, x1):
+    def cal_twiss_emitt(self, x, x1, coefficient=1):
         average_x = np.mean(x)
         average_x1 = np.mean(x1)
         sigma_x = np.average([(i - average_x) ** 2 for i in x])
@@ -118,7 +118,7 @@ class PercentEmit():
         alpha_x = -sigma_xx1 / epsilon_x
         gamma_x = (1 + alpha_x ** 2) / beta_x
 
-        norm_epsilon_x = self.beta * self.gamma * epsilon_x
+        norm_epsilon_x = self.beta * self.gamma**(coefficient) * epsilon_x
 
         return alpha_x, beta_x, gamma_x, epsilon_x, norm_epsilon_x
 
@@ -127,9 +127,9 @@ class PercentEmit():
         return gamma_x * x ** 2 + 2 * alpha_x * x * x1 + beta_x * x1 ** 2
 
     # 得到任意一个平面的百分比发射度
-    def get_any_emit(self, x, y, ratio):
+    def get_any_emit(self, x, y, ratio, coefficient):
         #########################################################
-        alpha_x, beta_x, gamma_x, epson_x, norm_epson_x = self.cal_twiss_emitt(x, y)
+        alpha_x, beta_x, gamma_x, epson_x, norm_epson_x = self.cal_twiss_emitt(x, y, coefficient)
 
         size_list = []
         for i in range(len(self.x_list)):
@@ -148,7 +148,7 @@ class PercentEmit():
         any_y_list = [y[i] for i in indices]
         # print(len(any_x_list))
         # 根据百分比的例子计算rms的twiss参数
-        alpha, beta, gamma, epsilon, norm_epsilon = list(self.cal_twiss_emitt(any_x_list, any_y_list))
+        alpha, beta, gamma, epsilon, norm_epsilon = list(self.cal_twiss_emitt(any_x_list, any_y_list, coefficient))
         ###########################################################
         # 根据全twiss参数，计算的全发射度
         all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, alpha_x, beta_x, gamma_x)
@@ -178,7 +178,7 @@ class PercentEmit():
         #epsi_xx1：rms发射度(归一化)  all_epsi_xx1：全twiss参数全发射度  percent_all_epsi_xx1：根据百分比twiss参数 全发射度
         alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1, all_epsi_xx1, percent_all_epsi_xx1 = self.get_any_emit(self.x_list,
                                                                                                             self.x1_list,
-                                                                                                            ratio)
+                                                                                                            ratio, 1)
         all_epsi_xx1 = all_epsi_xx1 * self.beta * self.gamma
 
         percent_all_epsi_xx1 = percent_all_epsi_xx1 * self.beta * self.gamma
@@ -188,7 +188,7 @@ class PercentEmit():
 
         alpha_yy1, beta_yy1, gamma_yy1, _, epsi_yy1, all_epsi_yy1, percent_all_epsi_yy1 = self.get_any_emit(self.y_list,
                                                                                                             self.y1_list,
-                                                                                                            ratio)
+                                                                                                            ratio, 1)
         all_epsi_yy1 = all_epsi_yy1 * self.beta * self.gamma
         percent_all_epsi_yy1 = percent_all_epsi_yy1 * self.beta * self.gamma
 
@@ -197,7 +197,7 @@ class PercentEmit():
 
         alpha_zz1, beta_zz1, gamma_zz1, _, epsi_zz1, all_epsi_zz1, percent_all_epsi_zz1 = self.get_any_emit(self.z_list,
                                                                                                             self.z1_list,
-                                                                                                            ratio)
+                                                                                                            ratio, 3)
         all_epsi_zz1 = all_epsi_zz1 * self.beta * self.gamma
         percent_all_epsi_zz1 = percent_all_epsi_zz1 * self.beta * self.gamma
 
@@ -206,13 +206,13 @@ class PercentEmit():
 
         alpha_xy, beta_xy, gamma_xy, epsi_xy, _, all_epsi_xy, percent_all_epsi_xy = self.get_any_emit(self.x_list,
                                                                                                       self.y_list,
-                                                                                                      ratio)
+                                                                                                      ratio, 1)
         xy_list = [alpha_xy, beta_xy, epsi_xy, all_epsi_xy, percent_all_epsi_xy]
         # print('xy', alpha_xy, beta_xy,  epsi_xy)
         
         alpha_phie, beta_phie, gamma_phie, epsi_phie, _, all_epsi_phie, percent_all_epsi_phie = self.get_any_emit(self.phi_list,
                                                                                                       self.E_list,
-                                                                                                      ratio)
+                                                                                                      ratio, 1)
         phie_list = [alpha_phie, beta_phie, epsi_phie, all_epsi_phie, percent_all_epsi_phie]
 
         res = [xx1_list, yy1_list, zz1_list, xy_list, phie_list]
@@ -221,16 +221,16 @@ class PercentEmit():
     # 得到几个平面的100%发射度
     def get_100_emit(self):
         self.get_data()
-        alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1 = self.cal_twiss_emitt(self.x_list, self.x1_list)
+        alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1 = self.cal_twiss_emitt(self.x_list, self.x1_list, 1)
         # print('xx1', alpha_xx1, beta_xx1,  epsi_xx1)
 
-        alpha_yy1, beta_yy1, gamma_yy1, _, epsi_yy1 = self.cal_twiss_emitt(self.y_list, self.y1_list)
+        alpha_yy1, beta_yy1, gamma_yy1, _, epsi_yy1 = self.cal_twiss_emitt(self.y_list, self.y1_list, 1)
         # print('yy1',alpha_yy1, beta_yy1,  epsi_yy1)
 
-        alpha_zz1, beta_zz1, gamma_zz1, _, epsi_zz1 = self.cal_twiss_emitt(self.z_list, self.z1_list)
+        alpha_zz1, beta_zz1, gamma_zz1, _, epsi_zz1 = self.cal_twiss_emitt(self.z_list, self.z1_list, 3)
         # print('zz1',alpha_zz1, beta_zz1,  epsi_zz1)
 
-        alpha_xy, beta_xy, gamma_xy, epsi_xy, _ = self.cal_twiss_emitt(self.x_list, self.y_list)
+        alpha_xy, beta_xy, gamma_xy, epsi_xy, _ = self.cal_twiss_emitt(self.x_list, self.y_list, 1)
         # print('xy', alpha_xy, beta_xy,  epsi_xy)
 
         xx1_list = [alpha_xx1, beta_xx1, epsi_xx1]

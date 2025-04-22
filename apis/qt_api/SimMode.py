@@ -100,7 +100,7 @@ class SimMode():
 
 
 if __name__ == '__main__':
-    path = r"D:\using\test_avas_qt\cafe_avas4"
+    path = r"C:\Users\shliu\Desktop\xiaochu"
     item = {"projectPath": path}
     obj = SimMode(item)
     obj.run()

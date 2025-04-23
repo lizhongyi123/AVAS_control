@@ -36,7 +36,6 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
                 line = line.strip()
                 input_lines.append(line)
 
-
     input_lines = [i.split() for i in input_lines if i.strip()]
 
     if not case_sensitive:
@@ -76,9 +75,10 @@ def read_lattice_mulp(lattice_mulp_path):
             break
     return new_lattice_list
 
-# def read_lattice_with_name(lattice_mulp_path):
-#     res = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
-
+def read_lattice_with_name(lattice_mulp_path):
+    res = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
+    # for i in res:
+    #     print(i)
 
 
 
@@ -178,7 +178,9 @@ if __name__ == "__main__":
     # res = read_dst(path)
     # print(res['phase'][0])
     # read_runsignal(0)
-    path = r"C:\Users\shliu\Desktop\maxi\test_m"
-    res = read_lattice_mulp(path)
-    for i in res:
-        print(i)
+    path = r"C:\Users\shliu\Desktop\test_lattice\lattice_mulp.txt"
+    # res = read_lattice_mulp(path)
+    # for i in res:
+    #     print(i)
+    res = read_lattice_with_name(path)
+    print(res)

@@ -169,7 +169,6 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test4213"
 
 
 
@@ -181,12 +180,12 @@ if __name__ == "__main__":
                                     'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
                                     "alpha_y", "beta_y", "emit_y",
                                     "alpha_z", "beta_z", "emit_z",
-                                    'distribution_x', 'distribution_y'],
+                                    'distribution_x', 'distribution_y', "use_dst"],
         # 'distribution_y', 'aaa'
 
 
         "inputKeys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
-                       "dumpperiodicity", "spacechargelong",'spacechargetype' ]
+                       "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device" ]
         #"spacechargetype", 'bbb'
     }
     platform = "web"

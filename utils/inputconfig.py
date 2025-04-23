@@ -9,7 +9,7 @@ import os
 class InputConfig():
     def __init__(self):
         self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                                     "spacechargelong", "spacechargetype"]
+                                     "spacechargelong", "spacechargetype", "fieldSource", "device"]
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
                          "spacechargelong", "spacechargetype"]
 

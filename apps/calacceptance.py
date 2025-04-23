@@ -153,7 +153,7 @@ class Acceptance():
 
         in_dis = self.get_para(0)
         out_dis = self.get_para(-1)
-        print(156, out_dis)
+
 
         # pd.set_option('display.max_columns', None)
         in_dis = pd.DataFrame(in_dis, columns=['x', 'xx', 'y', 'yy', 'z', 'zz', 'phi', 'E', 'loss'])
@@ -169,7 +169,7 @@ class Acceptance():
 
         in_dis["E"] -= w
         # print(in_dis)
-        print(out_dis)
+
 
         #丢失的粒子
         loss_particles = in_dis[out_dis["loss"] == 1].copy()
@@ -183,7 +183,7 @@ class Acceptance():
         if kind == 0:
             #x方向
             emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["x"], in_dis["xx"], btgm)
-            print(emit_norm, t_alpha, t_beta, t_gamma)
+
 
 
             loss_particles.loc[:,'ellipse'] = (t_gamma * loss_particles["x"] ** 2 +
@@ -236,7 +236,8 @@ class Acceptance():
 
 
         elif kind == 2:
-            emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["z"], in_dis["zz"], btgm)
+            zbtgm = gamma**3 * beta
+            emit_norm, t_alpha, t_beta, t_gamma = self.twiss(in_dis["z"], in_dis["zz"], zbtgm)
             print(emit_norm, t_alpha, t_beta, t_gamma)
 
 
@@ -286,7 +287,7 @@ class Acceptance():
 
             return loss_min_emit, None, phi_min, E_min,
 
-    def twiss(self, x, y, btgm):
+    def twiss(self, x, y, btgm, ):
         x_sigma = numpy.average(x ** 2)
         y_sigma = numpy.average(y ** 2)
         x_y_corr = numpy.average(x * y)

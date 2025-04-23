@@ -262,7 +262,7 @@ def write_to_file_input_ini(item, param):
     #  'scmethod': 'SPICNIC', 'fieldSource': ''}
     kwargs = {}
     if param.get("fieldSource") == "thisProject":
-        param["fieldSource"] = ""
+        param["fieldSource"] = os.path.join(item["projectPath"], "InputFile", "field")
 
     input_param = copy.deepcopy(param)
 
@@ -492,15 +492,13 @@ if __name__ == '__main__':
     # item = {"dstPath": dst_path}
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
-    #
-    path = r"C:\Users\shliu\Desktop\test4212"
-    item = {"projectPath": path}
+
+
     # res = create_from_file_input_ini(item)
     # print(res)
-    param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
-             'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'cafe'}
+
     # param = {'fieldSource': r'E:\\using\\test_avas_qt\\test_ini\\field'}
-    write_to_file_input_ini(item, param)
+
 
     # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
     # item = {"filePath": path }

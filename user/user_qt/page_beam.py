@@ -388,7 +388,7 @@ class PageBeam(QWidget):
         label_use_dst = QLabel("Use particle file")
         self.cb_use_dst = QCheckBox('', self)
         self.cb_use_dst.stateChanged.connect(self.cb_use_dst_change)
-        self.cb_use_dst.setChecked(True)  # 设置默认选中
+
 
         layout_use_dst.addWidget(label_use_dst)
         layout_use_dst.addWidget(self.cb_use_dst)
@@ -582,6 +582,13 @@ class PageBeam(QWidget):
         self.distribution_combo_longi.setCurrentText(beam_res.get('distribution_y'))
 
 
+        if beam_res.get("use_dst") is None:
+            pass
+        elif int(beam_res.get("use_dst")) == 1:
+            self.cb_use_dst.setChecked(True)
+        elif int(beam_res.get("use_dst")) == 0:
+            self.cb_use_dst.setChecked(False)
+
             # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:
             #     self.text_displacePos_x.setText(beam_res.get('displacepos')[0])
             #     self.text_displacePos_y.setText(beam_res.get('displacepos')[1])
@@ -635,6 +642,12 @@ class PageBeam(QWidget):
 
         res["distribution_x"] = self.distribution_combo_trans.currentText()
         res["distribution_y"] = self.distribution_combo_longi.currentText()
+
+
+        res['numofcharge'] = self.text_charge.text()
+
+
+        res["use_dst"] = self.cb_use_dst_num
 
         return res
 

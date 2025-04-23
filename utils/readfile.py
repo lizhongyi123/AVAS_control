@@ -76,6 +76,12 @@ def read_lattice_mulp(lattice_mulp_path):
             break
     return new_lattice_list
 
+# def read_lattice_with_name(lattice_mulp_path):
+#     res = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
+
+
+
+
 
 def read_dst(input):
     """

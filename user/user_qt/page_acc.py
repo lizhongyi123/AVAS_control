@@ -172,10 +172,11 @@ class PageAccept(QWidget):
             all_emit, norm_emit, x_min, xx_min = cal_acceptance(self.project_path, 3)
 
 
+
         if self.cb_x.isChecked() or self.cb_y.isChecked() or self.cb_z.isChecked() \
             or self.cb_phie.isChecked():
 
-            if norm_emit:
+            if norm_emit is not None:
                 self.emit_line.setText(str(round(all_emit, self.decimals)))
                 self.emit_norm_line.setText(str(round(norm_emit,self.decimals)))
             else:
@@ -204,7 +205,7 @@ class PageAccept(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAccept(r'C:\Users\anxin\Desktop\test_acct')
+    main_window = PageAccept(r'C:\Users\shliu\Desktop\xiaochu')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

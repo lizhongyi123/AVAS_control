@@ -24,7 +24,7 @@ class CreatBasicFile():
 
         self.input_info = {
             "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
-            "device":"cpu", "outputcontrol_start": 0, "outputcontrol_grid": 200,
+            "device":"cpu", "outputcontrol_start": 0, "outputcontrol_grid": 300,
         }
 
         self.ini_info = \

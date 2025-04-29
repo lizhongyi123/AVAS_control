@@ -10,7 +10,7 @@ class DensityParameter():
         with open(self.density_path, "rb") as f:
             # 读取 zg_lis 的长度 (第一个整数)
             run_step = struct.unpack('i', f.read(4))[0]
-            grid_num = struct.unpack('i', f.read(4))[0]
+            self.grid_num = struct.unpack('i', f.read(4))[0]
             # print(run_step, grid_num)
             # 初始化结果数据结构
             data["zg_lis"] = []
@@ -68,7 +68,7 @@ class DensityParameter():
                 # 动态处理 self.bins 数量的数据
                 tab = []
                 for _ in range(4):
-                    tab_part = struct.unpack('i' * grid_num, f.read(grid_num * 4))  # 读取 bins 个 float
+                    tab_part = struct.unpack('i' * self.grid_num, f.read(self.grid_num * 4))  # 读取 bins 个 float
                     tab.append(list(tab_part))
                 data["tab_lis"].append(tab)
 

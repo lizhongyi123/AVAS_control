@@ -4,6 +4,7 @@ from dataprovision.densityparameter import DensityParameter
 import matplotlib.pyplot as plt
 import numpy as np
 from utils.tool import get_list_interval, generate_web_picture_param
+import sys
 class PlotDensity(Picturedensity):
     def __init__(self, path, picture_type, sample_interval):
         super(PlotDensity, self).__init__()
@@ -18,6 +19,7 @@ class PlotDensity(Picturedensity):
 
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
+        self.bins = file_obj.grid_num
         # print(data["tab_lis"])
         type_lis = ['x', 'y', 'r', 'z']
         self.z = data["zg_lis"]
@@ -93,6 +95,8 @@ class PlotDensityLevel(PicturePlot_2D):
 
         file_obj = DensityParameter(self.path)
         data = file_obj.get_parameter()
+        self.bins = file_obj.grid_num
+
         # print(data["tab_lis"])
         type_lis = ['x', 'y', 'r', 'z']
         self.x = data["zg_lis"]
@@ -103,15 +107,20 @@ class PlotDensityLevel(PicturePlot_2D):
         if index != 2:
             for i in range(len(self.x)):
                 v = [data["minb_lis"][i][index] * 1000, data["maxb_lis"][i][index] * 1000]
+
                 density = data["tab_lis"][i][index]
 
-                counts1 = np.array(density[150:])
-                # 对前半部分取反
-                counts2 = np.array(density[:150][::-1])
+                bin_edges = np.linspace(v[0], v[1], self.bins + 1)
+                mid = len(bin_edges) // 2
 
-                bin_edges = np.linspace(v[0], v[1], self.bins+1)[:300]
-                edge1 = bin_edges[150:]
-                edge2 = bin_edges[0:150][::-1]
+                density = np.array(density)
+
+                counts1 = density[mid:]
+                counts2 = density[:mid][::-1]
+                edge1 = bin_edges[mid:]
+                edge2 = bin_edges[:mid][::-1]
+
+
 
                 ratio = counts1 + counts2
 
@@ -175,7 +184,7 @@ class PlotDensityLevel(PicturePlot_2D):
                 # 计算归一化后的累积比例
                 cumulative_ratio = np.cumsum(ratio_normalized)
                 # print(cumulative_ratio)
-                bin_edges = np.linspace(v[0], v[1], self.bins + 1)[:300]
+                bin_edges = np.linspace(v[0], v[1], self.bins + 1)[:self.bins]
                 edge1 = bin_edges
                 # 找到达到90%、99%、99.9%累积值的索引
                 thresholds = [0.9, 0.99, 0.999, 0.9999]
@@ -397,7 +406,7 @@ if __name__ == "__main__":
     # path3 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_tot_par.dat"
 
     # path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\density_par_1_98.dat"
-    path1 = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_1_1.dat"
+    path1 = r"C:\Users\shliu\Desktop\testex2\OutputFile\density_par_0_0.dat"
     # v = PlotDensity(path1)
     # v.get_data('x')
     # v.ylim = [-50, 50]
@@ -408,6 +417,6 @@ if __name__ == "__main__":
     # # v.get_x_y(picture_type='r')
     # # v.ylim = [0, 50]
     # # v.run(show_=1, fig=None)
-    v = PlotDensityProcess(path1)
-    v.get_x_y('x', 'emit')
+    v = PlotDensityLevel(path1, "x", 1)
+    v.get_x_y()
     v.run(show_=1, fig=None)

@@ -12,44 +12,52 @@ class MultiParticle():
     """
     多粒子模拟
     """
-    def __init__(self, project_path):  # *arg **kwargs #dllpath写死
-        self.project_path = project_path
+    def __init__(self, item):  # *arg **kwargs #dllpath写死
+        self.project_path = item["project_path"]
+        self.input_file = item.get("input_file")
+        self.output_file = item.get("output_file")
+        self.field_file = item.get("field_file")
+        self.errorlog_path = item.get("errorlog_path")
+        self.multiparticle_engine = item.get("mulp_engine")
 
+        if self.input_file is None:
+            self.input_file = os.path.join(self.project_path, "InputFile")
+        if self.output_file is None:
+            self.output_file = os.path.join(self.project_path, "OutputFile")
 
+        if self.field_file == None:
+            self.field_file = self.input_file
 
-    def run(self, input_file='InputFile', output_file='OutputFile', field_file = None):
-        errorlog = os.path.join(self.project_path, output_file, "ErrorLog.txt")
-        if os.path.exists(errorlog):
-            os.remove(errorlog)
+        if self.errorlog_path is None:
+            self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
 
+        if self.multiparticle_engine is None:
+            self.multiparticle_engine = MultiParticleEngine()
 
-        inputfilepath = os.path.join(self.project_path, input_file)
-        outputfilePath = os.path.join(self.project_path, output_file)
+    def run(self):
 
-        if field_file == None:
-            fielfilepath = os.path.join(self.project_path, input_file)
-        else:
-            fielfilepath = field_file
-
-        self.multiparticle_engine = MultiParticleEngine()
-
-
-        res_tmp = self.multiparticle_engine.get_path(inputfilepath, outputfilePath, fielfilepath)
-
-
+        if os.path.exists(self.errorlog_path):
+            os.remove(self.errorlog_path)
+        print(41, self.field_file)
+        res_tmp = self.multiparticle_engine.get_path(self.input_file, self.output_file, self.field_file)
 
         res = self.multiparticle_engine.main_agent(1)
         if res == 1:
-            raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
+            # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
 
-            # raise Exception(f'{error}')
-            # error = self.check_error_file(errorlog)
-            # raise Exception(f'{error}')
+            error = self.check_error_file(self.errorlog_path)
+            raise Exception(f'{error}')
         elif res == 2:
-            raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
-            # error = self.check_error_file(errorlog)
-            # raise Exception(f'{error}')
+            # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
+            error = self.check_error_file(self.errorlog_path)
+            raise Exception(f'{error}')
         return res
+        return error_parts
+
+    def stop(self):
+        res = self.multiparticle_engine.main_agent(2)
+        print("停止", res)
+
 
     def check_error_file(self, ErrorLog):
         with open(ErrorLog, 'r') as file:
@@ -57,11 +65,9 @@ class MultiParticle():
 
         # error_parts = re.findall(r'[A-Za-z\s:,.]+', text)[3]
         error_parts = text.split('     ')[1]
-        print(42, error_parts)
         return error_parts
 
-    def stop(self):
-        self.multiparticle_engine.stop_function()
+
 
 
 
@@ -73,10 +79,13 @@ def basic_mulp(project_path):
 
 if __name__ == "__main__":
     start = time.time()
-    project_path = r"D:\using\test_avas_qt\cafe_avas3"
+    project_path = r"C:\Users\shliu\Desktop\testex2"
+    item = {
 
+        "project_path": project_path
+    }
 
-    obj = MultiParticle(project_path)
+    obj = MultiParticle(item)
     obj.run()
 
     end = time.time()

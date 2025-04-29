@@ -4,6 +4,8 @@ import numpy
 import numpy as np
 import os
 from utils.exception import CustomFileNotFoundError
+import re
+import global_varible
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
@@ -36,6 +38,7 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
                 line = line.strip()
                 input_lines.append(line)
 
+    input_lines = [re.sub(":" ," : ", i) for i in input_lines]
     input_lines = [i.split() for i in input_lines if i.strip()]
 
     if not case_sensitive:
@@ -75,12 +78,40 @@ def read_lattice_mulp(lattice_mulp_path):
             break
     return new_lattice_list
 
-def read_lattice_with_name(lattice_mulp_path):
-    res = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
-    # for i in res:
-    #     print(i)
+def read_lattice_mulp_with_name(lattice_mulp_path):
+    ini_lattice = read_txt(lattice_mulp_path, out='list', readdall=None, case_sensitive=True)
+
+    #为原件添加名字，如没有名字，则添加自定义名字
+    for i in ini_lattice:
+        if i[0].lower() in global_varible.all_element:
+            if ":" not in i:
+                i.insert(0, "no_name")
+                i.insert(1, ":")
 
 
+    #构建命令列表和名字列表
+    lattice_list = []
+    name_list = []
+    for i in ini_lattice:
+        if ":" in i:
+            lattice_list.append(i[2:])
+            name_list.append(i[0])
+        elif ":" not in i:
+            lattice_list.append(i)
+            name_list.append(None)
+
+    #将大写变为小写
+    new_lattice_list = []
+    for i in lattice_list:
+        i[0] = i[0].lower()
+        if i[0] == 'bend':
+            i[1] = np.abs(float(i[4])/180 * np.pi * float(i[5]))
+
+        new_lattice_list.append(i)
+        if i[0] == "end":
+            break
+    new_name_list = name_list[:len(new_lattice_list)]
+    return new_lattice_list, new_name_list
 
 
 def read_dst(input):
@@ -182,5 +213,5 @@ if __name__ == "__main__":
     # res = read_lattice_mulp(path)
     # for i in res:
     #     print(i)
-    res = read_lattice_with_name(path)
+    res = read_lattice_mulp_with_name(path)
     print(res)

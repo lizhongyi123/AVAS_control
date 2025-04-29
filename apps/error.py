@@ -13,7 +13,7 @@ import numpy as np
 from dataprovision.latticeparameter import LatticeParameter
 from dataprovision.datasetparameter import DatasetParameter
 
-from utils.readfile import read_txt, read_lattice_mulp
+from utils.readfile import read_txt, read_lattice_mulp, read_lattice_mulp_with_name
 from utils.treatlist import flatten_list, list_one_two
 from utils.treatfile import copy_file, split_file
 from utils.tool import write_to_txt, calculate_mean, calculate_rms, add_to_txt
@@ -28,17 +28,26 @@ import multiprocessing
 import global_varible
 import copy
 
-from utils.tolattice import write_mulp_to_lattice_only_sim
-from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
+from utils.tolattice import write_mulp_to_lattice_only_sim, write_mulp_to_lattice_only_sim2
+
 from apps.err_adjust import Adjust_Error
 from utils.exception import MissingcommandError
+from utils.tool import judge_command_on_element, add_element_end_index, delete_element_end_index
+from apps.diaginfo import DiagInfo
 
+from aftertreat.dataanalysis.extodensity import ExtoDensity, MergeDensityData
 class Error():
     """
     该类为误差分析
     """
-    def __init__(self, project_path, seed=50, if_normal=0, field_path=None,
-                 if_generate_density_file=0):
+    def __init__(self, item):
+
+        project_path = item.get("project_path")
+        seed = item.get("seed")
+        if_normal = item.get("if_normal")
+        field_path = item.get("field_path")
+        if_generate_density_file = item.get("if_generate_density_file")
+        self.item = item
 
         random.seed(seed)
 
@@ -63,13 +72,7 @@ class Error():
 
         self.loss = []
         self.opti_res = []
-        self.error_elemment_command = global_varible.error_elemment_command
-        self.error_elemment_stat = global_varible.error_elemment_command_stat
-        self.error_elemment_dyn = global_varible.error_elemment_command_dyn
 
-        self.error_beam_command = global_varible.error_beam_command
-        self.error_beam_stat = global_varible.error_beam_stat
-        self.error_beam_dyn = global_varible.error_beam_dyn
 
         self.all_group = 1
         self.all_time = 1
@@ -116,7 +119,7 @@ class Error():
     def delete_element_end_index(self, error_lattice):
         error_lattice_copy = copy.deepcopy(error_lattice)
         for i in error_lattice_copy:
-            if i[0] in global_varible.long_element:
+            if i[0] in global_varible.all_element:
                 i.pop()
         return error_lattice_copy
 
@@ -127,7 +130,7 @@ class Error():
         """
 
 
-        input_lines = read_lattice_mulp(self.lattice_mulp_path)
+        input_lines, _  = read_lattice_mulp_with_name(self.lattice_mulp_path)
 
         for i in input_lines:
             if i[0] == 'err_step':
@@ -164,7 +167,7 @@ class Error():
                     self.err_quad_dyn_on[j-1] = int(i[j])
 
             elif i[0] == 'err_cav_dyn_on':
-                print(167)
+
                 for j in range(1, len(i)):
                     self.err_cav_dyn_on[j-1] = int(i[j])
 
@@ -205,7 +208,7 @@ class Error():
                     return self.increase_error(res)
 
 
-            elif input_lines[i][0] in global_varible.long_element and N > 0:
+            elif input_lines[i][0] in global_varible.mulpud_element and N > 0:
                 # 在叠加场添加磁场原件误差
                 if input_lines[i][0] == 'field' and input_lines[i][4] == '3':
                     if command[0] in (
@@ -225,30 +228,13 @@ class Error():
         else:
             return 1 + max(self.get_dimension(item) for item in lst)
 
-    def judge_command_on_element(self, lattice, command):
-        #返回一个命令对应的是哪个元件
-        lattice = copy.deepcopy(lattice)
-
-        command_index = lattice.index(command)
-        command_on_element = None
-        for i in range(command_index, len(lattice)):
-            if lattice[i][0] in global_varible.long_element:
-                command_on_element = int(lattice[i][-1].split("_")[1])
-                break
-        return command_on_element
 
     def set_error_to_lattice(self, lattice):
         # for i in lattice:
         #     print(i)
         lattice = copy.deepcopy(lattice)
 
-        index = 0
-        #为元件增加编号
-        for i in lattice:
-            if i[0] in global_varible.long_element:
-                add_name = f'element_{index}'
-                i.append(add_name)
-                index += 1
+        lattice = add_element_end_index(lattice)
 
 
         #为每个误差命令添加一个编号
@@ -271,7 +257,7 @@ class Error():
             #作用元件数量
             N = int(lattice[err_index][1])
             #判断误差命令在哪个元件上
-            command_on_element = self.judge_command_on_element(lattice, i)
+            command_on_element = judge_command_on_element(lattice, i)
             if command_on_element is not None:
                 err_command_action_scope.append(list(range(command_on_element, command_on_element + N)))
             else:
@@ -283,8 +269,7 @@ class Error():
 
         #根据命令和作用域向lattice插入
         for i in range(len(err_command)):
-            if err_command[i][0] in ['err_quad_ncpl_stat', 'err_quad_cpl_stat',
-                                      'err_quad_ncpl_dyn', 'err_quad_cpl_dyn', ]:
+            if err_command[i][0] in global_varible.error_elemment_command_quad:
 
                 for j in lattice:
                     if j[0] == 'field' and int(float(j[4])) == 3:
@@ -294,9 +279,7 @@ class Error():
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
                             j.insert(-1, err_command[i])
 
-            elif err_command[i][0] in ['err_cav_ncpl_stat', 'err_cav_cpl_stat',
-                                      'err_cav_ncpl_dyn', 'err_cav_cpl_dyn', ]:
-
+            elif err_command[i][0] in global_varible.error_elemment_command_cav:
                 for j in lattice:
                     if j[0] == 'field' and int(float(j[4])) == 1:
                         if int(j[-1].split("_")[-1]) in err_command_action_scope[i]:
@@ -309,7 +292,7 @@ class Error():
 
     def generate_lattice_mulp_list(self, group):
 
-        input_lines = read_lattice_mulp(self.lattice_mulp_path)
+        input_lines, _ = read_lattice_mulp_with_name(self.lattice_mulp_path)
 
         #为cpl生成误差，如果是cpl，直接生成对应的误差
         input_lines_copy = self.generate_error(input_lines, group, 'cpl')
@@ -332,7 +315,7 @@ class Error():
             'err_cav_stat': ['err_cav_ncpl_stat', 'err_cav_cpl_stat'],
             'err_cav_dyn': ['err_cav_ncpl_dyn', 'err_cav_cpl_dyn']
         }
-
+        #为每个误差添加唯一的误差，动态和静态，防止出现动态和静态同时存在
         for i in lattice:
             if self.get_dimension(i) == 1:
                 res_treat.append(i)
@@ -389,6 +372,11 @@ class Error():
                     k1 = copy.deepcopy(k)
                     res_treat.append(k1)
 
+        # for i in res_treat:
+        #     print(i)
+        # breakpoint()
+
+        #删除误差后面的编号
         for i in res_treat:
             if i[0] in global_varible.error_elemment_command:
                 i.pop()
@@ -397,6 +385,7 @@ class Error():
         #对ncpl误差进行生成
         res_treat = self.generate_error(res_treat, group, 'ncpl')
 
+        #将所有的cpl变成ncpl
         for i in res_treat:
             if i[0] == "err_cav_cpl_dyn":
                 i[0] = "err_cav_ncpl_dyn"
@@ -410,19 +399,24 @@ class Error():
             elif i[0] == "err_quad_cpl_stat":
                 i[0] = "err_quad_ncpl_stat"
 
+        #规定每个误差命令只作用于一个原件
         for i in res_treat:
             if i[0] in global_varible.error_elemment_command:
                 i[1] = 1
 
         # for i in res_treat:
         #     print(i)
-        index = 0
-        for i in res_treat:
-            if i[0] in global_varible.long_element:
-                add_name = f'element_{index}'
-                i.append(add_name)
-                index += 1
 
+        # index = 0
+        # for i in res_treat:
+        #     if i[0] in global_varible.all_element:
+        #         add_name = f'element_{index}'
+        #         i.append(add_name)
+        #         index += 1
+        res_treat = add_element_end_index(res_treat)
+        # for i in res_treat:
+        #     print(i)
+        # breakpoint()
         self.lattice_mulp_list = res_treat
         # for i in self.lattice_mulp_list:
         #     print(i)
@@ -475,7 +469,7 @@ class Error():
                     target[i] = dx * (group)
                 target[2] = 0
 
-        if input[0] in self.error_beam_command:
+        if input[0] in global_varible.error_beam_command:
             for i in range(2, len(input)):
                 input[i] = float(input[i])
             input = input + [0] * (15 - len(input))
@@ -547,6 +541,7 @@ class Error():
 
         input_lines = copy.deepcopy(input_lines)
 
+        #产生ncpl的误差
         if kind == 'ncpl':
             for i in range(len(input_lines)):
                 if len(input_lines[i]) == 0:
@@ -556,10 +551,11 @@ class Error():
                     input_lines[i] = ['err_step', '1', '1']
 
 
-                elif input_lines[i][0] in self.error_elemment_command or \
-                        input_lines[i][0] in self.error_beam_command:
+                elif input_lines[i][0] in global_varible.error_elemment_command_ncpl or \
+                        input_lines[i][0] in global_varible.error_beam_command:
                     input_lines[i] = self.generate_error_base(input_lines[i], group)
 
+        #产生cpl的误差
         elif kind == 'cpl':
             for i in range(len(input_lines)):
                 if len(input_lines[i]) == 0:
@@ -573,18 +569,24 @@ class Error():
 
 
     def run_multiparticle(self, p_path, out_putfile_):
-        multiparticle_obj = MultiParticle(p_path)
+        item = {
+            "project_path": p_path,
+            "output_file": os.path.join(p_path, out_putfile_),
+            "field_file": self.field_path,
+            "errorlog_path": os.path.join(p_path, r'OutputFile/error_middle/output_0/ErrorLog.txt'),
+        }
+        multiparticle_obj = MultiParticle(item)
 
-        res = multiparticle_obj.run(output_file=out_putfile_, field_file=self.field_path)
-
+        res = multiparticle_obj.run()
+        return res
 
     def run_normal(self):
         #模拟没有误差的情况
-        write_mulp_to_lattice_only_sim(self.lattice_mulp_path, self.lattice_path)
+        write_mulp_to_lattice_only_sim2(self.lattice_mulp_path, self.lattice_path)
 
         ouput = os.path.normpath(os.path.join(self.project_path, 'OutputFile/error_middle/output_0'))
         os.mkdir(ouput)
-
+        print(589)
         # process = multiprocessing.Process(target=self.run_multiparticle,
         #                                   args=(self.project_path, 'OutputFile/error_middle/output_0'))
         #
@@ -592,7 +594,7 @@ class Error():
         # process.join()  # 等待子进程运行结束
 
         self.run_multiparticle(self.project_path, 'OutputFile/error_middle/output_0')
-
+        print(597)
         self.write_density_every_time(0, 0)
 
         copy_file(self.lattice_path, self.normal_out_path)
@@ -789,7 +791,7 @@ class Error():
             add_to_txt(self.errors_par_path, [t1_lis])
 
         elif time == self.all_time:
-            errors_par_tot_list = read_lattice_mulp(self.errors_par_tot_path)
+            errors_par_tot_list = read_txt(self.errors_par_tot_path, out="list")
 
             t_lis = [j for j in errors_par_tot_list[1:] if int(j[0].split("_")[0]) == group]
 
@@ -849,27 +851,34 @@ class Error():
         if group == 0:
             is_normal = 1
 
-        beamset_path = os.path.join(self.error_middle_output0_path, "BeamSet.plt")
-        # if not os.path.exists(beamset_path):
-        #     return 0
+        exdata_path = os.path.join(self.error_middle_output0_path, "ExData.edt")
+
 
         dataset_path = os.path.join(self.error_middle_output0_path, "DataSet.txt")
         target_density_path = os.path.join(self.output_path,  f"density_par_{group}_{time}.dat")
         # print(dataset_path)
         # sys.exit()
+
+        # if is_normal == 1:
+        #     density_obj = PlttoDensity(beamset_path,  dataset_path, target_density_path)
+        #     density_obj.generate_density_file_onestep(is_normal)
+        #
+        # elif is_normal == 0:
+        #     #如果不是正常模拟
+        #     normal_density_path = os.path.join(self.output_path,  f"density_par_{0}_{0}.dat")
+        #     density_obj = PlttoDensity(beamset_path, dataset_path, target_density_path, normal_density_path, self.project_path)
+        #     density_obj.generate_density_file_onestep(is_normal)
+
         if is_normal == 1:
-            # print(dataset_path)
-            # print(target_density_path)
-            density_obj = PlttoDensity(beamset_path,  dataset_path, target_density_path)
+            density_obj = ExtoDensity(exdata_path,  dataset_path, target_density_path)
             density_obj.generate_density_file_onestep(is_normal)
 
         elif is_normal == 0:
-            #如果不是正常模拟
             normal_density_path = os.path.join(self.output_path,  f"density_par_{0}_{0}.dat")
-            density_obj = PlttoDensity(beamset_path, dataset_path, target_density_path, normal_density_path, self.project_path)
+            density_obj = ExtoDensity(exdata_path, dataset_path, target_density_path, normal_density_path, self.project_path)
             density_obj.generate_density_file_onestep(is_normal)
 
-        os.remove(beamset_path)
+        os.remove(exdata_path)
 
         if time == self.all_time:
             #到了某一组的最后一次模拟
@@ -895,25 +904,20 @@ class Error():
 
         err_datas_path = os.path.join(self.output_path, f"Error_Datas_{group}_{time}.txt")
         lattice_path = self.lattice_path
-        input = read_lattice_mulp(lattice_path)
+        input,_ = read_lattice_mulp_with_name(lattice_path)
         # print(input)
         # 为每个元件加编号
-        index = 0
-        for i in input:
-            if i[0] in global_varible.long_element:
-                add_name = f'element_{index}'
-                i.append(add_name)
-                index += 1
 
+        input = add_element_end_index(input)
         res = []
         for i in range(len(input)):
-            if input[i][0] == global_varible.error_elemment_command_dyn[1]:
+            if input[i][0] == global_varible.error_elemment_command_dyn_ncpl[1]:
                 #quad
                 index = input[i+1][-1].split('_')[-1]
                 err_name = f"CAV_ERROR[{index}]"
                 t_lis = [err_name] + input[i][3:]
                 res.append(t_lis)
-            elif input[i][0] == global_varible.error_elemment_command_dyn[0]:
+            elif input[i][0] == global_varible.error_elemment_command_dyn_ncpl[0]:
                 # quad
                 index = input[i + 1][-1].split('_')[-1]
                 err_name = f"QUAD_ERROR[{index}]"
@@ -950,8 +954,8 @@ class Error():
             raise Exception("Missing error on command")
 
 class ErrorDyn(Error):
-    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
+    def __init__(self, item):
+        super().__init__(item)
 
 
     def run_one_time(self, group, time, lattice_mulp_list):
@@ -969,7 +973,8 @@ class ErrorDyn(Error):
 
         for i in error_lattice:
             # 静态误差注释掉
-            if i[0] in self.error_elemment_stat or i[0] in self.error_beam_stat:
+            if (i[0] in global_varible.error_elemment_command_stat_ncpl or
+                    i[0] in global_varible.error_beam_stat):
                 i[0] = "!" + i[0]
 
             # 开关 静态误差注释掉
@@ -994,7 +999,7 @@ class ErrorDyn(Error):
         #
         # process.start()  # 启动子进程
         # process.join()  # 等待子进程运行结束
-        self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
+        res = self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
 
         self.write_density_every_time(group, time)
 
@@ -1022,6 +1027,7 @@ class ErrorDyn(Error):
 
         if self.if_normal == 1:
             self.run_normal()
+            print(1030)
             self.write_err_par_every_time(0,0)
 
 
@@ -1031,12 +1037,24 @@ class ErrorDyn(Error):
                 print(i, j)
                 lattice_mulp_list = self.generate_lattice_mulp_list(i)
                 self.run_one_time(i, j, lattice_mulp_list)
-                self.write_err_datas(i, j)
-                self.write_err_par_every_time(i, j)
+                self.write_err_datas(i, j)  #误差数据
+                self.write_err_par_every_time(i, j)  #par_tot
+
+                # 将束诊参数写入到文件
+                group = i
+                time = j
+                item = {
+                    "project_path": self.project_path,
+                    "input_file": self.input_path,
+                    "output_file": os.path.join(self.output_path, "error_output", f"output_{group}_{time}"),
+                    "diag_file_path": os.path.join(self.output_path, f"par_diag_datas_{group}_{time}.txt"),
+                }
+                obj = DiagInfo(item)
+                obj.write_diag_info_to_file()
 
 class Errorstat(Error):
-    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
+    def __init__(self, item):
+        super().__init__(item)
         self.all_error_lattice = []
         # 只优化
         # self.only_adjust_sign = 0
@@ -1073,7 +1091,8 @@ class Errorstat(Error):
 
         #动态误差全部注释掉，把静态误差变为动态误差
         for i in error_lattice:
-            if i[0] in self.error_elemment_dyn or i[0] in self.error_beam_dyn:
+            if (i[0] in global_varible.error_elemment_command_dyn_ncpl or
+                    i[0] in global_varible.error_beam_dyn):
                 i[0] = "!" + i[0]
             # 如果是静态误差，变成动态误差
             elif i[0] == 'err_beam_stat':
@@ -1150,23 +1169,6 @@ class Errorstat(Error):
         return opti_res_this_dict, diag_res_this
 
 
-    def write_diag_datas(self, diag_every):
-        k = list(diag_every.keys())[0]
-        v = list(diag_every.values())[0]
-
-        diag_datas_path = os.path.join(self.output_path, f"Diag_Datas_{k}.txt")
-        diag_lis = []
-        for index, i in enumerate(v):
-            v = [round(j, 3) for j in i]
-
-            t_lis = [f"diag_command_{index}" + "\n",
-                    f"postion  {v[0]}" + "\n",
-                      f"center  {v[1]}  {v[2]}" + "\n",
-                      f"rms_size {v[3]} {v[4]}" + "\n",
-                      f"energy {v[5]}" + "\n",
-            ]
-            diag_lis.append(t_lis)
-        write_to_txt(diag_datas_path, diag_lis)
 
     def write_adjust_datas(self, group, time, opti_res_this):
         adjust_datas_path = os.path.join(self.output_path, f"Adjust_Datas_{group}_{time}.txt")
@@ -1182,7 +1184,7 @@ class Errorstat(Error):
         write_to_txt(adjust_datas_path, res)
     def judge_opti(self,):
         "判断是否需要优化"
-        lattice_mulp_list = read_lattice_mulp(self.lattice_mulp_path )
+        lattice_mulp_list, _ = read_lattice_mulp_with_name(self.lattice_mulp_path )
         all_adjust_N = []
         all_diag_N = []
         for i in lattice_mulp_list:
@@ -1216,7 +1218,8 @@ class Errorstat(Error):
             for i in range(1, self.all_group+1):
                 for j in range(1, self.all_time + 1):
                     lattice_mulp_list = self.generate_lattice_mulp_list(i)
-                    opti_res_this, diag_res = self.run_one_time_opti(i, j, lattice_mulp_list)
+                    opti_res_this, loss_this = self.run_one_time_opti(i, j, lattice_mulp_list)
+                    print(opti_res_this, loss_this)
                     # opti_res_this = {'1_8': 0.4933612120807681, '1_7': 0.7579544029403025,
                     #                  '5_8': 0.7614636313839422, '5_7': 0.25891675029296335}
                     #
@@ -1231,7 +1234,15 @@ class Errorstat(Error):
                     # 将优化参数写入到文件
                     self.write_adjust_datas(group, time,  opti_res_this)
                     # 将束诊参数写入到文件
-                    self.write_diag_datas(diag_res)
+                    item = {
+                        "project_path": self.project_path,
+                        "input_file": self.input_path,
+                        "output_file": os.path.join(self.output_path, "error_output", f"output_{group}_{time}"),
+                        "diag_file_path": os.path.join(self.output_path, f"par_diag_datas_{group}_{time}.txt"),
+                    }
+                    obj = DiagInfo(item)
+                    obj.write_diag_info_to_file()
+
 
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
@@ -1246,10 +1257,23 @@ class Errorstat(Error):
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
+                    group = i
+                    time = j
+                    item = {
+                        "project_path": self.project_path,
+                        "input_file": self.input_path,
+                        "output_file": os.path.join(self.output_path, "error_output", f"output_{group}_{time}"),
+                        "diag_file_path": os.path.join(self.output_path, f"par_diag_datas_{group}_{time}.txt"),
+                    }
+                    obj = DiagInfo(item)
+                    obj.write_diag_info_to_file()
+
+
+
 
 class Errorstatdyn(Errorstat):
-    def __init__(self, project_path, seed, if_normal, field_path, if_generate_density_file):
-        super().__init__(project_path, seed, if_normal, field_path, if_generate_density_file)
+    def __init__(self, item):
+        super().__init__(item)
         self.err_type = 'stat_dyn'
 
 
@@ -1281,31 +1305,31 @@ class Errorstatdyn(Errorstat):
         tmp_err_beam_dyn = []
         for i in range(len(error_lattice)):
             # 处理双误差情况
-            if error_lattice[i][0] in global_varible.long_element:
+            if error_lattice[i][0] in global_varible.mulpud_element:
                 #如果一个元件前面两个都是误差，那么一定一个是静态的，一个是动态的的
-                if error_lattice[i - 1][0] in global_varible.error_elemment_command and \
-                        error_lattice[i - 2][0] in global_varible.error_elemment_command:
+                if error_lattice[i - 1][0] in global_varible.error_elemment_command_ncpl and \
+                        error_lattice[i - 2][0] in global_varible.error_elemment_command_ncpl:
 
                     for j in range(3, len(error_lattice[i - 2])):
                         error_lattice[i - 2][j] += error_lattice[i - 1][j]
                     error_lattice[i - 1].insert(0, False)
 
                     #把静态的变成动态的
-                    if error_lattice[i - 2][0] == global_varible.error_elemment_command_stat[0]:
-                        error_lattice[i - 2][0] = global_varible.error_elemment_command_dyn[0]
+                    if error_lattice[i - 2][0] == global_varible.error_elemment_command_stat_ncpl[0]:
+                        error_lattice[i - 2][0] = global_varible.error_elemment_command_dyn_ncpl[0]
 
-                    elif error_lattice[i - 2][0] == global_varible.error_elemment_command_stat[1]:
-                        error_lattice[i - 2][0] = global_varible.error_elemment_command_dyn[1]
+                    elif error_lattice[i - 2][0] == global_varible.error_elemment_command_stat_ncpl[1]:
+                        error_lattice[i - 2][0] = global_varible.error_elemment_command_dyn_ncpl[1]
 
                     # print(error_lattice)
 
-                # 如果一个元件前面一个是误差，那么直接把动态变成静态
-                elif error_lattice[i - 1][0] in global_varible.error_elemment_command:
-                    if error_lattice[i - 1][0] == global_varible.error_elemment_command_stat[0]:
-                        error_lattice[i - 1][0] = global_varible.error_elemment_command_dyn[0]
+                # 如果一个元件前面一个是误差，那么直接把静态变成动态
+                elif error_lattice[i - 1][0] in global_varible.error_elemment_command_ncpl:
+                    if error_lattice[i - 1][0] == global_varible.error_elemment_command_stat_ncpl[0]:
+                        error_lattice[i - 1][0] = global_varible.error_elemment_command_dyn_ncpl[0]
 
-                    elif error_lattice[i - 1][0] == global_varible.error_elemment_command_stat[1]:
-                        error_lattice[i - 1][0] = global_varible.error_elemment_command_dyn[1]
+                    elif error_lattice[i - 1][0] == global_varible.error_elemment_command_stat_ncpl[1]:
+                        error_lattice[i - 1][0] = global_varible.error_elemment_command_dyn_ncpl[1]
 
             #把所有的on命令都准备删除
             elif error_lattice[i][0] in global_varible.error_elemment_dyn_on or \
@@ -1382,7 +1406,7 @@ class Errorstatdyn(Errorstat):
 
 
         # 去掉编号后缀
-        error_lattice = self.delete_element_end_index(error_lattice)
+        error_lattice = delete_element_end_index(error_lattice)
         error_lattice = [i for i in error_lattice if i[0] is not False]
 
         #############################
@@ -1448,15 +1472,15 @@ class Errorstatdyn(Errorstat):
 
                     lattice_mulp_list = self.generate_lattice_mulp_list(i)
                     self.all_error_lattice.append(lattice_mulp_list)
-
-                    opti_res_this, diag_res = self.run_one_time_opti(i, j, lattice_mulp_list)
+                    #只使用静态误差进行优化
+                    opti_res_this, loss_this = self.run_one_time_opti(i, j, lattice_mulp_list)
 
                     opti_res.append(opti_res_this)
 
                     # 将优化参数写入到文件
                     self.write_adjust_datas(i, j,  opti_res_this)
-                    # 将束诊参数写入到文件
-                    self.write_diag_datas(diag_res)
+
+
 
 
             #将优化的结果进行保存
@@ -1478,6 +1502,19 @@ class Errorstatdyn(Errorstat):
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
+                    group = i
+                    time = j
+
+                    # 将束诊参数写入到文件
+                    item = {
+                        "project_path": self.project_path,
+                        "input_file": self.input_path,
+                        "output_file": os.path.join(self.output_path, "error_output", f"output_{group}_{time}"),
+                        "diag_file_path": os.path.join(self.output_path, f"par_diag_datas_{group}_{time}.txt"),
+                    }
+                    obj = DiagInfo(item)
+                    obj.write_diag_info_to_file()
+
 
         # 第二种情况，不需要优化
         else:
@@ -1495,6 +1532,18 @@ class Errorstatdyn(Errorstat):
                     self.write_err_datas(i, j)
                     self.write_err_par_every_time(i, j)
 
+                    # 将束诊参数写入到文件
+                    group = i
+                    time = j
+                    item = {
+                        "project_path": self.project_path,
+                        "input_file": self.input_path,
+                        "output_file": os.path.join(self.output_path, "error_output", f"output_{group}_{time}"),
+                        "diag_file_path": os.path.join(self.output_path, f"par_diag_datas_{group}_{time}.txt"),
+                    }
+                    obj = DiagInfo(item)
+                    obj.write_diag_info_to_file()
+
 
 class OnlyAdjust(Errorstat):
     def __init__(self, project_path, seed):
@@ -1505,7 +1554,7 @@ class OnlyAdjust(Errorstat):
 
         # self.only_adjust_sign = 1
         self.err_type = 'only_adjust'
-        input_lines = read_lattice_mulp(self.lattice_mulp_path)
+        input_lines, _ = read_lattice_mulp_with_name(self.lattice_mulp_path)
         index = 0
         for i in input_lines:
             if i[0] in global_varible.long_element:
@@ -1548,17 +1597,21 @@ if __name__ == "__main__":
 
     #     os.mkdir(file)
 
-    field = r"E:\using\test_avas_qt\field"
-    path = r"C:\Users\shliu\Desktop\test_half\HLAF\half_avas"
+
+    path = r"C:\Users\shliu\Desktop\testex2"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
     #
-    obj = ErrorDyn(path,
-                   0, 1, field_path=None, if_generate_density_file=1)
-
-    # obj = Errorstatdyn(path,
-    #                0, 1, field_path= None)
+    # obj = Errorstat(path, 0, 1, field_path=None, if_generate_density_file=1)
+    item = {
+        "project_path": path,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    obj = ErrorDyn(item)
 
     obj.run()
 

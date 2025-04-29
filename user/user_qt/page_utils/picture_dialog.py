@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("Qt5Agg")
 from PyQt5.QtCore import pyqtSignal
-from utils.readfile import read_lattice_mulp
+from utils.readfile import read_lattice_mulp_with_name
 import os
 
 #最普通的，只有一张图片
@@ -436,7 +436,7 @@ class CavityVoltageDialog(QDialog):
 
     def get_feld(self):
         lattice_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
-        all_info = read_lattice_mulp(lattice_path)
+        all_info, _ = read_lattice_mulp_with_name(lattice_path)
 
         for i in all_info:
             if i[0] == 'field' and float(i[4]) == 1:

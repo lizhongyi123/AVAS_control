@@ -11,6 +11,7 @@ from utils.readfile import read_txt, read_dst
 from user.user_qt.user_defined import treat_err, treat_err2, gray240
 from utils.inputconfig import InputConfig
 from apis.qt_api.api import create_from_file_input_ini, write_to_file_input_ini
+from utils.tool import safe_to_float, safe_int, safe_str
 class PageInput(QWidget):
     input_signal = pyqtSignal(dict)
 
@@ -298,6 +299,33 @@ class PageInput(QWidget):
         group_box_dumpPeriodicity.setLayout(vbox_dumpPeriodicity)
         ###################################################
 
+        #density 控制
+
+        group_box_density_control = QGroupBox()
+
+        layout_density_control= QHBoxLayout()
+
+        #111
+        self.cb_generate_density = QCheckBox('Generate density file', self)
+        # self.cb_generate_density.setFixedWidth(70)
+        self.cb_generate_density.stateChanged.connect(self.cd_genenrate_density_file_change)
+
+        self.label_density_grid = QLabel('Denity grid')
+        self.label_density_grid.setMinimumWidth(70)
+
+        self.text_density_grid = QLineEdit("")
+        self.text_density_grid.setMinimumWidth(70)
+
+        layout_density_control.addWidget(self.cb_generate_density)
+        layout_density_control.addStretch(1)
+        layout_density_control.addWidget(self.label_density_grid)
+        layout_density_control.addWidget(self.text_density_grid)
+        layout_density_control.addStretch(1)
+        group_box_density_control.setLayout(layout_density_control)
+
+
+
+
 
 
         vertical_layout_main.addWidget(group_box_mulp_env)
@@ -309,6 +337,7 @@ class PageInput(QWidget):
         vertical_layout_main.addWidget(group_box_dumpPeriodicity)
         vertical_layout_main.addWidget(group_box_sc_use)
         vertical_layout_main.addWidget(group_box_field_source)
+        vertical_layout_main.addWidget(group_box_density_control)
 
         vertical_layout_main.addWidget(group_box_sc_step)
 
@@ -376,8 +405,6 @@ class PageInput(QWidget):
         item = {"projectPath": self.project_path}
         input_ini_res = create_from_file_input_ini(item)
 
-        if input_ini_res["code"] == -1:
-            raise Exception(input_ini_res['data']["msg"])
 
         input_ini_res = input_ini_res['data']["inputiniParams"]
 
@@ -385,30 +412,42 @@ class PageInput(QWidget):
         if input_ini_res.get('sim_type') == "mulp":
             self.cb_mulp.setChecked(True)
         elif input_ini_res.get('sim_type') == "env":
-                self.cb_env.setChecked(True)
+            self.cb_env.setChecked(True)
+
 
         if input_ini_res.get('scmethod') == "FFT":
             self.cb_fft.setChecked(True)
         elif input_ini_res.get('scmethod') == "SPICNIC":
-                self.cb_picnic.setChecked(True)
+            self.cb_picnic.setChecked(True)
 
 
-        self.scan_phase_num = int(input_ini_res.get('scanphase', 1))
+        self.scan_phase_num = safe_int(input_ini_res.get('scanphase'), 1)
         self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
 
-        self.sc_use_num = int(input_ini_res.get('spacecharge', 0))
+        self.sc_use_num = safe_int(input_ini_res.get('spacecharge'), 1)
         if self.sc_use_num == 0:
             self.sc_use_checkbox.setChecked(False)
         elif self.sc_use_num == 1:
             self.sc_use_checkbox.setChecked(True)
 
-        self.step_per_period_text.setText(str(input_ini_res.get('steppercycle', '100')))
+        self.step_per_period_text.setText(safe_str(input_ini_res.get('steppercycle'), "100"))
 
-        self.dumpPeriodicity_text.setText(str(input_ini_res.get('dumpperiodicity', '1')))
+        self.dumpPeriodicity_text.setText(safe_str(input_ini_res.get('dumpperiodicity'), "0"))
 
         # 对于包络模型的输入
-        self.text_field_source.setText(str(input_ini_res["fieldSource"]))
+        self.text_field_source.setText(safe_str(input_ini_res["fieldSource"]))
 
+
+        self.outputcontrol_start = safe_int(input_ini_res.get('outputcontrol_start'), 0)
+
+        if self.outputcontrol_start == 0:
+            self.outputcontrol_start = self.cb_generate_density.setChecked(False)
+        elif self.outputcontrol_start == 1:
+            self.outputcontrol_start = self.cb_generate_density.setChecked(True)
+
+        self.text_density_grid.setText(safe_str(input_ini_res["outputcontrol_grid"], "200"))
+
+        # 对于包络模型的输入
         if input_ini_res.get('spacechargelong') is not None:
             self.sc_step_text.setText(input_ini_res.get('spacechargelong'))
 
@@ -482,6 +521,8 @@ class PageInput(QWidget):
         if self.dumpPeriodicity_text.text():
             res["dumpperiodicity"] = int(self.dumpPeriodicity_text.text())
 
+        res["outputcontrol_start"] = self.outputcontrol_start
+        res["outputcontrol_grid"] = self.text_density_grid.text()
 
         res["fieldSource"] = self.text_field_source.text()
         if self.sc_step_text.text():
@@ -546,6 +587,12 @@ class PageInput(QWidget):
             self.sc_use_num = 1
         else:
             self.sc_use_num = 0
+
+    def cd_genenrate_density_file_change(self, state):
+        if state == Qt.Checked:
+            self.outputcontrol_start = 1
+        else:
+            self.outputcontrol_start = 0
 
     def scan_phase_selection(self, index):
         # 处理用户的选择
@@ -618,7 +665,7 @@ class PageInput(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'E:\using\test_avas_qt\test_ini')
+    main_window = PageInput(r'C:\Users\shliu\Desktop\test429')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

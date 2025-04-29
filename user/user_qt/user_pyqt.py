@@ -469,7 +469,7 @@ class MainWindow(QMainWindow):
             self.handle_error(str(e))
             return False
 
-        self.page_data.fill_parameter()
+        # self.page_data.fill_parameter()
 
 
         self.sim_thread = SimThread(self.project_path)

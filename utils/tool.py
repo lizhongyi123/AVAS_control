@@ -3,6 +3,7 @@ import copy
 import global_varible
 import os
 import uuid
+import numpy as np
 def write_to_txt(path, lis):
     with open(path, 'w') as f:
         for i in lis:
@@ -65,7 +66,7 @@ def judge_command_on_element(lattice, command):
     command_index = lattice.index(command)
     command_on_element = None
     for i in range(command_index, len(lattice)):
-        if lattice[i][0] in global_varible.long_element:
+        if lattice[i][0] in global_varible.all_element:
             command_on_element = int(lattice[i][-1].split("_")[1])
             break
     return command_on_element
@@ -73,19 +74,19 @@ def judge_command_on_element(lattice, command):
 def delete_element_end_index(error_lattice):
     error_lattice_copy = copy.deepcopy(error_lattice)
     for i in error_lattice_copy:
-        if i[0] in global_varible.long_element:
+        if i[0] in global_varible.all_element:
             i.pop()
     return error_lattice_copy
 
-def add_element_end_index(error_lattice):
-    error_lattice = copy.deepcopy(error_lattice)
+def add_element_end_index(lattice):
+    lattice = copy.deepcopy(lattice)
     index = 0
-    for i in error_lattice:
-        if i[0] in global_varible.long_element:
+    for i in lattice:
+        if i[0] in global_varible.all_element:
             add_name = f'element_{index}'
             i.append(add_name)
             index += 1
-    return error_lattice
+    return lattice
 
 
 #判断一个数能否转化成其他类型
@@ -103,7 +104,7 @@ def can_convert_to_othertype(s: str, target_type) -> bool:
     except ValueError:
         return False
 
-def convert_to_othertype(s: str, target_type) -> bool:
+def convert_to_othertype(s: str, target_type):
     if target_type == int:
         v1 = int(float(s))
     elif target_type == float:
@@ -112,13 +113,47 @@ def convert_to_othertype(s: str, target_type) -> bool:
         v1 = str(s)
     return v1
 
+def convert_to_othertype_dict(k , v, target_type) :
+    #对字典的类型进行转换
+    if v is None:
+        return None
+
+    else:
+        try:
+            if target_type == int:
+                v = int(float(v))
+            elif target_type == float:
+                v = float(v)
+            elif target_type == str:
+                v = str(v)
+            return v
+        except:
+            raise ValueError(f"Cannot {k} {v} to target type {target_type}")
+
+
+
+
 def safe_to_float(text, default=0.0):
     try:
         return float(text)
     except ValueError:
         return 0
 
+def safe_int(v, default=0):
+    try:
+        if v is None:
+            return default
+        return int(v)
+    except (ValueError, TypeError):
+        return default
 
+def safe_str(v, default=""):
+    try:
+        if v is None:
+            return default
+        return str(v)
+    except (ValueError, TypeError):
+        return default
 def get_list_interval(data, interval):
     #该函数是为了间隔获取数据，如果是一个一维列表，就直接操作，如果是多维列表，
     #就分别获取每个列表的间隔数据
@@ -151,6 +186,109 @@ def generate_web_picture_path(project_path):
     filename = f"{uuid.uuid4().hex}.png"
     save_path = os.path.join(picture_save_directory, filename)
     return save_path
+
+
+def trans_xp_xx1(item):
+    # freq= {
+    #     "BaseMassInMeV":,
+    #      "freq":,
+    #        "average_vz":
+    #         "part_dict"
+    # }
+    BaseMassInMeV = item["BaseMassInMeV"]
+    freq = item["freq"]
+    part_dict = item["part_dict"]
+    part_list = item["part_list"]
+    num = item["num"]
+
+    all_exist_v = []
+
+    #入口时，计算所有粒子的平均值
+    #出口，只计算还存在的粒子的平均值
+    for particle in part_list:
+        p2 = particle[1] ** 2 + particle[3] ** 2 + particle[5] ** 2
+        beta = math.sqrt(p2 / (1 + p2))
+        # gamma = 1 / math.sqrt(1 - beta ** 2)
+        v = beta* global_varible.c_light
+
+        # beta_z = math.sqrt(particle[5] ** 2 / (1 + particle[5] ** 2))
+        # v_z = beta_z * global_varible.c_light
+
+        all_exist_v.append(v)
+
+    average_v = np.mean(all_exist_v)
+    # print(len(all_exist_v))
+
+
+    all_part = []
+    #用于处理将x-p空间的数据转换成xx1空间
+    for particle in part_list:
+        # print(186, particle)
+
+        p2 = particle[1] ** 2 + particle[3] ** 2 + particle[5] ** 2
+        beta = math.sqrt(p2 / (1 + p2))
+        gamma = 1 / math.sqrt(1 - beta ** 2)
+        v = beta* global_varible.c_light
+
+        beta_z = math.sqrt(particle[5] ** 2 / (1 + particle[5] ** 2))
+        v_z = beta_z * global_varible.c_light
+
+        v_x = (particle[1] / particle[5]) * v_z
+        v_y = (particle[3] / particle[5]) * v_z
+
+        t = -(particle[4] / v_z)
+
+        x = (particle[0] + v_x * t) * 1000  # mm
+
+        xx = particle[1] / particle[5] * 1000
+        y = (particle[2] + v_y * t) * 1000
+        yy = particle[3] / particle[5] * 1000
+
+        # z = (part_dict['location'] + particle[4])* 1000
+        z = particle[4] * 1000
+
+        zz = (v - average_v) / average_v * 1000
+
+        phi = t * 2 * global_varible.Pi * freq / global_varible.Pi * 180  # 度
+
+        E = (gamma - 1) * BaseMassInMeV  # MeV
+
+        part_index = particle[7]
+        tlist = [x, xx, y, yy, z, zz, phi, E, 1, part_index]
+
+        # exist_part.append(tlist)
+
+        if num == -1:
+            if particle[6] == 0:
+                tlist = [0] * 8 + [0, particle[7]]
+
+        all_part.append(tlist)
+    return all_part
+
+def cal_twiss(item):
+    x = item["x"]
+    x1 = item["x1"]
+    coefficient = item["coefficient"]
+    gamma = item["gamma"]
+    beta = item["beta"]
+
+
+    average_x = np.mean(x)
+    average_x1 = np.mean(x1)
+    sigma_x = np.average([(i - average_x) ** 2 for i in x])
+    sigma_x1 = np.average([(i - average_x1) ** 2 for i in x1])
+
+    sigma_xx1 = np.average([(x[i] - average_x) * (x1[i] - average_x1) for i in range(len(x))])
+
+    epsilon_x = math.sqrt(sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)
+
+    beta_x = sigma_x / epsilon_x
+    alpha_x = -sigma_xx1 / epsilon_x
+    gamma_x = (1 + alpha_x ** 2) / beta_x
+
+    norm_epsilon_x = beta * gamma ** (coefficient) * epsilon_x
+
+    return alpha_x, beta_x, gamma_x, epsilon_x, norm_epsilon_x
 
 if __name__ == '__main__':
     # code = 1

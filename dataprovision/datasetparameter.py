@@ -2,13 +2,14 @@
 import sys
 import time
 
-from utils.readfile import read_dst, read_txt
+from utils.readfile import read_dst, read_txt, read_dst_fast
 import math
 
 from global_varible import Pi, c_light
 from dataprovision.latticeparameter import LatticeParameter
-
+from utils.getinfotools import get_mass_freq
 import random
+import numpy as np
 
 class DatasetParameter():
     """
@@ -24,18 +25,18 @@ class DatasetParameter():
         dataset_info = read_txt(self.dataset_path, out='list')
         if len(dataset_info) == 0:
             return False
-        index = 0
+        # index = 0
 
-        nan_in = False
-        for index0, i in enumerate(dataset_info):
-            if '-nan(ind)' in i or 'nan' in i:
-                nan_in = True
-                index = index0
-                break
-        if nan_in:
-            dataset_info = dataset_info[: index]
-        else:
-            pass
+        # nan_in = False
+        # for index0, i in enumerate(dataset_info):
+        #     if '-nan(ind)' in i or 'nan' in i:
+        #         nan_in = True
+        #         index = index0
+        #         break
+        # if nan_in:
+        #     dataset_info = dataset_info[: index]
+        # else:
+        #     pass
 
         self.num_of_particle = float(dataset_info[0][28])
 
@@ -145,18 +146,24 @@ class DatasetParameter():
         self.max_yy = [-1 * i[24] for i in dataset_info]
 
         self.ek = [i[0] for i in dataset_info]  ##MeV
+
         self.loss = [self.num_of_particle - i[28] for i in dataset_info]  ##
         self.number_exist = [i[28] for i in dataset_info]
 
         self.sync_pz = [i[34] for i in dataset_info]
-        self.v5 = [i[5] for i in dataset_info]
+
+
+        if self.project_path:
+            beam_info = get_mass_freq(self.project_path)
+            self.BaseMassInMeV = beam_info["particlerestmass"]
+            self.freq = beam_info["frequency"]
+            self.current = beam_info["current"]
+            self.current = np.array(self.number_exist) / self.num_of_particle * self.current
+
         if self.project_path:
             self.get_phi()
 
-        if nan_in:
-            return False
-        else:
-            return True
+        return True
 
     def get_lattice_end_index(self):
         lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
@@ -172,21 +179,9 @@ class DatasetParameter():
         print("end_index", end_index)
         return end_index
 
-    def get_mass_freq(self):
-        beam_txt = self.project_path + r'/InputFile/beam.txt'
-        res = read_txt(beam_txt)
-        if res.get('readparticledistribution') is None:
-            BaseMassInMeV = float(res.get('particlerestmass'))
-            freq = float(res.get('frequency'))
-        else:
-            dstfile = self.project_path + r'/InputFile' + r"/" + res.get('readparticledistribution')
-            dst_res = read_dst(dstfile)
-            BaseMassInMeV = float(dst_res.get('basemassinmev'))
-            freq = float(dst_res.get('freq'))
-        return BaseMassInMeV, freq
 
     def get_phi(self):
-        self.BaseMassInMeV, self.freq = self.get_mass_freq()
+
         beta = []
         self.phi = []
         self.phi_phi = []
@@ -208,10 +203,7 @@ if __name__ == "__main__":
     obj = DatasetParameter(path1)
     v = obj.get_parameter()
     z = obj.z
-    # for i in range(1000):
-    #     v = obj.get_parameter()
-    #     print(obj.z[-1])
-    #     time.sleep(2)
+
 
     import numpy as np
     # import time

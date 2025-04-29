@@ -1,4 +1,7 @@
 # -- coding: utf-8 --
+AVAS_control_path = r"D:\AVAS_CONTROL\AVAS_control"
+import sys
+sys.path.append(AVAS_control_path)
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
@@ -16,7 +19,7 @@ import os
 from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
-from utils.tolattice import write_mulp_to_lattice_only_sim
+from utils.tolattice import write_mulp_to_lattice_only_sim2
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
@@ -28,9 +31,12 @@ from apis.qt_api.judge_lattice import JudgeLattice
 from aftertreat.picture.plotphaseellipse import PlotPhaseEllipse
 from utils.tool import format_output, generate_web_picture_param, generate_web_picture_path
 import uuid
+from apps.diaginfo import DiagInfo
+from aftertreat.dataanalysis.extodensity import  ExtoDensity
+from utils.inputconfig import InputConfig
 #下列为功能函数
 #基础运行
-def basic_mulp(project_path, field_path = None):
+def basic_mulp(**item):
     """
     :param project_path:
     :return:
@@ -38,21 +44,50 @@ def basic_mulp(project_path, field_path = None):
     """
 
     # else:
-    multiparticle_obj = MultiParticle(project_path)
+    project_path = item.get('project_path')
+
+    multiparticle_obj = MultiParticle(item)
 
     lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
-    write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
+    write_mulp_to_lattice_only_sim2(lattice_mulp_path, lattice_path)
 
-    res = multiparticle_obj.run(field_file=field_path)
+    res = multiparticle_obj.run()
+
+    #生成束诊文件
+    diag_item = {
+        "project_path": project_path,
+        "input_file": os.path.join(project_path, 'InputFile'),
+        "output_file": os.path.join(project_path, 'OutputFile'),
+        "diag_file_path": os.path.join(project_path, 'OutputFile', 'par_diag1.txt'),
+    }
+    obj = DiagInfo(diag_item)
+    obj.write_diag_info_to_file()
+
+    #
+    item = { "projectPath": project_path,}
+    input_info = InputConfig()
+    input_info = input_info.create_from_file(item)
+    input_info = input_info["data"]["inputParams"]
+
+
+    if input_info.get("outputcontrol_start") == 1 and input_info.get("outputcontrol_grid") > 0:
+    #生成密度文件
+        exdata_path = os.path.join(project_path, "OutputFile", "ExData.edt")
+
+        dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
+        target_density_path = os.path.join(project_path, "OutputFile", f"density_par.dat")
+
+        density_obj = ExtoDensity(exdata_path, dataset_path, target_density_path)
+        density_obj.generate_density_file_onestep(1)
+
     print('模拟结束')
-
     return res
 
 #粒子数扩充
 def change_particle_number(infile_path, outfile_path, ratio):
-    """
 
+    """
     :param infile_path: 输入
     :param outfile_path: 输出
     :param ratio: 扩大的比例
@@ -88,37 +123,60 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
+def err_dyn(**item):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-
-    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = ErrorDyn(default_item)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
+def err_stat(**item):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = Errorstat(default_item)
     v.run()
     
 
-def err_stat_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file=1):
+def err_stat_dyn(**item):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = Errorstatdyn(default_item)
     v.run()
     return None
 
@@ -693,8 +751,10 @@ def judge_opti(res):
         return 0
 
 if __name__ == '__main__':
-    # path = r"D:\using\test_avas_qt\cafe_avas3"
-    # res = basic_mulp(path)
+
+    path = r"C:\Users\shliu\Desktop\11\hebt_avas"
+    item = {"project_path": path}
+    res = basic_mulp(**item)
 
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {
@@ -810,13 +870,13 @@ if __name__ == '__main__':
     # print(res)
     # "filePath": r"inData.dst",
     #"filePath": r"part_rfq.dst",
-    item = {
-        "filePath": r"inData.dst",
-        "platform": "web",
-        "projectPath": r"D:\using\test_avas_qt\cafe_avas",
-        "location": "out"
-    }
-
-
-    res = plot_phase(**item)
-    print(res)
+    # item = {
+    #     "filePath": r"inData.dst",
+    #     "platform": "web",
+    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas",
+    #     "location": "out"
+    # }
+    #
+    #
+    # res = plot_phase(**item)
+    # print(res)

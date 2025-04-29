@@ -4,20 +4,22 @@ from utils.exception import (TypeError, ValueRangeError, ValueChooseError, ListL
 from utils.tool import write_to_txt, convert_dic2lis
 import copy
 from utils.iniconfig import IniConfig
-from utils.tool import format_output
+from utils.tool import format_output ,convert_to_othertype_dict
 import os
 class InputConfig():
     def __init__(self):
         self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                                     "spacechargelong", "spacechargetype", "fieldSource", "device"]
+                                     "spacechargelong", "spacechargetype", "fieldSource", "device", "outputcontrol_start", "outputcontrol_grid"]
+
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                         "spacechargelong", "spacechargetype"]
+                         "spacechargelong", "spacechargetype", "outputcontrol_start", "outputcontrol_grid"]
 
         self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "spacechargelong": None, "spacechargetype": None}
+                                "spacechargelong": None, "spacechargetype": None, "outputcontrol_start":None, "outputcontrol_grid":None}
 
         self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",]
         self.env_keys = ["spacechargelong", "spacechargetype"]
+
     # def initialize_input(self):
     #     self.input_parameter = {'scmethod': None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
     #                             "maxthreads": None}
@@ -28,20 +30,32 @@ class InputConfig():
     def read_input_txt(self, path):
         #读取beam文件
         input_lis = read_txt(path, out='list', readdall=True, case_sensitive=True, )
-
+        new_input_lis = []
 
         for i in input_lis:
-            if len(i) == 1:
-                i.append(None)
-            if i[0] == "!sim_type":
-                i[0] = "sim_type"
+            # 确保不影响原始数据结构
+            item = i.copy()
+            if len(item) == 1:
+                item.append(None)
+            if item[0] == "!sim_type":
+                item[0] = "sim_type"
+            new_input_lis.append(item)
+
+            if item[0] == "outputcontrol":
+                item = item + (3-len(item)) * [None]
+                new_input_lis.append(["outputcontrol_start", item[1]])
+                new_input_lis.append(["outputcontrol_grid", item[2]])
+
 
         res = {}
-        for i in input_lis:
+        for i in new_input_lis:
             if len(i) == 2:
                 res[i[0]] = i[1]
             else:
                 res[i[0]] = i[1:]
+
+        if res.get("outputcontrol") is not None:
+            del res["outputcontrol"]
 
         return res
 
@@ -53,28 +67,45 @@ class InputConfig():
             path = other_path
 
         kwargs = {}
-        try:
-            original_dict = self.read_input_txt(path)
 
-            #验证是否存在未知元素
+        original_dict = self.read_input_txt(path)
+
+        # 验证是否存在未知元素
+        # for k, v in original_dict.items():
+        #     if k not in self.input_parameter_keys:
+        #         raise UnknownkeywordError(message=None, key=k)
+
+
+        # 如果不存在未知元素, 转换类型
+        for k, v in original_dict.items():
+            original_dict[k] = self.convert_v(k, v)
+
+        if self.validate_type(original_dict):
             for k, v in original_dict.items():
-                if k not in self.input_parameter_keys:
-                    raise UnknownkeywordError(message=None, key=k)
+                self.input_parameter[k] = original_dict[k]
 
-            #如果不存在未知元素, 转换类型
-            for k, v in original_dict.items():
-                original_dict[k] = self.convert_v(k, v)
-
-            if self.validate_type(original_dict):
-                for k, v in original_dict.items():
-                    self.input_parameter[k] = original_dict[k]
-
-        except Exception as e:
-            code = -1
-            msg = str(e)
-            kwargs.update({'inputParams': {}})
-            output = format_output(code, msg=msg, **kwargs)
-            return output
+        # try:
+        #     original_dict = self.read_input_txt(path)
+        #
+        #     #验证是否存在未知元素
+        #     for k, v in original_dict.items():
+        #         if k not in self.input_parameter_keys:
+        #             raise UnknownkeywordError(message=None, key=k)
+        #
+        #     #如果不存在未知元素, 转换类型
+        #     for k, v in original_dict.items():
+        #         original_dict[k] = self.convert_v(k, v)
+        #
+        #     if self.validate_type(original_dict):
+        #         for k, v in original_dict.items():
+        #             self.input_parameter[k] = original_dict[k]
+        #
+        # except Exception as e:
+        #     code = -1
+        #     msg = str(e)
+        #     kwargs.update({'inputParams': {}})
+        #     output = format_output(code, msg=msg, **kwargs)
+        #     return output
 
         # print("read", self.beam_parameter)
         kwargs.update({'inputParams': copy.deepcopy(self.input_parameter)})
@@ -86,17 +117,11 @@ class InputConfig():
             if v == '':
                 kwargs[k] = None
         kwargs1 = {}
-        try:
-            self.validate_type(kwargs)
-            for k, v in kwargs.items():
-                self.input_parameter[k] = v
 
-        except Exception as e:
-            code = -1
-            msg = str(e)
-            kwargs1.update({'inputParams': {}})
-            output = format_output(code, msg=msg, **kwargs1)
-            return output
+        self.validate_type(kwargs)
+        for k, v in kwargs.items():
+            self.input_parameter[k] = v
+
 
         kwargs1.update({'inputParams': copy.deepcopy(self.input_parameter)})
         output = format_output(**kwargs1)
@@ -110,35 +135,37 @@ class InputConfig():
             path = other_path
 
         kwargs = {}
-        try:
-            v_dic = {}
-            if self.input_parameter["sim_type"] == 'mulp':
-                v_dic = copy.deepcopy(self.input_parameter)
-                v_dic["!sim_type"] = v_dic["sim_type"]
 
-                del v_dic["spacechargelong"]
-                del v_dic["spacechargetype"]
-                del v_dic["sim_type"]
-            elif self.input_parameter["sim_type"] == 'env':
+        v_dic = {}
+        if self.input_parameter["sim_type"] == 'mulp':
+            v_dic = copy.deepcopy(self.input_parameter)
+            v_dic["!sim_type"] = v_dic["sim_type"]
 
-                v_dic["!sim_type"] = self.input_parameter["sim_type"]
-                v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
-                v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
+            del v_dic["spacechargelong"]
+            del v_dic["spacechargetype"]
+            del v_dic["sim_type"]
+        elif self.input_parameter["sim_type"] == 'env':
 
+            v_dic["!sim_type"] = self.input_parameter["sim_type"]
+            v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
+            v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
 
-            v_lis = convert_dic2lis(v_dic)
-            for index, i in enumerate(v_lis):
-                v_lis[index] = ["" if v is None else v for v in i]
-            #检查是否存在未None的情况
+        v_dic["outputcontrol"] = [v_dic["outputcontrol_start"], v_dic["outputcontrol_grid"]]
 
-            write_to_txt(path, v_lis)
+        del v_dic["outputcontrol_start"]
+        del v_dic["outputcontrol_grid"]
 
-        except Exception as e:
-            code = -1
-            msg = str(e)
-            kwargs.update({'inputParams': {}})
-            output = format_output(code, msg=msg, **kwargs)
-            return output
+        v_lis = convert_dic2lis(v_dic)
+
+        new_vlis = []
+        for index, i in enumerate(v_lis):
+            if None in i:
+                pass
+            else:
+                new_vlis.append(i)
+
+        write_to_txt(path, new_vlis)
+
 
         kwargs.update({'inputParams': copy.deepcopy(self.input_parameter)})
         output = format_output(**kwargs)
@@ -173,22 +200,16 @@ class InputConfig():
                 if not isinstance(v, int):
                     raise TypeError(k, int, type(v))
 
-            elif k not in self.input_parameter_keys:
-                raise UnknownkeywordError(k)
+            # elif k not in self.input_parameter_keys:
+            #     raise UnknownkeywordError(k)
 
         return True
 
 
 
     def convert_v(self, k, v):
-        if v is not None:
-            expected_type = None
-            try:
-                if k in self.int_keys:
-                    expected_type = int
-                    v = int(v)
-            except (ValueError, TypeError):
-                raise ValueConvertError(k, expected_type, v)
+        if k in self.int_keys:
+            v = convert_to_othertype_dict(k, v, int)
             return v
 
         else:
@@ -196,37 +217,43 @@ class InputConfig():
 
     def validate_run(self, item):
         res = self.create_from_file(item)
-        if res["code"] == -1:
-            raise Exception(res["data"]["msg"])
+
         input_params = res["data"]["inputParams"]
         #当所有输入符合
-        if input_params["sim_type"] == 'mulp':
-            for k in self.mulp_keys:
-                if input_params[k] is None:
-                    raise MisskeywordError(f"{k}")
-
-        elif input_params["sim_type"] == 'env':
-            for k in self.env_keys:
-                if input_params[k] is None:
-                    raise MisskeywordError(f"{k}")
+        # if input_params["sim_type"] == 'mulp':
+        #     for k in self.mulp_keys:
+        #         if input_params[k] is None:
+        #             raise MisskeywordError(f"{k}")
+        #
+        # elif input_params["sim_type"] == 'env':
+        #     for k in self.env_keys:
+        #         if input_params[k] is None:
+        #             raise MisskeywordError(f"{k}")
 
 if __name__ == "__main__":
     import json
 
-    path =r"C:\Users\shliu\Desktop\test1113\test4"
+    path = r"C:\Users\shliu\Desktop\test429"
     item = {"projectPath": path}
+
     obj = InputConfig()
     res = obj.create_from_file(item)
-    print(res)
+    set_param = {'boundary ': 0}
+    res = obj.set_param(**set_param)
+    obj.write_to_file(item)
 
-    v = {k: v if v else " " for k, v in res["data"]["inputParams"].items()}
-    print(1, v)
-    # print(res)
-    # for k, v in res["data"]["inputParams"].items():
-    #     if v:
-    #         print(v)
-    v = json.dumps(v)
-    print(2, v)
-    # set_param = {'scanphase': 2}
-    # obj.set_input(**set_param)
-    # obj.write_input()
+
+
+
+    # v = {k: v if v else " " for k, v in res["data"]["inputParams"].items()}
+    # print(1, v)
+    # # print(res)
+    # # for k, v in res["data"]["inputParams"].items():
+    # #     if v:
+    # #         print(v)
+    # v = json.dumps(v)
+    # print(2, v)
+    # set_param = {'scanphase': None}
+    # res = obj.set_param(**set_param)
+    # print(254, res)
+    # obj.write_to_file(item)

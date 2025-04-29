@@ -1,9 +1,10 @@
 ﻿import matplotlib.pyplot as plt
-from utils.readfile import read_txt, read_dst
+from utils.readfile import read_txt, read_dst, read_lattice_mulp_with_name
 from aftertreat.picture.initialplot import PicturelBar_2D, PicturePlot_2D
 import numpy as np
 from dataprovision.latticeparameter import LatticeParameter
 from dataprovision.datasetparameter import DatasetParameter
+from utils.readfile import read_lattice_mulp_with_name
 class PlotCavityVoltage(PicturelBar_2D):
     """
     腔压图
@@ -23,7 +24,7 @@ class PlotCavityVoltage(PicturelBar_2D):
 
     def get_x_y(self, ):
 
-        all_info = read_txt(self.lattice_mulp_path, out='list')
+        all_info, _ = read_lattice_mulp_with_name(self.lattice_mulp_path)
         x = []
         y = []
         index = 1
@@ -86,7 +87,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
 
         self.project_path = project_path
         self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
+        self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
         self.picture_type = picture_type
@@ -101,9 +102,12 @@ class PlotPhaseAdvance(PicturePlot_2D):
         dataset_obj = DatasetParameter(self.dataset_path)
         dataset_obj.get_parameter()
 
+        lattcie_mulp_list, lattice_mulp_name = read_lattice_mulp_with_name(self.lattice_mulp_path)
+        lattcie_mulp_list = [i for i in lattcie_mulp_list if not i[0].startswith("diag")]
 
-        lattice_obj = LatticeParameter(self.lattice_path)
-        lattice_obj.get_parameter()
+
+        lattice_obj = LatticeParameter()
+        lattice_obj.get_parameter(lattcie_mulp_list)
         v_start_end = lattice_obj.v_start_end
 
         z = dataset_obj.z ##
@@ -176,7 +180,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\eee"
-    obj = PlotCavitySynPhase(project_path)
+    project_path = r"C:\Users\shliu\Desktop\test_lattice"
+    obj = PlotPhaseAdvance(project_path, "meter" )
     obj.get_x_y()
     obj.run(show_=1, fig =None)

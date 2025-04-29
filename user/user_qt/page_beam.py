@@ -25,7 +25,7 @@ from user.user_qt.page_utils.phaseellipse_dialog import PhaseEllipseWidget
 gray240 = "rgb(240, 240, 240)"
 from apis.qt_api.api import cal_beam_parameter
 from apis.basic_api.api import plot_dataset
-from utils.tool import safe_to_float
+from utils.tool import safe_to_float, safe_int, safe_str
 
 class PageBeam(QWidget):
     def __init__(self, project_path):
@@ -545,11 +545,10 @@ class PageBeam(QWidget):
         beam_obj = BeamConfig()
         beam_res = beam_obj.create_from_file(item)
 
-        if beam_res["code"] == -1:
-            raise Exception(beam_res["data"]["msg"])
 
 
         beam_res = beam_res["data"]['beamParams']
+
         for k, v in beam_res.items():
             if v is not None:
                 beam_res[k] = str(v)
@@ -583,9 +582,9 @@ class PageBeam(QWidget):
 
         if beam_res.get("use_dst") is None:
             pass
-        elif int(beam_res.get("use_dst")) == 1:
+        elif safe_int(beam_res.get("use_dst")) == 1:
             self.cb_use_dst.setChecked(True)
-        elif int(beam_res.get("use_dst")) == 0:
+        elif safe_int(beam_res.get("use_dst")) == 0:
             self.cb_use_dst.setChecked(False)
 
             # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:

@@ -68,39 +68,44 @@ class SimMode():
             field_path = None
 
         obj = JudgeLattice(self.lattice_mulp_path)
+        item = {
+            "project_path": self.project_path,
+            "field_path": field_path,
+            "seed": err_seed
+        }
 
         if base_mode == "mulp":
             if err_mode == "stat":
                 obj.judge_lattice("stat_error")
-                err_stat(self.project_path, err_seed, if_normal=1, field_path=field_path)
+                err_stat(**item)
 
             elif err_mode == "dyn":
                 obj.judge_lattice("dyn_error")
-                err_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
+                err_dyn(**item)
 
             elif err_mode == "stat_dyn":
                 obj.judge_lattice("stat_dyn_error")
-                err_stat_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
+                err_stat_dyn(**item)
             else:
                 obj.judge_lattice("basic_mulp")
-                basic_mulp(self.project_path, field_path=field_path)
+                basic_mulp(**item)
 
-        elif base_mode == "env":
-            if ini_info['match']["cal_input_twiss"] == 1:
-                circle_match(self.project_path)
-            elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 0:
-                match_twiss(self.project_path, 0)
-            elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 1:
-                match_twiss(self.project_path, 1)
-            else:
-                basic_env(self.project_path)
+        # elif base_mode == "env":
+        #     if ini_info['match']["cal_input_twiss"] == 1:
+        #         circle_match(self.project_path)
+        #     elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 0:
+        #         match_twiss(self.project_path, 0)
+        #     elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 1:
+        #         match_twiss(self.project_path, 1)
+        #     else:
+        #         basic_env(self.project_path)
 
         output = format_output()
         return output
 
 
 if __name__ == '__main__':
-    path = r"C:\Users\shliu\Desktop\xiaochu"
+    path = r"C:\Users\shliu\Desktop\test_lattice"
     item = {"projectPath": path}
     obj = SimMode(item)
     obj.run()

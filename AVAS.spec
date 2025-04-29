@@ -7,6 +7,7 @@ block_cipher = None
 a = Analysis(
     [ 'main.py', 'api.py', 'global_varible.py',
 
+
 './aftertreat/picture/initialplot.py',
 './aftertreat/picture/plotacc.py',
 './aftertreat/picture/plotdataset.py',
@@ -19,6 +20,7 @@ a = Analysis(
 './aftertreat/picture/__init__.py',
 './aftertreat/dataanalysis/caltwiss.py',
 './aftertreat/dataanalysis/EAanalysis.py',
+'./aftertreat/dataanalysis/extodensity.py',
 './aftertreat/dataanalysis/out_percentemitt.py',
 './aftertreat/dataanalysis/percentemitt.py',
 './aftertreat/dataanalysis/plttodensity.py',
@@ -34,9 +36,9 @@ a = Analysis(
 './apps/calacceptance.py',
 './apps/changeNp.py',
 './apps/circlematch.py',
+'./apps/diaginfo.py',
 './apps/EA.py',
 './apps/error.py',
-'./apps/error_base_function.py',
 './apps/err_adjust.py',
 './apps/LongAccelerator.py',
 './apps/matchtwiss.py',
@@ -53,10 +55,12 @@ a = Analysis(
 './dataprovision/datasetparameter.py',
 './dataprovision/densityparameter.py',
 './dataprovision/env_beam_out.py',
+'./dataprovision/exdataparameter.py',
 './dataprovision/latticeparameter.py',
 './dataprovision/__init__.py',
 './otherdemand/listpackagefiles.py',
 './otherdemand/zhuanhuan.py',
+
 './user/user_qt/page_acc.py',
 './user/user_qt/page_analysis.py',
 './user/user_qt/page_beam.py',
@@ -70,6 +74,7 @@ a = Analysis(
 './user/user_qt/page_others.py',
 './user/user_qt/page_output.py',
 
+
 './user/user_qt/user_defined.py',
 './user/user_qt/user_pyqt.py',
 './user/user_qt/lattice_file/latticeideuseclass.py',
@@ -81,12 +86,12 @@ a = Analysis(
 './utils/change_win_to_linux.py',
 './utils/exception.py',
 './utils/getinfotools.py',
+'./utils/griddensity.py',
 './utils/iniconfig.py',
 './utils/initilaconfig.py',
 './utils/inputconfig.py',
 './utils/latticecheck.py',
 './utils/latticeconfig.py',
-'./utils/mathtools.py',
 './utils/myoptimize.py',
 './utils/readfile.py',
 './utils/tolattice.py',

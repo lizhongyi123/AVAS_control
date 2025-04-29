@@ -5,6 +5,7 @@ import math
 import numpy as np
 from dataprovision.beamparameter import DstParameter
 import matplotlib.pyplot as plt
+from utils.tool import cal_twiss
 class PercentEmit():
     """
     本类为计算发射度及百分比发射度
@@ -105,22 +106,16 @@ class PercentEmit():
 
     # 计算任意一个twiss参数和发射度
     def cal_twiss_emitt(self, x, x1, coefficient=1):
-        average_x = np.mean(x)
-        average_x1 = np.mean(x1)
-        sigma_x = np.average([(i - average_x) ** 2 for i in x])
-        sigma_x1 = np.average([(i - average_x1) ** 2 for i in x1])
+        item = {
+            "x": x,
+            "x1": x1,
+            "coefficient": coefficient,
+            "gamma": self.gamma,
+            "beta": self.beta,
+        }
+        res =cal_twiss(item)
+        return res
 
-        sigma_xx1 = np.average([(x[i] - average_x) * (x1[i] - average_x1) for i in range(len(x))])
-
-        epsilon_x = math.sqrt(sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)
-
-        beta_x = sigma_x / epsilon_x
-        alpha_x = -sigma_xx1 / epsilon_x
-        gamma_x = (1 + alpha_x ** 2) / beta_x
-
-        norm_epsilon_x = self.beta * self.gamma**(coefficient) * epsilon_x
-
-        return alpha_x, beta_x, gamma_x, epsilon_x, norm_epsilon_x
 
     def get_size(self, x, x1, alpha_x, beta_x, gamma_x):
         #计算全发射度
@@ -243,8 +238,8 @@ class PercentEmit():
 
 
 if __name__ == '__main__':
-    dst_path = r"C:\Users\shliu\Desktop\test422\result\part_dtl1.dst"
-    dst_path = r"C:\Users\shliu\Desktop\eee\result\part_rfq.dst"
+    dst_path = r"C:\Users\shliu\Desktop\test_changdu\OutputFile\inData.dst"
+    # dst_path = r"C:\Users\shliu\Desktop\xiaochu\OutputFile\inData.dst"
     # dst_path = r"C:\Users\shliu\Desktop\test42\part_rfq.dst"
 
     # dst_path = r"C:\Users\anxin\Desktop\tace_test\result\part_dtl1.dst"

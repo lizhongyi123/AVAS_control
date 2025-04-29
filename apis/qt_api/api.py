@@ -227,21 +227,21 @@ def create_from_file_input_ini(item):
 
     input_obj = InputConfig()
     input_res = input_obj.create_from_file(item)
-    if input_res["code"] == -1:
-        code = -1
-        msg = input_res["data"]["msg"]
-        kwargs.update({'inputiniParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
+    # if input_res["code"] == -1:
+    #     code = -1
+    #     msg = input_res["data"]["msg"]
+    #     kwargs.update({'inputiniParams': {}})
+    #     output = format_output(code, msg=msg, **kwargs)
+    #     return output
 
     ini_obj = IniConfig()
     ini_res = ini_obj.create_from_file(item)
-    if input_res["code"] == -1:
-        code = -1
-        msg = input_res["data"]["msg"]
-        kwargs.update({'inputiniParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
+    # if input_res["code"] == -1:
+    #     code = -1
+    #     msg = input_res["data"]["msg"]
+    #     kwargs.update({'inputiniParams': {}})
+    #     output = format_output(code, msg=msg, **kwargs)
+    #     return output
 
     new_dic = {}
     new_dic.update(input_res["data"]["inputParams"])
@@ -259,12 +259,13 @@ def write_to_file_input_ini(item, param):
     # item的格式{“projectPath”： “path”}
     # {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
     #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
-    #  'scmethod': 'SPICNIC', 'fieldSource': ''}
+    #  'scmethod': 'SPICNIC', 'fieldSource': '', "device": "", "outputcontrol_start": , "outputcontrol_grid": }
     kwargs = {}
     if param.get("fieldSource") == "thisProject":
         param["fieldSource"] = os.path.join(item["projectPath"], "InputFile", "field")
 
     input_param = copy.deepcopy(param)
+
 
     del input_param["fieldSource"]
     if input_param.get("device"):
@@ -493,14 +494,16 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"D:\using\test_avas_qt\cafe_avas4"
+    path = r"C:\Users\shliu\Desktop\test_changdu"
     item = {"projectPath": path}
-    # res = create_from_file_input_ini(item)
-    # print(res)
-    param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
-             'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'thisProject'}
-    # param = {'fieldSource': r'E:\\using\\test_avas_qt\\test_ini\\field'}
-    write_to_file_input_ini(item, param)
+
+    # param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
+    #          'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'thisProject'}
+    # write_to_file_input_ini(item, param)
+
+    res = create_from_file_input_ini(item)
+    print(res)
+
 
     # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"
     # item = {"filePath": path }

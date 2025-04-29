@@ -39,7 +39,8 @@ class MultiParticleEngine():
 
     #input, beam, lattice都应该为自定义的结构体
     def main_agent(self, value):
-        value = ctypes.c_int(1)
+
+        value = ctypes.c_int(value)
         value = ctypes.pointer(value)
         if platform.system() == 'Windows':
             res = self.library.main_agent(value)
@@ -48,36 +49,31 @@ class MultiParticleEngine():
 
         return res
 
-    def stop(self):
-        pass
+
 
 if __name__ == '__main__':
-    project_path = r"E:\using\test_avas_qt\cafe_avas"
+    import threading
+    import time
+
+    project_path = r"C:\Users\shliu\Desktop\HEBT\hebt_avas"
     inputfile = os.path.join(project_path, "InputFile")
     outputfile = os.path.join(project_path, "OutputFile")
     fieldfile = os.path.join(project_path, "InputFile")
 
     # 创建一个停止标志，用于停止执行
-    stop_event = threading.Event()
+    obj = MultiParticleEngine()
+    obj.get_path(inputfile, outputfile, fieldfile)
 
-
-    def run_main_agent():
-        """在新的线程中运行 main_agent 函数"""
-        multiparticle_engine.main_agent(1)
-
-
-    # 启动一个线程运行 `main_agent`
-    agent_thread = threading.Thread(target=run_main_agent)
+    agent_thread = threading.Thread(target=obj.main_agent, args=(1,))
     agent_thread.start()
 
-    # 等待一段时间后停止运行
-    time.sleep(3)  # 假设我们等待 3 秒后想停止任务
-    print("Stopping the engine...")
+    # 主线程等待 3 秒
+    # time.sleep(3)
+    #
+    # print("3秒后发送停止信号 main_agent(0)")
+    # obj.main_agent(0)
+    #
+    # # 可选：等子线程结束
+    # agent_thread.join()
+    # print("线程已结束")
 
-    # 设置停止事件标志
-    stop_event.set()
-
-    # 等待线程执行完成
-    agent_thread.join()
-
-    print("Engine stopped.")

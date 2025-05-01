@@ -37,7 +37,7 @@ class InputConfig():
             item = i.copy()
             if len(item) == 1:
                 item.append(None)
-            if item[0] == "!sim_type":
+            if item[0] == "sim_type":
                 item[0] = "sim_type"
             new_input_lis.append(item)
 
@@ -139,21 +139,21 @@ class InputConfig():
         v_dic = {}
         if self.input_parameter["sim_type"] == 'mulp':
             v_dic = copy.deepcopy(self.input_parameter)
-            v_dic["!sim_type"] = v_dic["sim_type"]
+            v_dic["outputcontrol"] = [v_dic["outputcontrol_start"], v_dic["outputcontrol_grid"]]
 
             del v_dic["spacechargelong"]
             del v_dic["spacechargetype"]
-            del v_dic["sim_type"]
+
+            del v_dic["outputcontrol_start"]
+            del v_dic["outputcontrol_grid"]
+
+
         elif self.input_parameter["sim_type"] == 'env':
 
-            v_dic["!sim_type"] = self.input_parameter["sim_type"]
+            v_dic["sim_type"] = self.input_parameter["sim_type"]
             v_dic["spacechargelong"] = self.input_parameter["spacechargelong"]
             v_dic["spacechargetype"] = self.input_parameter["spacechargetype"]
 
-        v_dic["outputcontrol"] = [v_dic["outputcontrol_start"], v_dic["outputcontrol_grid"]]
-
-        del v_dic["outputcontrol_start"]
-        del v_dic["outputcontrol_grid"]
 
         v_lis = convert_dic2lis(v_dic)
 

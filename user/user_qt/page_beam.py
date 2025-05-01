@@ -693,27 +693,21 @@ class PageBeam(QWidget):
 
 
         item = {"projectPath": self.project_path,
-                "use_dst": self.cb_use_dst_num,
                 }
         beam_obj = BeamConfig()
-        try:
-            for k, v in beam_dict.items():
-                if v is not None:
-                    if k in beam_obj.int_keys:
-                        beam_dict[k] = int(v)
-                    elif k in beam_obj.float_keys:
-                        beam_dict[k] = float(v)
 
-        except Exception as e:
-            raise Exception(e)
+        for k, v in beam_dict.items():
+            if v is not None:
+                if k in beam_obj.int_keys:
+                    beam_dict[k] = int(v)
+                elif k in beam_obj.float_keys:
+                    beam_dict[k] = float(v)
+
 
         res = beam_obj.set_param(**beam_dict)
-        if res["code"] == -1:
-            raise Exception(res['data']['msg'])
 
         res = beam_obj.write_to_file(item)
-        if res["code"] == -1:
-            raise Exception(res['data']['msg'])
+
 
 
 
@@ -815,7 +809,6 @@ class PageBeam(QWidget):
             # 如果文件不在文件夹中并且重名了
             elif not file_in_directory(source_file, target_folder) and \
                 file_in_directory(target_dst_file, target_folder):
-                copy_file(source_file, target_folder)
                 msg = QMessageBox.question(self, '文件已存在', '文件已存在，是否要覆盖？',
                                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
@@ -834,7 +827,7 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'C:\Users\shliu\Desktop\maxi\test_m\325')
+    main_window = PageBeam(r'C:\Users\shliu\Desktop\test_lattice')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")

@@ -438,14 +438,14 @@ class PageInput(QWidget):
         self.text_field_source.setText(safe_str(input_ini_res["fieldSource"]))
 
 
-        self.outputcontrol_start = safe_int(input_ini_res.get('outputcontrol_start'), 0)
+        self.outputcontrol_start_num = safe_int(input_ini_res.get('outputcontrol_start'), 0)
 
-        if self.outputcontrol_start == 0:
-            self.outputcontrol_start = self.cb_generate_density.setChecked(False)
-        elif self.outputcontrol_start == 1:
-            self.outputcontrol_start = self.cb_generate_density.setChecked(True)
+        if self.outputcontrol_start_num == 0:
+            self.cb_generate_density.setChecked(False)
+        elif self.outputcontrol_start_num == 1:
+            self.cb_generate_density.setChecked(True)
 
-        self.text_density_grid.setText(safe_str(input_ini_res["outputcontrol_grid"], "200"))
+        self.text_density_grid.setText(safe_str(input_ini_res["outputcontrol_grid"], "300"))
 
         # 对于包络模型的输入
         if input_ini_res.get('spacechargelong') is not None:
@@ -503,10 +503,11 @@ class PageInput(QWidget):
             # res.append(["!simtype",  "env"])
             res["sim_type"] = "env"
 
+
+
         if self.cb_fft.isChecked():
             res["scmethod"] = "FFT"
         elif self.cb_picnic.isChecked():
-
             res["scmethod"] = "SPICNIC"
 
         res["scanphase"] =self.scan_phase_combo.currentIndex()
@@ -516,17 +517,17 @@ class PageInput(QWidget):
         else:
             res["spacecharge"] = 0
 
-        res['steppercycle'] = int(self.step_per_period_text.text())
+        res['steppercycle'] = safe_int(self.step_per_period_text.text(), 10)
 
         if self.dumpPeriodicity_text.text():
-            res["dumpperiodicity"] = int(self.dumpPeriodicity_text.text())
+            res["dumpperiodicity"] = safe_int(self.dumpPeriodicity_text.text(), 0)
 
-        res["outputcontrol_start"] = self.outputcontrol_start
+        res["outputcontrol_start"] = self.outputcontrol_start_num
         res["outputcontrol_grid"] = self.text_density_grid.text()
 
         res["fieldSource"] = self.text_field_source.text()
         if self.sc_step_text.text():
-            res['spacechargelong'] = int(self.sc_step_text.text())
+            res['spacechargelong'] = safe_int(self.sc_step_text.text(), 1)
         else:
             res['spacechargelong'] = None
 
@@ -590,9 +591,9 @@ class PageInput(QWidget):
 
     def cd_genenrate_density_file_change(self, state):
         if state == Qt.Checked:
-            self.outputcontrol_start = 1
+            self.outputcontrol_start_num = 1
         else:
-            self.outputcontrol_start = 0
+            self.outputcontrol_start_num = 0
 
     def scan_phase_selection(self, index):
         # 处理用户的选择

@@ -93,13 +93,16 @@ class DiagInfo():
                 #这里需要将束诊的单位从mm换成m
                 dic["position"] = dic["position"] + float(all_shift_in_field_commnad[i][1]) /1000
             diag_dict.append(dic)
+
         # for i in diag_dict:
         #     print(i)
         new_diag_dict = self.get_info_from_dataset(diag_dict, dataset_path)
         return new_diag_dict
 
     def write_diag_info_to_file(self, ):
+
         new_diag_dict = self.generate_all_diag_info()
+
 
         write_lis = []
         for i in new_diag_dict:

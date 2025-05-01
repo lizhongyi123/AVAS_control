@@ -54,7 +54,7 @@ def basic_mulp(**item):
 
     res = multiparticle_obj.run()
 
-    #生成束诊文件
+    # 生成束诊文件
     diag_item = {
         "project_path": project_path,
         "input_file": os.path.join(project_path, 'InputFile'),
@@ -752,7 +752,10 @@ def judge_opti(res):
 
 if __name__ == '__main__':
 
-    path = r"C:\Users\shliu\Desktop\11\hebt_avas"
+    path = r"C:\Users\shliu\Desktop\hebt_avas"
+    # path = r"C:\Users\shliu\Desktop\test_lattice"
+    # path = r"C:\Users\shliu\Desktop\xiaochu"
+
     item = {"project_path": path}
     res = basic_mulp(**item)
 

@@ -64,7 +64,6 @@ class DatasetParameter():
                 else:
                     self.z.append(self.z[-1] + dataset_info[i][38])
             elif (dataset_info[i][35] == 1):
-                print(63, dataset_info[i][35])
                 self.z.append(self.z[-1] + math.sqrt(dataset_info[i][37] ** 2 + dataset_info[i][38] ** 2))
                 sign1 = 1
                 sign2 = 0

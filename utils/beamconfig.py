@@ -48,8 +48,6 @@ class BeamConfig():
     def read_beam_txt(self, path):
         #读取beam文件
         beam_lis = read_txt(path, out='list', case_sensitive=True)
-        # print(beam_lis)
-
 
         for i in beam_lis:
             if len(i) == 1:
@@ -163,7 +161,7 @@ class BeamConfig():
 
         v_key = ["alpha_x", "beta_x", "emit_x",
                        "alpha_y", "beta_y", "emit_y",
-                       "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y" ]
+                       "alpha_z", "beta_z", "emit_z", "distribution_x", "distribution_y"]
         for i in v_key:
             del v_dic[i]
 
@@ -263,12 +261,12 @@ class BeamConfig():
 
 if __name__ == "__main__":
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\test429"
+        "projectPath": r"C:\Users\shliu\Desktop\test_lattice"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
-
-    para = {'numofcharge': None, 'particlerestmass': 938,}
-    res = obj.set_param(**para)
-    obj.write_to_file(item)
+    print(res)
+    # para = {'numofcharge': None, 'particlerestmass': 938,}
+    # res = obj.set_param(**para)
+    # obj.write_to_file(item)

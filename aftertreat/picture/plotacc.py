@@ -113,4 +113,4 @@ if __name__ == "__main__":
     project_path = r"C:\Users\shliu\Desktop\xiaochu"
     # project_path = r"C:\Users\shliu\Desktop\xiaochu"
     obj = PlotAcc(project_path)
-    obj.run(3)
+    obj.run(0)

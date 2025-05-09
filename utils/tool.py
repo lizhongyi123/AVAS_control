@@ -69,6 +69,8 @@ def judge_command_on_element(lattice, command):
         if lattice[i][0] in global_varible.all_element:
             command_on_element = int(lattice[i][-1].split("_")[1])
             break
+    if command_on_element is None:
+        command_on_element = -1
     return command_on_element
 
 def delete_element_end_index(error_lattice):

@@ -103,11 +103,9 @@ class PlotPhaseAdvance(PicturePlot_2D):
         dataset_obj.get_parameter()
 
         lattcie_mulp_list, lattice_mulp_name = read_lattice_mulp_with_name(self.lattice_mulp_path)
-        lattcie_mulp_list = [i for i in lattcie_mulp_list if not i[0].startswith("diag")]
-
 
         lattice_obj = LatticeParameter()
-        lattice_obj.get_parameter(lattcie_mulp_list)
+        lattice_obj.get_period(lattcie_mulp_list)
         v_start_end = lattice_obj.v_start_end
 
         z = dataset_obj.z ##
@@ -180,7 +178,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test_lattice"
-    obj = PlotPhaseAdvance(project_path, "meter" )
+    project_path = r"C:\Users\shliu\Desktop\test_schedule\cafe_avas"
+    obj = PlotPhaseAdvance(project_path, "period" )
     obj.get_x_y()
     obj.run(show_=1, fig =None)

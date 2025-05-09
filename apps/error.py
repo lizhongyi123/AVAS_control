@@ -586,7 +586,7 @@ class Error():
 
         ouput = os.path.normpath(os.path.join(self.project_path, 'OutputFile/error_middle/output_0'))
         os.mkdir(ouput)
-        print(589)
+
         # process = multiprocessing.Process(target=self.run_multiparticle,
         #                                   args=(self.project_path, 'OutputFile/error_middle/output_0'))
         #
@@ -594,7 +594,7 @@ class Error():
         # process.join()  # 等待子进程运行结束
 
         self.run_multiparticle(self.project_path, 'OutputFile/error_middle/output_0')
-        print(597)
+
         self.write_density_every_time(0, 0)
 
         copy_file(self.lattice_path, self.normal_out_path)
@@ -1598,7 +1598,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\shliu\Desktop\testex2"
+    path = r"C:\Users\shliu\Desktop\56\new_project"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 

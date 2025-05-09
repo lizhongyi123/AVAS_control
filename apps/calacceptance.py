@@ -10,7 +10,6 @@ from global_varible import c_light, Pi
 from dataprovision.latticeparameter import LatticeParameter
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('QtAgg')
 from utils.tool import trans_xp_xx1
 from utils.tool import cal_twiss
 class Acceptance():

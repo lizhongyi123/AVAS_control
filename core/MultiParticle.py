@@ -38,7 +38,7 @@ class MultiParticle():
 
         if os.path.exists(self.errorlog_path):
             os.remove(self.errorlog_path)
-        print(41, self.field_file)
+
         res_tmp = self.multiparticle_engine.get_path(self.input_file, self.output_file, self.field_file)
 
         res = self.multiparticle_engine.main_agent(1)
@@ -51,8 +51,9 @@ class MultiParticle():
             # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
             error = self.check_error_file(self.errorlog_path)
             raise Exception(f'{error}')
+
+
         return res
-        return error_parts
 
     def stop(self):
         res = self.multiparticle_engine.main_agent(2)

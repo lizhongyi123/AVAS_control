@@ -7,7 +7,7 @@ if __name__ == "__main__":
     AVAS_path = r"D:\AVAS_CONTROL\AVAS_control"
     files = [ "aftertreat\picture", "aftertreat\dataanalysis", r"apis\basic_api", r"apis\qt_api",
               "apps",
-              "core", "dataprovision", "otherdemand",
+              "core", "dataprovision", "hpc","otherdemand",
               r"user\user_qt", r"user\user_qt\lattice_file", r"user\user_qt\page_utils",
               "utils"]
 

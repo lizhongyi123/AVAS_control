@@ -4,7 +4,7 @@ from api import basic_mulp
 import multiprocessing
 from utils.change_win_to_linux import change_end_crlf
 if __name__ == '__main__':
-    path = r"C:\Users\anxin\Desktop\linux版本"
+    path = r"C:\Users\shliu\Desktop\yun3\cafe_avas"
     beam_path = os.path.join(path, "InputFile", "beam.txt")
     input_path = os.path.join(path, "InputFile", "input.txt")
     change_end_crlf(beam_path)

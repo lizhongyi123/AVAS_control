@@ -1,7 +1,5 @@
 # -- coding: utf-8 --
-AVAS_control_path = r"D:\AVAS_CONTROL\AVAS_control"
-import sys
-sys.path.append(AVAS_control_path)
+
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
@@ -82,7 +80,7 @@ def basic_mulp(**item):
         density_obj.generate_density_file_onestep(1)
 
     print('模拟结束')
-    return res
+    return True
 
 #粒子数扩充
 def change_particle_number(infile_path, outfile_path, ratio):
@@ -752,7 +750,7 @@ def judge_opti(res):
 
 if __name__ == '__main__':
 
-    path = r"C:\Users\shliu\Desktop\hebt_avas"
+    path = r"C:\Users\shliu\Desktop\cafe_avas"
     # path = r"C:\Users\shliu\Desktop\test_lattice"
     # path = r"C:\Users\shliu\Desktop\xiaochu"
 

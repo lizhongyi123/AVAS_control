@@ -19,7 +19,7 @@ class DiagInfo():
 
         lattice_mulp_path = os.path.join(input_file, "lattice_mulp.txt")
 
-        dataset_path = os.path.join(output_file, "dataset.txt")
+        dataset_path = os.path.join(output_file, "DataSet.txt")
 
 
 
@@ -62,6 +62,7 @@ class DiagInfo():
         all_diag_command = []
         all_shift_in_field_commnad = []
         all_diag_name = []
+
         for index, i in enumerate(lattice_copy):
             if i[0].startswith("diag"):
                 all_diag_command.append(i)
@@ -118,7 +119,7 @@ class DiagInfo():
 
             if i["diag_command"][0] == 'diag_energy':
                 diag_type = "energy"
-            elif i["diag_command"][0] == 'diag_postion':
+            elif i["diag_command"][0] == 'diag_position':
                 diag_type = "center"
             elif i["diag_command"][0] == 'diag_size':
                 diag_type = "rms_size"

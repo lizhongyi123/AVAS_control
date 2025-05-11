@@ -8,6 +8,7 @@ a = Analysis(
     [ 'main.py', 'api.py', 'global_varible.py',
 
 
+D:\AVAS_CONTROL\AVAS_control\venv\Scripts\python.exe D:\AVAS_CONTROL\AVAS_control\otherdemand\listpackagefiles.py
 './aftertreat/picture/initialplot.py',
 './aftertreat/picture/plotacc.py',
 './aftertreat/picture/plotdataset.py',
@@ -30,6 +31,7 @@ a = Analysis(
 './apis/qt_api/api.py',
 './apis/qt_api/createbasicfile.py',
 './apis/qt_api/getschedule.py',
+'./apis/qt_api/hpc_simmode.py',
 './apis/qt_api/judge_lattice.py',
 './apis/qt_api/SimMode.py',
 './apps/basicenv.py',
@@ -58,9 +60,13 @@ a = Analysis(
 './dataprovision/exdataparameter.py',
 './dataprovision/latticeparameter.py',
 './dataprovision/__init__.py',
+'./hpc/get_errordata.py',
+'./hpc/get_jobstatus.py',
+'./hpc/stop_job.py',
+'./hpc/submit_job.py',
 './otherdemand/listpackagefiles.py',
 './otherdemand/zhuanhuan.py',
-
+'./user/user_qt/lattice_file',
 './user/user_qt/page_acc.py',
 './user/user_qt/page_analysis.py',
 './user/user_qt/page_beam.py',
@@ -73,7 +79,6 @@ a = Analysis(
 './user/user_qt/page_match.py',
 './user/user_qt/page_others.py',
 './user/user_qt/page_output.py',
-
 
 './user/user_qt/user_defined.py',
 './user/user_qt/user_pyqt.py',
@@ -100,6 +105,7 @@ a = Analysis(
 './utils/treatlist.py',
 './utils/treat_directory.py',
 './utils/__init__.py',
+
     ],
 
     pathex=[r'D:\AVAS_CONTROL\AVAS_control'],

@@ -750,13 +750,18 @@ def judge_opti(res):
 
 if __name__ == '__main__':
 
-    path = r"C:\Users\shliu\Desktop\cafe_avas"
+    path = r"C:\Users\shliu\Desktop\test_s59"
     # path = r"C:\Users\shliu\Desktop\test_lattice"
     # path = r"C:\Users\shliu\Desktop\xiaochu"
 
-    item = {"project_path": path}
-    res = basic_mulp(**item)
+    item = {"project_path": path,
+            "if_normal": 0,
+            "if_generate_density_file": 0
+            }
+    res = err_stat(**item)
 
+    item = {"project_path": path,}
+    # res = basic_mulp(**item)
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {
     #     "projectPath": path,

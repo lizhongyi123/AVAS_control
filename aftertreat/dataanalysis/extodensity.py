@@ -17,6 +17,55 @@ import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataprovision.exdataparameter import Exdata
 
+
+def read_exdata_onestep_worker(args):
+    # print(args)
+    # index0 plt中的索引
+    ex_data_this, dataset_info, dataset_index_list = args
+
+    # exdata中的index
+    ex_index = ex_data_this["index"]
+
+    if ex_index in dataset_index_list:
+        index_dataset = dataset_index_list.index(ex_index)
+    else:
+        return {}
+
+    zg = ex_data_this["z_ave"]
+
+    emit = [dataset_info["emit_x"][index_dataset], dataset_info["emit_y"][index_dataset], dataset_info["emit_z"][index_dataset]]
+    rms_size = [dataset_info["rms_x"][index_dataset], dataset_info["rms_y"][index_dataset], dataset_info["rms_z"][index_dataset]]
+
+    nownumofp = int(dataset_info["number_exist"][index_dataset])
+    moy = [ex_data_this["x_ave"], ex_data_this["y_ave"], ex_data_this["r_ave"], 0]
+
+    # 应该是相对于中心的偏移值，但是这里的z不知道中心值是谁，只能相对于自己的中心值，等后处理加上中心值的偏移
+    maxb = [ex_data_this["x_max"], ex_data_this["y_max"], ex_data_this["r_max"], ex_data_this["z_max"] - zg]
+    minb = [ex_data_this["x_min"], ex_data_this["y_min"], ex_data_this["r_min"], ex_data_this["z_min"] - zg]
+
+    maxr = maxb
+    minr = minb
+
+    tab = [ex_data_this["tab_x"], ex_data_this["tab_y"], ex_data_this["tab_r"], ex_data_this["tab_z"]]
+
+    # t3 = time.time()
+    # dt3 = t3-t2
+    # self.dt3 += dt3
+    res = {}
+    res["zg"] = zg
+    res["emit"] = emit
+    res["rms_size"] = rms_size
+    res["nownumofp"] = nownumofp
+    res["moy"] = moy
+    res["maxb"] = maxb
+    res["minb"] = minb
+    res["maxr"] = maxr
+    res["minr"] = minr
+    res["tab"] = tab
+
+    return res
+
+
 class ExtoDensity():
     def __init__(self,  exdata_path, dataset_path, target_density_path, normal_density_path=None, project_path=None):
         self.project_path = project_path
@@ -28,54 +77,7 @@ class ExtoDensity():
         self.bins = 300
 
 
-    def read_exdata_onestep_worker(self, args):
-        # print(args)
-        #index0 plt中的索引
-        ex_data_this, dataset_obj, dataset_index_list = args
 
-        # exdata中的index
-        ex_index = ex_data_this["index"]
-
-        if ex_index in dataset_index_list:
-            index_dataset = dataset_index_list.index(ex_index)
-        else:
-            return {}
-
-        zg = ex_data_this["z_ave"]
-
-        emit = [dataset_obj.emit_x[index_dataset], dataset_obj.emit_y[index_dataset], dataset_obj.emit_z[index_dataset]]
-        rms_size = [dataset_obj.rms_x[index_dataset], dataset_obj.rms_y[index_dataset], dataset_obj.rms_z[index_dataset]]
-
-
-        nownumofp = int(dataset_obj.number_exist[index_dataset])
-        moy = [ex_data_this["x_ave"], ex_data_this["y_ave"], ex_data_this["r_ave"], 0]
-
-        #应该是相对于中心的偏移值，但是这里的z不知道中心值是谁，只能相对于自己的中心值，等后处理加上中心值的偏移
-        maxb = [ex_data_this["x_max"], ex_data_this["y_max"], ex_data_this["r_max"], ex_data_this["z_max"] - zg]
-        minb = [ex_data_this["x_min"], ex_data_this["y_min"], ex_data_this["r_min"], ex_data_this["z_min"] - zg]
-
-        maxr = maxb
-        minr = minb
-
-        tab = [ex_data_this["tab_x"], ex_data_this["tab_y"], ex_data_this["tab_r"], ex_data_this["tab_z"]]
-
-
-        # t3 = time.time()
-        # dt3 = t3-t2
-        # self.dt3 += dt3
-        res = {}
-        res["zg"] = zg
-        res["emit"] = emit
-        res["rms_size"] = rms_size
-        res["nownumofp"] = nownumofp
-        res["moy"] = moy
-        res["maxb"] = maxb
-        res["minb"] = minb
-        res["maxr"] = maxr
-        res["minr"] = minr
-        res["tab"] = tab
-
-        return res
 
     def generatet_density_data_onestep(self, isnormal):
         """
@@ -89,7 +91,6 @@ class ExtoDensity():
 
         ex_data_obj = Exdata(self.exdata_path)
         ex_data_list = ex_data_obj.get_param()
-
         all_step = ex_data_obj.step
 
 
@@ -103,12 +104,24 @@ class ExtoDensity():
         v1 = [i for i in range(0, all_step-1)]
         step_list = v1
 
+        dataset_info = {
+            "emit_x": dataset_obj.emit_x,
+            "emit_y": dataset_obj.emit_y,
+            "emit_z": dataset_obj.emit_z,
+            "rms_x": dataset_obj.rms_x,
+            "rms_y": dataset_obj.rms_y,
+            "rms_z": dataset_obj.rms_z,
+            "number_exist": dataset_obj.number_exist,
+
+        }
+
         with Pool(num_workers) as pool:  # 使用上下文管理器
             # 准备每一步的参数
-            args = [(ex_data_list[i], dataset_obj, dataset_index_list) for i in step_list]
+            args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
 
             # 使用进程池并行执行每一步数据处理
-            results = pool.map(self.read_exdata_onestep_worker, args)
+
+            results = pool.map(read_exdata_onestep_worker, args)
 
         # results = []
         # # 收集并整理结果

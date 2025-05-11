@@ -35,7 +35,7 @@ class MultiParticle():
             self.multiparticle_engine = MultiParticleEngine()
 
     def run(self):
-
+        print(38, self.input_file, self.output_file, self.field_file)
         if os.path.exists(self.errorlog_path):
             os.remove(self.errorlog_path)
 
@@ -79,16 +79,12 @@ def basic_mulp(project_path):
 
 
 if __name__ == "__main__":
-    start = time.time()
-    project_path = r"C:\Users\shliu\Desktop\testex2"
-    item = {
 
-        "project_path": project_path
-    }
 
+    item = {'project_path': r'C:\Users\shliu\Desktop\test511',
+            }
     obj = MultiParticle(item)
     obj.run()
 
-    end = time.time()
-    print(f"总时间: {end - start}")
+
 

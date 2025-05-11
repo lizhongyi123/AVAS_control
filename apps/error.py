@@ -1598,7 +1598,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\shliu\Desktop\56\new_project"
+    path = r"C:\Users\shliu\Desktop\test511"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
@@ -1607,11 +1607,11 @@ if __name__ == "__main__":
     item = {
         "project_path": path,
         "seed": 50,
-        "if_normal": 1,
+        "if_normal": 0,
         "field_path": None,
-        "if_generate_density_file":1
+        "if_generate_density_file":0
     }
-    obj = ErrorDyn(item)
+    obj = Errorstat(item)
 
     obj.run()
 

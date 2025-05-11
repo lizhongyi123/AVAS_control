@@ -198,13 +198,15 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"D:\using\test_avas_qt\cafe_avas\OutputFile\output_0\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\test511\OutputFile\error_output\output_1_1\DataSet.txt"
     obj = DatasetParameter(path1)
     v = obj.get_parameter()
-    z = obj.z
-
-
+    x = obj.x
     import numpy as np
+    x = np.array(x) * 1000
+    print(x)
+    #
+    # import numpy as np
     # import time
     # t0 = time.time()
     # path1 = r"C:\Users\shliu\Desktop\jiqunshiyong\test_err_dyn\OutputFile\DataSet.txt"

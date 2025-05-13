@@ -18,6 +18,7 @@ def get_errordata(**item):
     output = format_output(**kwargs)
     return output
 
+
 if __name__ == '__main__':
     item = {
         "projectPath": r"C:\Users\shliu\Desktop\test_schedule\cafe_avas"

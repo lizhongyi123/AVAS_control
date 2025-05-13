@@ -21,6 +21,7 @@ def get_jobstatus_in_hpc(**item):
     kwargs.update({"jobStatus": rows, "ifFinish": if_finish, })
 
     output = format_output(**kwargs)
+    return output
 
 def get_jobstatus_in_windows(**item):
     rows = [['JOBID', 'PARTITION', 'NAME', 'USER', 'ST', 'TIME', 'NODES', 'NODELIST(REASON)'],

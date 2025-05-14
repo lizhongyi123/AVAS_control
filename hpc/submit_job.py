@@ -55,8 +55,7 @@ def submit_job(**item):
     work_dir = os.path.dirname(script_directory)  # 获取上级目录的路径
     print(work_dir)
 
-    # job_name = "AVAS_" + str(uuid.uuid4())[:8]
-    job_name = "AVAS56"
+    job_name = "AVAS_" + str(uuid.uuid4())[:8]
     job_script = f"{job_name}.sh"
 
     job_script_path = os.path.join(tmp_dir, job_script)
@@ -92,19 +91,12 @@ def submit_job(**item):
         f.write(script_content)
 
     # 提交作业
-    print(95)
-    t0 = time.time()
-    result = subprocess.run(["sbatch", job_script_path], capture_output=True, text=True)
-    t1 =time.time()
-    print(t1-t0)
+    # result = subprocess.run(["sbatch", job_script_path], capture_output=True, text=True)
+    # lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
+    # rows = [line.split() for line in lines]
+    # job_id = rows[0][3]
 
-    print(97)
-    lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
-    print(103, lines)
-    rows = [line.split() for line in lines]
-    print(105, rows)
-    job_id = rows[0][3]
-
+    job_id = 111
     # job_id = 3
     kwargs = {
         "jobInfo": {
@@ -120,5 +112,5 @@ def submit_job(**item):
 
 
 if __name__ == "__main__":
-    item = {"projectPath": r"C:\Users\shliu\Desktop\test422\cafe_avas"}
+    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"}
     submit_job(**item)

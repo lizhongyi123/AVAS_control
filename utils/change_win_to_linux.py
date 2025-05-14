@@ -1,5 +1,5 @@
 from utils.treatfile import delete_file
-
+import os
 
 def change_end_crlf(file):
     """
@@ -22,7 +22,13 @@ def read(file):
 
 if __name__ == '__main__':
     file1 = r"C:\Users\shliu\Desktop\jiqun\test_err_dyn\InputFile\lattice_mulp.txt"
-    change_end_crlf(file1)
+
+    path = r"C:\Users\shliu\Desktop\yun3\cafe_avas"
+    beam_path = os.path.join(path, "InputFile", "beam.txt")
+    input_path = os.path.join(path, "InputFile", "input.txt")
+    change_end_crlf(beam_path)
+    change_end_crlf(input_path)
+
 
     # file1 = r"C:\Users\shliu\Desktop\jiqun\lattice_cuowu2.txt"
     # # change_end(file)

@@ -30,8 +30,9 @@ from aftertreat.picture.plotphaseellipse import PlotPhaseEllipse
 from utils.tool import format_output, generate_web_picture_param, generate_web_picture_path
 import uuid
 from apps.diaginfo import DiagInfo
-from aftertreat.dataanalysis.extodensity import  ExtoDensity
+from aftertreat.dataanalysis.extodensity import ExtoDensity
 from utils.inputconfig import InputConfig
+
 #下列为功能函数
 #基础运行
 def basic_mulp(**item):
@@ -747,6 +748,14 @@ def judge_opti(res):
         return 1
     else:
         return 0
+def change_file_win2linux(**item):
+    path = item.get('project_path')
+    beam_path = os.path.join(path, "InputFile", "beam.txt")
+    input_path = os.path.join(path, "InputFile", "input.txt")
+    change_end_crlf(beam_path)
+    change_end_crlf(input_path)
+
+
 
 if __name__ == '__main__':
 

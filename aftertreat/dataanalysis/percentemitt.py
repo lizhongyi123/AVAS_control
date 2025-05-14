@@ -238,7 +238,7 @@ class PercentEmit():
 
 
 if __name__ == '__main__':
-    dst_path = r"C:\Users\shliu\Desktop\test_changdu\OutputFile\inData.dst"
+    dst_path = r"C:\Users\anxin\Desktop\test_yaxin\OutputFile\outData_3.405000.dst"
     # dst_path = r"C:\Users\shliu\Desktop\xiaochu\OutputFile\inData.dst"
     # dst_path = r"C:\Users\shliu\Desktop\test42\part_rfq.dst"
 

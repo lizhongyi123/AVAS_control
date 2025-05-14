@@ -4,12 +4,14 @@ def get_errordata(**item):
     error_exist = False
     project_path = item['projectPath']
     err_path = os.path.join(project_path, "OutputFile", "tmp", "errordata.log")
-    with open(err_path, 'r') as file:
+    with open(err_path, 'r', encoding="UTF-8") as file:
         text = file.read()
+        print(9, text)
         if text.strip():  # 去除空格和换行后仍有内容
             error_exist = True
         else:
             error_exist = False
+
     if error_exist:
         kwargs = {"errorInfo": text}
     else:
@@ -21,7 +23,7 @@ def get_errordata(**item):
 
 if __name__ == '__main__':
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\test_schedule\cafe_avas"
+        "projectPath": r"C:\\Users\\anxin\\Desktop\\test_schedule\\cafe_avas"
     }
     res = get_errordata(**item)
     print(res)

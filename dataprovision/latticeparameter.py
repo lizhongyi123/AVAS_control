@@ -365,10 +365,13 @@ class LatticeParameter():
 
 
 if __name__ == "__main__":
-    lattice_path = r"C:\Users\shliu\Desktop\test_schedule\cafe_avas\InputFile\lattice_mulp1.txt"
+    lattice_path = r"C:\Users\anxin\Desktop\test_ya2\InputFile\lattice.txt"
     res = LatticeParameter(lattice_path)
-    res.get_period()
-    print(res.total_length)
+    res.get_parameter()
+    print(res.v_start)
+    print(res.v_len)
+    # res.get_period()
+    # print(res.total_length)
     # print(res.v_start)
     # print(res.v_len)
 

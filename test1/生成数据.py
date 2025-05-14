@@ -7,11 +7,14 @@ import numpy as np
 from core.MultiParticle import MultiParticle
 import shutil
 if __name__ == "__main__":
-    project_path = r"E:\using\hu\saomiao_mebt"
-    lattice_mulp_path = r"E:\using\hu\saomiao_mebt\InputFile\lattice_mulp.txt"
-    lattice_path = r"E:\using\hu\saomiao_mebt\InputFile\lattice.txt"
+    project_path = r"C:\Users\anxin\Desktop\test_yaxin"
 
-    lattice_mulp_lis = read_txt(lattice_mulp_path, out='list',readdall=True)
+    lattice_mulp_path = os.path.join(project_path, "InputFile", "lattice_mulp.txt")
+    lattice_path = os.path.join(project_path, "InputFile", "lattice.txt")
+
+
+    lattice_mulp_lis = read_txt(lattice_mulp_path, out='list', readdall=True)
+
     # print(lattice_mulp_lis)
 
     orig_data = np.array([289.543, -276.219, 209.933, -147.316, 209.068, -156.973])
@@ -29,7 +32,7 @@ if __name__ == "__main__":
 
         index = 0
         for j in lattice_mulp_lis:
-            if len(j)> 0 and j[0] == "fieldx":
+            if len(j) > 0 and j[0] == "fieldx":
                 v = copy.deepcopy(j)
                 v[0] = 'field'
                 v[-2] = random_num[index]
@@ -44,17 +47,20 @@ if __name__ == "__main__":
                 f.write(' '.join(map(str, k)) + '\n')
 
         #随机数保存
-        suiji  = r"E:\using\hu\saomiao_mebt\suiji.txt"
+        suiji = os.path.join(project_path, "suiji.txt")
+
         random_num.insert(0, i)
         with open(suiji, 'a') as f:
             f.write(' '.join(map(str, random_num)) + '\n')
 
+
+        item = {"project_path": project_path}
         #模拟
-        obj = MultiParticle(project_path)
+        obj = MultiParticle(item)
         obj.run()
 
         #dataset复制
-        orig_dataset = r"E:\using\hu\saomiao_mebt\OutputFile\DataSet.txt"
-        destination_folder = os.path.join(r"E:\using\hu\saomiao_mebt\data", f"dataset_{i}.txt")
+        orig_dataset = os.path.join(project_path, "OutputFile", "DataSet.txt")
+        destination_folder = os.path.join(project_path, "data", f"dataset_{i}.txt")
 
         shutil.copy(orig_dataset, destination_folder)

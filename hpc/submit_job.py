@@ -91,13 +91,13 @@ def submit_job(**item):
         f.write(script_content)
 
     # 提交作业
-    # result = subprocess.run(["sbatch", job_script_path], capture_output=True, text=True)
-    # lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
-    # rows = [line.split() for line in lines]
-    # job_id = rows[0][3]
+    result = subprocess.run(["sbatch", job_script_path], capture_output=True, text=True)
+    lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
+    rows = [line.split() for line in lines]
+    job_id = rows[0][3]
 
-    job_id = 111
-    # job_id = 3
+    # job_id = 111
+
     kwargs = {
         "jobInfo": {
             "projectPath": project_path,

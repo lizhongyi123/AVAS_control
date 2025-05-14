@@ -5,7 +5,6 @@ import os
 from utils.tool import format_output
 def get_jobstatus_in_hpc(**item):
     job_id = item['jobId']
-    print("job_id", job_id)
     result = subprocess.run(["squeue", "-j", str(job_id)], capture_output=True, text=True)
 
     lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]

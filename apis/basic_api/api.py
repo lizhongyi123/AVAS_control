@@ -32,7 +32,7 @@ import uuid
 from apps.diaginfo import DiagInfo
 from aftertreat.dataanalysis.extodensity import ExtoDensity
 from utils.inputconfig import InputConfig
-
+from utils.change_win_to_linux import change_end_crlf
 #下列为功能函数
 #基础运行
 def basic_mulp(**item):
@@ -755,21 +755,29 @@ def change_file_win2linux(**item):
     change_end_crlf(beam_path)
     change_end_crlf(input_path)
 
+    output = format_output()
+
+    return output
+
 
 
 if __name__ == '__main__':
 
-    path = r"C:\Users\shliu\Desktop\test_s59"
+    path = r"C:\Users\anxin\Desktop\AVAS1.1\error_example"
+    item = {"project_path": path}
+    res = change_file_win2linux(**item)
+    print(res)
+
     # path = r"C:\Users\shliu\Desktop\test_lattice"
     # path = r"C:\Users\shliu\Desktop\xiaochu"
 
-    item = {"project_path": path,
-            "if_normal": 0,
-            "if_generate_density_file": 0
-            }
-    res = err_stat(**item)
-
-    item = {"project_path": path,}
+    # item = {"project_path": path,
+    #         "if_normal": 0,
+    #         "if_generate_density_file": 0
+    #         }
+    # res = err_stat(**item)
+    #
+    # item = {"project_path": path,}
     # res = basic_mulp(**item)
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {

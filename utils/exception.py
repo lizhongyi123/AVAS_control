@@ -110,6 +110,7 @@ class MissingcommandError(Exception):
         return f"Missing command: {self.command}"
 
 class BaseError():
+    #处理和项目，lattice有关的错误
     def __init__(self, ):
         pass
 
@@ -149,6 +150,13 @@ class BaseError():
 
     # def is_not_avas_project_error(self, directory):
     #     raise Exception(f"{directory} is not a  AVAS project")
+
+
+
+class NormalError():
+    #处理各种常见的Error，主要是指程序
+    def __init__(self):
+        pass
 
 
 

@@ -13,6 +13,10 @@ from utils.treat_directory import list_files_in_directory
 from utils.iniconfig import IniConfig
 from utils.inputconfig import InputConfig
 import pandas as pd
+from utils.beamconfig import BeamConfig
+from apis.qt_api.judge_lattice import JudgeLattice
+
+
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
     kwargs = {}
@@ -464,10 +468,53 @@ def get_file_choose_type(item):
     return output
 
 
+def project_check(item):
+    propject_path = item.get("projectPath")
+
+    input_config = InputConfig()
+    input_config.validate_run(item)
+
+    # 检查beam文件
+    beam_config = BeamConfig()
+    beam_config.validate_run(item)
+
+    ini_config = IniConfig()
+    ini_info = ini_config.validate_run(item)
+
+    ini_info = ini_info["data"]["iniParams"]
+
+    base_mode = ini_info["input"]["sim_type"],
+    err_mode = ini_info["error"]["error_type"],
+    err_seed = ini_info["error"]["seed"]
+
+
+    #检查lattice
+    lattice_mulp_path = os.path.join(propject_path, "InputFile", "lattice_mulp.txt")
+    lattice_obj = JudgeLattice(lattice_mulp_path)
+
+    if base_mode == "mulp":
+        if err_mode == "stat":
+            lattice_obj.judge_lattice("stat_error")
+        elif err_mode == "dyn":
+            lattice_obj.judge_lattice("dyn_error")
+        elif err_mode == "stat_dyn":
+            lattice_obj.judge_lattice("stat_dyn_error")
+        else:
+            lattice_obj.judge_lattice("basic_mulp")
+
+
+    output = format_output()
+    return output
+
+
 
 
 if __name__ == '__main__':
-    pass
+    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"}
+    res = project_check(item)
+    print(res)
+
+    # pass
     # item = {
     # "particletype": "H",
     # "nucleonnumber": 10,
@@ -494,15 +541,15 @@ if __name__ == '__main__':
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
     #
-    path = r"C:\Users\shliu\Desktop\test_changdu"
-    item = {"projectPath": path}
+    # path = r"C:\Users\shliu\Desktop\test_changdu"
+    # item = {"projectPath": path}
 
     # param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
     #          'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'thisProject'}
     # write_to_file_input_ini(item, param)
 
-    res = create_from_file_input_ini(item)
-    print(res)
+    # res = create_from_file_input_ini(item)
+    # print(res)
 
 
     # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"

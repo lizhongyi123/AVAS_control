@@ -4,6 +4,8 @@ import configparser
 import os
 from utils.tool import format_output
 import copy
+import utils.exception as exce
+
 
 class IniConfig():
     def __init__(self):
@@ -134,9 +136,39 @@ class IniConfig():
         output = format_output(**kwargs)
         return output
 
+    def validate_run(self, item):
+        ini_info_base = self.create_from_file(item)
+
+        if ini_info_base["code"] == -1:
+            raise Exception(ini_info_base["data"]['msg'])
+        ini_info = ini_info_base["data"]["iniParams"]
+        base_mode = ini_info["input"]["sim_type"]
+
+        match_mode = [
+            ini_info["match"]["cal_input_twiss"],
+            ini_info["match"]["match_with_twiss"],
+            ini_info["match"]["use_initial_value"],
+        ]
+
+        err_mode = ini_info["error"]["error_type"]
+        err_seed = ini_info["error"]["seed"]
+
+        if base_mode not in ["mulp", "env"]:
+            raise exce.ValueRangeError('sim type', ["mulp", "env"], base_mode)
+
+        all_error_type = ["stat", "dyn", "stat_dyn", ""]
+        if err_mode not in all_error_type:
+            raise exce.ValueRangeError('error type', all_error_type, err_mode)
+
+        return ini_info_base
+
 # 示例用法
 
 if __name__ == '__main__':
+    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    }
+    cfg = IniConfig()
+    cfg.validate_run(item)
     # file_path = r"C:\Users\shliu\Desktop\test1113\test1\InputFile\ini.ini" # 替换为你的 INI 文件路径
     # cfg = IniConfig()
     # res = cfg.creat_from_file(file_path)
@@ -154,16 +186,16 @@ if __name__ == '__main__':
     # print(cfg.ini_dict)
     # ini_dict = cfg.initialize()
     # cfg.write_ini(ini_dict)
-    item = {"projectPath": r"C:\Users\shliu\Desktop\test4212"
-    }
-    cfg = IniConfig()
-    # cfg.write_to_file(item)
-
-    res = cfg.create_from_file(item)
+    # item = {"projectPath": r"C:\Users\shliu\Desktop\test4212"
+    # }
+    # cfg = IniConfig()
+    # # cfg.write_to_file(item)
+    #
+    # res = cfg.create_from_file(item)
+    # # print(res)
+    #
+    # param = {'project': {'fieldSource': "thisProject", }}
+    # res = cfg.set_param(**param)
     # print(res)
-
-    param = {'project': {'fieldSource': "thisProject", }}
-    res = cfg.set_param(**param)
-    print(res)
-    res = cfg.write_to_file(item)
-    print(res)
+    # res = cfg.write_to_file(item)
+    # print(res)

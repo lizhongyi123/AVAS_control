@@ -5,13 +5,17 @@ import os
 from utils.tool import format_output
 def get_jobstatus_in_hpc(**item):
     job_id = item['jobId']
+    print("job_id", job_id)
     result = subprocess.run(["squeue", "-j", str(job_id)], capture_output=True, text=True)
 
     lines = [line.strip() for line in result.stdout.strip().split("\n") if line.strip()]
 
     rows = [line.split() for line in lines]
 
-    if len(rows) == 1:
+
+    if len(rows) == 0:
+        raise Exception("the jobId not exist")
+    elif len(rows) == 1:
         if_finish = 2
     elif len(rows) == 2:
         if_finish = 1
@@ -21,6 +25,7 @@ def get_jobstatus_in_hpc(**item):
 
     output = format_output(**kwargs)
     return output
+
 
 def get_jobstatus_in_windows(**item):
     rows = [['JOBID', 'PARTITION', 'NAME', 'USER', 'ST', 'TIME', 'NODES', 'NODELIST(REASON)'],

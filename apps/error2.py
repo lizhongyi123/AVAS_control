@@ -573,7 +573,7 @@ class Error():
             "project_path": p_path,
             "output_file": os.path.join(p_path, out_putfile_),
             "field_file": self.field_path,
-            "errorlog_path": os.path.join(p_path, r'OutputFile/error_middle/output_0/ErrorLog.txt'),
+            "errorlog_path": os.path.join(p_path, r'OutputFile/error_output/output_0/ErrorLog.txt'),
         }
         multiparticle_obj = MultiParticle(item)
 

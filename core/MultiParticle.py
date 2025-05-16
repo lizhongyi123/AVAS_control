@@ -16,7 +16,7 @@ class MultiParticle():
         self.project_path = item["project_path"]
         self.input_file = item.get("input_file")
         self.output_file = item.get("output_file")
-        self.field_file = item.get("field_file")
+        self.field_path = item.get("field_path")
         self.errorlog_path = item.get("errorlog_path")
         self.multiparticle_engine = item.get("mulp_engine")
 
@@ -25,8 +25,8 @@ class MultiParticle():
         if self.output_file is None:
             self.output_file = os.path.join(self.project_path, "OutputFile")
 
-        if self.field_file == None:
-            self.field_file = self.input_file
+        if self.field_path == None:
+            self.field_path = self.input_file
 
         if self.errorlog_path is None:
             self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
@@ -35,11 +35,11 @@ class MultiParticle():
             self.multiparticle_engine = MultiParticleEngine()
 
     def run(self):
-        print(38, self.input_file, self.output_file, self.field_file)
+        print(38, self.input_file, self.output_file, self.field_path)
         if os.path.exists(self.errorlog_path):
             os.remove(self.errorlog_path)
 
-        res_tmp = self.multiparticle_engine.get_path(self.input_file, self.output_file, self.field_file)
+        res_tmp = self.multiparticle_engine.get_path(self.input_file, self.output_file, self.field_path)
 
         res = self.multiparticle_engine.main_agent(1)
         if res == 1:

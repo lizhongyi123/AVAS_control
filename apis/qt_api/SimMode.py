@@ -30,6 +30,16 @@ class SimMode():
         with open(signa_path, 'w') as f:
             f.write(str(info))
 
+    def write_sim_error(self, info):
+        tmp_dir = os.path.join(self.project_path, "OutputFile", "tmp")
+
+        os.makedirs(tmp_dir, exist_ok=True)  # 确保 tmp 目录存在
+
+        errordata_path = os.path.join(tmp_dir, "errordata.txt")
+
+        with open(errordata_path, 'w') as f:
+            f.write(str(info))
+
     def run(self):
         #检查
         self.write_signal(1)
@@ -78,6 +88,7 @@ class SimMode():
                     basic_mulp(**item)
 
             self.write_signal(2)
+            self.write_sim_error('')
 
         except Exception as e:
             self.write_signal(2)
@@ -98,7 +109,7 @@ class SimMode():
 
 if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
-    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
+    path = r"C:\Users\anxin\Desktop\test516"
 
     item = {"projectPath": path}
     obj = SimMode(item)

@@ -4,12 +4,14 @@ import os
 from ctypes import POINTER, c_char_p, cdll
 import platform
 
+
 class MultiParticleEngine():
     def __init__(self):
         script_directory = os.path.dirname(os.path.abspath(__file__))  # 获取当前脚本所在文件夹的绝对路径
         parent_directory = os.path.dirname(script_directory)  # 获取上级目录的路径
         self.dll_path = os.path.join(parent_directory, 'dllfile', 'AVAS.dll')  # 使用绝对路径连接得到完整的路径
         self.so_path = os.path.join(parent_directory, 'dllfile', 'libAVAS.so')  # 使用绝对路径连接得到完整的路径
+        print(13, self.so_path)
         try:
             if platform.system() == 'Windows':
                 # 尝试加载DLL文件
@@ -24,20 +26,23 @@ class MultiParticleEngine():
             elif platform.system() == "Linux":
                 raise ValueError(f"Failed to load so '{self.so_path}'. Reason: {e}")
 
-
     def get_path(self, inputfilepath, outputfilePath, fieldfilePath):
+        print(30, inputfilepath, outputfilePath, fieldfilePath)
         if platform.system() == 'Windows':
             inputfilepath = ctypes.c_wchar_p(inputfilepath)
             outputfilePath = ctypes.c_wchar_p(outputfilePath)
             fieldfilePath = ctypes.c_wchar_p(fieldfilePath)
             res = self.library.path(inputfilepath, outputfilePath, fieldfilePath)
         elif platform.system() == "Linux":
+
+
             inputfilepath = ctypes.c_char_p(inputfilepath.encode('utf-8'))  # 转为字节并包装为 c_char_p
             outputfilePath = ctypes.c_char_p(outputfilePath.encode('utf-8'))
-            res = self.AVAS_cdll.path(inputfilepath, outputfilePath)
+            fieldfilePath = ctypes.c_char_p(fieldfilePath.encode('utf-8'))
+            res = self.AVAS_cdll.path(inputfilepath, outputfilePath, fieldfilePath)
         return res
 
-    #input, beam, lattice都应该为自定义的结构体
+    # input, beam, lattice都应该为自定义的结构体
     def main_agent(self, value):
 
         value = ctypes.c_int(value)
@@ -48,8 +53,6 @@ class MultiParticleEngine():
             res = self.AVAS_cdll.main_agent(value)
 
         return res
-
-
 
 if __name__ == '__main__':
     import threading

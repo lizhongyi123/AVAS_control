@@ -2,8 +2,6 @@ import sys
 
 from core.MultiParticle import MultiParticle
 
-item = {"project_path": ""}
-m1obj = MultiParticle(item)
 
 from utils.beamconfig import BeamConfig
 from utils.inputconfig import InputConfig
@@ -79,6 +77,7 @@ class SimMode():
                 "seed": err_seed,
                 "device": device,
             }
+            print(82, item)
             # print(item)
             # sys.exit()
             if base_mode == "mulp":

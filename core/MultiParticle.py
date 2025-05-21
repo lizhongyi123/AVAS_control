@@ -30,6 +30,9 @@ class MultiParticle():
         self.multiparticle_engine = item.get("mulp_engine")
         self.device = item.get("device")
 
+        if self.device in [None, ""]:
+            self.device = "cpu"
+
         if self.input_file is None:
             self.input_file = os.path.join(self.project_path, "InputFile")
         if self.output_file is None:
@@ -41,11 +44,11 @@ class MultiParticle():
         if self.errorlog_path is None:
             self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
 
-        if self.multiparticle_engine is None:
-            self.multiparticle_engine = MultiParticleEngine()
+        if self.device  == "cpu":
+            if self.multiparticle_engine is None:
+                self.multiparticle_engine = MultiParticleEngine()
 
-        if self.device in [None, ""]:
-            self.device = "cpu"
+
 
     def run(self):
         if self.device == "cpu":

@@ -1,3 +1,5 @@
+import sys
+
 from core.MultiParticle import MultiParticle
 
 item = {"project_path": ""}
@@ -51,6 +53,7 @@ class SimMode():
 
             ini_info = ini_info["data"]["iniParams"]
             base_mode = ini_info["input"]["sim_type"]
+            device = ini_info["input"]["device"]
 
             match_mode = [
                 ini_info["match"]["cal_input_twiss"],
@@ -69,12 +72,15 @@ class SimMode():
             #如果field_path是空的
             if not field_path:
                 field_path = None
+
             item = {
                 "project_path": self.project_path,
                 "field_path": field_path,
-                "seed": err_seed
+                "seed": err_seed,
+                "device": device,
             }
-
+            # print(item)
+            # sys.exit()
             if base_mode == "mulp":
                 if err_mode == "stat":
                     err_stat(**item)
@@ -118,7 +124,7 @@ class SimMode():
 
 if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
-    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    path = r"C:\Users\anxin\Desktop\gpu_jiqun\cafe_avas"
 
     item = {"projectPath": path}
     obj = SimMode(item)

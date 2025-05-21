@@ -10,25 +10,22 @@ def get_errordata(**item):
         error_exist = False
         with open(err_path, 'r', encoding="UTF-8") as file:
             text = file.read()
-            print(9, text)
             if text.strip():  # 去除空格和换行后仍有内容
                 error_exist = True
             else:
                 error_exist = False
 
         if error_exist:
-            kwargs = {"errorInfo": text, "ifFinish": 2 }
+            kwargs = {"errorInfo": text,}
         else:
-            kwargs = {"errorInfo": "", "ifFinish": 2 }
+            kwargs = {"errorInfo": ""}
 
-        output = format_output(**kwargs)
 
     else:
     #如果文件不存在,证明还没有模拟完
-        kwargs = {"errorInfo": "", "ifFinish": 1}
-        output = format_output(**kwargs)
+        kwargs = {"errorInfo": ""}
 
-    return output
+    return kwargs
 
 
 

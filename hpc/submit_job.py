@@ -16,18 +16,32 @@ import time
 #     job_id = str(uuid.uuid4())[:8]
 #     print(f"模拟提交 SLURM 任务：用户名={username}, 输出路径={output_path}")
 #     return job_id, "模拟提交成功（开发环境）"
+# template = """#!/bin/bash
+# #SBATCH --job-name={job_name}
+# #SBATCH --partition=cpup{partition}
+# #SBATCH --nodes=1
+# #SBATCH --time=01:00:00
+# #SBATCH --output={tmp_dir}\outputdata.log
+# #SBATCH --error={tmp_dir}\errordata.log
+# #SBATCH --cpus-per-task=56
+#
+# cd {work_dir}
+# python apis/qt_api/hpc_simmode.py {project_path}
+# """
+
 template = """#!/bin/bash
 #SBATCH --job-name={job_name}
-#SBATCH --partition=cpup{partition}
+
 #SBATCH --nodes=1
 #SBATCH --time=01:00:00
 #SBATCH --output={tmp_dir}\outputdata.log
 #SBATCH --error={tmp_dir}\errordata.log
-#SBATCH --cpus-per-task=56
 
 cd {work_dir}
 python apis/qt_api/hpc_simmode.py {project_path}
+
 """
+
 
 
 def submit_job(**item):
@@ -107,7 +121,7 @@ def submit_job(**item):
     }
 
     output = format_output(**kwargs)
-    print(output)
+
     return output
 
 

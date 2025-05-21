@@ -88,7 +88,7 @@ class SimMode():
                     basic_mulp(**item)
 
             self.write_signal(2)
-            self.write_sim_error('')
+
 
         except Exception as e:
             self.write_signal(2)
@@ -103,14 +103,24 @@ class SimMode():
         #     else:
         #         basic_env(self.project_path)
 
-        output = format_output()
+
+        jobInfo_dict = {
+            'jobInfo': {'projectPath': self.project_path,
+                    'jobName': '',
+                    'jobId': 0}
+        }
+
+        kwargs = {}
+        kwargs.update(jobInfo_dict)
+        output = format_output(**kwargs)
         return output
 
 
 if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
-    path = r"C:\Users\anxin\Desktop\test516"
+    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
 
     item = {"projectPath": path}
     obj = SimMode(item)
-    obj.run()
+    res = obj.run()
+    print(res)

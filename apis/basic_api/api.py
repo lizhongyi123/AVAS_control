@@ -250,7 +250,7 @@ def plot_dataset(**item):
     webreturn_type = default_item.get("webreturnType")
     need_data = default_item.get("needData")
 
-    dataset_path = os.path.join(project_path, "OutputFile", "dataset.txt")
+    dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
     v = PlotDataSet(dataset_path, picture_type, sample_interval)
     v.get_x_y()
 

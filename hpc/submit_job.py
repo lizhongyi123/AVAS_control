@@ -16,31 +16,48 @@ import time
 #     job_id = str(uuid.uuid4())[:8]
 #     print(f"模拟提交 SLURM 任务：用户名={username}, 输出路径={output_path}")
 #     return job_id, "模拟提交成功（开发环境）"
-# template = """#!/bin/bash
-# #SBATCH --job-name={job_name}
-# #SBATCH --partition=cpup{partition}
-# #SBATCH --nodes=1
-# #SBATCH --time=01:00:00
-# #SBATCH --output={tmp_dir}\outputdata.log
-# #SBATCH --error={tmp_dir}\errordata.log
-# #SBATCH --cpus-per-task=56
-#
-# cd {work_dir}
-# python apis/qt_api/hpc_simmode.py {project_path}
-# """
+
 
 template = """#!/bin/bash
 #SBATCH --job-name={job_name}
-
+#SBATCH --partition=cpup{partition}
 #SBATCH --nodes=1
 #SBATCH --time=01:00:00
 #SBATCH --output={tmp_dir}\outputdata.log
 #SBATCH --error={tmp_dir}\errordata.log
+#SBATCH --cpus-per-task=56
 
 cd {work_dir}
 python apis/qt_api/hpc_simmode.py {project_path}
-
 """
+
+template_gpu = """#!/bin/bash
+#SBATCH --job-name={job_name}
+
+#SBATCH --partition=gpup1
+#SBATCH --gres=gpu:1
+
+#SBATCH --time=01:00:00
+#SBATCH --output={tmp_dir}\outputdata.log
+#SBATCH --error={tmp_dir}\errordata.log
+
+
+cd {work_dir}
+mpirun -np 1 python apis/qt_api/hpc_simmode.py {project_path}
+"""
+
+# template = """#!/bin/bash
+# #SBATCH --job-name={job_name}
+#
+# #SBATCH --nodes=1
+# #SBATCH --time=01:00:00
+# #SBATCH --output={tmp_dir}\outputdata.log
+# #SBATCH --error={tmp_dir}\errordata.log
+#
+# cd {work_dir}
+# python apis/qt_api/hpc_simmode.py {project_path}
+#
+# """
 
 
 
@@ -85,17 +102,27 @@ def submit_job(**item):
     ini_res = ini_res["data"]["iniParams"]
 
     if ini_res["input"]["device"] == "cpu":
-        pass
+        device = "cpu"
     elif ini_res["input"]["device"] == "gpu":
-        pass
-    partition = 8
-
-    script_content = (template.replace("{job_name}", job_name).
-                      replace("{project_path}", project_path).
-                      replace("{tmp_dir}", tmp_dir).
-                      replace("{work_dir}", work_dir).
-                      replace("{partition}", str(partition))
-                      )
+        device = "gpu"
+    else:
+        device = "cpu"
+    if device == "cpu":
+        partition = 8
+        script_content = (template.replace("{job_name}", job_name).
+                          replace("{project_path}", project_path).
+                          replace("{tmp_dir}", tmp_dir).
+                          replace("{work_dir}", work_dir).
+                          replace("{partition}", str(partition))
+                          )
+    elif device == "gpu":
+        partition = 8
+        script_content = (template_gpu.replace("{job_name}", job_name).
+                          replace("{project_path}", project_path).
+                          replace("{tmp_dir}", tmp_dir).
+                          replace("{work_dir}", work_dir).
+                          replace("{partition}", str(partition))
+                          )
 
     script_content = script_content.replace("\\", "/")
 
@@ -123,6 +150,7 @@ def submit_job(**item):
     output = format_output(**kwargs)
 
     return output
+
 
 
 if __name__ == "__main__":

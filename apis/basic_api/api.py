@@ -696,17 +696,22 @@ def plot_density_transport(**item):
     elif platform == "web":
         file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
 
+    default_item["filePath"] = file_path
+
     picture_type = default_item.get("pictureType")
     process_type = ["centroid", "emit", "rms_size", "rms_size_max"]
+
     if picture_type == "density":
-        res = plot_density(**item)
+        res = plot_density(**default_item)
 
     elif picture_type == "density_level":
-        res = plot_density_level(**item)
+        res = plot_density_level(**default_item)
 
     elif picture_type in process_type:
-        res = plot_density_process(**item)
+        res = plot_density_process(**default_item)
     return res
+
+
 def plot_phase_ellipse(parameter_item, picture_type, show_=1, fig = None, platform = "qt"):
     obj = PlotPhaseEllipse()
     obj.get_x_y(picture_type, parameter_item)

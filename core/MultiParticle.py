@@ -70,6 +70,8 @@ class MultiParticle():
                 error = self.check_error_file(self.errorlog_path)
                 raise Exception(f'{error}')
         elif self.device == "gpu":
+            # from sim_gpu.pic import *
+
             #重写beam和input
             generate_input_gpu(self.input_file,  self.output_file, self.field_path)
             generate_beam_gpu(self.input_file, self.output_file, self.field_path)
@@ -117,6 +119,7 @@ def generate_input_gpu(input_file, output_file, field_path):
     ori_input_res.append(["numofgrid", 24, 24, 24])
     ori_input_res.append(["MeshRms", 4, 4, 4])
     ori_input_res.append(["statOutputInterval", 1])
+    ori_input_res.append(["beampath", input_file])
 
     input_txt_gpu = os.path.join(input_file, "input_gpu.txt")
     write_to_txt(input_txt_gpu, ori_input_res)

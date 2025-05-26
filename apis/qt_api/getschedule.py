@@ -101,14 +101,11 @@ class GetSchedule():
         dic["allStep"] = all_step
 
 
-
-
-
         error_output_path = os.path.join(self.project_path, 'OutputFile', 'error_output')
         error_middle_path = os.path.join(self.project_path, 'OutputFile', 'error_middle')
         error_middle_output0_path = os.path.join(self.project_path, 'OutputFile', 'error_middle', 'output_0')
 
-        all_files = list_files_in_directory(error_output_path)
+        all_files = list_files_in_directory(error_output_path,"mtime")
 
         #如果还没进行模拟
         if len(all_files) == 0:
@@ -116,7 +113,6 @@ class GetSchedule():
 
         #如果已经进行了模拟
         else:
-
             last_file = all_files[-1]
             now_group = int(last_file.split("/")[-1].split("_")[1])
             now_time = int(last_file.split("/")[-1].split("_")[2])

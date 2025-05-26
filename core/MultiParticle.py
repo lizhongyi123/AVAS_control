@@ -15,7 +15,20 @@ from utils.inputconfig import InputConfig
 from utils.beamconfig import BeamConfig
 from utils.readfile import read_txt
 from utils.tool import write_to_txt, convert_dic2lis
-from sim_gpu.pic import *
+import platform
+
+if platform.system() == 'Windows':
+    class SimulationRunner():
+        def __init__(self, item):
+            pass
+        def run(self,):
+            pass
+
+elif platform.system() == "Linux":
+    from sim_gpu.pic import *
+
+
+
 
 class MultiParticle():
     """
@@ -69,6 +82,7 @@ class MultiParticle():
                 # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
                 error = self.check_error_file(self.errorlog_path)
                 raise Exception(f'{error}')
+
         elif self.device == "gpu":
             # from sim_gpu.pic import *
 
@@ -144,8 +158,7 @@ def basic_mulp(project_path):
 
 if __name__ == "__main__":
     
-    item = {'project_path': r'C:\Users\anxin\Desktop\gpu_jiqun\cafe_avas',
-            "device": "gpu"
+    item = {'project_path': r'C:\Users\anxin\Desktop\test_schedule\cafe_avas',
             }
     obj = MultiParticle(item)
     obj.run()

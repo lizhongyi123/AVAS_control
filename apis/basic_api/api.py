@@ -694,7 +694,7 @@ def plot_density_transport(**item):
     if platform == "qt":
         file_path = default_item.get("filePath")
     elif platform == "web":
-        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
+        file_path = os.path.join(project_path, 'OutputFile', default_item.get("filePath"))
 
     default_item["filePath"] = file_path
 
@@ -768,10 +768,10 @@ def change_file_win2linux(**item):
 
 if __name__ == '__main__':
 
-    path = r"C:\Users\anxin\Desktop\AVAS1.1\error_example"
-    item = {"project_path": path}
-    res = change_file_win2linux(**item)
-    print(res)
+    # path = r"C:\Users\anxin\Desktop\AVAS1.1\error_example"
+    # item = {"project_path": path}
+    # res = change_file_win2linux(**item)
+    # print(res)
 
     # path = r"C:\Users\shliu\Desktop\test_lattice"
     # path = r"C:\Users\shliu\Desktop\xiaochu"
@@ -882,19 +882,19 @@ if __name__ == '__main__':
     # res = plot_density_level(**item)
     # print(res)
 
-    # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\density_par_0_0.dat",
-    #     "desnityPlane": "x",
-    #     "pictureType": "density_level",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "sampleInterval": 1,
-    #     "needData": False,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-    #
-    #
-    # res = plot_density_transport(**item)
+    item = {
+        "filePath": r"density_par_0_0.dat",
+        "desnityPlane": "x",
+        "pictureType": "density_level",
+        "platform": "web",
+        "show_": 0,
+        "sampleInterval": 1,
+        "needData": False,
+        "projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
+    }
+
+
+    res = plot_density_transport(**item)
     # print(res)
     # "filePath": r"inData.dst",
     #"filePath": r"part_rfq.dst",

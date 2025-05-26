@@ -188,6 +188,7 @@ class GetSchedule():
 
         kwargs.update({'schedule':res})
         output = format_output(**kwargs)
+        print(191, output)
         return output
 
 
@@ -195,13 +196,13 @@ class GetSchedule():
 
 if __name__ == '__main__':
     import time
-    path = r"C:\Users\shliu\Desktop\test_schedule\cafe_avas_error"
+    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
     # path = r"C:\Users\shliu\Desktop\test_schedule\cafe_avas"
 
     item = {"projectPath": path}
     obj = GetSchedule(item)
-
-    for i in range(1000):
-        res = obj.main()
-        print(res)
-        time.sleep(1)
+    obj.main()
+    # for i in range(1000):
+    #     res = obj.main()
+    #     print(res)
+    #     time.sleep(1)

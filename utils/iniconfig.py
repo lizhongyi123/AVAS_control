@@ -42,28 +42,23 @@ class IniConfig():
         config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
 
 
-        try:
-            if not os.path.exists(path):
-                print(f"文件路径 {path} 不存在。")
-                return False
 
-            config = configparser.ConfigParser()
-            config.optionxform = str
-            config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
+        if not os.path.exists(path):
+            print(f"文件路径 {path} 不存在。")
+            return False
 
-            for section in config.sections():
-                for key, value in config.items(section):
-                    if key not in self.str_keys:
-                        self.ini_parameter[section][key] = int(value)
-                    else:
-                        self.ini_parameter[section][key] = value
+        config = configparser.ConfigParser()
+        config.optionxform = str
+        config.read(path, encoding='utf-8')  # 确保文件以正确的编码读取
 
-        except Exception as e:
-            code = -1
-            msg = str(e)
-            kwargs.update({'iniParams': {}})
-            output = format_output(code, msg=msg, **kwargs)
-            return output
+        for section in config.sections():
+            for key, value in config.items(section):
+                if key not in self.str_keys:
+                    self.ini_parameter[section][key] = int(value)
+                else:
+                    self.ini_parameter[section][key] = value
+
+
 
         # print("read", self.ini_parameter)
         kwargs.update({'iniParams': copy.deepcopy(self.ini_parameter)})

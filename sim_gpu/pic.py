@@ -1,7 +1,6 @@
 import sys
 import os
 from ctypes import *
-from mpi4py import MPI
 from sim_gpu.structures import *
 from sim_gpu.initializer import *
 from sim_gpu.run import *
@@ -9,12 +8,24 @@ import time
 
 class MPIContext:
     def __init__(self):
-        self.comm = MPI.COMM_WORLD
-        self.rank = self.comm.Get_rank()
-        self.comm_size = self.comm.Get_size()
-        self.mpi_obj = MPIObject()
-        self.mpi_obj.commSize = self.comm_size
-        self.mpi_obj.rank = self.rank
+        try:
+            from mpi4py import MPI  # 延迟导入，确保只有在需要时才触发
+            self.comm = MPI.COMM_WORLD
+            self.rank = self.comm.Get_rank()
+            self.comm_size = self.comm.Get_size()
+
+            self.mpi_obj = MPIObject()
+            self.mpi_obj.commSize = self.comm_size
+            self.mpi_obj.rank = self.rank
+            print(f"[MPI] Init success - rank={self.rank}, size={self.comm_size}")
+        except Exception as e:
+            print("[MPI] 初始化失败:", e)
+            import traceback
+            traceback.print_exc()
+            self.comm = None
+            self.rank = 0
+            self.comm_size = 1
+            self.mpi_obj = None
 
 class CUB:
     def __init__(self, beam_ptr):

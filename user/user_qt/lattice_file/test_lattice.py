@@ -136,10 +136,20 @@ class CodeEditor(QPlainTextEdit):
         block = self.document().firstBlock()  # 获取文档的第一行
         while block.isValid():
             text = block.text().strip()
+            # print(text)
             # if text.startswith("drift") or text.startswith("field"):
-            if any(text.startswith(prefix) for prefix in global_varible.long_element):
-                logical_number += 1  # 递增编号
-                self.line_number_map[block.blockNumber()] = logical_number
+            # if any(text.startswith(prefix) for prefix in global_varible.all_element):
+
+            text_lower = text.lower()
+            if ":" in text_lower:
+                text_lower = text_lower.split(":", 1)[1]
+
+            if not text.startswith("!") and text_lower.split():
+                first_word = text_lower.split()[0]
+                if first_word in global_varible.all_element:
+                    logical_number += 1  # 递增编号
+                    self.line_number_map[block.blockNumber()] = logical_number
+
             elif text.startswith("end"):
                 break
             block = block.next()  # 移动到下一个 block

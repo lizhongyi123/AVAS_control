@@ -328,7 +328,6 @@ class Picturedensity():
         self.ylim = []
         self.set_legend = 0
         self.patch_list=None
-        self.bins=300
 
     def get_data(self):
         self.z = []

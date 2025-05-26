@@ -1,8 +1,11 @@
 ﻿
 import sys
+avas_control = r"D:\AVAS_CONTROL\AVAS_control"
+sys.path.append(avas_control)
+import sys
 import time
 
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QObject
 from PyQt5.QtWidgets import QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
     QStackedWidget,QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QMessageBox,\
     QApplication, QGroupBox
@@ -38,6 +41,65 @@ from multiprocessing import Process, Queue
 from apis.qt_api.api import judge_if_is_avas_project
 import traceback
 from utils.exception import BaseError
+from concurrent.futures import ProcessPoolExecutor
+
+# def basic_run(project_path, queue):
+#     try:
+#         item = {"projectPath": project_path}
+#         obj = SimMode(item)
+#         obj.run()
+#     except Exception as e:
+#         queue.put(str(e))
+#     finally:
+#         queue.close()
+
+
+# class SimThread(QThread):
+#     finished = pyqtSignal()  # 任务完成信号
+#     sim_error_signal = pyqtSignal(str)
+#
+#     def __init__(self, project_path):
+#         super().__init__()
+#         self.project_path = project_path
+#         self.process = None
+#
+#     def run(self):
+#         try:
+#             print("Thread started")
+#             item = {"projectPath": self.project_path}
+#
+#             queue = Queue()  # 创建队列用于传递异常信息
+#
+#             # 创建进程并传递队列
+#             self.process = Process(target=basic_run, args=(self.project_path, queue,))
+#             self.process.start()
+#             self.process.join()
+#
+#             # 检查子进程是否有异常
+#             if not queue.empty():
+#                 error_message = queue.get()
+#                 raise Exception(f"Subprocess Error: {error_message}")
+#
+#             self.finished.emit()
+#             print("Thread finished")
+#
+#         except Exception as e:
+#             self.sim_error_signal.emit(str(e))
+#
+#     def stop(self):
+#         if self.process and self.process.is_alive():
+#             print("Stopping process...")
+#             self.process.terminate()  # 强制终止子进程
+#             self.process.join()       # 等待子进程结束
+#             print("Process stopped")
+#
+#         self.quit()  # 让 QThread 退出
+#         self.wait()  # 确保线程彻底结束
+
+
+
+
+
 def basic_run(project_path, queue):
     try:
         item = {"projectPath": project_path}
@@ -49,47 +111,54 @@ def basic_run(project_path, queue):
         queue.close()
 
 
-class SimThread(QThread):
-    finished = pyqtSignal()  # 任务完成信号
+class SimThread(QObject):
+    finished = pyqtSignal()
     sim_error_signal = pyqtSignal(str)
 
     def __init__(self, project_path):
         super().__init__()
         self.project_path = project_path
         self.process = None
+        self.queue = None
+        self.check_timer = QTimer()
+        self.check_timer.timeout.connect(self.check_process)
 
-    def run(self):
-        try:
-            print("Thread started")
-            item = {"projectPath": self.project_path}
+    def start(self):
+        self.queue = Queue()
+        self.process = Process(target=basic_run, args=(self.project_path, self.queue))
+        self.process.start()
+        self.check_timer.start(1000)  # 更快响应 UI
 
-            queue = Queue()  # 创建队列用于传递异常信息
-
-            # 创建进程并传递队列
-            self.process = Process(target=basic_run, args=(self.project_path, queue,))
-            self.process.start()
+    def check_process(self):
+        if not self.process.is_alive():
             self.process.join()
+            self.process = None
+            self.check_timer.stop()
 
-            # 检查子进程是否有异常
-            if not queue.empty():
-                error_message = queue.get()
-                raise Exception(f"Subprocess Error: {error_message}")
+            if not self.queue.empty():
+                error_msg = self.queue.get()
+                self.sim_error_signal.emit(f"Process Error: {error_msg}")
+            else:
+                self.finished.emit()
 
-            self.finished.emit()
-            print("Thread finished")
-
-        except Exception as e:
-            self.sim_error_signal.emit(str(e))
+            if self.queue:
+                self.queue.close()
+                self.queue = None
 
     def stop(self):
         if self.process and self.process.is_alive():
-            print("Stopping process...")
-            self.process.terminate()  # 强制终止子进程
-            self.process.join()       # 等待子进程结束
-            print("Process stopped")
+            print("Force killing simulation process.")
+            self.process.terminate()
+            self.process.join()
+            self.process = None
 
-        self.quit()  # 让 QThread 退出
-        self.wait()  # 确保线程彻底结束
+        if self.check_timer.isActive():
+            self.check_timer.stop()
+
+        if self.queue:
+            self.queue.close()
+            self.queue = None
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -469,7 +538,7 @@ class MainWindow(QMainWindow):
             self.handle_error(str(e))
             return False
 
-        self.page_data.fill_parameter()
+        # self.page_data.fill_parameter()
 
 
         self.sim_thread = SimThread(self.project_path)
@@ -506,18 +575,18 @@ class MainWindow(QMainWindow):
 
 #停止程序所有的运行
     def stop_all(self):
-        #改变按钮状态
+        # 改变按钮状态
         self.run_btn_state(0)
 
         try:
-            if self.sim_thread and self.sim_thread.isRunning():
+            if self.sim_thread and self.sim_thread.process and self.sim_thread.process.is_alive():
                 self.sim_thread.stop()
         except Exception as e:
-            raise Exception(f"QT thread stop Error {e}")
+            raise Exception(f"SimThread stop error: {e}")
         finally:
             self.sim_thread = None
             self.timer1.stop()
-            print('结束进程')
+            print("结束进程")
 
     def on_task_finished(self):
         print("Task finished.")

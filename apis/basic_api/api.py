@@ -1,4 +1,5 @@
 # -- coding: utf-8 --
+
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
@@ -16,7 +17,7 @@ import os
 from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
-from utils.tolattice import write_mulp_to_lattice_only_sim
+from utils.tolattice import write_mulp_to_lattice_only_sim2
 from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
@@ -28,9 +29,13 @@ from apis.qt_api.judge_lattice import JudgeLattice
 from aftertreat.picture.plotphaseellipse import PlotPhaseEllipse
 from utils.tool import format_output, generate_web_picture_param, generate_web_picture_path
 import uuid
+from apps.diaginfo import DiagInfo
+from aftertreat.dataanalysis.extodensity import ExtoDensity
+from utils.inputconfig import InputConfig
+from utils.change_win_to_linux import change_end_crlf
 #下列为功能函数
 #基础运行
-def basic_mulp(project_path, field_path = None):
+def basic_mulp(**item):
     """
     :param project_path:
     :return:
@@ -38,21 +43,50 @@ def basic_mulp(project_path, field_path = None):
     """
 
     # else:
-    multiparticle_obj = MultiParticle(project_path)
+    project_path = item.get('project_path')
+
+    multiparticle_obj = MultiParticle(item)
 
     lattice_mulp_path = os.path.join(project_path, 'InputFile', 'lattice_mulp.txt')
     lattice_path = os.path.join(project_path, 'InputFile', 'lattice.txt')
-    write_mulp_to_lattice_only_sim(lattice_mulp_path, lattice_path)
+    write_mulp_to_lattice_only_sim2(lattice_mulp_path, lattice_path)
 
-    res = multiparticle_obj.run(field_file=field_path)
+    res = multiparticle_obj.run()
+
+    # 生成束诊文件
+    diag_item = {
+        "project_path": project_path,
+        "input_file": os.path.join(project_path, 'InputFile'),
+        "output_file": os.path.join(project_path, 'OutputFile'),
+        "diag_file_path": os.path.join(project_path, 'OutputFile', 'par_diag1.txt'),
+    }
+    obj = DiagInfo(diag_item)
+    obj.write_diag_info_to_file()
+
+    #
+    item = { "projectPath": project_path,}
+    input_info = InputConfig()
+    input_info = input_info.create_from_file(item)
+    input_info = input_info["data"]["inputParams"]
+
+
+    if input_info.get("outputcontrol_start") == 1 and input_info.get("outputcontrol_grid") > 0:
+    #生成密度文件
+        exdata_path = os.path.join(project_path, "OutputFile", "ExData.edt")
+
+        dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
+        target_density_path = os.path.join(project_path, "OutputFile", f"density_par.dat")
+
+        density_obj = ExtoDensity(exdata_path, dataset_path, target_density_path)
+        density_obj.generate_density_file_onestep(1)
+
     print('模拟结束')
-
-    return res
+    return True
 
 #粒子数扩充
 def change_particle_number(infile_path, outfile_path, ratio):
-    """
 
+    """
     :param infile_path: 输入
     :param outfile_path: 输出
     :param ratio: 扩大的比例
@@ -88,37 +122,60 @@ def circle_match(project_path):
     return res
 
 
-def err_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
+def err_dyn(**item):
     """
     p跑动态误差, 静态误差将被注释掉
     :param project_path:
     :return:
     """
-
-    v = ErrorDyn(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = ErrorDyn(default_item)
     res = v.run()
     print('动态误差结束')
 
     return res
 
-def err_stat(project_path, seed, if_normal=1, field_path = None, generate_density_file = 1):
+def err_stat(**item):
     """
     :param project_path:
     :return:
     根据是否有adjust命令判断是否需要优化
     """
-    v = Errorstat(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = Errorstat(default_item)
     v.run()
     
 
-def err_stat_dyn(project_path, seed, if_normal=1, field_path = None, generate_density_file=1):
+def err_stat_dyn(**item):
     """
 
     :param project_path:
     :return:
     动态误差和静态误差一起跑，
     """
-    v = Errorstatdyn(project_path, seed, if_normal, field_path, generate_density_file)
+    default_item = {
+        "project_path": None,
+        "seed": 50,
+        "if_normal": 1,
+        "field_path": None,
+        "if_generate_density_file":1
+    }
+    default_item.update(item)
+    v = Errorstatdyn(default_item)
     v.run()
     return None
 
@@ -193,7 +250,7 @@ def plot_dataset(**item):
     webreturn_type = default_item.get("webreturnType")
     need_data = default_item.get("needData")
 
-    dataset_path = os.path.join(project_path, "OutputFile", "dataset.txt")
+    dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
     v = PlotDataSet(dataset_path, picture_type, sample_interval)
     v.get_x_y()
 
@@ -637,19 +694,24 @@ def plot_density_transport(**item):
     if platform == "qt":
         file_path = default_item.get("filePath")
     elif platform == "web":
-        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
+        file_path = os.path.join(project_path, 'OutputFile', default_item.get("filePath"))
+
+    default_item["filePath"] = file_path
 
     picture_type = default_item.get("pictureType")
     process_type = ["centroid", "emit", "rms_size", "rms_size_max"]
+
     if picture_type == "density":
-        res = plot_density(**item)
+        res = plot_density(**default_item)
 
     elif picture_type == "density_level":
-        res = plot_density_level(**item)
+        res = plot_density_level(**default_item)
 
     elif picture_type in process_type:
-        res = plot_density_process(**item)
+        res = plot_density_process(**default_item)
     return res
+
+
 def plot_phase_ellipse(parameter_item, picture_type, show_=1, fig = None, platform = "qt"):
     obj = PlotPhaseEllipse()
     obj.get_x_y(picture_type, parameter_item)
@@ -691,11 +753,37 @@ def judge_opti(res):
         return 1
     else:
         return 0
+def change_file_win2linux(**item):
+    path = item.get('project_path')
+    beam_path = os.path.join(path, "InputFile", "beam.txt")
+    input_path = os.path.join(path, "InputFile", "input.txt")
+    change_end_crlf(beam_path)
+    change_end_crlf(input_path)
+
+    output = format_output()
+
+    return output
+
+
 
 if __name__ == '__main__':
-    # path = r"D:\using\test_avas_qt\cafe_avas3"
-    # res = basic_mulp(path)
 
+    # path = r"C:\Users\anxin\Desktop\AVAS1.1\error_example"
+    # item = {"project_path": path}
+    # res = change_file_win2linux(**item)
+    # print(res)
+
+    # path = r"C:\Users\shliu\Desktop\test_lattice"
+    # path = r"C:\Users\shliu\Desktop\xiaochu"
+
+    # item = {"project_path": path,
+    #         "if_normal": 0,
+    #         "if_generate_density_file": 0
+    #         }
+    # res = err_stat(**item)
+    #
+    # item = {"project_path": path,}
+    # res = basic_mulp(**item)
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {
     #     "projectPath": path,
@@ -794,29 +882,30 @@ if __name__ == '__main__':
     # res = plot_density_level(**item)
     # print(res)
 
-    # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\density_par_0_0.dat",
-    #     "desnityPlane": "x",
-    #     "pictureType": "density_level",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "sampleInterval": 1,
-    #     "needData": False,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-    #
-    #
-    # res = plot_density_transport(**item)
-    # print(res)
-    # "filePath": r"inData.dst",
-    #"filePath": r"part_rfq.dst",
     item = {
-        "filePath": r"inData.dst",
+        "filePath": r"density_par_0_0.dat",
+        "desnityPlane": "x",
+        "pictureType": "density_level",
         "platform": "web",
-        "projectPath": r"D:\using\test_avas_qt\cafe_avas",
-        "location": "out"
+        "show_": 0,
+        "sampleInterval": 1,
+        "needData": False,
+        "projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
     }
 
 
-    res = plot_phase(**item)
-    print(res)
+    res = plot_density_transport(**item)
+
+    # print(res)
+    # "filePath": r"inData.dst",
+    #"filePath": r"part_rfq.dst",
+    # item = {
+    #     "filePath": r"inData.dst",
+    #     "platform": "web",
+    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas",
+    #     "location": "out"
+    # }
+    #
+    #
+    # res = plot_phase(**item)
+    # print(res)

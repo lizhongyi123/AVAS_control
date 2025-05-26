@@ -1,9 +1,6 @@
 import sys
-import os
-import time
-import traceback
+
 from PyQt5.QtWidgets import QApplication, QMessageBox
-import multiprocessing
 from user.user_qt.user_pyqt import MainWindow
 import multiprocessing
 from PyQt5.QtWidgets import QApplication

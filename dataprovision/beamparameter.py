@@ -92,7 +92,6 @@ class DstParameter():
         self.gamma = 1 + self.energy / self.BaseMassInMeV
 
         self.beta = math.sqrt(1 - 1.0 / self.gamma / self.gamma)
-        print(self.beta, self.gamma)
         # sys.exit()
         #中心x
         self.center_x = np.mean(self.x_list)

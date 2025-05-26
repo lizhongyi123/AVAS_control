@@ -146,7 +146,7 @@ def tran_tracewin_avas(tracewin_list):
                 avas_list.append(["superposeend"])
 
         elif stat[0].lower() == "superpose_map":
-            tmp = ["superpose", float(stat[1])/1000]
+            tmp = ["superpose", float(stat[1])/1000, float(stat[2])/1000, float(stat[3])/1000, stat[4], stat[5], stat[6] ]
             avas_list.append(tmp)
 
         elif stat[0].lower() == 'FIELD_MAP'.lower():
@@ -262,8 +262,9 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\test_half\HLAF\HIAF.dat"
-    avas_lattice_path = r"C:\Users\shliu\Desktop\test_half\HLAF\lattice.txt"
+    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\HEBT\tr.dat"
+
+    avas_lattice_path = r"C:\Users\shliu\Desktop\HEBT\lattice.txt"
 
 
     # 修改后的lattice

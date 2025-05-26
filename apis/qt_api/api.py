@@ -13,6 +13,10 @@ from utils.treat_directory import list_files_in_directory
 from utils.iniconfig import IniConfig
 from utils.inputconfig import InputConfig
 import pandas as pd
+from utils.beamconfig import BeamConfig
+from apis.qt_api.judge_lattice import JudgeLattice
+
+
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
     kwargs = {}
@@ -227,21 +231,21 @@ def create_from_file_input_ini(item):
 
     input_obj = InputConfig()
     input_res = input_obj.create_from_file(item)
-    if input_res["code"] == -1:
-        code = -1
-        msg = input_res["data"]["msg"]
-        kwargs.update({'inputiniParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
+    # if input_res["code"] == -1:
+    #     code = -1
+    #     msg = input_res["data"]["msg"]
+    #     kwargs.update({'inputiniParams': {}})
+    #     output = format_output(code, msg=msg, **kwargs)
+    #     return output
 
     ini_obj = IniConfig()
     ini_res = ini_obj.create_from_file(item)
-    if input_res["code"] == -1:
-        code = -1
-        msg = input_res["data"]["msg"]
-        kwargs.update({'inputiniParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
+    # if input_res["code"] == -1:
+    #     code = -1
+    #     msg = input_res["data"]["msg"]
+    #     kwargs.update({'inputiniParams': {}})
+    #     output = format_output(code, msg=msg, **kwargs)
+    #     return output
 
     new_dic = {}
     new_dic.update(input_res["data"]["inputParams"])
@@ -259,12 +263,13 @@ def write_to_file_input_ini(item, param):
     # item的格式{“projectPath”： “path”}
     # {'sim_type': 'mulp', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 50,
     #  'dumpperiodicity': 1, 'spacechargelong': None, 'spacechargetype': None,
-    #  'scmethod': 'SPICNIC', 'fieldSource': ''}
+    #  'scmethod': 'SPICNIC', 'fieldSource': '', "device": "", "outputcontrol_start": , "outputcontrol_grid": }
     kwargs = {}
     if param.get("fieldSource") == "thisProject":
         param["fieldSource"] = os.path.join(item["projectPath"], "InputFile", "field")
 
     input_param = copy.deepcopy(param)
+
 
     del input_param["fieldSource"]
     if input_param.get("device"):
@@ -463,10 +468,53 @@ def get_file_choose_type(item):
     return output
 
 
+def project_check(item):
+    propject_path = item.get("projectPath")
+
+    input_config = InputConfig()
+    input_config.validate_run(item)
+
+    # 检查beam文件
+    beam_config = BeamConfig()
+    beam_config.validate_run(item)
+
+    ini_config = IniConfig()
+    ini_info = ini_config.validate_run(item)
+
+    ini_info = ini_info["data"]["iniParams"]
+
+    base_mode = ini_info["input"]["sim_type"],
+    err_mode = ini_info["error"]["error_type"],
+    err_seed = ini_info["error"]["seed"]
+
+
+    #检查lattice
+    lattice_mulp_path = os.path.join(propject_path, "InputFile", "lattice_mulp.txt")
+    lattice_obj = JudgeLattice(lattice_mulp_path)
+
+    if base_mode == "mulp":
+        if err_mode == "stat":
+            lattice_obj.judge_lattice("stat_error")
+        elif err_mode == "dyn":
+            lattice_obj.judge_lattice("dyn_error")
+        elif err_mode == "stat_dyn":
+            lattice_obj.judge_lattice("stat_dyn_error")
+        else:
+            lattice_obj.judge_lattice("basic_mulp")
+
+
+    output = format_output()
+    return output
+
+
 
 
 if __name__ == '__main__':
-    pass
+    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"}
+    res = project_check(item)
+    print(res)
+
+    # pass
     # item = {
     # "particletype": "H",
     # "nucleonnumber": 10,
@@ -492,12 +540,16 @@ if __name__ == '__main__':
     # item = {"dstPath": dst_path}
     # beam_parameter = cal_beam_parameter(item)
     # print(beam_parameter)
+    #
+    # path = r"C:\Users\shliu\Desktop\test_changdu"
+    # item = {"projectPath": path}
 
+    # param = {'sim_type': 'mulp', 'scmethod': 'FFT', 'scanphase': 1, 'spacecharge': 1, 'steppercycle': 100,
+    #          'dumpperiodicity': 0, 'spacechargelong': 100, 'spacechargetype': 0, 'fieldSource': 'thisProject'}
+    # write_to_file_input_ini(item, param)
 
     # res = create_from_file_input_ini(item)
     # print(res)
-
-    # param = {'fieldSource': r'E:\\using\\test_avas_qt\\test_ini\\field'}
 
 
     # path = r"E:\using\test_avas_qt\cafe_avas\InputFile"

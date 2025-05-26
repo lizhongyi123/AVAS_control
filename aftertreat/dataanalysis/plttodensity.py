@@ -63,14 +63,15 @@ class PlttoDensity():
         syn_y = dataset_obj.syn_y[index]
 
 
-
+        print(one_dict)
         if one_dict["tpye"] == 0:
             filtered_lis = [i for i in one_lis if i[-1] != 1]
         elif one_dict["tpye"] == 1:
             filtered_lis = [i for i in one_lis if i[-1] != 0]
+
         x = np.array([i[0] for i in filtered_lis]) + syn_x
         y = np.array([i[2] for i in filtered_lis]) + syn_y
-        z = np.array([i[4] for i in filtered_lis])
+        z = np.array([i[4] for i in filtered_lis])  #相对于同步粒子的坐标
         r = np.sqrt(x ** 2 + y ** 2)
 
 
@@ -245,7 +246,10 @@ class PlttoDensity():
 
                 E = dataset_obj.ek[-1]
 
-                BaseMassInMeV, freq = get_mass_freq(self.project_path)
+                res = get_mass_freq(self.project_path)
+
+                BaseMassInMeV = res["particlerestmass"]
+
                 timestep = get_timestep(self.project_path)
 
                 timestep = timestep * dumpPeriodicity

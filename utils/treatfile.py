@@ -4,6 +4,9 @@ from utils.treat_directory import list_files_in_directory
 import time
 from datetime import datetime
 from send2trash import send2trash
+
+from pathlib import Path
+
 # 复制文件到目标文件夹
 def copy_file(source_file, target_folder):
     shutil.copy(source_file, target_folder)
@@ -62,7 +65,18 @@ def delete_file(path):
     :param path:
     :return:
     """
-    send2trash(path)
+    p = Path(path)
+    if not p.exists():
+        print("路径不存在")
+        return
+
+    if p.is_file():
+        p.unlink()  # 删除文件
+    elif p.is_dir():
+        shutil.rmtree(p)  # 删除整个文件夹
+    else:
+        print("不是文件也不是文件夹")
+
 if __name__ == "__main__":
     path1 = r"C:\Users\shliu\Desktop\111"
     path2 = r"C:\Users\shliu\Desktop\test_time"

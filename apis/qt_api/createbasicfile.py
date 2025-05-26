@@ -14,7 +14,7 @@ class CreatBasicFile():
         self.lattice_env_path = os.path.join(project_path, "InputFile", "lattice_env.txt")
         self.ini_path = os.path.join(project_path, "InputFile", "ini.ini")
         self.beam_info = {
-            'readparticledistribution': None, 'numofcharge': 1, 'particlerestmass': 938.272, 'current': 0,
+            'readparticledistribution': "", 'numofcharge': 1, 'particlerestmass': 938.272, 'current': 0,
             'particlenumber': 5000, 'frequency': 100, 'kneticenergy': 1,
             "alpha_x": 0, "beta_x": 1, "emit_x": 0.1,
             "alpha_y": 0, "beta_y": 1, "emit_y": 0.1,
@@ -23,7 +23,8 @@ class CreatBasicFile():
         }
 
         self.input_info = {
-            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0
+            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
+            "device":"cpu", "outputcontrol_start": 0, "outputcontrol_grid": 300,
         }
 
         self.ini_info = \
@@ -31,7 +32,7 @@ class CreatBasicFile():
             "lattice":{"length": 0},
              "input": {"sim_type": "mulp", "device": "cpu"},
              "match": {"cal_input_twiss": 0, "match_with_twiss": 0, "use_initial_value": 0},
-             "error": {"error_type": "undefined", "seed": 0, "if_normal": 1},
+             "error": {"error_type": "", "seed": 0, "if_normal": 1},
              }
 
     def create_basic_beam_file(self):
@@ -103,15 +104,21 @@ class CreateBasicProject():
             "inputExtra": list(input_extra_keys),
             "inputMissing": list(input_missing_keys)
         }
-        print(106, msg)
         return msg
 
     def create_project(self):
         obj = CreatBasicFile(self.project_path)
+
+        error_info = {
+            "error_type": obj.ini_info["error"]["error_type"],
+            "seed": obj.ini_info["error"]["seed"],
+        }
+
         kwargs = {
             "projectPath": self.project_path,
             "beamParams": obj.beam_info,
             "inputParams": obj.input_info,
+            "errorParams": error_info,
             "beamExtra": [],
             "beamMissing": [],
             "inputExtra": [],
@@ -168,7 +175,9 @@ class CreateBasicProject():
 
 
 
+
 if __name__ == "__main__":
+    project_path = r"C:\Users\shliu\Desktop\test429"
 
 
 
@@ -185,7 +194,7 @@ if __name__ == "__main__":
 
 
         "inputKeys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
-                       "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device" ]
+                       "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device", "outputcontrol_start", "outputcontrol_grid", ]
         #"spacechargetype", 'bbb'
     }
     platform = "web"

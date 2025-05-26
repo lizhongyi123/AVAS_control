@@ -1,5 +1,5 @@
 #此函数用来在模拟前对lattice进行检验，
-from utils.readfile import read_txt, read_lattice_mulp
+from utils.readfile import read_txt, read_lattice_mulp, read_lattice_mulp_with_name
 from utils.exception import MissingcommandError
 import global_varible
 from utils.tool import delete_element_end_index, add_element_end_index
@@ -265,7 +265,7 @@ class JudgeLattice():
 
         # elifm
     def judge_lattice(self, mode):
-        lattice_mulp_list = read_lattice_mulp(self.lattice_mulp_path)
+        lattice_mulp_list, _ = read_lattice_mulp_with_name(self.lattice_mulp_path)
         self.judge_base_element_command(lattice_mulp_list)
 
         if mode == "err_dyn":
@@ -285,7 +285,7 @@ class JudgeLattice():
 
 
 if __name__ == '__main__':
-    lattice_mulp_path = r"E:\using\test_avas_qt\test_error\InputFile\lattice_mulp.txt"
+    lattice_mulp_path = r"C:\Users\shliu\Desktop\HEBT\hebt_avas\InputFile\lattice_mulp.txt"
     v = JudgeLattice(lattice_mulp_path)
-    res = v.judge_lattice()
+    res = v.judge_lattice(1)
     print(res)

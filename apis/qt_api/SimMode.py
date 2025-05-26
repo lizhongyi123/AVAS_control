@@ -1,3 +1,7 @@
+import sys
+
+from core.MultiParticle import MultiParticle
+
 
 from utils.beamconfig import BeamConfig
 from utils.inputconfig import InputConfig
@@ -9,6 +13,7 @@ from apis.basic_api.api import basic_mulp, basic_env, match_twiss, circle_match,
     err_dyn, err_stat, err_stat_dyn
 from utils.tool import format_output
 from apis.qt_api.judge_lattice import JudgeLattice
+
 class SimMode():
     def __init__(self, item):
         self.item = item
@@ -19,85 +24,108 @@ class SimMode():
         self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", "lattice_mulp.txt")
         self.runsignal = os.path.join(self.project_path, "OutputFile", 'runsignal.txt')
 
-    def file_check(self):
-        #检查input文件
-        input_config = InputConfig()
-        input_config.validate_run(self.item)
 
-        #检查beam文件
-        beam_config = BeamConfig()
-        beam_config.validate_run(self.item)
+    def write_signal(self, info):
+        signa_path = os.path.join(self.project_path, "OutputFile", "signal.txt")
+        with open(signa_path, 'w') as f:
+            f.write(str(info))
 
+    def write_sim_error(self, info):
+        tmp_dir = os.path.join(self.project_path, "OutputFile", "tmp")
 
+        os.makedirs(tmp_dir, exist_ok=True)  # 确保 tmp 目录存在
+
+        errordata_path = os.path.join(tmp_dir, "errordata.txt")
+
+        with open(errordata_path, 'w') as f:
+            f.write(str(info))
 
     def run(self):
         #检查
-        self.file_check()
+        self.write_signal(1)
+        try:
 
-        #判断模拟类型并进行模拟
-        ini_obj = IniConfig()
-        ini_info = ini_obj.create_from_file(self.item)
-        if ini_info["code"] == -1:
-            raise Exception(ini_info["data"]['msg'])
-        ini_info = ini_info["data"]["iniParams"]
-        base_mode = ini_info["input"]["sim_type"]
+            #判断模拟类型并进行模拟
+            ini_obj = IniConfig()
+            ini_info = ini_obj.create_from_file(self.item)
 
+            ini_info = ini_info["data"]["iniParams"]
+            base_mode = ini_info["input"]["sim_type"]
+            device = ini_info["input"]["device"]
 
-        match_mode = [
-            ini_info["match"]["cal_input_twiss"],
-            ini_info["match"]["match_with_twiss"],
-            ini_info["match"]["use_initial_value"],
-        ]
+            match_mode = [
+                ini_info["match"]["cal_input_twiss"],
+                ini_info["match"]["match_with_twiss"],
+                ini_info["match"]["use_initial_value"],
+            ]
 
-        err_mode = ini_info["error"]["error_type"]
-        err_seed = ini_info["error"]["seed"]
+            err_mode = ini_info["error"]["error_type"]
+            err_seed = ini_info["error"]["seed"]
 
-        #检查类型
-        if base_mode not in ["mulp", "env"]:
-            raise exce.ValueRangeError('sim type', ["mulp", "env"], base_mode)
-
-        all_error_type =["stat", "dyn", "stat_dyn", ""]
-        if err_mode not in all_error_type:
-            raise exce.ValueRangeError('error type', all_error_type, err_mode)
+            #检查类型
 
 
-        field_path = ini_info["project"]["fieldSource"]
+            field_path = ini_info["project"]["fieldSource"]
 
-        #如果field_path是空的
-        if not field_path:
-            field_path = None
+            #如果field_path是空的
+            if not field_path:
+                field_path = None
 
-        obj = JudgeLattice(self.lattice_mulp_path)
+            item = {
+                "project_path": self.project_path,
+                "field_path": field_path,
+                "seed": err_seed,
+                "device": device,
+            }
+            print(82, item)
+            # print(item)
+            # sys.exit()
+            if base_mode == "mulp":
+                if err_mode == "stat":
+                    err_stat(**item)
 
-        if base_mode == "mulp":
-            if err_mode == "stat":
-                obj.judge_lattice("stat_error")
-                err_stat(self.project_path, err_seed, if_normal=1, field_path=field_path)
+                elif err_mode == "dyn":
+                    err_dyn(**item)
 
-            elif err_mode == "dyn":
-                obj.judge_lattice("dyn_error")
-                err_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
+                elif err_mode == "stat_dyn":
+                    err_stat_dyn(**item)
+                else:
+                    basic_mulp(**item)
 
-            elif err_mode == "stat_dyn":
-                obj.judge_lattice("stat_dyn_error")
-                err_stat_dyn(self.project_path, err_seed, if_normal=1, field_path=field_path)
-            else:
-                obj.judge_lattice("basic_mulp")
-                basic_mulp(self.project_path, field_path=field_path)
+            self.write_signal(2)
 
-        elif base_mode == "env":
-            if ini_info['match']["cal_input_twiss"] == 1:
-                circle_match(self.project_path)
-            elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 0:
-                match_twiss(self.project_path, 0)
-            elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 1:
-                match_twiss(self.project_path, 1)
-            else:
-                basic_env(self.project_path)
 
-        output = format_output()
+        except Exception as e:
+            self.write_signal(2)
+            raise Exception(str(e))
+        # elif base_mode == "env":
+        #     if ini_info['match']["cal_input_twiss"] == 1:
+        #         circle_match(self.project_path)
+        #     elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 0:
+        #         match_twiss(self.project_path, 0)
+        #     elif ini_info['match']["match_with_twiss"] == 1 and ini_info['match']["use_initial_value"] == 1:
+        #         match_twiss(self.project_path, 1)
+        #     else:
+        #         basic_env(self.project_path)
+
+
+        jobInfo_dict = {
+            'jobInfo': {'projectPath': self.project_path,
+                    'jobName': '',
+                    'jobId': 0}
+        }
+
+        kwargs = {}
+        kwargs.update(jobInfo_dict)
+        output = format_output(**kwargs)
         return output
 
 
 if __name__ == '__main__':
-    pass
+    # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    path = r"C:\Users\anxin\Desktop\gpu_jiqun\cafe_avas"
+
+    item = {"projectPath": path}
+    obj = SimMode(item)
+    res = obj.run()
+    print(res)

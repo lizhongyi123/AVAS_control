@@ -285,7 +285,7 @@ class JudgeLattice():
 
 
 if __name__ == '__main__':
-    lattice_mulp_path = r"C:\Users\shliu\Desktop\HEBT\hebt_avas\InputFile\lattice_mulp.txt"
+    lattice_mulp_path = r"C:\Users\anxin\Desktop\test_schedule\field_ciads\InputFile\lattice_mulp.txt"
     v = JudgeLattice(lattice_mulp_path)
     res = v.judge_lattice(1)
     print(res)

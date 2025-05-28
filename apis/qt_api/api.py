@@ -482,15 +482,15 @@ def project_check(item):
     ini_info = ini_config.validate_run(item)
 
     ini_info = ini_info["data"]["iniParams"]
-
-    base_mode = ini_info["input"]["sim_type"],
-    err_mode = ini_info["error"]["error_type"],
+    base_mode = ini_info["input"]["sim_type"]
+    err_mode = ini_info["error"]["error_type"]
     err_seed = ini_info["error"]["seed"]
 
 
     #检查lattice
     lattice_mulp_path = os.path.join(propject_path, "InputFile", "lattice_mulp.txt")
     lattice_obj = JudgeLattice(lattice_mulp_path)
+
 
     if base_mode == "mulp":
         if err_mode == "stat":

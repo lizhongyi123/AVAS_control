@@ -1,32 +1,11 @@
 import sys
 import time
 import platform
-import subprocess
 import os
-import re
-from os import device_encoding
-
-# sys.path.append(r'E:\AVAS_CONTROL\AVAS_control')
 
 from core.MultiParticleEngine import MultiParticleEngine
-import multiprocessing
-
-from utils.inputconfig import InputConfig
-from utils.beamconfig import BeamConfig
 from utils.readfile import read_txt
 from utils.tool import write_to_txt, convert_dic2lis
-import platform
-
-if platform.system() == 'Windows':
-    class SimulationRunner():
-        def __init__(self, item):
-            pass
-        def run(self,):
-            pass
-
-elif platform.system() == "Linux":
-    from sim_gpu.pic import *
-
 
 
 
@@ -82,9 +61,8 @@ class MultiParticle():
                 # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
                 error = self.check_error_file(self.errorlog_path)
                 raise Exception(f'{error}')
-
         elif self.device == "gpu":
-            # from sim_gpu.pic import *
+            from sim_gpu.pic import SimulationRunner
 
             #重写beam和input
             generate_input_gpu(self.input_file,  self.output_file, self.field_path)

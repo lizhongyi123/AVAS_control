@@ -168,11 +168,14 @@ class GetSchedule():
 
             elif err_mode in ["stat", "dyn", "stat_dyn"]:
                 res = self.get_error_schedule()
+            one_ratio = res["currentLength"] / res["totalLength"]
+            if one_ratio >= 0.98:
+                res["currentLength"] = res["totalLength"]
         except Exception as e:
             code = 1
             msg = str(e)
-            res = {"totalLength": 0,
-                   "currentLength": self.total_length,
+            res = {"totalLength": self.total_length,
+                   "currentLength": 0,
                    "allStep": 1,
                    "currentStep": 1,
                    }
@@ -184,7 +187,7 @@ class GetSchedule():
 
         kwargs.update({'schedule':res})
         output = format_output(**kwargs)
-        print(191, output)
+        print(192, output)
         return output
 
 

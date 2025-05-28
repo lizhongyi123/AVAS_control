@@ -42,7 +42,7 @@ from apis.qt_api.api import judge_if_is_avas_project
 import traceback
 from utils.exception import BaseError
 from concurrent.futures import ProcessPoolExecutor
-
+from apis.qt_api.api import project_check
 # def basic_run(project_path, queue):
 #     try:
 #         item = {"projectPath": project_path}
@@ -540,7 +540,9 @@ class MainWindow(QMainWindow):
 
         # self.page_data.fill_parameter()
 
+        item ={"projectPath": self.project_path}
 
+        project_check(item)
         self.sim_thread = SimThread(self.project_path)
         #完成
         self.sim_thread.finished.connect(self.on_task_finished)

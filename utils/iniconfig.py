@@ -133,7 +133,6 @@ class IniConfig():
 
     def validate_run(self, item):
         ini_info_base = self.create_from_file(item)
-
         if ini_info_base["code"] == -1:
             raise Exception(ini_info_base["data"]['msg'])
         ini_info = ini_info_base["data"]["iniParams"]

@@ -115,13 +115,21 @@ class ExtoDensity():
 
         }
 
-        with Pool(num_workers) as pool:  # 使用上下文管理器
-            # 准备每一步的参数
-            args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
+        # with Pool(num_workers) as pool:  # 使用上下文管理器
+        #     # 准备每一步的参数
+        #     args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
+        #
+        #     # 使用进程池并行执行每一步数据处理
+        #
+        #     results = pool.map(read_exdata_onestep_worker, args)
+        args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
 
-            # 使用进程池并行执行每一步数据处理
+        # 使用普通for循环串行执行每一步数据处理
+        results = []
+        for arg in args:
+            result = read_exdata_onestep_worker(arg)
+            results.append(result)
 
-            results = pool.map(read_exdata_onestep_worker, args)
 
         # results = []
         # # 收集并整理结果

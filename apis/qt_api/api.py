@@ -65,53 +65,7 @@ def cal_beam_parameter(item):
     output = format_output(**kwargs)
     return output
 
-def cal_beam_parameter(item):
-    dst_path = item["dstPath"]
-    kwargs = {}
 
-    beam_parameter = {}
-    try:
-        if os.path.exists(dst_path):
-            dst_res = read_dst_fast(dst_path)
-            beam_parameter['particlerestmass'] = dst_res['basemassinmev']
-            beam_parameter['current'] = dst_res['ib']
-            beam_parameter['particlenumber'] = dst_res['number']
-            beam_parameter['frequency'] = dst_res['freq']
-            beam_parameter['kneticenergy'] = dst_res['kneticenergy']
-
-            obj = PercentEmit(dst_path)
-            res = obj.get_percent_emit(1)
-
-            alpha_xx1, beta_xx1, epsi_xx1, _, _ = res[0]
-            alpha_yy1, beta_yy1, epsi_yy1, _, _ = res[1]
-            alpha_zz1, beta_zz1, epsi_zz1, _, _ = res[2]
-
-            beam_parameter['alpha_x'] = alpha_xx1
-            beam_parameter['beta_x'] = beta_xx1
-            beam_parameter['emit_x'] = epsi_xx1
-
-            beam_parameter['alpha_y'] = alpha_yy1
-            beam_parameter['beta_y'] = beta_yy1
-            beam_parameter['emit_y'] = epsi_yy1
-
-            beam_parameter['alpha_z'] = alpha_zz1
-            beam_parameter['beta_z'] = beta_zz1
-            beam_parameter['emit_z'] = epsi_zz1
-
-            beam_parameter["readparticledistribution"] = ""
-            beam_parameter["distribution_x"] = ""
-            beam_parameter["distribution_y"] = ""
-            beam_parameter["numofcharge"] = ""
-    except Exception as e:
-        code = -1
-        msg = str(e)
-        kwargs.update({'beamParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
-
-    kwargs.update({'beamParams': copy.deepcopy(beam_parameter)})
-    output = format_output(**kwargs)
-    return output
 
 
 def get_inputfile_path(item):

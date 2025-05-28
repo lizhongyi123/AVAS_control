@@ -35,6 +35,12 @@ from utils.inputconfig import InputConfig
 from utils.change_win_to_linux import change_end_crlf
 #下列为功能函数
 #基础运行
+
+
+# -- coding: utf-8 --
+
+# 下列为功能函数
+# 基础运行
 def basic_mulp(**item):
     """
     :param project_path:
@@ -64,14 +70,13 @@ def basic_mulp(**item):
     obj.write_diag_info_to_file()
 
     #
-    item = { "projectPath": project_path,}
+    item = {"projectPath": project_path, }
     input_info = InputConfig()
     input_info = input_info.create_from_file(item)
     input_info = input_info["data"]["inputParams"]
 
-
     if input_info.get("outputcontrol_start") == 1 and input_info.get("outputcontrol_grid") > 0:
-    #生成密度文件
+        # 生成密度文件
         exdata_path = os.path.join(project_path, "OutputFile", "ExData.edt")
 
         dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
@@ -83,9 +88,9 @@ def basic_mulp(**item):
     print('模拟结束')
     return True
 
-#粒子数扩充
-def change_particle_number(infile_path, outfile_path, ratio):
 
+# 粒子数扩充
+def change_particle_number(infile_path, outfile_path, ratio):
     """
     :param infile_path: 输入
     :param outfile_path: 输出
@@ -96,6 +101,7 @@ def change_particle_number(infile_path, outfile_path, ratio):
     v = ChangeNp(infile_path, outfile_path, ratio)
     v.run()
     return None
+
 
 def match_twiss(project_path, use_lattice_initial_value=0):
     """
@@ -109,6 +115,7 @@ def match_twiss(project_path, use_lattice_initial_value=0):
     print('匹配结束')
 
     return res
+
 
 def circle_match(project_path):
     """
@@ -133,7 +140,7 @@ def err_dyn(**item):
         "seed": 50,
         "if_normal": 1,
         "field_path": None,
-        "if_generate_density_file":1
+        "if_generate_density_file": 1
     }
     default_item.update(item)
     v = ErrorDyn(default_item)
@@ -141,6 +148,7 @@ def err_dyn(**item):
     print('动态误差结束')
 
     return res
+
 
 def err_stat(**item):
     """
@@ -153,12 +161,12 @@ def err_stat(**item):
         "seed": 50,
         "if_normal": 1,
         "field_path": None,
-        "if_generate_density_file":1
+        "if_generate_density_file": 1
     }
     default_item.update(item)
     v = Errorstat(default_item)
     v.run()
-    
+
 
 def err_stat_dyn(**item):
     """
@@ -172,12 +180,13 @@ def err_stat_dyn(**item):
         "seed": 50,
         "if_normal": 1,
         "field_path": None,
-        "if_generate_density_file":1
+        "if_generate_density_file": 1
     }
     default_item.update(item)
     v = Errorstatdyn(default_item)
     v.run()
     return None
+
 
 def basic_env(project_path, lattice):
     """
@@ -191,15 +200,18 @@ def basic_env(project_path, lattice):
     res = obj.run()
     return res
 
-def longdistance( project_path, kind):
+
+def longdistance(project_path, kind):
     obj = LongAccelerator(project_path, kind)
     obj.run()
     return None
+
 
 def cal_acceptance(project_path, kind):
     obj = Acceptance(project_path)
     emit, norm_emit, x_min, xx_min = obj.cal_accptance(kind)
     return emit, norm_emit, x_min, xx_min
+
 
 def plot_acc(project_path, kind):
     obj = PlotAcc(project_path)
@@ -207,9 +219,9 @@ def plot_acc(project_path, kind):
     return res
 
 
-#下列为画图函数
+# 下列为画图函数
 
-#画dataset中的数据
+# 画dataset中的数据
 # def plot_dataset(project_path, picture_type, show_=1, fig=None, platform = "qt"):
 #
 #     """
@@ -227,7 +239,7 @@ def plot_acc(project_path, kind):
 
 
 def plot_dataset(**item):
-    #item = {project_path: , picture_type: , show_: 1, fig: None, platform: "qt", "sample_interval": 1}
+    # item = {project_path: , picture_type: , show_: 1, fig: None, platform: "qt", "sample_interval": 1}
     """
     :param project_path:
     :param picture_name:
@@ -235,7 +247,8 @@ def plot_dataset(**item):
     :return:
     dataset文件中数据的可视化
     """
-    default_item = {"projectPath": None, "pictureType": None, "show_": 0, "fig": None, "platform": "qt", "sampleInterval": 1,
+    default_item = {"projectPath": None, "pictureType": None, "show_": 0, "fig": None, "platform": "qt",
+                    "sampleInterval": 1,
                     "needData": False
                     }
 
@@ -258,11 +271,11 @@ def plot_dataset(**item):
         output = v.run(show_, fig)
 
     elif platform == "web":
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
         v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -274,15 +287,13 @@ def plot_dataset(**item):
     return output
 
 
-
-#画相图
+# 画相图
 # def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
 #     v = PlotPhase(dst_path)
 #     res = v.run(show_, fig)
 #     return res
 
 def plot_phase(**item):
-
     default_item = {"filePath": None, "pictureType": "xx1", "show_": 0, "fig": None, "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out"}
 
@@ -302,7 +313,6 @@ def plot_phase(**item):
         elif location == "in":
             file_path = os.path.join(project_path, "InputFile", default_item.get("filePath"))
 
-
     v = PlotPhase(file_path)
 
     if platform == "qt":
@@ -320,8 +330,8 @@ def plot_phase(**item):
             output = format_output(code, msg=msg, **picture_param)
     return output
 
-def plot_cavity_voltage(project_path, ratio, show_=1, fig = None, platform = "qt"):
 
+def plot_cavity_voltage(project_path, ratio, show_=1, fig=None, platform="qt"):
     """
     :param project_path:
     :param ratio: {} 场名：比例
@@ -335,6 +345,7 @@ def plot_cavity_voltage(project_path, ratio, show_=1, fig = None, platform = "qt
     v.get_x_y()
     res = v.run(show_, fig)
     return res
+
 
 # def plot_cavity_syn_phase(project_path, show_=1, fig = None, platform = "qt"):
 #     # item = {project_path, show_=1, fig = None, platform = "qt"}
@@ -378,12 +389,12 @@ def plot_cavity_syn_phase(**item):
 
     elif platform == "web":
 
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
 
         v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -393,7 +404,6 @@ def plot_cavity_syn_phase(**item):
         output = format_output(**picture_param)
 
     return output
-
 
 
 def plot_phase_advance(**item):
@@ -422,12 +432,12 @@ def plot_phase_advance(**item):
     if platform == "qt":
         output = v.run(show_, fig)
     elif platform == "web":
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
 
         v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -436,6 +446,7 @@ def plot_phase_advance(**item):
 
         output = format_output(**picture_param)
     return output
+
 
 def plot_error_out(**item):
     """
@@ -454,7 +465,6 @@ def plot_error_out(**item):
 
     default_item.update(item)
 
-
     stat_method = default_item.get("statMethod")
     picture_type = default_item.get("pictureType")
     show_ = default_item.get("show_")
@@ -465,7 +475,7 @@ def plot_error_out(**item):
     if platform == "qt":
         file_path = default_item.get("filePath")
     elif platform == "web":
-        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
+        file_path = os.path.join(project_path, 'OutputFile', default_item.get("filePath"))
 
     v = PlotErrout(file_path, stat_method, picture_type)
     v.get_x_y()
@@ -473,11 +483,11 @@ def plot_error_out(**item):
     if platform == "qt":
         output = v.run(show_, fig)
     elif platform == "web":
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
         output = v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -485,7 +495,6 @@ def plot_error_out(**item):
             picture_param["pictureInfo"] = data
 
         output = format_output(**picture_param)
-
 
     return output
 
@@ -500,7 +509,7 @@ def plot_error_emit_loss(**item):
     误差图
     """
     default_item = {"filePath": None, "pictureType": "par", "show_": 0, "fig": None,
-                    "platform": "qt", "needData":False, "projectPath": None}
+                    "platform": "qt", "needData": False, "projectPath": None}
     default_item.update(item)
 
     picture_type = default_item.get("pictureType")
@@ -513,7 +522,7 @@ def plot_error_emit_loss(**item):
     if platform == "qt":
         file_path = default_item.get("filePath")
     elif platform == "web":
-        file_path = os.path.join(project_path, 'outputFile', default_item.get("filePath"))
+        file_path = os.path.join(project_path, 'OutputFile', default_item.get("filePath"))
 
     v = PlotErr_emit_loss(file_path, picture_type)
     v.get_x_y()
@@ -522,27 +531,27 @@ def plot_error_emit_loss(**item):
         output = v.run(show_, fig)
 
     elif platform == "web":
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
         v.run(show_, fig, save_path)
-        
-        #生成返回信息
+
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
         if need_data is True:
             pictureInfo = {}
             pictureInfo["labelx"] = v.xlabel
             pictureInfo["labely1"] = v.ylabel1
             pictureInfo["labely2"] = v.ylabel2
-    
+
             pictureInfo["datax1"] = v.xy["ax1_x"]
             pictureInfo["datay1"] = v.xy["ax1_y"]
-    
+
             pictureInfo["datax2"] = v.xy["ax2_x"]
             pictureInfo["datay2"] = v.xy["ax2_y"]
-    
+
             pictureInfo["legends1"] = v.labels1
             pictureInfo["legend2"] = v.labels2
-            
+
             picture_param["pictureInfo"] = pictureInfo
 
         output = format_output(**picture_param)
@@ -552,6 +561,7 @@ def plot_error_emit_loss(**item):
         #     kwargs.update(pictureParam)
         #     output = format_output(code, msg=msg, **kwargs)
     return output
+
 
 def plot_density(**item):
     default_item = {"filePath": None, "desnityPlane": "x", "show_": 0, "fig": None, "platform": "qt",
@@ -567,7 +577,7 @@ def plot_density(**item):
     sample_interval = default_item.get("sampleInterval")
     need_data = default_item.get("needData")
     project_path = default_item.get("projectPath")
-    
+
     v = PlotDensity(file_path, picture_type, sample_interval)
     v.get_x_y()
 
@@ -590,7 +600,6 @@ def plot_density(**item):
             picture_param["pictureInfo"] = pictureInfo
 
         output = format_output(**picture_param)
-
 
     return output
 
@@ -619,10 +628,10 @@ def plot_density_level(**item):
     elif platform == "web":
         save_path = generate_web_picture_path(project_path)
 
-        #运行并保存图片
+        # 运行并保存图片
         v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -635,16 +644,16 @@ def plot_density_level(**item):
 
 
 def plot_density_process(**item):
-
-    #density_plane = ["x", "y", "r", "z"]
-    #picture_type = [
-    #"centroid"
-    #"emit",
+    # density_plane = ["x", "y", "r", "z"]
+    # picture_type = [
+    # "centroid"
+    # "emit",
     # rms_size, rms_size_max,
-    #lost, maxlost, minlost,
+    # lost, maxlost, minlost,
     # ]
 
-    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "centroid", "show_": 0, "fig": None, "platform": "qt",
+    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "centroid", "show_": 0, "fig": None,
+                    "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None}
 
     default_item.update(item)
@@ -665,12 +674,12 @@ def plot_density_process(**item):
     if platform == "qt":
         output = v.run(show_, fig)
     elif platform == "web":
-        #生成文件名
+        # 生成文件名
         save_path = generate_web_picture_path(project_path)
 
         v.run(show_, fig, save_path)
 
-        #生成返回信息
+        # 生成返回信息
         picture_param = {"picturePath": save_path, "pictureInfo": {}}
 
         if need_data is True:
@@ -683,8 +692,10 @@ def plot_density_process(**item):
 
     return res
 
+
 def plot_density_transport(**item):
-    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "density", "show_": 0, "fig": None, "platform": "qt",
+    default_item = {"filePath": None, "desnityPlane": "x", "pictureType": "density", "show_": 0, "fig": None,
+                    "platform": "qt",
                     "sampleInterval": 1, "needData": False, "projectPath": None}
 
     default_item.update(item)
@@ -712,26 +723,24 @@ def plot_density_transport(**item):
     return res
 
 
-def plot_phase_ellipse(parameter_item, picture_type, show_=1, fig = None, platform = "qt"):
+def plot_phase_ellipse(parameter_item, picture_type, show_=1, fig=None, platform="qt"):
     obj = PlotPhaseEllipse()
     obj.get_x_y(picture_type, parameter_item)
     res = obj.run(show_, fig)
     return res
 
 
-
-
-def plot_env_beam_out(project_path, picture_name, show_=1, fig = None):
-    v =PlotEnvBeamOut(project_path)
+def plot_env_beam_out(project_path, picture_name, show_=1, fig=None):
+    v = PlotEnvBeamOut(project_path)
     v.get_x_y(picture_name)
     res = v.run(show_, fig)
     return res
 
 
 ################################################################################`#######################################
-#下列为数据分析函数
+# 下列为数据分析函数
 
-#计算twiss参数
+# 计算twiss参数
 def cal_twiss(dst_path):
     v = CalTwiss(dst_path)
     res = v.get_emit_xyz()
@@ -739,7 +748,6 @@ def cal_twiss(dst_path):
 
 
 def judge_opti(res):
-
     sign = []
     # 判断是否需要矫正
     for i in res:
@@ -753,16 +761,20 @@ def judge_opti(res):
         return 1
     else:
         return 0
+
+
 def change_file_win2linux(**item):
     path = item.get('project_path')
     beam_path = os.path.join(path, "InputFile", "beam.txt")
     input_path = os.path.join(path, "InputFile", "input.txt")
+    boundary_path = os.path.join(path, "InputFile", "boundary.txt")
+
     change_end_crlf(beam_path)
     change_end_crlf(input_path)
+    if os.path.exists(boundary_path):
+        change_end_crlf(boundary_path)
 
-    output = format_output()
 
-    return output
 
 
 

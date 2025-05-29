@@ -4,7 +4,7 @@ import configparser
 import os
 from utils.tool import format_output
 import copy
-import utils.exception as exce
+from utils import exception as exce
 
 
 class IniConfig():

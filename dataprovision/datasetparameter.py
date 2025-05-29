@@ -43,7 +43,7 @@ class DatasetParameter():
         dataset_info = [[float(j) for j in i] for i in dataset_info]
 
 
-        self.dataset_index = [int(i[-1]) for i in dataset_info]
+        self.dataset_index = [int(i[39]) for i in dataset_info]
 
         # random.seed(40)
         # for i in range(1, len(dataset_info)):

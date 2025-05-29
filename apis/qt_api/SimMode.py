@@ -8,7 +8,9 @@ from utils.inputconfig import InputConfig
 from utils.iniconfig import IniConfig
 from utils.latticeconfig import LatticeConfig
 import os
-import utils.exception as exce
+
+from utils import exception as exce
+
 from apis.basic_api.api import basic_mulp, basic_env, match_twiss, circle_match, \
     err_dyn, err_stat, err_stat_dyn
 from utils.tool import format_output

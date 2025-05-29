@@ -66,8 +66,6 @@ def cal_beam_parameter(item):
     return output
 
 
-
-
 def get_inputfile_path(item):
     # item = {"projectPath": "fdasf" }
     kwargs = {}

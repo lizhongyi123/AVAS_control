@@ -15,6 +15,7 @@ from utils.inputconfig import InputConfig
 import pandas as pd
 from utils.beamconfig import BeamConfig
 from apis.qt_api.judge_lattice import JudgeLattice
+import global_varible
 
 
 def cal_beam_parameter(item):
@@ -30,6 +31,7 @@ def cal_beam_parameter(item):
             beam_parameter['particlenumber'] = dst_res['number']
             beam_parameter['frequency'] = dst_res['freq']
             beam_parameter['kneticenergy'] = dst_res['kneticenergy']
+
 
             obj = PercentEmit(dst_path)
             res = obj.get_percent_emit(1)
@@ -51,9 +53,18 @@ def cal_beam_parameter(item):
             beam_parameter['emit_z'] = epsi_zz1
 
             beam_parameter["readparticledistribution"] = ""
-            beam_parameter["distribution_x"] = "GS"
-            beam_parameter["distribution_y"] = "GS"
-            beam_parameter["numofcharge"] = ""
+            beam_parameter["distribution_x"] = "undefined"
+            beam_parameter["distribution_y"] = "undefined"
+
+            demical_keys = [
+                "particlerestmass", "kneticenergy", "alpha_x", "beta_x", "emit_x", "alpha_y", "beta_y", "emit_y",
+                "alpha_z", "beta_z", "emit_z",
+            ]
+            for k, v in beam_parameter.items():
+                if k in demical_keys:
+                    beam_parameter[k] = round(v, global_varible.decimals7)
+
+#            beam_parameter["numofcharge"] = ""
     except Exception as e:
         code = -1
         msg = str(e)
@@ -162,9 +173,17 @@ def get_fieldfile(item):
 def get_allfile_relative_path(item):
     #带后缀
     kwargs = {}
-    fieldpath = item["filePath"]
+    default_item = {
+        "filePath": None,
+        "sort_by": "mtime"
+    }
+    default_item.update(item)
+
+    fieldpath = default_item["filePath"]
+    sort_by = default_item["sort_by"]
+
     if os.path.exists(fieldpath):
-        all_files = list_files_in_directory(fieldpath, sort_by="mtime")
+        all_files = list_files_in_directory(fieldpath, sort_by=sort_by)
         v = [i.split(r"/")[-1] for i in all_files]
         kwargs.update({'allFile': v})
         output = format_output(**kwargs)
@@ -458,13 +477,45 @@ def project_check(item):
     output = format_output()
     return output
 
+def get_all_files_in_project(item):
+    #获取一个project下的所有后文件
+    project_path = item["projectPath"]
+
+    kwargs = {}
+    kwargs["inputPath"] = "InputFile"
+    kwargs["outputPath"] = "OutputFile"
+    kwargs["projectPath"] = project_path
+    kwargs["fileIninput"] = []
+    kwargs["fileInoutput"] = []
+
+    input_path = os.path.join(project_path, "InputFile")
+    output_path = os.path.join(project_path, "OutputFile")
+
+    item = {"filePath": input_path, "sort_by": "name"}
+    file_in_input = get_allfile_relative_path(item)["data"]["allFile"]
 
 
+    item = {"filePath": output_path, "sort_by": "name"}
+    ori_output_files = get_allfile_relative_path(item)["data"]["allFile"]
+    folders = ['error_adjust', "error_middle", 'error_output']
+    folder_part = [f for f in ori_output_files if f in folders]
+    file_part = [f for f in ori_output_files if f not in folders]
+
+    kwargs["fileIninput"] = file_in_input
+    kwargs["fileInoutput"] = file_part
+
+    output = format_output(code=0, msg="success", **kwargs)
+
+
+    return output
 
 if __name__ == '__main__':
-    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"}
-    res = project_check(item)
-    print(res)
+    # item = {"dstPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas\InputFile\part_rfq.dst"}
+    # res = cal_beam_parameter(item)
+    # print(res)
+
+    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"}
+    get_all_files_in_project(item)
 
     # pass
     # item = {

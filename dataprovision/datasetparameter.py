@@ -20,11 +20,20 @@ class DatasetParameter():
         self.dataset_path = dataset_path
         self.z = []
         self.project_path = project_path
+        self.len_num_evert_step = 41
 
     def get_parameter(self):
         dataset_info = read_txt(self.dataset_path, out='list')
+
+
         if len(dataset_info) == 0:
             return False
+        if len(dataset_info) == 1:
+            return False
+
+
+        if len(dataset_info[-1]) != self.len_num_evert_step:
+            dataset_info = dataset_info[:-1]
         # index = 0
 
         # nan_in = False
@@ -152,6 +161,7 @@ class DatasetParameter():
         self.sync_pz = [i[34] for i in dataset_info]
 
 
+
         if self.project_path:
             beam_info = get_mass_freq(self.project_path)
             self.BaseMassInMeV = beam_info["particlerestmass"]
@@ -159,8 +169,15 @@ class DatasetParameter():
             self.current = beam_info["current"]
             self.current = np.array(self.number_exist) / self.num_of_particle * self.current
 
+
+
         if self.project_path:
             self.get_phi()
+
+
+        if self.project_path:
+            self.particle_t = [i[40] for i in dataset_info] #粒子飞行时间
+            self.abs_pahse = [i[40] *  2 * 180 * self.freq  for i in dataset_info] #绝对相位
 
         return True
 
@@ -198,13 +215,11 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\test511\OutputFile\error_output\output_1_1\DataSet.txt"
-    obj = DatasetParameter(path1)
+    path1 = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas\OutputFile\DataSet.txt"
+    project_path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()
-    x = obj.x
-    import numpy as np
-    x = np.array(x) * 1000
-    print(x)
+    print(obj.beta_x[-1])
     #
     # import numpy as np
     # import time

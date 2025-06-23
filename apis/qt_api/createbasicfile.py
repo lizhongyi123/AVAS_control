@@ -24,7 +24,7 @@ class CreatBasicFile():
 
         self.input_info = {
             "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
-            "device":"cpu", "outputcontrol_start": 0, "outputcontrol_grid": 300,
+            "device":"cpu", "pchistogram_start": 0, "pchistogram_grid": 300,
         }
 
         self.ini_info = \
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
 
         "inputKeys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
-                       "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device", "outputcontrol_start", "outputcontrol_grid", ]
+                       "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device", "pchistogram_start", "pchistogram_grid", ]
         #"spacechargetype", 'bbb'
     }
     platform = "web"

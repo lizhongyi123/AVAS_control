@@ -261,12 +261,13 @@ class BeamConfig():
 
 if __name__ == "__main__":
     item = {
-        "projectPath": r"C:\Users\shliu\Desktop\test_lattice"
+        "projectPath": r"C:\Users\anxin\Desktop\test_hiaf\v1"
     }
 
     obj = BeamConfig()
     res = obj.create_from_file(item)
     print(res)
-    # para = {'numofcharge': None, 'particlerestmass': 938,}
-    # res = obj.set_param(**para)
-    # obj.write_to_file(item)
+    para = {'numofcharge': None, 'particlerestmass': 939,}
+    res = obj.set_param(**para)
+    print(res)
+    obj.write_to_file(item)

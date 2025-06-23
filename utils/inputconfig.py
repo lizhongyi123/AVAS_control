@@ -9,13 +9,13 @@ import os
 class InputConfig():
     def __init__(self):
         self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                                     "spacechargelong", "spacechargetype", "fieldSource", "device", "outputcontrol_start", "outputcontrol_grid"]
+                                     "spacechargelong", "spacechargetype", "fieldSource", "device", "pchistogram_start", "pchistogram_grid"]
 
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                         "spacechargelong", "spacechargetype", "outputcontrol_start", "outputcontrol_grid"]
+                         "spacechargelong", "spacechargetype", "pchistogram_start", "pchistogram_grid"]
 
         self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "spacechargelong": None, "spacechargetype": None, "outputcontrol_start":None, "outputcontrol_grid":None}
+                                "spacechargelong": None, "spacechargetype": None, "pchistogram_start":None, "pchistogram_grid":None}
 
         self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",]
         self.env_keys = ["spacechargelong", "spacechargetype"]
@@ -41,10 +41,10 @@ class InputConfig():
                 item[0] = "sim_type"
             new_input_lis.append(item)
 
-            if item[0] == "outputcontrol":
+            if item[0] == "pchistogram":
                 item = item + (3-len(item)) * [None]
-                new_input_lis.append(["outputcontrol_start", item[1]])
-                new_input_lis.append(["outputcontrol_grid", item[2]])
+                new_input_lis.append(["pchistogram_start", item[1]])
+                new_input_lis.append(["pchistogram_grid", item[2]])
 
 
         res = {}
@@ -54,8 +54,8 @@ class InputConfig():
             else:
                 res[i[0]] = i[1:]
 
-        if res.get("outputcontrol") is not None:
-            del res["outputcontrol"]
+        if res.get("pchistogram") is not None:
+            del res["pchistogram"]
 
         return res
 
@@ -139,13 +139,13 @@ class InputConfig():
         v_dic = {}
         if self.input_parameter["sim_type"] == 'mulp':
             v_dic = copy.deepcopy(self.input_parameter)
-            v_dic["outputcontrol"] = [v_dic["outputcontrol_start"], v_dic["outputcontrol_grid"]]
+            v_dic["pchistogram"] = [v_dic["pchistogram_start"], v_dic["pchistogram_grid"]]
 
             del v_dic["spacechargelong"]
             del v_dic["spacechargetype"]
 
-            del v_dic["outputcontrol_start"]
-            del v_dic["outputcontrol_grid"]
+            del v_dic["pchistogram_start"]
+            del v_dic["pchistogram_grid"]
 
 
         elif self.input_parameter["sim_type"] == 'env':

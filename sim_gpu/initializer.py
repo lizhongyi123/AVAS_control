@@ -36,17 +36,29 @@ InitializeLatticeComponents = libPIC.InitializeLatticeComponents
 InitializeLatticeComponents.argtypes = [POINTER(Configurations), POINTER(RunningOptions)]
 InitializeLatticeComponents.restype = POINTER(Lattice)
 
+# 设置误差项
+InitializeErrorParameters = libPIC.InitializeErrorParameters
+InitializeErrorParameters.argtypes = [POINTER(Lattice), POINTER(Configurations), POINTER(Configurations)]
+
+# 设置叠加长
+InitializeSuperpose = libPIC.InitializeSuperpose
+InitializeSuperpose.argtypes = [POINTER(Lattice), POINTER(Configurations)]
+InitializeSuperpose.restype = c_bool
+
+
 # 初始化束流函数
 InitializeBeam = libPIC.InitializeBeam
 InitializeBeam.argtypes = [POINTER(Configurations), POINTER(MPIObject), POINTER(Lattice), POINTER(RunningOptions)]
 InitializeBeam.restype = POINTER(Beam)
 
 # 初始化统计束流结构体
-InitializeBeam
+InitializeBeamStatistics = libPIC.InitializeBeamStatistics
+InitializeBeamStatistics.argtypes = [POINTER(BeamStatistics), POINTER(RunningOptions)]
 
 # 初始化CUB函数
 InitializeCUB = libPIC.InitializeCUB
-InitializeCUB.argtypes = [POINTER(Beam), POINTER(CUBObject)]
+
+InitializeCUB.argtypes = [POINTER(Beam), POINTER(CUBObject), POINTER(MPIObject)]
 
 # 初始化PIC函数
 InitializePIC = libPIC.InitializePIC
@@ -54,7 +66,7 @@ InitializePIC.argtypes = [POINTER(PIC), POINTER(RunningOptions), POINTER(CUBObje
 
 # 初始化FFT函数
 InitializerFFT = libPIC.InitializerFFT
-InitializerFFT.argtypes = [POINTER(FFTSolver), POINTER(PIC)]
+InitializerFFT.argtypes = [POINTER(FFTSolver), POINTER(PIC), POINTER(MPIObject)]
 
 # 初始化输出数据结构体
 InitializeOutputObject = libPIC.InitializeOutputObject
@@ -67,4 +79,3 @@ InitializePhase.restype = c_int
 # 创建CUDA流函数
 CreateCudaStream = libPIC.CreateCudaStream
 CreateCudaStream.restype = c_void_p
-

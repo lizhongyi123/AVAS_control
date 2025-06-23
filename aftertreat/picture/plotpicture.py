@@ -39,7 +39,7 @@ class PlotCavityVoltage(PicturelBar_2D):
         self.y = y
 
         return self.x, self.y
-
+import os
 
 class PlotCavitySynPhase(PicturePlot_2D):
     """
@@ -86,10 +86,10 @@ class PlotPhaseAdvance(PicturePlot_2D):
         self.labels = [r"$\sigma_{x}$", r"$\sigma_{y}$", r"$\sigma_{z}$"]
 
         self.project_path = project_path
-        self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
-        self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
-        self.dataset_path = self.project_path + r'\OutputFile' + r'\DataSet.txt'
+        self.beam_path = os.path.join(self.project_path, 'InputFile', 'beam.txt')
+        self.lattice_mulp_path = os.path.join(self.project_path, 'InputFile', 'lattice_mulp.txt')
+        self.input_path = os.path.join(self.project_path, 'InputFile', 'input.txt')
+        self.dataset_path = os.path.join(self.project_path, 'OutputFile', 'DataSet.txt')
         self.picture_type = picture_type
 
     def get_x_y(self):

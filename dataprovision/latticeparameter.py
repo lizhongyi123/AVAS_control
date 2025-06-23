@@ -365,6 +365,7 @@ class LatticeParameter():
 
 
 if __name__ == "__main__":
+    #C:\Users\anxin\Desktop\AVAS_control\dataprovision\latticeparameter.py
     lattice_path = r"C:\Users\anxin\Desktop\test_ya2\InputFile\lattice.txt"
     res = LatticeParameter(lattice_path)
     res.get_parameter()

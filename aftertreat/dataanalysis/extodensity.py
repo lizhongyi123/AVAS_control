@@ -125,11 +125,19 @@ class ExtoDensity():
         args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
 
         # 使用普通for循环串行执行每一步数据处理
+        t0 = time.time()
+
         results = []
         for arg in args:
             result = read_exdata_onestep_worker(arg)
             results.append(result)
 
+        t1 = time.time()
+        dt = t1 - t0
+
+        print(138, t0)
+        print(139, t1)
+        print(140, dt)
 
         # results = []
         # # 收集并整理结果

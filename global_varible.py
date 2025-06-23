@@ -62,3 +62,5 @@ error_elemment_command_quad = ['err_quad_ncpl_stat', 'err_quad_cpl_stat',
 
 error_elemment_command_cav = ['err_cav_ncpl_stat', 'err_cav_cpl_stat',
                                       'err_cav_ncpl_dyn', 'err_cav_cpl_dyn', ]
+
+decimals7 = 7

@@ -7,13 +7,15 @@ from dataprovision.datasetparameter import DatasetParameter
 from dataprovision.latticeparameter import LatticeParameter
 from utils.tool import get_list_interval
 import os
+import matplotlib
+matplotlib.use('Qt5Agg')
 # [ 'emittance_x', 'emittance_y', 'emittance_z',
 # 'longitudinal_phase', ]
 class PlotDataSet(PicturePlot_2D):
     """
     dataset文件的可视化
     """
-    def __init__(self, dataset_path, picture_name, sample_interval, project_path=None):
+    def __init__(self, dataset_path, picture_name, sample_interval=1, project_path=None):
         super().__init__()
         self.picture_name = picture_name
         self.sample_interval = sample_interval
@@ -73,6 +75,9 @@ class PlotDataSet(PicturePlot_2D):
         beta_y = dataset_obj.beta_y[:end_index]
         beta_z = dataset_obj.beta_z[:end_index]
 
+        center_x = [i * 10**3 for i in dataset_obj.x][:end_index]#变为mm
+        center_y = [i *10**3 for i in dataset_obj.y][:end_index]
+
         loss = dataset_obj.loss[:end_index]
         # phi = dataset_obj.phi[:end_index]
         # phi_phi = dataset_obj.phi_phi[:end_index]
@@ -93,6 +98,33 @@ class PlotDataSet(PicturePlot_2D):
         # #     beta.append(math.sqrt(1 - 1.0 / gammaaaa / gammaaaa))
         # #     rms_z.append(data[i][20] / (beta[-1] * C_light) * freq * 360)
         # #     rms_zz.append(-1 * (data[i][20] / (beta[-1] * C_light) * 162.5e6 * 360))
+
+        if self.picture_name == "c_x":
+            self.x = z
+            self.y = [center_x]
+            self.xlabel = "z(m)"
+            self.ylabel = "Cener x(mm)"
+            # self.ylim = [-max(loss)-3, max(loss) + 3]
+
+        if self.picture_name == "c_y":
+            self.x = z
+            self.y = [center_y]
+            self.xlabel = "z(m)"
+            self.ylabel = "Cener y(mm)"
+            # self.ylim = [-max(loss)-3, max(loss) + 3]
+
+
+        elif self.picture_name == 'c_xy':
+            self.x = z
+            self.y = [center_x, center_y]
+
+            self.xlabel = "z(m)"
+            self.ylabel = "Center x and y(mm)"
+
+            self.labels = ['x', 'y']
+            self.colors = ['r', 'b',]
+            self.set_legend = 1
+
 
 
 
@@ -320,13 +352,21 @@ class PlotDataSet(PicturePlot_2D):
             self.colors = self.colors[:-2]
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test_avas_qt\fileld_ciads"
-    dataset_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\DataSet.txt"
-    a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
+    project_path = r"C:\Users\anxin\Desktop\test_hiaf\hiaf"
+    dataset_path = r"C:\Users\anxin\Desktop\test_hiaf\hiaf\OutputFile\error_output\output_0\DataSet.txt"
+    a = PlotDataSet(project_path=None,  picture_name = 'c_xy', dataset_path=dataset_path)
+    # a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
+
     a.get_x_y()
     # a.need_element(aper=1)
     a.run(show_=1)
 
+    a = PlotDataSet(project_path=None,  picture_name = 'loss', dataset_path=dataset_path)
+    # a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
+
+    a.get_x_y()
+    # a.need_element(aper=1)
+    a.run(show_=1)
     # a = PlotDataSet(project_path=None,  picture_name = 'alpha_x', dataset_path=dataset_path)
     # a.get_x_y()
     # # a.need_element(aper=1)

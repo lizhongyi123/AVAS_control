@@ -438,14 +438,14 @@ class PageInput(QWidget):
         self.text_field_source.setText(safe_str(input_ini_res["fieldSource"]))
 
 
-        self.outputcontrol_start_num = safe_int(input_ini_res.get('outputcontrol_start'), 0)
+        self.pchistogram_start_num = safe_int(input_ini_res.get('pchistogram_start'), 0)
 
-        if self.outputcontrol_start_num == 0:
+        if self.pchistogram_start_num == 0:
             self.cb_generate_density.setChecked(False)
-        elif self.outputcontrol_start_num == 1:
+        elif self.pchistogram_start_num == 1:
             self.cb_generate_density.setChecked(True)
 
-        self.text_density_grid.setText(safe_str(input_ini_res["outputcontrol_grid"], "300"))
+        self.text_density_grid.setText(safe_str(input_ini_res["pchistogram_grid"], "300"))
 
         # 对于包络模型的输入
         if input_ini_res.get('spacechargelong') is not None:
@@ -522,8 +522,8 @@ class PageInput(QWidget):
         if self.dumpPeriodicity_text.text():
             res["dumpperiodicity"] = safe_int(self.dumpPeriodicity_text.text(), 0)
 
-        res["outputcontrol_start"] = self.outputcontrol_start_num
-        res["outputcontrol_grid"] = self.text_density_grid.text()
+        res["pchistogram_start"] = self.pchistogram_start_num
+        res["pchistogram_grid"] = self.text_density_grid.text()
 
         res["fieldSource"] = self.text_field_source.text()
         if self.sc_step_text.text():
@@ -591,9 +591,9 @@ class PageInput(QWidget):
 
     def cd_genenrate_density_file_change(self, state):
         if state == Qt.Checked:
-            self.outputcontrol_start_num = 1
+            self.pchistogram_start_num = 1
         else:
-            self.outputcontrol_start_num = 0
+            self.pchistogram_start_num = 0
 
     def scan_phase_selection(self, index):
         # 处理用户的选择

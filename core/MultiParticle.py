@@ -85,7 +85,6 @@ class MultiParticle():
 
             res= 0
 
-
         return res
 
     def stop(self):
@@ -136,7 +135,7 @@ def basic_mulp(project_path):
 
 if __name__ == "__main__":
     
-    item = {'project_path': r'C:\Users\anxin\Desktop\test_schedule\cafe_avas',
+    item = {'project_path': r'C:\Users\anxin\Desktop\test_shao2',
             }
     obj = MultiParticle(item)
     obj.run()

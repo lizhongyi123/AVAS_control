@@ -209,9 +209,13 @@ if __name__ == "__main__":
     # res = read_dst(path)
     # print(res['phase'][0])
     # read_runsignal(0)
-    path = r"C:\Users\shliu\Desktop\test_lattice\lattice_mulp.txt"
-    # res = read_lattice_mulp(path)
-    # for i in res:
-    #     print(i)
-    res = read_lattice_mulp_with_name(path)
+    # path = r"C:\Users\shliu\Desktop\test_lattice\lattice_mulp.txt"
+    # # res = read_lattice_mulp(path)
+    # # for i in res:
+    # #     print(i)
+    # res = read_lattice_mulp_with_name(path)
+    # print(res)
+
+    path = r"C:\Users\anxin\Desktop\2beam\part_rfq100_F.dst"
+    res = read_dst_fast(path)
     print(res)

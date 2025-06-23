@@ -75,7 +75,7 @@ def basic_mulp(**item):
     input_info = input_info.create_from_file(item)
     input_info = input_info["data"]["inputParams"]
 
-    if input_info.get("outputcontrol_start") == 1 and input_info.get("outputcontrol_grid") > 0:
+    if input_info.get("pchistogram_start") == 1 and input_info.get("pchistogram_grid") > 0:
         # 生成密度文件
         exdata_path = os.path.join(project_path, "OutputFile", "ExData.edt")
 
@@ -786,13 +786,13 @@ if __name__ == '__main__':
     # print(res)
 
     # path = r"C:\Users\shliu\Desktop\test_lattice"
-    # path = r"C:\Users\shliu\Desktop\xiaochu"
+    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
 
-    # item = {"project_path": path,
-    #         "if_normal": 0,
-    #         "if_generate_density_file": 0
-    #         }
-    # res = err_stat(**item)
+    item = {"project_path": path,
+            "if_normal": 0,
+            "if_generate_density_file": 0
+            }
+    res = err_dyn(**item)
     #
     # item = {"project_path": path,}
     # res = basic_mulp(**item)

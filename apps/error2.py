@@ -1162,7 +1162,7 @@ if __name__ == "__main__":
 
 
 
-    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
+    path = r"C:\Users\anxin\Desktop\test_shao"
 
     item = {
         "project_path": path,

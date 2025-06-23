@@ -262,9 +262,9 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\HEBT\tr.dat"
+    tracewin_lattiace_path = r"C:\Users\anxin\Desktop\mebtAVASP\20230118-proton-19.07.dat"
 
-    avas_lattice_path = r"C:\Users\shliu\Desktop\HEBT\lattice.txt"
+    avas_lattice_path = r"C:\Users\anxin\Desktop\mebtAVASP\lattice.txt"
 
 
     # 修改后的lattice

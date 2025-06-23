@@ -1,7 +1,7 @@
 ﻿
 import sys
-avas_control = r"D:\AVAS_CONTROL\AVAS_control"
-sys.path.append(avas_control)
+# avas_control = r"D:\AVAS_CONTROL\AVAS_control"
+# sys.path.append(avas_control)
 import sys
 import time
 

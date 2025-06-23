@@ -125,8 +125,8 @@ class SimMode():
 
 if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
-    path = r"C:\Users\anxin\Desktop\gpu_jiqun\cafe_avas"
-
+    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
     item = {"projectPath": path}
     obj = SimMode(item)
     res = obj.run()

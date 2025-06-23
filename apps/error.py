@@ -853,7 +853,7 @@ class Error():
         if group == 0:
             is_normal = 1
 
-        exdata_path = os.path.join(self.error_middle_output0_path, "ExData.edt")
+        exdata_path = os.path.join(self.error_middle_output0_path, "PCHistogram.dat")
 
 
         dataset_path = os.path.join(self.error_middle_output0_path, "DataSet.txt")
@@ -1601,19 +1601,19 @@ if __name__ == "__main__":
 
 
     path = r"C:\Users\shliu\Desktop\test511"
-    # obj = ErrorDyn(path,
-    #                50, 1, field_path=None, if_generate_density_file = 1)
+    obj = ErrorDyn(path,
+                   50, 1, field_path=None, if_generate_density_file = 1)
 
     #
     # obj = Errorstat(path, 0, 1, field_path=None, if_generate_density_file=1)
-    item = {
-        "project_path": path,
-        "seed": 50,
-        "if_normal": 0,
-        "field_path": None,
-        "if_generate_density_file":0
-    }
-    obj = Errorstat(item)
+    # item = {
+    #     "project_path": path,
+    #     "seed": 50,
+    #     "if_normal": 0,
+    #     "field_path": None,
+    #     "if_generate_density_file":0
+    # }
+    # obj = Errorstat(item)
 
     obj.run()
 

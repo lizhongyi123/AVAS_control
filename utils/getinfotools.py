@@ -6,7 +6,7 @@ from utils.readfile import read_dst, read_txt
 from utils.iniconfig import IniConfig
 from utils.inputconfig import InputConfig
 def get_mass_freq(project_path):
-    beam_txt = project_path + r'/InputFile/beam.txt'
+    beam_txt = os.path.join(project_path, "InputFile", 'beam.txt')
     res = read_txt(beam_txt, case_sensitive=True)
     beam_parameter = {'numofcharge': None,
                       'particlerestmass': None,

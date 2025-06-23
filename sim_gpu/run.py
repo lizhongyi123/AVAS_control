@@ -12,6 +12,8 @@ libpicso_path = os.path.join(parent_directory, 'dllfile', "libPIC.so")  # 使用
 libPIC = CDLL(libpicso_path)
 libCudaRT = CDLL("libcudart.so")
 
+
+
 # 推进函数_FFT
 RunSimulationWithSpaceChargeUsingFFT = libPIC.RunSimulationWithSpaceChargeUsingFFT
 RunSimulationWithSpaceChargeUsingFFT.argtypes = [POINTER(RunningOptions), POINTER(Lattice), POINTER(Beam), POINTER(BeamStatistics), POINTER(CUBObject), POINTER(MPIObject), POINTER(PIC), POINTER(FFTSolver), POINTER(OutputObject), c_void_p]
@@ -33,6 +35,7 @@ OutputRealParticles.argtypes = [POINTER(Beam), POINTER(MPIObject), c_void_p]
 OutputPhaseParticles.argtypes = [POINTER(Beam), POINTER(MPIObject), c_void_p]
 
 # 释放内存
+ReleaseBeamStatistics = libPIC.ReleaseBeamStatistics
 ReleaseOutputObject = libPIC.ReleaseOutputObject
 ReleaseLatticeComponents = libPIC.ReleaseLatticeComponents
 ReleaseBeam = libPIC.ReleaseBeam
@@ -41,6 +44,7 @@ ReleaseCUBObject = libPIC.ReleaseCUBObject
 ReleaseMPIObject = libPIC.ReleaseMPIObject
 ReleaseFFTSolver = libPIC.ReleaseFFTSolver
 ReleaseConfigurations = libPIC.ReleaseConfigurations
+ReleaseBeamStatistics.argtypes = [POINTER(BeamStatistics)]
 ReleaseOutputObject.argtypes = [POINTER(RunningOptions), POINTER(OutputObject)]
 ReleaseLatticeComponents.argtypes = [POINTER(Lattice)]
 ReleaseBeam.argtypes = [POINTER(Beam)]
@@ -48,10 +52,8 @@ ReleasePIC.argtypes = [POINTER(PIC)]
 ReleaseCUBObject.argtypes = [POINTER(CUBObject)]
 ReleaseMPIObject.argtypes = [POINTER(MPIObject)]
 ReleaseFFTSolver.argtypes = [POINTER(FFTSolver)]
-ReleaseConfigurations.argtypes = [POINTER(Configurations)]
+ReleaseConfigurations.argtypes = [POINTER(POINTER(Configurations))]
 
 # 重置GPU
 cudaDeviceReset = libCudaRT.cudaDeviceReset
 #cudaDeviceReset.restype = [c_int]
-
-

@@ -9,7 +9,7 @@ import os
 from user.user_qt.user_defined import treat_err
 from utils.latticeconfig import LatticeConfig
 
-from user.user_qt.lattice_file.test_lattice import CodeEditorWithLineNumbers
+from user.user_qt.lattice_file.lattice_ide import CodeEditorWithLineNumbers
 class PageLattice(QWidget):
     def __init__(self, project_path):
         super().__init__()

@@ -339,7 +339,6 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_accept_action)
 
         # toolbar.addAction(page_others_action)
-
         # toolbar.addAction(page_longdistance_action)
 
 

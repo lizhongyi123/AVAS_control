@@ -445,6 +445,7 @@ class PageInput(QWidget):
         elif self.pchistogram_start_num == 1:
             self.cb_generate_density.setChecked(True)
 
+
         self.text_density_grid.setText(safe_str(input_ini_res["pchistogram_grid"], "300"))
 
         # 对于包络模型的输入
@@ -666,7 +667,7 @@ class PageInput(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'C:\Users\shliu\Desktop\test429')
+    main_window = PageInput(r'C:\Users\anxin\Desktop\test_schedule\cafe_avas')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

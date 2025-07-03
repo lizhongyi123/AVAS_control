@@ -880,7 +880,7 @@ class Error():
             density_obj = ExtoDensity(exdata_path, dataset_path, target_density_path, normal_density_path, self.project_path)
             density_obj.generate_density_file_onestep(is_normal)
 
-        os.remove(exdata_path)
+        # os.remove(exdata_path)
 
         if time == self.all_time:
             #到了某一组的最后一次模拟
@@ -1029,7 +1029,6 @@ class ErrorDyn(Error):
 
         if self.if_normal == 1:
             self.run_normal()
-            print(1030)
             self.write_err_par_every_time(0,0)
 
 
@@ -1600,20 +1599,20 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\shliu\Desktop\test511"
-    obj = ErrorDyn(path,
-                   50, 1, field_path=None, if_generate_density_file = 1)
+    path = r"C:\Users\anxin\Desktop\test\test_error"
+    # obj = ErrorDyn(path,
+    #                50, 1, field_path=None, if_generate_density_file = 1)
 
     #
-    # obj = Errorstat(path, 0, 1, field_path=None, if_generate_density_file=1)
-    # item = {
-    #     "project_path": path,
-    #     "seed": 50,
-    #     "if_normal": 0,
-    #     "field_path": None,
-    #     "if_generate_density_file":0
-    # }
-    # obj = Errorstat(item)
+
+    item = {
+        "project_path": path,
+        "seed": 50,
+        "if_normal": 0,
+        "field_path": None,
+        "if_generate_density_file":0
+    }
+    obj = ErrorDyn(item)
 
     obj.run()
 

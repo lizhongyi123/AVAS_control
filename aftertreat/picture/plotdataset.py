@@ -8,7 +8,7 @@ from dataprovision.latticeparameter import LatticeParameter
 from utils.tool import get_list_interval
 import os
 import matplotlib
-matplotlib.use('Qt5Agg')
+# matplotlib.use('Qt5Agg')
 # [ 'emittance_x', 'emittance_y', 'emittance_z',
 # 'longitudinal_phase', ]
 class PlotDataSet(PicturePlot_2D):

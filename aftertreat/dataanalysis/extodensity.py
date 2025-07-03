@@ -16,7 +16,7 @@ from dataprovision.densityparameter import DensityParameter
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataprovision.exdataparameter import Exdata
-
+import pandas as pd
 
 def read_exdata_onestep_worker(args):
     # print(args)
@@ -83,38 +83,42 @@ class ExtoDensity():
         """
         使用多进程并行生成密度数据
         """
-        dataset_obj = DatasetParameter(self.dataset_path)
-        dataset_obj.get_parameter()
-
-        #dataset中所有的序号
-        dataset_index_list = dataset_obj.dataset_index
-
-        ex_data_obj = Exdata(self.exdata_path)
-        ex_data_list = ex_data_obj.get_param()
-        all_step = ex_data_obj.step
-
-
-        # print(all_step)
-
-        # breakpoint()
-        # 使用进程池并行处理每一步的数据
-
-        num_workers = max(cpu_count() - 3, 1)  # 根据 CPU 核心数动态调整
-
-        v1 = [i for i in range(0, all_step-1)]
-        step_list = v1
-
-        dataset_info = {
-            "emit_x": dataset_obj.emit_x,
-            "emit_y": dataset_obj.emit_y,
-            "emit_z": dataset_obj.emit_z,
-            "rms_x": dataset_obj.rms_x,
-            "rms_y": dataset_obj.rms_y,
-            "rms_z": dataset_obj.rms_z,
-            "number_exist": dataset_obj.number_exist,
-
-        }
-
+        # dataset_obj = DatasetParameter(self.dataset_path)
+        # dataset_obj.get_parameter()
+        #
+        # #dataset中所有的序号
+        # dataset_index_list = dataset_obj.dataset_index
+        #
+        # ex_data_obj = Exdata(self.exdata_path)
+        # ex_data_list = ex_data_obj.get_param()
+        # all_step = ex_data_obj.step
+        # print(f"总步长是{all_step}")
+        #
+        # # print(all_step)
+        #
+        # # breakpoint()
+        # # 使用进程池并行处理每一步的数据
+        #
+        # num_workers = max(cpu_count() - 3, 1)  # 根据 CPU 核心数动态调整
+        # # num_workers = int(os.environ.get("SLURM_CPUS_PER_TASK", 1))
+        # print(f"使用的 CPU 数量: {num_workers}")
+        #
+        # v1 = [i for i in range(0, all_step-1)]
+        # step_list = v1
+        #
+        # dataset_info = {
+        #     "emit_x": dataset_obj.emit_x,
+        #     "emit_y": dataset_obj.emit_y,
+        #     "emit_z": dataset_obj.emit_z,
+        #     "rms_x": dataset_obj.rms_x,
+        #     "rms_y": dataset_obj.rms_y,
+        #     "rms_z": dataset_obj.rms_z,
+        #     "number_exist": dataset_obj.number_exist,
+        #
+        # }
+        #
+        # t0 = time.time()
+        # print(f"cpu数量{cpu_count()}")
         # with Pool(num_workers) as pool:  # 使用上下文管理器
         #     # 准备每一步的参数
         #     args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
@@ -122,23 +126,24 @@ class ExtoDensity():
         #     # 使用进程池并行执行每一步数据处理
         #
         #     results = pool.map(read_exdata_onestep_worker, args)
-        args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
+        #
+        # t1 = time.time()
+        # dt10 = t1 - t0
+        # print(f"多线程时间{dt10}")
+        #
+        # # 使用普通for循环串行执行每一步数据处理
+        # t2 = time.time()
+        # args = [(ex_data_list[i], dataset_info, dataset_index_list) for i in step_list]
+        # results = []
+        # for arg in args:
+        #     result = read_exdata_onestep_worker(arg)
+        #     results.append(result)
+        #
+        # t3 = time.time()
+        # dt32 = t3 - t2
+        # print(f"单线程时间{dt32}")
 
-        # 使用普通for循环串行执行每一步数据处理
-        t0 = time.time()
-
-        results = []
-        for arg in args:
-            result = read_exdata_onestep_worker(arg)
-            results.append(result)
-
-        t1 = time.time()
-        dt = t1 - t0
-
-        print(138, t0)
-        print(139, t1)
-        print(140, dt)
-
+################################################################
         # results = []
         # # 收集并整理结果
         # for i in step_list:
@@ -168,9 +173,74 @@ class ExtoDensity():
         # # 排序结果，确保按照步骤索引顺序返回
         # results.sort(key=lambda x: x[0])
         # results = [res[1] for res in results]  # 提取最终结果
+##################################################################
+        dataset_obj = DatasetParameter(self.dataset_path)
+        dataset_obj.get_parameter()
+        t0 = time.time()
+        ds_df = pd.DataFrame({
+            "index": dataset_obj.dataset_index,
+            "emit_x": dataset_obj.emit_x,
+            "emit_y": dataset_obj.emit_y,
+            "emit_z": dataset_obj.emit_z,
+            "rms_x": dataset_obj.rms_x,
+            "rms_y": dataset_obj.rms_y,
+            "rms_z": dataset_obj.rms_z,
+            "number_exist": dataset_obj.number_exist,
+        })
+
+        # 2. 读取 exdata → DataFrame
+        ex_data_obj = Exdata(self.exdata_path)
+        ex_df = pd.DataFrame(ex_data_obj.get_param())  # 每行就是一步
+        # pd.set_option('display.max_columns', None)
+
+        all_step = len(ex_df)  # == ex_data_obj.step
+
+        # 3. merge 只做一次匹配，避免 Python for 查表
+        merged = ex_df.merge(ds_df, on="index", how="inner", copy=False)
+
+        # -------- 下面把各列一次性转成 NumPy 数组 ----------
+        zg = merged["z_ave"].to_numpy(dtype=np.float32)
+
+        emit = merged[["emit_x", "emit_y", "emit_z"]].to_numpy(dtype=np.float32)
+        rms_size = merged[["rms_x", "rms_y", "rms_z"]].to_numpy(dtype=np.float32)
+
+        nownumofp = merged["number_exist"].to_numpy(dtype=np.int32)
+
+        moy = merged[["x_ave", "y_ave", "r_ave"]].to_numpy(dtype=np.float32)
+        moy = np.column_stack([moy, np.zeros_like(zg)])  # 第 4 列占位
+
+        z_max_shift = (merged["z_max"].to_numpy(dtype=np.float32) - zg)
+        z_min_shift = (merged["z_min"].to_numpy(dtype=np.float32) - zg)
 
 
+        maxb = np.column_stack([merged[["x_max", "y_max", "r_max"]], z_max_shift]).astype(np.float32)
+        minb = np.column_stack([merged[["x_min", "y_min", "r_min"]], z_min_shift]).astype(np.float32)
 
+        maxr = maxb.copy()
+        minr = minb.copy()
+
+        tab = merged[["tab_x", "tab_y", "tab_r", "tab_z"]].to_numpy(object)
+
+        # 4. 打包成原来期望的 results (list[dict])，后面代码可直接复用
+        results = [
+            {
+                "zg": zg[i],
+                "emit": emit[i],
+                "rms_size": rms_size[i],
+                "nownumofp": int(nownumofp[i]),
+                "moy": moy[i],
+                "maxb": maxb[i],
+                "minb": minb[i],
+                "maxr": maxr[i],
+                "minr": minr[i],
+                "tab": tab[i],  # [tab_x, tab_y, tab_r, tab_z]
+            }
+            for i in range(len(zg))
+        ]
+        t1 = time.time()
+        dt = t1-t0
+        print(f"新算法时间{dt}")
+######################################################################################
         results = list(filter(bool, results))
 
         zg_lis = [res["zg"] for res in results]
@@ -339,6 +409,8 @@ class MergeDensityData(ExtoDensity):
         zg_lis = all_data[0]["zg_lis"]
         # print(zg_lis)
         data_length = len(all_data)
+        for i in range(data_length):
+            print(len(all_data[i]["emit_lis"]))
 
         all_emit_lis = np.array([all_data[i]["emit_lis"] for i in range(data_length)])
         emit_lis = np.mean(all_emit_lis, axis=0)
@@ -459,14 +531,18 @@ class MergeDensityData(ExtoDensity):
 if __name__ == "__main__":
     import time
     t1 = time.time()
-    import multiprocessing
-    base = r"C:\Users\shliu\Desktop\testex2\OutputFile\error_output\output_0_0"
 
-    exdata_path = os.path.join(base, "ExData.edt")
+    # base = os.path.join(project, "OutputFile")
+
+    base = r"C:\Users\anxin\Desktop\test\test_error\OutputFile\error_output\output_0_0"
+    exdata_path = os.path.join(base, "PCHistogram.dat")
     dataset_path = os.path.join(base, "DataSet.txt")
 
-    base1 = r"C:\Users\shliu\Desktop\testex2\OutputFile"
-    target_density_path = os.path.join(base1, "density_0_0.dat")
+
+    base1 = r"C:\Users\anxin\Desktop\test\test_error\OutputFile"
+
+    target_density_path = os.path.join(base1, "density.dat")
+
     print(target_density_path)
     # normal_density_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_0_0.dat"
     obj = ExtoDensity(exdata_path, dataset_path, target_density_path)
@@ -497,10 +573,10 @@ if __name__ == "__main__":
     # # obj.generate_density_file_onestep(isnormal=0)
 
     # paths = [
-    #     r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_1\density_1_1.dat",
-    #     r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\output_1_2\density_1_2.dat",
+    #     r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_1.dat",
+    #     r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_2.dat",
     # ]
     #
-    # target_path = r"C:\Users\shliu\Desktop\testz\OutputFile\error_output\density_tot_1.dat"
+    # target_path = r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_3.dat"
     # obj = MergeDensityData(paths, target_path)
     # obj.generate_density_file()

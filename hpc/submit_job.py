@@ -58,8 +58,31 @@ mpirun -np 1 python apis/qt_api/hpc_simmode.py {project_path}
 # python apis/qt_api/hpc_simmode.py {project_path}
 #
 # """
+######################################
+# #!/bin/bash
+# #SBATCH --job-name=AVAS_4bad7bc1
+#
+# #SBATCH --partition=gpup1
+# #SBATCH --gres=gpu:1
+#
+# ##SBATCH --nodelist=gpu002
+# #SBATCH --time=01:00:00
+# #SBATCH --output=outputdata.log
+# #SBATCH --error=errordata.log
+# #SBATCH --cpus-per-task=54
+#
+# export OMPI_MCA_hwloc_base_binding_policy=none
+# export OMPI_MCA_rmaps_base_mapping_policy=slot
+#
+# module load cuda/11.8.0-gcc-4.8.5
+# module load openmpi/4.1.5-gcc-9.4.0
+# module load gcc/9.4.0-gcc-4.8.5
+#
+# cd /public/home/lzy_gpu/li521
+#
+# mpirun -np 1  python /public/home/lzy_gpu/li521/test_simmode.py
 
-
+##################################
 
 def submit_job(**item):
     # item = {"projectPath": ""

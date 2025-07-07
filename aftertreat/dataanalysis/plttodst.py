@@ -141,13 +141,17 @@ class Plttozcode():
         pass
 if __name__ == "__main__":
 
-    project_path = r"C:\Users\anxin\Desktop\314\cafe_avas"
+    project_path = r"C:\Users\anxin\Desktop\test\cafe_avas"
     # project_path = r"C:\Users\anxin\Desktop\test_mulp"
     beamset_path = os.path.join(project_path, "OutputFile", "BeamSet.plt")
 
     obj = Plttozcode(beamset_path, project_path)
-    obj.to_z_form_onestep(0)
-    # obj.write_to_dst(-1)
+    all_step = obj.get_all_step()
+    print(all_step)
+
+    # obj.to_z_form_onestep(0)
+
+    obj.write_to_dst(0)
     # print(obj.get_all_step())
     # for i in range(54):
     #     obj.to_dst_variable_z(i)

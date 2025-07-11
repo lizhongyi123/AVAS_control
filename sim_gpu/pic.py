@@ -7,25 +7,30 @@ from sim_gpu.run import *
 import time
 
 class MPIContext:
-    def __init__(self):
-        try:
+    try :
+        def __init__(self):
             from mpi4py import MPI  # 延迟导入，确保只有在需要时才触发
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
             self.comm_size = self.comm.Get_size()
-
+            self.mpi_obj = None
+            self.mpi_ptr = None
+            self._setup_mpi_obj()
+        def _setup_mpi_obj(self):
             self.mpi_obj = MPIObject()
             self.mpi_obj.commSize = self.comm_size
             self.mpi_obj.rank = self.rank
+            self.mpi_ptr = pointer(self.mpi_obj)
+            SetDeviceForProcessors(self.mpi_ptr, c_int(-1))
             print(f"[MPI] Init success - rank={self.rank}, size={self.comm_size}")
-        except Exception as e:
-            print("[MPI] 初始化失败:", e)
-            import traceback
-            traceback.print_exc()
-            self.comm = None
-            self.rank = 0
-            self.comm_size = 1
-            self.mpi_obj = None
+    except Exception as e:
+        print("[MPI] 初始化失败:", e)
+        import traceback
+        traceback.print_exc()
+        self.comm = None
+        self.rank = 0
+        self.comm_size = 1
+        self.mpi_obj = None
 
 
 class CUB:

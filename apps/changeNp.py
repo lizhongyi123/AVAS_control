@@ -187,11 +187,11 @@ def process_and_write(input_file, output_file, sample_size=10000):
 # 示例调用
 
 
-# if __name__ == "__main__":
-#     inFileName = r"C:\Users\anxin\Desktop\test1\jinwusuo zhenshi.dst"
-#     outFileName = r"C:\Users\anxin\Desktop\test1\jinwusuo zhenshi1.dst"
-#     a = ChangeNp(inFileName, outFileName, 20)
-#     a.run()
-#     input_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq.dst"
-#     output_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq1.dst"
-#     process_and_write(input_file, output_file)
+if __name__ == "__main__":
+    inFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp.dst"
+    outFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp1.dst"
+    a = ChangeNp(inFileName, outFileName, 100)
+    a.run()
+    # input_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq.dst"
+    # output_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq1.dst"
+    # process_and_write(input_file, output_file)

@@ -73,7 +73,10 @@ mpirun -np 1 python apis/qt_api/hpc_simmode.py {project_path}
 #
 # export OMPI_MCA_hwloc_base_binding_policy=none
 # export OMPI_MCA_rmaps_base_mapping_policy=slot
-#
+
+#export OMPI_MCA_rmaps_base_mapping_policy=slot:PE=54   # 映射：一次拿 28 核
+#export OMPI_MCA_hwloc_base_binding_policy=core
+
 # module load cuda/11.8.0-gcc-4.8.5
 # module load openmpi/4.1.5-gcc-9.4.0
 # module load gcc/9.4.0-gcc-4.8.5

@@ -187,7 +187,7 @@ class GetSchedule():
 
         kwargs.update({'schedule':res})
         output = format_output(**kwargs)
-        print(192, output)
+        # print(192, output)
         return output
 
 

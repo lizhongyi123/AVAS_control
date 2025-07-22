@@ -786,16 +786,17 @@ if __name__ == '__main__':
     # print(res)
 
     # path = r"C:\Users\shliu\Desktop\test_lattice"
-    path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
-
-    item = {"project_path": path,
-            "if_normal": 0,
-            "if_generate_density_file": 0
-            }
-    res = err_dyn(**item)
+    # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
     #
-    # item = {"project_path": path,}
-    # res = basic_mulp(**item)
+    # item = {"project_path": path,
+    #         "if_normal": 0,
+    #         "if_generate_density_file": 0
+    #         }
+    # res = err_dyn(**item)
+    #
+    path= r"C:\Users\shliu\Desktop\test_ma"
+    item = {"project_path": path,}
+    res = basic_mulp(**item)
     # path = r"D:\using\test_avas_qt\cafe_avas"
     # item = {
     #     "projectPath": path,

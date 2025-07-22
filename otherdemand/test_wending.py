@@ -8,8 +8,13 @@ pyautogui.FAILSAFE = False      # 仍然禁用左上角紧急停止
 def main():
     time.sleep(2)               # 启动前缓冲 2 秒
 
+<<<<<<< Updated upstream
     target_start = (24, 82)     # “启动”按钮
     target_stop  = (76, 81)     # “结束”按钮
+=======
+    target_start = (26, 83)     # “启动”按钮
+    target_stop  = (80, 82)     # “结束”按钮
+>>>>>>> Stashed changes
 
     for i in range(10_000):
         # ── 1. 每次循环先检测是否按下 Esc ──
@@ -22,7 +27,11 @@ def main():
         pyautogui.click()
 
         # ── 2. 在 sleep 里也检测 Esc，避免休眠期间无法终止 ──
+<<<<<<< Updated upstream
         wait_or_abort(2)        # 等待 5 秒（可中断）
+=======
+        wait_or_abort(3)        # 等待 5 秒（可中断）
+>>>>>>> Stashed changes
 
         print("循环", i, "→ 点击结束")
         pyautogui.moveTo(*target_stop, duration=0.5)
@@ -45,6 +54,7 @@ def safe_exit():
     sys.exit(0)
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     if 1:
         print("请在5秒内把鼠标移动到你想获取的位置...")
 
@@ -59,3 +69,19 @@ if __name__ == "__main__":
     # except KeyboardInterrupt:
     #     # 兼容在终端里 Ctrl+C
     #     safe_exit()
+=======
+    # if 0:
+    #     print("请在5秒内把鼠标移动到你想获取的位置...")
+    #
+    #     time.sleep(3)
+    #
+    #     # 获取并打印当前鼠标位置
+    #     x, y = pyautogui.position()
+    #     print(f"鼠标当前位置：({x}, {y})")
+    #
+    try:
+        main()
+    except KeyboardInterrupt:
+        # 兼容在终端里 Ctrl+C
+        safe_exit()
+>>>>>>> Stashed changes

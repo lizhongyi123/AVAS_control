@@ -11,6 +11,7 @@ libpicso_path = os.path.join(parent_directory, 'dllfile', "libPIC.so")  # 使用
 # 打开动态链接库
 libPIC = CDLL(libpicso_path)
 libCudaRT = CDLL("libcudart.so")
+libMPI = CDLL("libmpi.so")
 
 
 
@@ -57,3 +58,5 @@ ReleaseConfigurations.argtypes = [POINTER(POINTER(Configurations))]
 # 重置GPU
 cudaDeviceReset = libCudaRT.cudaDeviceReset
 #cudaDeviceReset.restype = [c_int]
+
+MPI_Finalize = libMPI.MPI_Finalize

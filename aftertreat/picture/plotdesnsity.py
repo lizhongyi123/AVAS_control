@@ -277,7 +277,7 @@ class PlotDensityProcess(PicturePlot_2D):
         lost_lis = data["lost_lis"]
         maxlost_lis = data["maxlost_lis"]
         minlost_lis = data["minlost_lis"]
-
+        print(rms_size_lis[:10])
         if picture_type == "centroid":
             if density_plane == "x":
                 self.y = [i[0] for i in moy]

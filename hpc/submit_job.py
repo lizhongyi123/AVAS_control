@@ -34,8 +34,10 @@ python apis/qt_api/hpc_simmode.py {project_path}
 template_gpu = """#!/bin/bash
 #SBATCH --job-name={job_name}
 
-#SBATCH --partition=gpup1
+#SBATCH --partition=avas
 #SBATCH --gres=gpu:1
+
+##SBATCH --nodelist=gpu010
 
 #SBATCH --time=01:00:00
 #SBATCH --output={tmp_dir}\outputdata.log

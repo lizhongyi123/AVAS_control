@@ -8,7 +8,6 @@ a = Analysis(
     [ 'main.py', 'api.py', 'global_varible.py',
 
 
-D:\AVAS_CONTROL\AVAS_control\venv\Scripts\python.exe D:\AVAS_CONTROL\AVAS_control\otherdemand\listpackagefiles.py
 './aftertreat/picture/initialplot.py',
 './aftertreat/picture/plotacc.py',
 './aftertreat/picture/plotdataset.py',
@@ -41,6 +40,7 @@ D:\AVAS_CONTROL\AVAS_control\venv\Scripts\python.exe D:\AVAS_CONTROL\AVAS_contro
 './apps/diaginfo.py',
 './apps/EA.py',
 './apps/error.py',
+'./apps/error2.py',
 './apps/err_adjust.py',
 './apps/LongAccelerator.py',
 './apps/matchtwiss.py',
@@ -66,7 +66,7 @@ D:\AVAS_CONTROL\AVAS_control\venv\Scripts\python.exe D:\AVAS_CONTROL\AVAS_contro
 './hpc/submit_job.py',
 './otherdemand/listpackagefiles.py',
 './otherdemand/zhuanhuan.py',
-'./user/user_qt/lattice_file',
+
 './user/user_qt/page_acc.py',
 './user/user_qt/page_analysis.py',
 './user/user_qt/page_beam.py',
@@ -79,6 +79,7 @@ D:\AVAS_CONTROL\AVAS_control\venv\Scripts\python.exe D:\AVAS_CONTROL\AVAS_contro
 './user/user_qt/page_match.py',
 './user/user_qt/page_others.py',
 './user/user_qt/page_output.py',
+
 
 './user/user_qt/user_defined.py',
 './user/user_qt/user_pyqt.py',

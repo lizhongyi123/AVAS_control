@@ -177,7 +177,7 @@ class DatasetParameter():
 
         if self.project_path:
             self.particle_t = [i[40] for i in dataset_info] #粒子飞行时间
-            self.abs_pahse = [i[40] *  2 * 180 * self.freq  for i in dataset_info] #绝对相位
+            self.abs_phase = [i[40] *  2 * 180 * self.freq  for i in dataset_info] #绝对相位
 
         return True
 

@@ -485,8 +485,8 @@ def get_all_files_in_project(item):
     kwargs["inputPath"] = "InputFile"
     kwargs["outputPath"] = "OutputFile"
     kwargs["projectPath"] = project_path
-    kwargs["fileIninput"] = []
-    kwargs["fileInoutput"] = []
+    kwargs["fileinInput"] = []
+    kwargs["fileinOutput"] = []
 
     input_path = os.path.join(project_path, "InputFile")
     output_path = os.path.join(project_path, "OutputFile")
@@ -501,8 +501,8 @@ def get_all_files_in_project(item):
     folder_part = [f for f in ori_output_files if f in folders]
     file_part = [f for f in ori_output_files if f not in folders]
 
-    kwargs["fileIninput"] = file_in_input
-    kwargs["fileInoutput"] = file_part
+    kwargs["fileinInput"] = file_in_input
+    kwargs["fileinOutput"] = file_part
 
     output = format_output(code=0, msg="success", **kwargs)
 
@@ -514,9 +514,9 @@ if __name__ == '__main__':
     # res = cal_beam_parameter(item)
     # print(res)
 
-    item = {"projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"}
-    get_all_files_in_project(item)
-
+    item = {"projectPath": r"D:\using\test_avas_qt\cafe_avas"}
+    res = get_all_files_in_project(item)
+    print(res)
     # pass
     # item = {
     # "particletype": "H",

@@ -77,7 +77,7 @@ def basic_mulp(**item):
 
     if input_info.get("pchistogram_start") == 1 and input_info.get("pchistogram_grid") > 0:
         # 生成密度文件
-        exdata_path = os.path.join(project_path, "OutputFile", "ExData.edt")
+        exdata_path = os.path.join(project_path, "OutputFile", "PCHistogram.dat")
 
         dataset_path = os.path.join(project_path, "OutputFile", "DataSet.txt")
         target_density_path = os.path.join(project_path, "OutputFile", f"density_par.dat")

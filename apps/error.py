@@ -1610,7 +1610,8 @@ if __name__ == "__main__":
         "seed": 50,
         "if_normal": 0,
         "field_path": None,
-        "if_generate_density_file":0
+        "if_generate_density_file":0,
+        "device":"gpu"
     }
     obj = ErrorDyn(item)
 

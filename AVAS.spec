@@ -85,7 +85,9 @@ a = Analysis(
 './user/user_qt/user_pyqt.py',
 './user/user_qt/lattice_file/latticeideuseclass.py',
 './user/user_qt/lattice_file/lattice_ide.py',
-'./user/user_qt/lattice_file/test_lattice.py',
+'./user/user_qt/lattice_file/latticeideuseclass.py',
+
+
 './user/user_qt/page_utils/phaseellipse_dialog.py',
 './user/user_qt/page_utils/picture_dialog.py',
 './utils/beamconfig.py',

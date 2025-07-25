@@ -47,6 +47,7 @@ class Error():
         if_normal = item.get("if_normal")
         field_path = item.get("field_path")
         if_generate_density_file = item.get("if_generate_density_file")
+        self.device = item.get("device")
         self.item = item
 
         random.seed(seed)
@@ -572,8 +573,9 @@ class Error():
         item = {
             "project_path": p_path,
             "output_file": os.path.join(p_path, out_putfile_),
-            "field_file": self.field_path,
-            "errorlog_path": os.path.join(p_path, r'OutputFile/error_output/output_0/ErrorLog.txt'),
+            "field_path": self.field_path,
+            "errorlog_path": os.path.join(p_path, r'OutputFile/error_middle/output_0/ErrorLog.txt'),
+            "device": self.device,
         }
         multiparticle_obj = MultiParticle(item)
 
@@ -1172,5 +1174,4 @@ if __name__ == "__main__":
         "if_generate_density_file":0
     }
     obj = err_stat2(**item)
-
 

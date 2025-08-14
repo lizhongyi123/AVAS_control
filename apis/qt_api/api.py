@@ -53,8 +53,8 @@ def cal_beam_parameter(item):
             beam_parameter['emit_z'] = epsi_zz1
 
             beam_parameter["readparticledistribution"] = ""
-            beam_parameter["distribution_x"] = "undefined"
-            beam_parameter["distribution_y"] = "undefined"
+            beam_parameter["distribution_x"] = "GS"
+            beam_parameter["distribution_y"] = "GS"
 
             demical_keys = [
                 "particlerestmass", "kneticenergy", "alpha_x", "beta_x", "emit_x", "alpha_y", "beta_y", "emit_y",

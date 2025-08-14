@@ -161,6 +161,7 @@ class GetSchedule():
 
 
         kwargs = {}
+
         try:
             if err_mode == "" and match_mode == "":
                 if base_mode == "mulp":

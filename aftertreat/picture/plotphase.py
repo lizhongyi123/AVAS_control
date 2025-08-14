@@ -22,7 +22,7 @@ class PlotPhase:
     def __init__(self, dst_path):
         self.dst_path = dst_path
         self.fig_size = (12.8, 9.2)
-        self.fontsize = 14
+        self.fontsize = 18
         self.gird_bins = 100
         self.maxpar_num = 10**4
     def run(self, show_, fig=None, save_path=None):
@@ -103,12 +103,16 @@ class PlotPhase:
         fig.colorbar(scatter, ax=ax)
         ax.set_xlabel(xlabel, fontdict=font)
         ax.set_ylabel(ylabel, fontdict=font)
+
+        ax.tick_params(axis='x', labelsize=14)  # x 轴刻度字体大小
+        ax.tick_params(axis='y', labelsize=14)
+
         ax.grid(linestyle="--")
 
 
 if __name__ == "__main__":
 
-    dst_path = r"C:\Users\shliu\Desktop\新建文件夹 (2)\outData_3.192000.dst"
+    dst_path = r"C:\Users\shliu\Desktop\dsthuatu\part_rfq.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
     plot_phase = PlotPhase(dst_path)
 

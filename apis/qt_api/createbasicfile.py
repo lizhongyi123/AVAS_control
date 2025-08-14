@@ -19,12 +19,13 @@ class CreatBasicFile():
             "alpha_x": 0, "beta_x": 1, "emit_x": 0.1,
             "alpha_y": 0, "beta_y": 1, "emit_y": 0.1,
             "alpha_z": 0, "beta_z": 1, "emit_z": 0.1,
-            "distribution_x": "GS", "distribution_y": "GS", "use_dst": 0
+            "distribution_x": "GS", "distribution_y": "GS", "use_dst": 0, "beam_type": "notDC",
         }
 
         self.input_info = {
             "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
-            "device":"cpu", "pchistogram_start": 0, "pchistogram_grid": 300,
+            "device":"cpu", "pchistogram_start": 0, "pchistogram_grid": 300, "longlimits_start": 0, "longlimits_phase": 0, "longlimits_energy": 0,
+            "boundary": 0
         }
 
         self.ini_info = \
@@ -177,7 +178,7 @@ class CreateBasicProject():
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test429"
+    project_path = r"D:\using\test_avas_qt\tc"
 
 
 

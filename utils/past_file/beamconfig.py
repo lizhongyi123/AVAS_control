@@ -1,5 +1,3 @@
-from fontTools.cffLib import privateDictOperators
-
 from utils.readfile import read_txt
 from utils.tool import write_to_txt, convert_dic2lis
 import copy
@@ -17,6 +15,13 @@ class BeamConfig():
                                     "alpha_y", "beta_y", "emit_y",
                                     "alpha_z", "beta_z", "emit_z",
                                     'distribution_x', 'distribution_y', "use_dst", "beamtype"]
+
+        self.with_dst_keys = ['readparticledistribution', 'numofcharge']
+
+        self.no_dst_keys = ['numofcharge', 'particlerestmass',
+                             'current', 'particlenumber', 'frequency',
+                             'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
+                             'distribution_x', 'distribution_y', "beamtype"]
 
 
         self.str_keys = ['readparticledistribution', 'distribution_x', "distribution_y",
@@ -47,13 +52,30 @@ class BeamConfig():
         #读取beam文件
         beam_lis = read_txt(path, out='list', case_sensitive=True)
 
+        for i in beam_lis:
+            if len(i) == 1:
+                i.append(None)
+
+        twiss_keys = ["twissx", "twissy", "twissz"]
+
+        for index, i in enumerate(beam_lis):
+            if i[0] in twiss_keys:
+                beam_lis[index] = i + (4 - len(i)) * [None]
+            elif i[0] == "distribution":
+                beam_lis[index] = i + (3 - len(i)) * [None]
+
+            elif i[0] == "readparticledistribution":
+                if len(i) == 2 and i[1] == "unknown":
+                    beam_lis[index][1] = None
+
+
+
         res = {}
         for i in beam_lis:
             if len(i) == 2:
                 res[i[0]] = i[1]
             else:
                 res[i[0]] = i[1:]
-
         return res
 
 
@@ -69,7 +91,8 @@ class BeamConfig():
 
 
         original_dict = self.read_beam_txt(path)
-
+        #处理twiss参数和distribution
+        #检查twiss和distribution的长度是否正常
 
         if "twissx" in original_dict.keys():
             original_dict["alpha_x"] = original_dict["twissx"][0]
@@ -90,8 +113,6 @@ class BeamConfig():
             original_dict["distribution_x"] = original_dict["distribution"][0]
             original_dict["distribution_y"] = original_dict["distribution"][1]
             del original_dict["distribution"]
-        if original_dict.get("readparticledistribution") == "unknown":
-            original_dict["readparticledistribution"] = None
 
         # #验证是否存在未知元素
         # for k, v in original_dict.items():
@@ -103,9 +124,9 @@ class BeamConfig():
             original_dict[k] = self.convert_v(k, v)
 
         #赋值给self.beam_parameter
-        # if self.validate_type(original_dict):
-        for k, v in original_dict.items():
-            self.beam_parameter[k] = original_dict[k]
+        if self.validate_type(original_dict):
+            for k, v in original_dict.items():
+                self.beam_parameter[k] = original_dict[k]
 
 
         # print("read", self.beam_parameter)
@@ -126,6 +147,7 @@ class BeamConfig():
 
         kwargs = {}
 
+        v_dic = {}
         v_dic = copy.deepcopy(self.beam_parameter)
         if use_dst == 1:
             v_dic['readparticledistribution'] = self.beam_parameter['readparticledistribution']
@@ -215,8 +237,7 @@ class BeamConfig():
         return True
 
     def validate_run(self, item):
-        pass
-        # res = self.create_from_file(item)
+        res = self.create_from_file(item)
         # if res["code"] == -1:
         #     raise Exception(res["data"]["msg"])
         # beam_params = res["data"]["beamParams"]
@@ -226,15 +247,9 @@ class BeamConfig():
         # #     if beam_params[k] is None:
         # #         raise Exception(f"missing parameter {k}")
         #
-
-        # self.with_dst_keys = ['readparticledistribution', 'numofcharge']
-        #
-        # self.no_dst_keys = ['numofcharge', 'particlerestmass',
-        #                     'current', 'particlenumber', 'frequency',
-        #                     'kneticenergy', 'alpha_x', 'beta_x', 'emit_x',
-        #                     'distribution_x', 'distribution_y', "beamtype"]
         # #当所有输入符合
         # use_dst = self.beam_parameter.get("use_dst")
+        # # if
         # if use_dst == 1:
         #     for k in self.with_dst_keys:
         #         if beam_params[k] is None:

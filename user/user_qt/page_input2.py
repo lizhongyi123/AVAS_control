@@ -11,7 +11,7 @@ from utils.readfile import read_txt, read_dst
 from user.user_qt.user_defined import treat_err, treat_err2, gray240
 from utils.inputconfig import InputConfig
 from apis.qt_api.api import create_from_file_input_ini, write_to_file_input_ini
-from utils.tool import safe_to_float, safe_int, safe_str
+from utils.tool import safe_float, safe_int, safe_str
 
 class mulpSettingsWidget(QWidget):
     def __init__(self):

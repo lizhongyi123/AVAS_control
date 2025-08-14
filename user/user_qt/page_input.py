@@ -11,7 +11,7 @@ from utils.readfile import read_txt, read_dst
 from user.user_qt.user_defined import treat_err, treat_err2, gray240
 from utils.inputconfig import InputConfig
 from apis.qt_api.api import create_from_file_input_ini, write_to_file_input_ini
-from utils.tool import safe_to_float, safe_int, safe_str
+from utils.tool import safe_float, safe_int, safe_str
 class PageInput(QWidget):
     input_signal = pyqtSignal(dict)
 
@@ -20,6 +20,7 @@ class PageInput(QWidget):
         self.project_path = project_path
         # self.multithreading_num = -1
         self.field_source_path = None
+        self.longlimits_start_num = 0
 
         self.initUI()
 
@@ -323,7 +324,51 @@ class PageInput(QWidget):
         layout_density_control.addStretch(1)
         group_box_density_control.setLayout(layout_density_control)
 
+        #############################################################
+        group_box_longlimits = QGroupBox()
 
+        layout_longlimits= QHBoxLayout()
+
+        #111
+        self.cb_longlimits_start = QCheckBox('Longlimits', self)
+        # self.cb_generate_density.setFixedWidth(70)
+        # self.cb_Longlimits_start.stateChanged.connect(self.cd_longlimits_start_change)
+
+        self.label_longlimits_phase = QLabel('Phase')
+        # self.label_longlimits_phase.setMinimumWidth(70)
+        self.text_longlimits_phase = QLineEdit("")
+        self.text_longlimits_phase.setMinimumWidth(70)
+        self.label_longlimits_phase_unit = QLabel('deg')
+
+
+        self.label_longlimits_energy = QLabel('Energy')
+        # self.label_longlimits_energy.setMinimumWidth(70)
+        self.text_longlimits_energy = QLineEdit("")
+        self.text_longlimits_energy.setMinimumWidth(70)
+        self.label_longlimits_energy_unit = QLabel('MeV')
+
+        layout_longlimits.addWidget(self.cb_longlimits_start)
+        layout_longlimits.addStretch(2)
+        layout_longlimits.addWidget(self.label_longlimits_phase)
+        layout_longlimits.addWidget(self.text_longlimits_phase)
+        layout_longlimits.addWidget(self.label_longlimits_phase_unit)
+        layout_longlimits.addStretch(2)
+        layout_longlimits.addWidget(self.label_longlimits_energy)
+        layout_longlimits.addWidget(self.text_longlimits_energy)
+        layout_longlimits.addWidget(self.label_longlimits_energy_unit)
+
+        layout_longlimits.addStretch(1)
+        group_box_longlimits.setLayout(layout_longlimits)
+
+########################################################################
+        group_box_boundary = QGroupBox()
+        layout_boundary= QHBoxLayout()
+        self.cb_boundary_start = QCheckBox('Boundary', self)
+
+        layout_boundary.addWidget(self.cb_boundary_start)
+        group_box_boundary.setLayout(layout_boundary)
+
+########################################################################
 
 
 
@@ -338,6 +383,8 @@ class PageInput(QWidget):
         vertical_layout_main.addWidget(group_box_sc_use)
         vertical_layout_main.addWidget(group_box_field_source)
         vertical_layout_main.addWidget(group_box_density_control)
+        vertical_layout_main.addWidget(group_box_longlimits)
+        vertical_layout_main.addWidget(group_box_boundary)
 
         vertical_layout_main.addWidget(group_box_sc_step)
 
@@ -367,6 +414,7 @@ class PageInput(QWidget):
         if field_source_path:
             self.text_field_source.setText(field_source_path)
         self.field_source_path = field_source_path
+
     def cb_basic_change(self, state):
         sender_checkbox = self.sender()  # 获取发送信号的复选框对象
         if sender_checkbox == self.cb_mulp:  # 如果发送信号的对象是 cb_mulp 复选框
@@ -408,6 +456,7 @@ class PageInput(QWidget):
 
         input_ini_res = input_ini_res['data']["inputiniParams"]
 
+        print(input_ini_res)
 
         if input_ini_res.get('sim_type') == "mulp":
             self.cb_mulp.setChecked(True)
@@ -433,6 +482,25 @@ class PageInput(QWidget):
         self.step_per_period_text.setText(safe_str(input_ini_res.get('steppercycle'), "100"))
 
         self.dumpPeriodicity_text.setText(safe_str(input_ini_res.get('dumpperiodicity'), "0"))
+
+        longlimits_start = safe_int(input_ini_res.get('longlimits_start', 0))
+        longlimits_phase = safe_str(input_ini_res.get('longlimits_phase', 0))
+        longlimits_energy = safe_str(input_ini_res.get('longlimits_energy', 0))
+
+        if longlimits_start == 0:
+            self.cb_longlimits_start.setChecked(False)
+        elif longlimits_start == 1:
+            self.cb_longlimits_start.setChecked(True)
+
+        self.text_longlimits_phase.setText(longlimits_phase)
+        self.text_longlimits_energy.setText(longlimits_energy)
+
+        boundary_start = safe_int(input_ini_res.get('boundary', 0))
+
+        if boundary_start == 0:
+            self.cb_boundary_start.setChecked(False)
+        elif boundary_start == 1:
+            self.cb_boundary_start.setChecked(True)
 
         # 对于包络模型的输入
         self.text_field_source.setText(safe_str(input_ini_res["fieldSource"]))
@@ -527,10 +595,25 @@ class PageInput(QWidget):
         res["pchistogram_grid"] = self.text_density_grid.text()
 
         res["fieldSource"] = self.text_field_source.text()
+
+        if self.cb_longlimits_start.isChecked():
+            res["longlimits_start"] = 1
+        else:
+            res["longlimits_start"] = 0
+
+        res["longlimits_phase"] =safe_float( self.text_longlimits_phase.text() )
+        res["longlimits_energy"] =safe_float( self.text_longlimits_energy.text() )
+
+        if self.cb_boundary_start.isChecked():
+            res["boundary"] = 1
+        else:
+            res["boundary"] = 0
+
         if self.sc_step_text.text():
             res['spacechargelong'] = safe_int(self.sc_step_text.text(), 1)
         else:
             res['spacechargelong'] = None
+
 
 
         if self.sc_step_meter_checkbox.isChecked():
@@ -665,9 +748,24 @@ class PageInput(QWidget):
             self.scan_phase_combo.setEnabled(False)
             self.scan_phase_combo.setStyleSheet(f"QComboBox {{ background-color:  {gray240} }}")
 
+
+# sec_sc = CollapsibleSection("空间电荷")
+# chk_sc = QtWidgets.QCheckBox("启用空间电荷计算")
+# sec_sc.form.addRow(chk_sc)
+# grid = QtWidgets.QSpinBox();
+# grid.setRange(16, 2048);
+# grid.setValue(300)
+# step = QtWidgets.QDoubleSpinBox();
+# step.setRange(0.0, 10.0);
+# step.setDecimals(4);
+# step.setSuffix(" m")
+# sec_sc.form.addRow("Density grid：", grid)
+# sec_sc.form.addRow("Space-charge step：", step)
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'C:\Users\anxin\Desktop\test_schedule\cafe_avas')
+    main_window = PageInput(r'D:\using\test_avas_qt\test_beam')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

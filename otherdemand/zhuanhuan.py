@@ -116,6 +116,8 @@ def chexck_superposeend(lis, i):
         return False
 
 def tran_tracewin_avas(tracewin_list):
+
+
     avas_list =[['start']]
     no_identify_list = []
 
@@ -146,12 +148,17 @@ def tran_tracewin_avas(tracewin_list):
                 avas_list.append(["superposeend"])
 
         elif stat[0].lower() == "superpose_map":
+
             tmp = ["superpose", float(stat[1])/1000, float(stat[2])/1000, float(stat[3])/1000, stat[4], stat[5], stat[6] ]
             avas_list.append(tmp)
 
         elif stat[0].lower() == 'FIELD_MAP'.lower():
-            if stat[1] == "70":
-                tmp = ["field", float(stat[2])/1000, float(stat[4])/1000,0,3,0,0,1, stat[5], stat[9]]
+            if stat[1] == "7":
+                #静电场
+                tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 2, 0, 0, stat[6], 0, stat[9]]
+
+            elif stat[1] == "70":
+                tmp = ["field", float(stat[2])/1000, float(stat[4])/1000,0, 3, 0, 0,   0, stat[5], stat[9]]
 
             elif stat[1] == "7700":
                 tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 1, freq, stat[3], stat[6],stat[5], stat[9]]
@@ -164,6 +171,13 @@ def tran_tracewin_avas(tracewin_list):
 
         elif stat[0].lower() == "QUAD".lower():
             tmp = ['quad', float(stat[1])/1000, float(stat[3])/1000, 0, float(stat[2]), 0, 0]
+            avas_list.append(tmp)
+
+            if chexck_superposeend(tracewin_list, index):
+                avas_list.append(["superposeend"])
+
+        elif stat[0].lower() == "SOLENOID".lower():
+            tmp = ['solenoid', float(stat[1])/1000, float(stat[3])/1000, 0, float(stat[2])]
             avas_list.append(tmp)
 
             if chexck_superposeend(tracewin_list, index):
@@ -208,7 +222,7 @@ def tran_tracewin_avas(tracewin_list):
             pass
 
         else:
-            # print(101, stat)
+            print(101, stat)
             pass
 
 
@@ -262,13 +276,12 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\anxin\Desktop\mebtAVASP\20230118-proton-19.07.dat"
+    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\change_lattice_jiang\clapa2.dat"
 
-    avas_lattice_path = r"C:\Users\anxin\Desktop\mebtAVASP\lattice.txt"
+    avas_lattice_path = r"C:\Users\shliu\Desktop\change_lattice_jiang\lattice.txt"
 
 
     # 修改后的lattice
-
 
     tracewin_lattice = read_tracewin(tracewin_lattiace_path)
 

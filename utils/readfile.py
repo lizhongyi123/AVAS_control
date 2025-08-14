@@ -198,11 +198,32 @@ def read_runsignal(path):
     return res
 
 
+def read_file_with_np(path, dtype=np.float64):
+    #该函数用来快速获取表格型文件
+    """
+    适合 ≤ 数十 MB 的文本文件
+    自动按任何空白分隔符（空格 / 制表符 / 连续空格）拆列。
 
+    Parameters
+    ----------
+    path : str or Path
+        文件路径
+    dtype : data‑type, default np.float64
+        改成 np.float32 可省一半内存、略快
+
+    Returns
+    -------
+    np.ndarray  shape=(n_rows, n_cols)
+    """
+    return np.loadtxt(path, dtype=dtype)
 
 
 #
 if __name__ == "__main__":
+    # path = r"D:\using\test_avas_qt\cafe_avas\OutputFile\DataSet.txt"
+    # res = read_file_with_np(path)
+    # print(res)
+
     # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
     # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
     # path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
@@ -216,6 +237,6 @@ if __name__ == "__main__":
     # res = read_lattice_mulp_with_name(path)
     # print(res)
 
-    path = r"C:\Users\anxin\Desktop\2beam\part_rfq100_F.dst"
+    path = r"C:\Users\shliu\Desktop\lijincheng\InputFile\20-30 graphite.dst"
     res = read_dst_fast(path)
     print(res)

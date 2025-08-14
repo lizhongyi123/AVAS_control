@@ -9,24 +9,15 @@ import os
 class InputConfig():
     def __init__(self):
         self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                                     "spacechargelong", "spacechargetype", "fieldSource", "device", "pchistogram_start", "pchistogram_grid",
-                                     "longlimits_start", "longlimits_phase", "longlimits_energy", "boundary"
-                                     ]
-
-
-        self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
-                                "spacechargelong": None, "spacechargetype": None, "pchistogram_start":None, "pchistogram_grid":None,
-                                "longlimits_start": None, "longlimits_phase": None, "longlimits_energy": None,
-                                "boundary": None
-                                }
+                                     "spacechargelong", "spacechargetype", "fieldSource", "device", "pchistogram_start", "pchistogram_grid"]
 
         self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                         "spacechargelong", "spacechargetype", "pchistogram_start", "pchistogram_grid", "longlimits_start", "boundary"]
+                         "spacechargelong", "spacechargetype", "pchistogram_start", "pchistogram_grid"]
 
-        self.float_keys = ["longlimits_phase", "longlimits_energy"]
+        self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
+                                "spacechargelong": None, "spacechargetype": None, "pchistogram_start":None, "pchistogram_grid":None}
 
-
-        self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", ]
+        self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",]
         self.env_keys = ["spacechargelong", "spacechargetype"]
 
     # def initialize_input(self):
@@ -39,14 +30,32 @@ class InputConfig():
     def read_input_txt(self, path):
         #读取beam文件
         input_lis = read_txt(path, out='list', readdall=True, case_sensitive=True, )
+        new_input_lis = []
+
+        for i in input_lis:
+            # 确保不影响原始数据结构
+            item = i.copy()
+            if len(item) == 1:
+                item.append(None)
+            if item[0] == "sim_type":
+                item[0] = "sim_type"
+            new_input_lis.append(item)
+
+            if item[0] == "pchistogram":
+                item = item + (3-len(item)) * [None]
+                new_input_lis.append(["pchistogram_start", item[1]])
+                new_input_lis.append(["pchistogram_grid", item[2]])
+
 
         res = {}
-        for i in input_lis:
+        for i in new_input_lis:
             if len(i) == 2:
                 res[i[0]] = i[1]
             else:
                 res[i[0]] = i[1:]
 
+        if res.get("pchistogram") is not None:
+            del res["pchistogram"]
 
         return res
 
@@ -60,16 +69,6 @@ class InputConfig():
         kwargs = {}
 
         original_dict = self.read_input_txt(path)
-        print(65, original_dict)
-        if "pchistogram" in original_dict.keys():
-            print(67)
-            original_dict["pchistogram_start"] = original_dict["pchistogram"][0]
-            original_dict["pchistogram_grid"] = original_dict["pchistogram"][1]
-        if "longlimits" in original_dict.keys():
-            original_dict["longlimits_start"] = original_dict["longlimits"][0]
-            original_dict["longlimits_phase"] = original_dict["longlimits"][1]
-            original_dict["longlimits_energy"] = original_dict["longlimits"][2]
-
 
         # 验证是否存在未知元素
         # for k, v in original_dict.items():
@@ -81,11 +80,34 @@ class InputConfig():
         for k, v in original_dict.items():
             original_dict[k] = self.convert_v(k, v)
 
-        for k, v in original_dict.items():
-            self.input_parameter[k] = original_dict[k]
+        if self.validate_type(original_dict):
+            for k, v in original_dict.items():
+                self.input_parameter[k] = original_dict[k]
 
+        # try:
+        #     original_dict = self.read_input_txt(path)
+        #
+        #     #验证是否存在未知元素
+        #     for k, v in original_dict.items():
+        #         if k not in self.input_parameter_keys:
+        #             raise UnknownkeywordError(message=None, key=k)
+        #
+        #     #如果不存在未知元素, 转换类型
+        #     for k, v in original_dict.items():
+        #         original_dict[k] = self.convert_v(k, v)
+        #
+        #     if self.validate_type(original_dict):
+        #         for k, v in original_dict.items():
+        #             self.input_parameter[k] = original_dict[k]
+        #
+        # except Exception as e:
+        #     code = -1
+        #     msg = str(e)
+        #     kwargs.update({'inputParams': {}})
+        #     output = format_output(code, msg=msg, **kwargs)
+        #     return output
 
-
+        # print("read", self.beam_parameter)
         kwargs.update({'inputParams': copy.deepcopy(self.input_parameter)})
         output = format_output(**kwargs)
         return output
@@ -95,9 +117,8 @@ class InputConfig():
             if v == '':
                 kwargs[k] = None
         kwargs1 = {}
-        #验证类型
-        self.validate_type(kwargs)
 
+        self.validate_type(kwargs)
         for k, v in kwargs.items():
             self.input_parameter[k] = v
 
@@ -119,15 +140,12 @@ class InputConfig():
         if self.input_parameter["sim_type"] == 'mulp':
             v_dic = copy.deepcopy(self.input_parameter)
             v_dic["pchistogram"] = [v_dic["pchistogram_start"], v_dic["pchistogram_grid"]]
-            v_dic["longlimits"] = [v_dic["longlimits_start"], v_dic["longlimits_phase"], v_dic["longlimits_energy"]]
 
+            del v_dic["spacechargelong"]
+            del v_dic["spacechargetype"]
 
-            need_delete = ["spacechargelong", "spacechargetype",
-                           "pchistogram_start", "pchistogram_grid",
-                           "longlimits_start", "longlimits_phase", "longlimits_energy"]
-
-            for i in need_delete:
-                del v_dic[i]
+            del v_dic["pchistogram_start"]
+            del v_dic["pchistogram_grid"]
 
 
         elif self.input_parameter["sim_type"] == 'env':
@@ -194,18 +212,13 @@ class InputConfig():
             v = convert_to_othertype_dict(k, v, int)
             return v
 
-        if k in self.float_keys:
-            v = convert_to_othertype_dict(k, v, float)
-            return v
-
         else:
             return v
 
     def validate_run(self, item):
-        pass
-        # res = self.create_from_file(item)
-        #
-        # input_params = res["data"]["inputParams"]
+        res = self.create_from_file(item)
+
+        input_params = res["data"]["inputParams"]
         #当所有输入符合
         # if input_params["sim_type"] == 'mulp':
         #     for k in self.mulp_keys:

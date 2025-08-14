@@ -135,11 +135,13 @@ def convert_to_othertype_dict(k , v, target_type) :
 
 
 
-def safe_to_float(text, default=0.0):
+def safe_float(v, default=0.0):
     try:
-        return float(text)
+        if v is None:
+            return default
+        return float(v)
     except ValueError:
-        return 0
+        return default
 
 def safe_int(v, default=0):
     try:

@@ -25,7 +25,7 @@ from user.user_qt.page_utils.phaseellipse_dialog import PhaseEllipseWidget
 gray240 = "rgb(240, 240, 240)"
 from apis.qt_api.api import cal_beam_parameter
 from apis.basic_api.api import plot_dataset
-from utils.tool import safe_to_float, safe_int, safe_str
+from utils.tool import safe_float, safe_int, safe_str
 
 class PageBeam(QWidget):
     def __init__(self, project_path):
@@ -34,6 +34,7 @@ class PageBeam(QWidget):
         self.decimals = 5
         self.obj_plt_ellipse = None
         self.cb_use_dst_num = 0
+        self.cb_beam_type = "notDC"
         self.initUI()
 
     def initUI(self):
@@ -397,11 +398,26 @@ class PageBeam(QWidget):
 
         ###################################################
 
+        group_cw = QGroupBox("")  # GroupBox标题可自定义
+        layout_cw = QHBoxLayout()
+
+        label_cw = QLabel("CW beam")
+        self.cb_cw = QCheckBox('', self)
+        self.cb_cw.stateChanged.connect(self.cb_cw_change)
+
+        layout_cw.addWidget(label_cw)
+        layout_cw.addWidget(self.cb_cw)
+
+        group_cw.setLayout(layout_cw)
+########################################################################################
+
         self.button_phase_ellipse = QPushButton("Visuallize preview of rms values")
         self.button_phase_ellipse.clicked.connect(self.plot_phase_ellipse)
         vertical_layout2.addLayout(hbox_distribution)
         vertical_layout2.addWidget(group_use_dst)
+        vertical_layout2.addWidget(group_cw)
         vertical_layout2.addWidget(self.button_phase_ellipse)
+
         # vertical_layout2.addLayout(hbox_displacePos)
         # vertical_layout2.addLayout(hbox_displaceDpos)
         vertical_layout2.addStretch(1)
@@ -474,23 +490,42 @@ class PageBeam(QWidget):
 
         # print(self.cb_use_dst_num)
 
+    def cb_cw_change(self,  state):
+        z_parameter = [
+            self.alpha_zz_text,
+            self.beta_zz_text,
+            self.varepsilon_zz_text,
+        ]
+        if state == Qt.Checked:
+            self.cb_beam_type = "DC"
+            for widget in z_parameter:
+                widget.setText("0")
+                widget.setEnabled(False)
 
+
+        elif state == Qt.Unchecked:
+            self.cb_beam_type = "notDC"
+            for widget in z_parameter:
+                widget.setEnabled(True)
+
+
+        pass
 
     def twiss_changed(self):
         # print("Twiss 参数改变了！")
         # time0 = time.time()
         self.twiss_parameter = {
-            "alpha_x": safe_to_float(self.alpha_xx_text.text()),
-            "beta_x": safe_to_float(self.beta_xx_text.text()),
-            "rms_emit_x": safe_to_float(self.varepsilon_xx_text.text()),
+            "alpha_x": safe_float(self.alpha_xx_text.text()),
+            "beta_x": safe_float(self.beta_xx_text.text()),
+            "rms_emit_x": safe_float(self.varepsilon_xx_text.text()),
 
-            "alpha_y": safe_to_float(self.alpha_yy_text.text()),
-            "beta_y": safe_to_float(self.beta_yy_text.text()),
-            "rms_emit_y": safe_to_float(self.varepsilon_yy_text.text()),
+            "alpha_y": safe_float(self.alpha_yy_text.text()),
+            "beta_y": safe_float(self.beta_yy_text.text()),
+            "rms_emit_y": safe_float(self.varepsilon_yy_text.text()),
 
-            "alpha_z": safe_to_float(self.alpha_zz_text.text()),
-            "beta_z": safe_to_float(self.beta_zz_text.text()),
-            "rms_emit_z": safe_to_float(self.varepsilon_zz_text.text()),
+            "alpha_z": safe_float(self.alpha_zz_text.text()),
+            "beta_z": safe_float(self.beta_zz_text.text()),
+            "rms_emit_z": safe_float(self.varepsilon_zz_text.text()),
         }
         time1 = time.time()
         if self.obj_plt_ellipse is not None:
@@ -587,6 +622,12 @@ class PageBeam(QWidget):
         elif safe_int(beam_res.get("use_dst")) == 0:
             self.cb_use_dst.setChecked(False)
 
+        if beam_res.get("beamtype") == "DC":
+            self.cb_cw.setChecked(True)
+        else:
+            self.cb_cw.setChecked(False)
+
+
             # if isinstance(beam_res.get('displacepos'), list) and len(beam_res.get('displacepos')) == 3:
             #     self.text_displacePos_x.setText(beam_res.get('displacepos')[0])
             #     self.text_displacePos_y.setText(beam_res.get('displacepos')[1])
@@ -632,7 +673,7 @@ class PageBeam(QWidget):
 
         res['beta_x'] = self.beta_xx_text.text()
         res['beta_y'] = self.beta_yy_text.text()
-        res['beta_z'] = self.beta_yy_text.text()
+        res['beta_z'] = self.beta_zz_text.text()
 
         res['emit_x'] = self.varepsilon_xx_text.text()
         res['emit_y'] = self.varepsilon_yy_text.text()
@@ -643,6 +684,7 @@ class PageBeam(QWidget):
 
 
         res["use_dst"] = self.cb_use_dst_num
+        res["beamtype"] = self.cb_beam_type
         return res
 
     def import_beam_parameter(self):
@@ -684,6 +726,9 @@ class PageBeam(QWidget):
         self.varepsilon_yy_text.setText(str(round(dst_res.get("emit_y"), self.decimals)))
         self.varepsilon_zz_text.setText(str(round(dst_res.get("emit_z"), self.decimals)))
 
+        self.distribution_combo_trans.setCurrentText(dst_res["distribution_x"])
+        self.distribution_combo_longi.setCurrentText(dst_res["distribution_y"])
+
     def save_beam(self):
         beam_dict = self.generate_beam_list()
         for k, v in beam_dict.items():
@@ -707,8 +752,6 @@ class PageBeam(QWidget):
         res = beam_obj.set_param(**beam_dict)
 
         res = beam_obj.write_to_file(item)
-
-
 
 
 
@@ -827,7 +870,7 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'C:\Users\shliu\Desktop\test_lattice')
+    main_window = PageBeam(r'D:\using\test_avas_qt\test_beam')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")

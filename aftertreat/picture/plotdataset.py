@@ -352,23 +352,11 @@ class PlotDataSet(PicturePlot_2D):
             self.colors = self.colors[:-2]
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\anxin\Desktop\test_hiaf\hiaf"
-    dataset_path = r"C:\Users\anxin\Desktop\test_hiaf\hiaf\OutputFile\error_output\output_0\DataSet.txt"
+    project_path = None
+    dataset_path = r"C:\Users\shliu\Desktop\test822\OutputFile\DataSet.txt"
     a = PlotDataSet(project_path=None,  picture_name = 'c_xy', dataset_path=dataset_path)
-    # a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
 
     a.get_x_y()
-    # a.need_element(aper=1)
     a.run(show_=1)
 
-    a = PlotDataSet(project_path=None,  picture_name = 'loss', dataset_path=dataset_path)
-    # a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
 
-    a.get_x_y()
-    # a.need_element(aper=1)
-    a.run(show_=1)
-    # a = PlotDataSet(project_path=None,  picture_name = 'alpha_x', dataset_path=dataset_path)
-    # a.get_x_y()
-    # # a.need_element(aper=1)
-    # a.run(show_=1)
-    #

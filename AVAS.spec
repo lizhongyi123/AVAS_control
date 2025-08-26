@@ -18,6 +18,7 @@ a = Analysis(
 './aftertreat/picture/plotphaseellipse.py',
 './aftertreat/picture/plotpicture.py',
 './aftertreat/picture/__init__.py',
+
 './aftertreat/dataanalysis/caltwiss.py',
 './aftertreat/dataanalysis/EAanalysis.py',
 './aftertreat/dataanalysis/extodensity.py',
@@ -26,6 +27,7 @@ a = Analysis(
 './aftertreat/dataanalysis/plttodensity.py',
 './aftertreat/dataanalysis/plttodst.py',
 './aftertreat/dataanalysis/__init__.py',
+
 './apis/basic_api/api.py',
 './apis/qt_api/api.py',
 './apis/qt_api/createbasicfile.py',
@@ -33,6 +35,7 @@ a = Analysis(
 './apis/qt_api/hpc_simmode.py',
 './apis/qt_api/judge_lattice.py',
 './apis/qt_api/SimMode.py',
+
 './apps/basicenv.py',
 './apps/calacceptance.py',
 './apps/changeNp.py',
@@ -47,11 +50,15 @@ a = Analysis(
 './apps/scan.py',
 './apps/tasks.py',
 './apps/__init__.py',
+
+'./conf/setting.py',
+
 './core/LinacOPTEngine.py',
 './core/LongAcceleratorEngine.py',
 './core/MultiParticle.py',
 './core/MultiParticleEngine.py',
 './core/__init__.py',
+
 './dataprovision/beamparameter.py',
 './dataprovision/beamset.py',
 './dataprovision/datasetparameter.py',
@@ -59,13 +66,24 @@ a = Analysis(
 './dataprovision/env_beam_out.py',
 './dataprovision/exdataparameter.py',
 './dataprovision/latticeparameter.py',
+'./dataprovision/singlepparameter.py',
 './dataprovision/__init__.py',
+
 './hpc/get_errordata.py',
 './hpc/get_jobstatus.py',
 './hpc/stop_job.py',
 './hpc/submit_job.py',
+
 './otherdemand/listpackagefiles.py',
+'./otherdemand/outtxt_to_outdst.py',
 './otherdemand/zhuanhuan.py',
+
+'./sim_gpu/initializer.py',
+'./sim_gpu/pic.py',
+'./sim_gpu/pic_bak.py',
+'./sim_gpu/run.py',
+'./sim_gpu/structures.py',
+
 
 './user/user_qt/page_acc.py',
 './user/user_qt/page_analysis.py',
@@ -74,22 +92,22 @@ a = Analysis(
 './user/user_qt/page_error.py',
 './user/user_qt/page_function.py',
 './user/user_qt/page_input.py',
+'./user/user_qt/page_input2.py',
 './user/user_qt/page_lattice.py',
 './user/user_qt/page_longdistance.py',
 './user/user_qt/page_match.py',
 './user/user_qt/page_others.py',
 './user/user_qt/page_output.py',
-
+'./user/user_qt/__init__.py',
+'./user/__init__.py',
 
 './user/user_qt/user_defined.py',
 './user/user_qt/user_pyqt.py',
 './user/user_qt/lattice_file/latticeideuseclass.py',
 './user/user_qt/lattice_file/lattice_ide.py',
-'./user/user_qt/lattice_file/latticeideuseclass.py',
-
-
 './user/user_qt/page_utils/phaseellipse_dialog.py',
 './user/user_qt/page_utils/picture_dialog.py',
+
 './utils/beamconfig.py',
 './utils/change_win_to_linux.py',
 './utils/exception.py',
@@ -111,7 +129,7 @@ a = Analysis(
 
     ],
 
-    pathex=[r'D:\AVAS_CONTROL\AVAS_control'],
+    pathex=[r'E:\AVAS_CONTROL\AVAS_control'],
     binaries=[],
     datas=[('./dllfile/AVAS.dll', 'dllfile'),
     ('./dllfile/AVAS.lib', 'dllfile'),

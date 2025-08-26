@@ -19,6 +19,7 @@ from apis.qt_api.judge_lattice import JudgeLattice
 import shutil
 import threading
 import time
+from conf.setting import run_env
 
 class SimMode():
     def __init__(self, item):
@@ -85,18 +86,19 @@ class SimMode():
             }
             # print(item)
             # sys.exit()
-            outputfile_path = os.path.join(self.project_path, "OutputFile")
-            olddir = outputfile_path + "_old_" + str(int(time.time() * 1000))  # 带时间戳防冲突
+            if run_env != "windows":
+                outputfile_path = os.path.join(self.project_path, "OutputFile")
+                olddir = outputfile_path + "_old_" + str(int(time.time() * 1000))  # 带时间戳防冲突
 
-            if os.path.exists(outputfile_path):
-                os.replace(outputfile_path, olddir)  # O(1) 重命名，瞬间完成
-            os.makedirs(outputfile_path, exist_ok=True)  # 新的空目录马上就绪
+                if os.path.exists(outputfile_path):
+                    os.replace(outputfile_path, olddir)  # O(1) 重命名，瞬间完成
+                os.makedirs(outputfile_path, exist_ok=True)  # 新的空目录马上就绪
 
-            # 后台线程慢慢删旧目录，不阻塞主流程
-            def _delete_async(path):
-                shutil.rmtree(path, ignore_errors=True)
+                # 后台线程慢慢删旧目录，不阻塞主流程
+                def _delete_async(path):
+                    shutil.rmtree(path, ignore_errors=True)
 
-            threading.Thread(target=_delete_async, args=(olddir,), daemon=True).start()
+                threading.Thread(target=_delete_async, args=(olddir,), daemon=True).start()
 
             if base_mode == "mulp":
                 if err_mode == "stat":
@@ -142,7 +144,8 @@ class SimMode():
 if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
     # path = r"C:\Users\anxin\Desktop\test\test_error"
-    path = r"C:\Users\anxin\Desktop\test\test_error"
+
+    path = r"C:\Users\shliu\Desktop\AVAS1.3\example"
     item = {"projectPath": path}
     obj = SimMode(item)
     res = obj.run()

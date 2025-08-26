@@ -215,11 +215,12 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas\OutputFile\DataSet.txt"
-    project_path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
+    path1 = r"C:\Users\shliu\Desktop\AVAS1.3\example\OutputFile\DataSet.txt"
+    project_path =None
     obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()
-    print(obj.beta_x[-1])
+    print(obj.beta_x)
+    print(obj.z)
     #
     # import numpy as np
     # import time

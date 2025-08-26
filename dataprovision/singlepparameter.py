@@ -34,7 +34,7 @@ class SinglePparameter():
 
         self.x = [i[0] for i in single_p_info]
         self.y = [i[1] for i in single_p_info]
-        self.y = [i[2] for i in single_p_info]
+        self.z = [i[2] for i in single_p_info]
 
         self.ek = [i[6] for i in single_p_info]
         self.particle_t = [i[7] for i in single_p_info]

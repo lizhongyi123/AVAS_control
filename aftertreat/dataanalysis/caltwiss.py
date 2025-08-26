@@ -291,7 +291,7 @@ class CalTwiss(object):
 
 
 if __name__ == "__main__":
-    a = CalTwiss(r"C:\Users\anxin\Desktop\te\part_dtl1_Ele[3][5]=0.3 Ele[5][5]=0.8.dst")
+    a = CalTwiss(r"C:\Users\shliu\Desktop\2brfq\inputFile\part_input.dst")
 #     # a.input(r"C:\Users\anxin\Desktop\cafe_avas\InputFile\part_rfq.dst")
     print(a.get_emit_xyz())
 

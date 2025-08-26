@@ -369,15 +369,29 @@ class PageInput(QWidget):
         group_box_boundary.setLayout(layout_boundary)
 
 ########################################################################
+        group_box_randomseed = QGroupBox()
+        layout_randomseed= QHBoxLayout()
+
+        label_randomseed = QLabel("Random seed of input beam")
+        self.text_randomseed = QLineEdit()
+        self.text_randomseed.setMinimumWidth(70)
+
+        layout_randomseed.addWidget(label_randomseed)
+        layout_randomseed.addStretch(1)
+        layout_randomseed.addWidget(self.text_randomseed)
+        layout_randomseed.addStretch(1)
+
+        group_box_randomseed.setLayout(layout_randomseed)
 
 
 
+##########################################################################
 
         vertical_layout_main.addWidget(group_box_mulp_env)
         vertical_layout_main.addWidget(group_box_sc_method)
 
         # vertical_layout_main.addWidget(group_box_multithreading)
-        vertical_layout_main.addWidget(group_box_scan_phase)
+        # vertical_layout_main.addWidget(group_box_scan_phase)
         vertical_layout_main.addWidget(group_box_step_per_period)
         vertical_layout_main.addWidget(group_box_dumpPeriodicity)
         vertical_layout_main.addWidget(group_box_sc_use)
@@ -385,6 +399,7 @@ class PageInput(QWidget):
         vertical_layout_main.addWidget(group_box_density_control)
         vertical_layout_main.addWidget(group_box_longlimits)
         vertical_layout_main.addWidget(group_box_boundary)
+        vertical_layout_main.addWidget(group_box_randomseed)
 
         vertical_layout_main.addWidget(group_box_sc_step)
 
@@ -456,7 +471,6 @@ class PageInput(QWidget):
 
         input_ini_res = input_ini_res['data']["inputiniParams"]
 
-        print(input_ini_res)
 
         if input_ini_res.get('sim_type') == "mulp":
             self.cb_mulp.setChecked(True)
@@ -470,8 +484,8 @@ class PageInput(QWidget):
             self.cb_picnic.setChecked(True)
 
 
-        self.scan_phase_num = safe_int(input_ini_res.get('scanphase'), 1)
-        self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
+        # self.scan_phase_num = safe_int(input_ini_res.get('scanphase'), 1)
+        # self.scan_phase_combo.setCurrentIndex(self.scan_phase_num)
 
         self.sc_use_num = safe_int(input_ini_res.get('spacecharge'), 1)
         if self.sc_use_num == 0:
@@ -516,6 +530,7 @@ class PageInput(QWidget):
 
         self.text_density_grid.setText(safe_str(input_ini_res["pchistogram_grid"], "300"))
 
+        self.text_randomseed.setText(safe_str(input_ini_res["randomseed"], "0"))
         # 对于包络模型的输入
         if input_ini_res.get('spacechargelong') is not None:
             self.sc_step_text.setText(input_ini_res.get('spacechargelong'))
@@ -579,7 +594,7 @@ class PageInput(QWidget):
         elif self.cb_picnic.isChecked():
             res["scmethod"] = "SPICNIC"
 
-        res["scanphase"] =self.scan_phase_combo.currentIndex()
+        # res["scanphase"] =self.scan_phase_combo.currentIndex()
 
         if self.sc_use_checkbox.isChecked():
             res["spacecharge"] = 1
@@ -608,6 +623,8 @@ class PageInput(QWidget):
             res["boundary"] = 1
         else:
             res["boundary"] = 0
+
+        res["randomseed"] = safe_int(self.text_randomseed.text())
 
         if self.sc_step_text.text():
             res['spacechargelong'] = safe_int(self.sc_step_text.text(), 1)
@@ -730,8 +747,8 @@ class PageInput(QWidget):
             for box in mulp_box:
                 box.setEnabled(True)
 
-            self.scan_phase_combo.setEnabled(True)
-            self.scan_phase_combo.setStyleSheet(f"")
+            # self.scan_phase_combo.setEnabled(True)
+            # self.scan_phase_combo.setStyleSheet(f"")
 
         elif self.cb_env.isChecked():
             for line_edit in env_line:
@@ -765,7 +782,7 @@ class PageInput(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'D:\using\test_avas_qt\test_beam')
+    main_window = PageInput(r'E:\using\test_avas_qt\cafe_avas2')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

@@ -15,17 +15,17 @@ class CreatBasicFile():
         self.ini_path = os.path.join(project_path, "InputFile", "ini.ini")
         self.beam_info = {
             'readparticledistribution': "", 'numofcharge': 1, 'particlerestmass': 938.272, 'current': 0,
-            'particlenumber': 5000, 'frequency': 100, 'kneticenergy': 1,
+            'particlenumber': 5000, 'frequency': 100000000, 'kneticenergy': 1,
             "alpha_x": 0, "beta_x": 1, "emit_x": 0.1,
             "alpha_y": 0, "beta_y": 1, "emit_y": 0.1,
             "alpha_z": 0, "beta_z": 1, "emit_z": 0.1,
-            "distribution_x": "GS", "distribution_y": "GS", "use_dst": 0, "beam_type": "notDC",
+            "distribution_x": "GS", "distribution_y": "GS", "use_dst": 0, "beam_type": "notdc",
         }
 
         self.input_info = {
-            "sim_type": "mulp", 'scmethod': "FFT", "scanphase": 1, 'spacecharge': 1, 'steppercycle': 100, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
+            "sim_type": "mulp", 'scmethod': "PICNIC",  'spacecharge': 1, 'steppercycle': 10, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
             "device":"cpu", "pchistogram_start": 0, "pchistogram_grid": 300, "longlimits_start": 0, "longlimits_phase": 0, "longlimits_energy": 0,
-            "boundary": 0
+            "boundary": 0, "randomseed": 0
         }
 
         self.ini_info = \
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         # 'distribution_y', 'aaa'
 
 
-        "inputKeys": ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle",
+        "inputKeys": ["sim_type", "scmethod",  "spacecharge", "steppercycle",
                        "dumpperiodicity", "spacechargelong",'spacechargetype', "fieldSource", "device", "pchistogram_start", "pchistogram_grid", ]
         #"spacechargetype", 'bbb'
     }

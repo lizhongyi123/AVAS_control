@@ -1,10 +1,7 @@
 ﻿import sys
 
-from utils.readfile import read_dst
 import math
-import numpy as np
 from dataprovision.beamparameter import DstParameter
-import matplotlib.pyplot as plt
 from utils.tool import cal_twiss
 class PercentEmit():
     """

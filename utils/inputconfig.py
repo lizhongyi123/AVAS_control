@@ -8,25 +8,24 @@ from utils.tool import format_output ,convert_to_othertype_dict
 import os
 class InputConfig():
     def __init__(self):
-        self.input_parameter_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
+        self.input_parameter_keys = ["sim_type", "scmethod", "spacecharge", "steppercycle", "dumpperiodicity",
                                      "spacechargelong", "spacechargetype", "fieldSource", "device", "pchistogram_start", "pchistogram_grid",
-                                     "longlimits_start", "longlimits_phase", "longlimits_energy", "boundary"
+                                     "longlimits_start", "longlimits_phase", "longlimits_energy", "boundary", "randomseed"
                                      ]
 
 
-        self.input_parameter = {"sim_type": None, "scanphase": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
+        self.input_parameter = {"sim_type": None, 'spacecharge': None, 'steppercycle': None, 'dumpperiodicity':None,
                                 "spacechargelong": None, "spacechargetype": None, "pchistogram_start":None, "pchistogram_grid":None,
                                 "longlimits_start": None, "longlimits_phase": None, "longlimits_energy": None,
-                                "boundary": None
+                                "boundary": None, "randomseed": None
                                 }
 
-        self.int_keys = ["scanphase", "spacecharge", "steppercycle", "dumpperiodicity",
-                         "spacechargelong", "spacechargetype", "pchistogram_start", "pchistogram_grid", "longlimits_start", "boundary"]
-
+        self.int_keys = ["spacecharge", "steppercycle", "dumpperiodicity",
+                         "spacechargelong", "spacechargetype", "pchistogram_start", "pchistogram_grid", "longlimits_start", "boundary", "randomseed"]
         self.float_keys = ["longlimits_phase", "longlimits_energy"]
 
 
-        self.mulp_keys = ["sim_type", "scmethod", "scanphase", "spacecharge", "steppercycle", "dumpperiodicity", ]
+        self.mulp_keys = ["sim_type", "scmethod", "spacecharge", "steppercycle", "dumpperiodicity", ]
         self.env_keys = ["spacechargelong", "spacechargetype"]
 
     # def initialize_input(self):
@@ -60,7 +59,6 @@ class InputConfig():
         kwargs = {}
 
         original_dict = self.read_input_txt(path)
-        print(65, original_dict)
         if "pchistogram" in original_dict.keys():
             print(67)
             original_dict["pchistogram_start"] = original_dict["pchistogram"][0]
@@ -160,9 +158,7 @@ class InputConfig():
             if k == "scmethod" and v is not None:
                 if v not in ["FFT", "SPICNIC"]:
                     raise ValueChooseError(k, ["FFT", "SPICNIC"], v)
-            elif k == "scanphase" and v is not None:
-                if v not in [0, 1, 2]:
-                    raise ValueChooseError(k, [0, 1, 2], v)
+
             elif k == "spacecharge" and v is not None:
                 if v not in [0, 1]:
                     raise ValueChooseError(k, [0, 1], v)

@@ -342,7 +342,7 @@ class PageAnalysis(QWidget):
         layout_in_out.addWidget(self.button_output)
 
         group_box_in_out = QGroupBox()
-        group_box_in_out.setLayout(layout_in_out)
+        # group_box_in_out.setLayout(layout_in_out)
 
 
 
@@ -359,7 +359,7 @@ class PageAnalysis(QWidget):
 ################################################################
 
         group_box_layout.addWidget(group_box_1)
-        group_box_layout.addWidget(env_picture_group_box)
+        # group_box_layout.addWidget(env_picture_group_box)
         group_box_layout.addWidget(picture_group_box)
 
 
@@ -563,7 +563,7 @@ class PageAnalysis(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageAnalysis(r'C:\Users\anxin\Desktop\test_ini')
+    main_window = PageAnalysis(r'C:\Users\shliu\Desktop\test825')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.show()

@@ -281,7 +281,7 @@ class MainWindow(QMainWindow):
         page_analysis_action = QAction('analysis', self)
         page_input_action = QAction('setting', self)
         # page_function_action = QAction('function', self)
-        page_match_action = QAction('match', self)
+        # page_match_action = QAction('match', self)
         page_others_action = QAction('others', self)
 
         page_data_action = QAction('data', self)
@@ -315,7 +315,7 @@ class MainWindow(QMainWindow):
         page_analysis_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_analysis))
         page_input_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_input))
         # page_function_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_function))
-        page_match_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_match))
+        # page_match_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_match))
 
         page_data_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_data))
         self.stacked_widget.currentChanged.connect(self.handle_page_change)
@@ -331,7 +331,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_lattice_action)
         toolbar.addAction(page_input_action)
         # toolbar.addAction(page_function_action)
-        toolbar.addAction(page_match_action)
+        # toolbar.addAction(page_match_action)
         toolbar.addAction(page_error_action)
 
         toolbar.addAction(page_output_action)

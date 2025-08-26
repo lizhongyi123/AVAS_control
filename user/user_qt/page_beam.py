@@ -34,7 +34,7 @@ class PageBeam(QWidget):
         self.decimals = 5
         self.obj_plt_ellipse = None
         self.cb_use_dst_num = 0
-        self.cb_beam_type = "notDC"
+        self.cb_beam_type = "notdc"
         self.initUI()
 
     def initUI(self):
@@ -497,14 +497,14 @@ class PageBeam(QWidget):
             self.varepsilon_zz_text,
         ]
         if state == Qt.Checked:
-            self.cb_beam_type = "DC"
+            self.cb_beam_type = "dc"
             for widget in z_parameter:
                 widget.setText("0")
                 widget.setEnabled(False)
 
 
         elif state == Qt.Unchecked:
-            self.cb_beam_type = "notDC"
+            self.cb_beam_type = "notdc"
             for widget in z_parameter:
                 widget.setEnabled(True)
 
@@ -622,7 +622,7 @@ class PageBeam(QWidget):
         elif safe_int(beam_res.get("use_dst")) == 0:
             self.cb_use_dst.setChecked(False)
 
-        if beam_res.get("beamtype") == "DC":
+        if beam_res.get("beamtype") == "dc":
             self.cb_cw.setChecked(True)
         else:
             self.cb_cw.setChecked(False)

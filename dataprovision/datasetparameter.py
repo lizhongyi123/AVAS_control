@@ -215,7 +215,7 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\AVAS1.3\example\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\shliu\Desktop\beida\beida_avas\OutputFile\DataSet.txt"
     project_path =None
     obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()

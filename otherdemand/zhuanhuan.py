@@ -170,7 +170,7 @@ def tran_tracewin_avas(tracewin_list):
 
 
         elif stat[0].lower() == "QUAD".lower():
-            tmp = ['quad', float(stat[1])/1000, float(stat[3])/1000, 0, float(stat[2]), 0, 0]
+            tmp = ['quad', float(stat[1])/1000, float(stat[3])/1000, 0, float(stat[2])]
             avas_list.append(tmp)
 
             if chexck_superposeend(tracewin_list, index):
@@ -276,9 +276,9 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\paper_tianyuan\cafe2\bd.dat"
+    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\paper_tianyuan\hiaf\SC0.4-15-2-4.dat"
 
-    avas_lattice_path = r"C:\Users\shliu\Desktop\paper_tianyuan\cafe2\lattice.txt"
+    avas_lattice_path = r"C:\Users\shliu\Desktop\paper_tianyuan\hiaf\lattice.txt"
 
 
     # 修改后的lattice

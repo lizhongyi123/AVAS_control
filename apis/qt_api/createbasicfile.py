@@ -23,7 +23,7 @@ class CreatBasicFile():
         }
 
         self.input_info = {
-            "sim_type": "mulp", 'scmethod': "PICNIC",  'spacecharge': 1, 'steppercycle': 10, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
+            "sim_type": "mulp", 'scmethod': "SPICNIC",  'spacecharge': 1, 'steppercycle': 10, 'dumpperiodicity': 0, "spacechargelong": 100, "spacechargetype": 0,
             "device":"cpu", "pchistogram_start": 0, "pchistogram_grid": 300, "longlimits_start": 0, "longlimits_phase": 0, "longlimits_energy": 0,
             "boundary": 0, "randomseed": 0
         }

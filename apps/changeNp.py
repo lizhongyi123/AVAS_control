@@ -152,7 +152,7 @@ class ChangeNp():
 
         return None
 
-def process_and_write(input_file, output_file, sample_size=10000):
+def low_np(input_file, output_file, sample_size=10000):
     with open(input_file, 'rb') as f:
         f.read(2)  # 跳过前2个字节
 
@@ -194,4 +194,4 @@ if __name__ == "__main__":
     a.run()
     # input_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq.dst"
     # output_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq1.dst"
-    # process_and_write(input_file, output_file)
+    # low_np(input_file, output_file)

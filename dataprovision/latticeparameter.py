@@ -366,11 +366,11 @@ class LatticeParameter():
 
 if __name__ == "__main__":
     #C:\Users\anxin\Desktop\AVAS_control\dataprovision\latticeparameter.py
-    lattice_path = r"C:\Users\anxin\Desktop\test_ya2\InputFile\lattice.txt"
+    lattice_path = r"C:\Users\shliu\Desktop\hpc_test\cafe2\InputFile\lattice_mulp.txt"
     res = LatticeParameter(lattice_path)
     res.get_parameter()
-    print(res.v_start)
-    print(res.v_len)
+    print(res.total_length)
+    # print(res.v_len)
     # res.get_period()
     # print(res.total_length)
     # print(res.v_start)

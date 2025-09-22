@@ -237,6 +237,16 @@ if __name__ == "__main__":
     # res = read_lattice_mulp_with_name(path)
     # print(res)
 
-    path = r"C:\Users\shliu\Desktop\lijincheng\InputFile\20-30 graphite.dst"
+    path = r"E:\using\test_avas_qt\cafe_avas\OutputFile\outData_1.000000.dst"
     res = read_dst_fast(path)
+    # partran_dist = res['partran_dist']
+    #
+    # x = [i[0] for i in partran_dist]
+    # y = [i[1] for i in partran_dist]
+    #
+    # import matplotlib.pyplot as plt
+    #
+    # plt.plot(x,y)
+    # plt.show()
+
     print(res)

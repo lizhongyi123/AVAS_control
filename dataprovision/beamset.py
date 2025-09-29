@@ -22,7 +22,7 @@ class BeamsetParameter():
             char2 = str(tdata[0])
 
             tdata = struct.unpack("<i", f.read(4))
-            self.dumpPeriodicity = int(tdata[0])
+            # self.dumpPeriodicity = int(tdata[0])
             # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
 
             tdata = struct.unpack("<i", f.read(4))
@@ -30,11 +30,11 @@ class BeamsetParameter():
             # print("粒子数为：{aa}".format(aa=numofp))
 
             tdata = struct.unpack("<d", f.read(8))
-            self.Ib = float(tdata[0])
+            # self.Ib = float(tdata[0])
             # print("流强为：{aa}mA".format(aa=self.Ib))
 
             tdata = struct.unpack("<d", f.read(8))
-            self.freq = float(tdata[0])
+            # self.freq = float(tdata[0])
             # print("频率为：{aa}MHz".format(aa=self.freq))
 
             tdata = struct.unpack("<d", f.read(8))
@@ -241,6 +241,59 @@ class BeamsetParameter():
                     self.allstep_dict.append(every_step_dict)
                     self.allstep_list.append(every_step_list)
 
+    def get_all_dict(self, ):
+        step_num = self.get_step()
+
+        all_step_dict = []
+        with open(self.beamset_path, 'rb') as f:
+
+            tdata = struct.unpack("<c", f.read(1))
+
+            tdata = struct.unpack("<c", f.read(1))
+
+
+            tdata = struct.unpack("<i", f.read(4))
+            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
+            tdata = struct.unpack("<i", f.read(4))
+            numofp = int(tdata[0])
+            # print("粒子数为：{aa}".format(aa=self.numofp))
+            tdata = struct.unpack("<d", f.read(8))
+            # print("流强为：{aa}mA".format(aa=self.Ib))
+            tdata = struct.unpack("<d", f.read(8))
+            # print("频率为：{aa}MHz".format(aa=self.freq))
+            tdata = struct.unpack("<d", f.read(8))
+            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+
+
+
+            for step_index in range(step_num):
+                one_step_dict = {}
+                tdata = struct.unpack("<c", f.read(1))
+
+                tpye = struct.unpack("<i", f.read(4))
+                one_step_dict["tpye"] = int(tpye[0])
+                # print("tpye", tpye)
+
+                Index = struct.unpack("<i", f.read(4))
+                one_step_dict["index"] = int(Index[0])
+                # print("index", Index)
+
+                time = struct.unpack("<d", f.read(8))
+                one_step_dict["time"] = float(time[0])
+                # print(time)
+
+                location = struct.unpack("<d", f.read(8))
+                one_step_dict["location"] = float(location[0])
+
+                f.seek((48+8) * numofp, 1)
+
+                all_step_dict.append(one_step_dict)
+
+        return all_step_dict
+
+
+
+        return self.one_step_dict, self.one_step_list
 
 if __name__ == "__main__":
     import os

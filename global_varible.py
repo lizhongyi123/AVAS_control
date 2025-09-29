@@ -35,7 +35,7 @@ error_beam_dyn_on = ['err_beam_dyn_on']
 error_beam_stat_on = ['err_beam_stat_on']
 
 mulp_basic_command = mulpud_element + \
-               ['start', 'end', 'superpose', 'superposeend', 'outputplane', "superposeout"]
+               ['start', 'end', 'superpose', 'superposeend', 'outputplane', "superposeout", "automaticoutput"]
 
 
 err_write_command = mulp_basic_command + ['err_step', 'err_cav_ncpl_dyn', 'err_quad_ncpl_dyn', 'err_beam_dyn',

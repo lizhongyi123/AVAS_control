@@ -794,7 +794,7 @@ if __name__ == '__main__':
     #         }
     # res = err_dyn(**item)
     #
-    path= r"C:\Users\shliu\Desktop\test_ma"
+    path= r"C:\Users\wangh\Desktop\shao"
     item = {"project_path": path,}
     res = basic_mulp(**item)
     # path = r"D:\using\test_avas_qt\cafe_avas"
@@ -894,20 +894,20 @@ if __name__ == '__main__':
     #
     # res = plot_density_level(**item)
     # print(res)
-
-    item = {
-        "filePath": r"density_par_0_0.dat",
-        "desnityPlane": "x",
-        "pictureType": "density_level",
-        "platform": "web",
-        "show_": 0,
-        "sampleInterval": 1,
-        "needData": False,
-        "projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
-    }
-
-
-    res = plot_density_transport(**item)
+    #
+    # item = {
+    #     "filePath": r"density_par_0_0.dat",
+    #     "desnityPlane": "x",
+    #     "pictureType": "density_level",
+    #     "platform": "web",
+    #     "show_": 0,
+    #     "sampleInterval": 1,
+    #     "needData": False,
+    #     "projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
+    # }
+    #
+    #
+    # res = plot_density_transport(**item)
 
     # print(res)
     # "filePath": r"inData.dst",

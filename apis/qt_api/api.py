@@ -23,54 +23,48 @@ def cal_beam_parameter(item):
     kwargs = {}
 
     beam_parameter = {}
-    try:
-        if os.path.exists(dst_path):
-            dst_res = read_dst_fast(dst_path)
-            beam_parameter['particlerestmass'] = dst_res['basemassinmev']
-            beam_parameter['current'] = dst_res['ib']
-            beam_parameter['particlenumber'] = dst_res['number']
-            beam_parameter['frequency'] = dst_res['freq']
-            beam_parameter['kneticenergy'] = dst_res['kneticenergy']
+
+    if os.path.exists(dst_path):
+        dst_res = read_dst_fast(dst_path)
+        beam_parameter['particlerestmass'] = dst_res['basemassinmev']
+        beam_parameter['current'] = dst_res['ib']
+        beam_parameter['particlenumber'] = dst_res['number']
+        beam_parameter['frequency'] = dst_res['freq']
+        beam_parameter['kneticenergy'] = dst_res['kneticenergy']
 
 
-            obj = PercentEmit(dst_path)
-            res = obj.get_percent_emit(1)
+        obj = PercentEmit(dst_path)
+        res = obj.get_percent_emit(1)
 
-            alpha_xx1, beta_xx1, epsi_xx1, _, _ = res[0]
-            alpha_yy1, beta_yy1, epsi_yy1, _, _ = res[1]
-            alpha_zz1, beta_zz1, epsi_zz1, _, _ = res[2]
+        alpha_xx1, beta_xx1, epsi_xx1, _, _ = res[0]
+        alpha_yy1, beta_yy1, epsi_yy1, _, _ = res[1]
+        alpha_zz1, beta_zz1, epsi_zz1, _, _ = res[2]
 
-            beam_parameter['alpha_x'] = alpha_xx1
-            beam_parameter['beta_x'] = beta_xx1
-            beam_parameter['emit_x'] = epsi_xx1
+        beam_parameter['alpha_x'] = alpha_xx1
+        beam_parameter['beta_x'] = beta_xx1
+        beam_parameter['emit_x'] = epsi_xx1
 
-            beam_parameter['alpha_y'] = alpha_yy1
-            beam_parameter['beta_y'] = beta_yy1
-            beam_parameter['emit_y'] = epsi_yy1
+        beam_parameter['alpha_y'] = alpha_yy1
+        beam_parameter['beta_y'] = beta_yy1
+        beam_parameter['emit_y'] = epsi_yy1
 
-            beam_parameter['alpha_z'] = alpha_zz1
-            beam_parameter['beta_z'] = beta_zz1
-            beam_parameter['emit_z'] = epsi_zz1
+        beam_parameter['alpha_z'] = alpha_zz1
+        beam_parameter['beta_z'] = beta_zz1
+        beam_parameter['emit_z'] = epsi_zz1
 
-            beam_parameter["readparticledistribution"] = ""
-            beam_parameter["distribution_x"] = "GS"
-            beam_parameter["distribution_y"] = "GS"
+        beam_parameter["readparticledistribution"] = ""
+        beam_parameter["distribution_x"] = "GS"
+        beam_parameter["distribution_y"] = "GS"
 
-            demical_keys = [
-                "particlerestmass", "kneticenergy", "alpha_x", "beta_x", "emit_x", "alpha_y", "beta_y", "emit_y",
-                "alpha_z", "beta_z", "emit_z",
-            ]
-            for k, v in beam_parameter.items():
-                if k in demical_keys:
-                    beam_parameter[k] = round(v, global_varible.decimals7)
+        demical_keys = [
+            "particlerestmass", "kneticenergy", "alpha_x", "beta_x", "emit_x", "alpha_y", "beta_y", "emit_y",
+            "alpha_z", "beta_z", "emit_z",
+        ]
+        for k, v in beam_parameter.items():
+            if k in demical_keys:
+                beam_parameter[k] = round(v, global_varible.decimals7)
 
-#            beam_parameter["numofcharge"] = ""
-    except Exception as e:
-        code = -1
-        msg = str(e)
-        kwargs.update({'beamParams': {}})
-        output = format_output(code, msg=msg, **kwargs)
-        return output
+
 
     kwargs.update({'beamParams': copy.deepcopy(beam_parameter)})
     output = format_output(**kwargs)
@@ -513,10 +507,10 @@ if __name__ == '__main__':
     # item = {"dstPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas\InputFile\part_rfq.dst"}
     # res = cal_beam_parameter(item)
     # print(res)
-
-    item = {"projectPath": r"D:\using\test_avas_qt\cafe_avas"}
-    res = get_all_files_in_project(item)
-    print(res)
+    #
+    # item = {"projectPath": r"D:\using\test_avas_qt\cafe_avas"}
+    # res = get_all_files_in_project(item)
+    # print(res)
     # pass
     # item = {
     # "particletype": "H",
@@ -539,11 +533,11 @@ if __name__ == '__main__':
     # res = get_fieldname(item)
     # print(res)
 
-    # dst_path = "E:\project\MEBT\RFQ_55_73_59_proton.dst"
-    # item = {"dstPath": dst_path}
-    # beam_parameter = cal_beam_parameter(item)
-    # print(beam_parameter)
-    #
+    dst_path = r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\InputFile\part_rfq.dst"
+    item = {"dstPath": dst_path}
+    beam_parameter = cal_beam_parameter(item)
+    print(beam_parameter)
+
     # path = r"C:\Users\shliu\Desktop\test_changdu"
     # item = {"projectPath": path}
 

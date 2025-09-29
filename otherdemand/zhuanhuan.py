@@ -153,14 +153,14 @@ def tran_tracewin_avas(tracewin_list):
             avas_list.append(tmp)
 
         elif stat[0].lower() == 'FIELD_MAP'.lower():
-            if stat[1] == "7":
+            if int(stat[1]) == 7:
                 #静电场
                 tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 2, 0, 0, stat[6], 0, stat[9]]
 
-            elif stat[1] == "70":
+            elif int(stat[1]) == 70:
                 tmp = ["field", float(stat[2])/1000, float(stat[4])/1000,0, 3, 0, 0,   0, stat[5], stat[9]]
 
-            elif stat[1] == "7700":
+            elif int(stat[1]) == "7700":
                 tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 1, freq, stat[3], stat[6],stat[5], stat[9]]
 
             avas_list.append(tmp)
@@ -276,9 +276,9 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\shliu\Desktop\paper_tianyuan\hiaf\SC0.4-15-2-4.dat"
+    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\end to end-design.dat"
 
-    avas_lattice_path = r"C:\Users\shliu\Desktop\paper_tianyuan\hiaf\lattice.txt"
+    avas_lattice_path = r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\lattice.txt"
 
 
     # 修改后的lattice

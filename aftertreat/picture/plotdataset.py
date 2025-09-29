@@ -353,7 +353,7 @@ class PlotDataSet(PicturePlot_2D):
 
 if __name__ == "__main__":
     project_path = None
-    dataset_path = r"C:\Users\shliu\Desktop\test822\OutputFile\DataSet.txt"
+    dataset_path = r"F:\using\test_avas_qt\cafe_avas\OutputFile\DataSet.txt"
     a = PlotDataSet(project_path=None,  picture_name = 'c_xy', dataset_path=dataset_path)
 
     a.get_x_y()

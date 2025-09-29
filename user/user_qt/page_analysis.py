@@ -20,7 +20,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
 from apis.basic_api.api import plot_env_beam_out
 
-from aftertreat.dataanalysis.plttodst import Plttozcode
+from aftertreat.dataanalysis.plttodstfile import Plttozcode
 from aftertreat.picture.plotphase import PlotPhase
 from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
 from aftertreat.picture.plotdataset import PlotDataSet

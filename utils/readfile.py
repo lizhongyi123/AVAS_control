@@ -237,7 +237,7 @@ if __name__ == "__main__":
     # res = read_lattice_mulp_with_name(path)
     # print(res)
 
-    path = r"E:\using\test_avas_qt\cafe_avas\OutputFile\outData_1.000000.dst"
+    path = r"C:\Users\wangh\Desktop\long_dis2\av_input\kongxin\inData.dst"
     res = read_dst_fast(path)
     # partran_dist = res['partran_dist']
     #

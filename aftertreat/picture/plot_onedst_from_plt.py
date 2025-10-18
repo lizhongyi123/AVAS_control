@@ -18,10 +18,11 @@ from matplotlib.colors import LinearSegmentedColormap
 import time
 from global_varible import c_light, Pi
 class PLlotdstfromplt():
-    def __init__(self, plt_path, distance, targe_dict_index):
+    def __init__(self, plt_path, distance, dataset_path=None, specified_index= None, ):
         self.plt_path = plt_path
         self.distance = distance
-        self.targe_dict_index = targe_dict_index
+        self.dataset_path = dataset_path
+        self.specified_index = specified_index
 
         self.fig_size = (12.8, 9.2)
         self.fontsize = 18
@@ -29,26 +30,34 @@ class PLlotdstfromplt():
         self.maxpar_num = 10**4
 
 
+
     def get_xy(self):
 
 
         obj = BeamsetParameter(self.plt_path)
         all_step = obj.get_step()
-        print(all_step)
+        print("所有步数", all_step)
         all_dict = obj.get_all_dict()
         print("最后一组", all_dict[-1])
-        targe_dict_index = None
 
+
+        targe_dict_index = None
         for i in all_dict:
             if i["location"] > self.distance:
                 targe_dict_index = all_dict.index(i)
 
                 break
-
+        #如果找不到比指定位置大的，选最后一个位置
         if targe_dict_index is None:
             targe_dict_index = all_step -1
-        if targe_dict_index != None:
-            targe_dict_index = self.targe_dict_index
+
+        #如果指定的索引比所有的索引都大，那么选最后一个
+        if self.specified_index is not None:
+            if self.specified_index >= all_step:
+                targe_dict_index = all_step -1
+
+        targe_dict_index = targe_dict_index
+
 
         part_dict = all_dict[targe_dict_index]
         print("使用的一组", part_dict)
@@ -68,12 +77,41 @@ class PLlotdstfromplt():
         "bunch_tpye": part_dict["tpye"],  #0/1
         }
         new_part_list = plt2dstdata(bunch_info, part_list)
-        return new_part_list
+
+
+        return part_dict, new_part_list
+
+    def get_dataset_data(self, plt_index):
+        dataset_obj = DatasetParameter(self.dataset_path)
+        dataset_obj.get_parameter()
+        dataset_index_list = dataset_obj.dataset_index
+
+        dataset_index = None
+        #如果dataset中存在plt的索引
+        if plt_index in dataset_index_list:
+            dataset_index = dataset_index_list.index(plt_index)
+        #如果dataset中不存在plt对应的索引
+        elif plt_index not in dataset_index_list:
+            t_index = plt_index -1
+            if t_index  in dataset_index_list:
+                dataset_index = dataset_index_list.index(t_index)
+            else:
+                dataset_index = None
+
+        if dataset_index is not None:
+            syn_x = dataset_obj.syn_x[dataset_index]
+            syn_y = dataset_obj.syn_y[dataset_index]
+        else:
+            print("dataset中没有对应数据")
+            syn_x = 0
+            syn_y = 0
+        return syn_x, syn_y
+
 
     def run(self,show_, fig=None, save_path=None):
-        partran_dist = np.array(self. get_xy())
+        partran_dict, partran_dist = self. get_xy()
 
-
+        partran_dist = numpy.array(partran_dist)
         x = partran_dist[:, 0] * 1000
         x1 = partran_dist[:, 1] * 1000  #mrad
         y = partran_dist[:, 2] * 1000
@@ -83,9 +121,11 @@ class PLlotdstfromplt():
         E -= np.mean(E)
         z = partran_dist[:, 6] *1000
 
+        plt_index = partran_dict["index"]
+        syn_x, syn_y = self.get_dataset_data(plt_index)
 
-
-
+        x = x + syn_x *1000
+        y = y + syn_y *1000
 
 
         if not fig:
@@ -135,16 +175,18 @@ class PLlotdstfromplt():
 
 if __name__ == '__main__':
 
-    plt_path1 =  r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\OutputFile\100bu\BeamSet.plt"
-    obj = PLlotdstfromplt(plt_path1, 3.26, 27412)
+    plt_path1 =  r"C:\Users\wangh\Desktop\qiaoxin3\test_qiao\OutputFile\最后原件加粗\BeamSet.plt"
+    dataset_path = r"C:\Users\wangh\Desktop\qiaoxin3\test_qiao\OutputFile\最后原件加粗\DataSet.txt"
+
+    # obj = PLlotdstfromplt(plt_path1, 3.26, dataset_path,None)
 
     # plt_path1 = R"C:\Users\wangh\Desktop\qiaoxin\test_qiao\OutputFile\BeamSet.plt"
     #
-    # obj = PLlotdstfromplt(plt_path1, 3.26, 7256)
+    obj = PLlotdstfromplt(plt_path1, 4.248352, dataset_path, None)
 
     obj.run(show_=1)
 
-
+    # obj.get_dataset_data(100)
     # res = obj.get_all_dict()
     # print(res)
 

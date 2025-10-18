@@ -111,6 +111,8 @@ class DatasetParameter():
         self.syn_x = [i[29] for i in dataset_info]
         self.syn_y = [i[31] for i in dataset_info]
 
+
+
         self.pz = [i[6] for i in dataset_info]
 
         self.x_1 = [self.px[i] / self.pz[i] for i in range(len(self.pz))]  # rad
@@ -215,12 +217,12 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\shliu\Desktop\beida\beida_avas\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\OutputFile\25bu\DataSet.txt"
     project_path =None
     obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()
-    print(obj.beta_x)
-    print(obj.z)
+    # print(obj.beta_x)
+    # print(obj.z)
     #
     # import numpy as np
     # import time

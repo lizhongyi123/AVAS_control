@@ -1,3 +1,5 @@
+import sys
+
 from pandas.core.interchange.dataframe_protocol import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,30 +50,41 @@ def write_to_dst(path, particle_info, p_dst):
             print("输出错误")
 
 if __name__ == '__main__':
-    input_path = r"C:\Users\wangh\Desktop\long_dis2\kongxin_beam\part_rfq.dst"
-    output_path = r"C:\Users\wangh\Desktop\long_dis2\kongxin_beam\kongxin.dst"
+    input_path = r"C:\Users\wangh\Desktop\ge_kongxin\12_5.dst"
+    output_path = r"C:\Users\wangh\Desktop\ge_kongxin\kongxin.dst"
 
     data_res = read_dst_fast(input_path)
 
     partran_dist = data_res['partran_dist']
-    print(partran_dist[:10])
+    # print(partran_dist[:10])
     partran_dist[:, [0, 2]] *= 10
 
 
     alpha = 0
-    beta = 2.57
+    beta = 1
     gamma_x = (1 + alpha ** 2) / beta
+
     size_xiao = []
     size_da = []
     size_list = []
+    v1 =[]
     for i in partran_dist:
         x =i[0]
         y = i[2]
         size = get_size(x, y, alpha, beta, gamma_x)
-        if  size > 0.4:
+        v1.append(size)
+    big_size = np.max(v1)
+
+    print("big_size", big_size)
+
+    for i in partran_dist:
+        x =i[0]
+        y = i[2]
+        size = get_size(x, y, alpha, beta, gamma_x)
+        if  size > big_size * 0.4:
             size_da.append(i)
         else:
-            if np.random.rand() < 0.8:  # 30% 概率保留中心粒子，可调
+            if np.random.rand() < 0.2:  # 30% 概率保留中心粒子，可调
                 size_xiao.append(i)
         size_list.append(size)
 
@@ -80,8 +93,9 @@ if __name__ == '__main__':
 
     # ✅ 给 size_da 添加随机误差（例如 5% 的高斯噪声）
     perturbed_list = [size_da]
-    for i in range(10):
-        mask = np.random.rand(len(size_da)) < 0.8
+
+    for i in range(3):
+        mask = np.random.rand(len(size_da)) < 0.89
         selected = size_da[mask]
 
         # Step 2: 对选中的粒子加随机扰动
@@ -94,19 +108,20 @@ if __name__ == '__main__':
         # size_da_perturbed[:, [1, 3, 4, 5]] += np.random.normal(0, 0.1, size_da_perturbed[:, [1, 3, 4, 5]].shape) * selected[
         #     :, [1, 3, 4, 5]]
 
-        size_da_perturbed[:, [0, 2]] += np.random.uniform(-0.05, 0.05, size_da_perturbed[:, [0, 2]].shape)
-        size_da_perturbed[:, [1, 3,]] += np.random.uniform(-0.5*10**-3, 0.5*10**-3, size_da_perturbed[:, [1, 3, ]].shape)
+        size_da_perturbed[:, [0, 2]] += np.random.uniform(-10, 10, size_da_perturbed[:, [0, 2]].shape)
+        size_da_perturbed[:, [1, 3,]] += np.random.uniform(-0.0005/1000, 0.0005/1000, size_da_perturbed[:, [1, 3, ]].shape)
         size_da_perturbed[:, [4]] += np.random.uniform(
-            -1e-2, 1e-2, size_da_perturbed[:, [4]].shape
+            -0.1, 0.1, size_da_perturbed[:, [4]].shape
         )
         size_da_perturbed[:, [5]] += np.random.uniform(
-            -0.1, 0.1, size_da_perturbed[:, [5]].shape
+            -0.005, 0.005, size_da_perturbed[:, [5]].shape
         )
         # Step 3: 合并原始粒子 + 扩充后的粒子
         perturbed_list.append(size_da_perturbed)
 
     # 合并原始 + 加误差的
     size_da_expanded = np.vstack(perturbed_list)
+
     all_size = np.vstack((size_da_expanded, size_xiao))
 
     # print(len(all_size))

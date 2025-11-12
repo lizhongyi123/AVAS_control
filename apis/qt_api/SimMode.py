@@ -59,6 +59,7 @@ class SimMode():
             ini_info = ini_info["data"]["iniParams"]
             base_mode = ini_info["input"]["sim_type"]
             device = ini_info["input"]["device"]
+            if_normal = ini_info["error"]["if_normal"]
 
             match_mode = [
                 ini_info["match"]["cal_input_twiss"],
@@ -83,6 +84,7 @@ class SimMode():
                 "field_path": field_path,
                 "seed": err_seed,
                 "device": device,
+                "if_normal": if_normal,
             }
             # print(item)
             # sys.exit()
@@ -145,7 +147,7 @@ if __name__ == '__main__':
     # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas"
     # path = r"C:\Users\anxin\Desktop\test\test_error"
 
-    path = r"C:\Users\shliu\Desktop\AVAS1.3\example"
+    path = r"F:\using\test_avas_qt\cafe_avas2"
     item = {"projectPath": path}
     obj = SimMode(item)
     res = obj.run()

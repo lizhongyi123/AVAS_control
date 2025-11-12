@@ -655,7 +655,12 @@ class Error():
         "rms_y'(rad)",   #12
 
         "delat_energy(MeV)", #能量变化  13
-
+        "alpha_xx'",
+        "beta_xx'",
+        "alpha_yy'",
+        "beta_yy'",
+        "alpha_zz'",
+        "beta_zz'",
         ]]
         write_to_txt(self.errors_par_tot_path, errors_par_tot_title)
 
@@ -776,6 +781,13 @@ class Error():
             dataset_obj.rms_x1[-1],
             dataset_obj.rms_y1[-1],
             dataset_obj.ek[-1] - normal_ek,  # MeV
+            dataset_obj.alpha_x[-1],
+            dataset_obj.beta_x[-1],
+            dataset_obj.alpha_y[-1],
+            dataset_obj.beta_y[-1],
+            dataset_obj.alpha_z[-1],
+            dataset_obj.beta_z[-1],
+
             # dataset_obj.phi[-1] - normal_data[14],  # deg
             ]
 
@@ -1599,7 +1611,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\anxin\Desktop\test\test_error"
+    path = r"F:\using\test_avas_qt\cafe_avas_err"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
@@ -1608,10 +1620,10 @@ if __name__ == "__main__":
     item = {
         "project_path": path,
         "seed": 50,
-        "if_normal": 0,
+        "if_normal": 1,
         "field_path": None,
         "if_generate_density_file":0,
-        "device":"gpu"
+        "device":"cpu"
     }
     obj = ErrorDyn(item)
 

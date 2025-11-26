@@ -168,30 +168,64 @@ def low_np(input_file, output_file, sample_size=10000):
 
         # 读取最后一个双精度浮点数
         BaseMassInMeV = struct.unpack("<d", f.read(8))[0]
-
     # 随机抽取样本
     sampled_partran_dist = partran_dist[np.random.choice(partran_dist.shape[0], sample_size, replace=False)]
 
     # 写入新文件
     with open(output_file, 'wb') as f:
-        f.write(b'\x00\x00')  # 前2个字节
+        f.write(struct.pack('c', b'\x7D'))
+        # 前2个字节
+        f.write(struct.pack('c', b'\x64'))
         f.write(struct.pack("<i", sample_size))  # 更新后的number
         f.write(struct.pack("<d", Ib))  # 写入Ib
         f.write(struct.pack("<d", freq))  # 写入freq
-        f.write(b'\x00')  # 跳过的1个字节
+        f.write(struct.pack('c', b'\x7D')) # 跳过的1个字节
+
         f.write(sampled_partran_dist.astype('<f8').tobytes())  # 写入抽样的partran_dist
         f.write(struct.pack("<d", BaseMassInMeV))  # 写入BaseMassInMeV
 
     print(f"Processed data saved to {output_file}")
 
 # 示例调用
+def repeat(input_file, output_file, raio = 10):
+    with open(input_file, 'rb') as f:
+        f.read(2)  # 跳过前2个字节
 
+        # 读取整数和两个双精度浮点数
+        number = struct.unpack("<i", f.read(4))[0]
+        Ib = struct.unpack("<d", f.read(8))[0]
+        freq = struct.unpack("<d", f.read(8))[0]
+
+        f.read(1)  # 跳过1个字节
+
+        # 读取 6 * number 个双精度浮点数 cm mrad
+        partran_dist = np.fromfile(f, dtype='<f8', count=6 * number).reshape(number, 6)
+
+        # 读取最后一个双精度浮点数
+        BaseMassInMeV = struct.unpack("<d", f.read(8))[0]
+    # 随机抽取样本
+    sampled_partran_dist = np.tile(partran_dist, (raio, 1))
+
+    # 写入新文件
+    with open(output_file, 'wb') as f:
+        f.write(struct.pack('c', b'\x7D'))
+        # 前2个字节
+        f.write(struct.pack('c', b'\x64'))
+        f.write(struct.pack("<i", len(sampled_partran_dist)))  # 更新后的number
+        f.write(struct.pack("<d", Ib))  # 写入Ib
+        f.write(struct.pack("<d", freq))  # 写入freq
+        f.write(struct.pack('c', b'\x7D')) # 跳过的1个字节
+
+        f.write(sampled_partran_dist.astype('<f8').tobytes())  # 写入抽样的partran_dist
+        f.write(struct.pack("<d", BaseMassInMeV))  # 写入BaseMassInMeV
+
+    print(f"Processed data saved to {output_file}")
 
 if __name__ == "__main__":
-    inFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp.dst"
-    outFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp1.dst"
-    a = ChangeNp(inFileName, outFileName, 100)
-    a.run()
-    # input_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq.dst"
-    # output_file = r"C:\Users\shliu\Desktop\rukoushutuan\new\part_rfq1.dst"
-    # low_np(input_file, output_file)
+    # inFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp.dst"
+    # outFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp1.dst"
+    # a = ChangeNp(inFileName, outFileName, 100)
+    # a.run()
+    input_file = r"C:\Users\wangh\Desktop\danengsan_p10\p10.dst"
+    output_file = r"C:\Users\wangh\Desktop\danengsan_p10\p1000.dst"
+    repeat(input_file, output_file, 100)

@@ -6,6 +6,7 @@ import os
 from utils.exception import CustomFileNotFoundError
 import re
 import global_varible
+import time
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
@@ -162,13 +163,14 @@ def read_dst(input):
 
     f.close()
     return res
-
 def read_dst_fast(input):
+    t0 = time.time()
     with open(input, 'rb') as f:
         f.read(2)  # 跳过前2个字节
 
         # 读取整数和两个双精度浮点数
         number = struct.unpack("<i", f.read(4))[0]
+        print("粒子数", number/10000, "万")
         Ib = struct.unpack("<d", f.read(8))[0]
         freq = struct.unpack("<d", f.read(8))[0]
 
@@ -186,9 +188,82 @@ def read_dst_fast(input):
     res['freq'] = freq*10**6
     res['partran_dist'] = partran_dist
     res['basemassinmev'] = BaseMassInMeV
-    energy_lis = np.array([i[5] for i in partran_dist])
-    res['kneticenergy'] = np.mean(energy_lis)
+    t1 = time.time()
+    print("读文件时间", t1 - t0)
+    res['kneticenergy'] = float(partran_dist[:, 5].mean())
+    t2 = time.time()
+
+    print("计算能量时间", t2 - t1)
+
     return res
+
+def write_to_dst(path, particle_info, p_dst):
+    # particle_info = {
+    #     "np": ,
+    #     "Ib":
+    #     "freq":
+    #     "BaseMassInMeV": ,
+    # }
+
+    np = particle_info["np"]
+    Ib = particle_info["Ib"]
+    freq = particle_info["freq"]
+    BaseMassInMeV = particle_info["BaseMassInMeV"]
+
+
+
+    outputfile_one_step = path
+
+    with open(outputfile_one_step, 'wb') as data0utFile:
+        try:
+            data0utFile.write(struct.pack('c', b'\x7D'))  # skip1
+            data0utFile.write(struct.pack('c', b'\x64'))  # skip2
+
+            data0utFile.write(struct.pack('i', np))
+            data0utFile.write(struct.pack('d', Ib))  # mA
+            data0utFile.write(struct.pack('d', freq/10**6))  # MHz
+
+            data0utFile.write(struct.pack('c', b'\x7D'))
+
+            for i in range(len(p_dst)):
+                for j in range(6):
+                    data0utFile.write(struct.pack('d', p_dst[i][j]))
+
+            data0utFile.write(struct.pack('d', BaseMassInMeV))  # Mev
+
+        except IOError:
+            print("输出错误")
+# def read_dst_fast(input):
+#     t0 = time.time()
+#     with open(input, 'rb') as f:
+#         f.read(2)  # 跳过前2个字节
+#
+#         # 读取整数和两个双精度浮点数
+#         number = struct.unpack("<i", f.read(4))[0]
+#         Ib = struct.unpack("<d", f.read(8))[0]
+#         freq = struct.unpack("<d", f.read(8))[0]
+#
+#         f.read(1)  # 跳过1个字节
+#
+#         # 读取 6 * number 个双精度浮点数 cm mrad
+#         partran_dist = np.fromfile(f, dtype='<f8', count=6 * number).reshape(number, 6)
+#
+#         # 读取最后一个双精度浮点数
+#         BaseMassInMeV = struct.unpack("<d", f.read(8))[0]
+#
+#     res= {}
+#     res['number'] = number
+#     res['ib'] = Ib
+#     res['freq'] = freq*10**6
+#     res['partran_dist'] = partran_dist
+#     res['basemassinmev'] = BaseMassInMeV
+#     t1 = time.time()
+#     print("读文件时间", t1 - t0)
+#     energy_lis = np.array([i[5] for i in partran_dist])
+#     t2 = time.time()
+#     print("计算能量时间", t2 - t1)
+#     res['kneticenergy'] = np.mean(energy_lis)
+#     return res
 
 def read_runsignal(path):
     res = 0

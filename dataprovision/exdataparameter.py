@@ -28,7 +28,6 @@ class Exdata():
             file_size = os.path.getsize(self.path)
 
             self.step = int((file_size) / byte_onestep)
-            print(31, self.step)
             dtype = np.dtype([
                 ('char', '<c'),
                 ('index', '<i4'),

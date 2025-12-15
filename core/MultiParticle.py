@@ -134,7 +134,7 @@ def basic_mulp(project_path):
 
 
 if __name__ == "__main__":
-    item = {'project_path': r"C:\Users\wangh\Desktop\danengsan_p10\avas_p10",
+    item = {'project_path': r"C:\Users\wangh\Desktop\demao",
             "device":"cpu"
             }
     obj = MultiParticle(item)

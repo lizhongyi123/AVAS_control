@@ -1611,7 +1611,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"F:\using\test_avas_qt\cafe_avas_err"
+    path = r"C:\Users\wangh\Desktop\likai_duibi\02_AVAS_Env_error"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
@@ -1619,10 +1619,10 @@ if __name__ == "__main__":
 
     item = {
         "project_path": path,
-        "seed": 50,
+        "seed": 0,
         "if_normal": 1,
         "field_path": None,
-        "if_generate_density_file":0,
+        "if_generate_density_file":1,
         "device":"cpu"
     }
     obj = ErrorDyn(item)

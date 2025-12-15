@@ -28,7 +28,7 @@ class PlotDataSet(PicturePlot_2D):
             self.project_path = None
         self.dataset_path = dataset_path
         # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        # self.lattice_path = self.project_path + r'\InputFile' + r'\lattice.txt'
+        self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", 'lattice_mulp.txt')
         # self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         # self.dataset_path = os.path.join(self.project_path, "OutputFile", "Dataset.txt" )
@@ -104,7 +104,7 @@ class PlotDataSet(PicturePlot_2D):
             self.y = [center_x]
             self.xlabel = "z(m)"
             self.ylabel = "Cener x(mm)"
-            # self.ylim = [-max(loss)-3, max(loss) + 3]
+            self.ylim = [-5, 5]
 
         if self.picture_name == "c_y":
             self.x = z
@@ -124,7 +124,7 @@ class PlotDataSet(PicturePlot_2D):
             self.labels = ['x', 'y']
             self.colors = ['r', 'b',]
             self.set_legend = 1
-
+            self.ylim = [-5, 5]
 
 
 
@@ -305,12 +305,13 @@ class PlotDataSet(PicturePlot_2D):
         #获取lattice参数
         lattice_res = LatticeParameter(self.lattice_mulp_path)
         lattice_res.get_parameter()
+        aperture = [i * 1000 for i in lattice_res.aperture]
 
         for i in range(len(lattice_res.v_name)):
-            aperture = [i *1000 for i in lattice_res.aperture]
 
 
-            aperture_fake = 1
+
+            height = aperture[i] * 2
 
             element = ''
             if lattice_res.v_name[i] == "field" and lattice_res.phi_syn[i]:
@@ -319,8 +320,8 @@ class PlotDataSet(PicturePlot_2D):
                 element = "sol"
 
             if element:
-                square_origin = [lattice_res.v_start[i], -0.5 * aperture_fake]
-                patch_list.append(obj_compound.create_shapes(square_origin, lattice_res.v_len[i], aperture_fake, element))
+                square_origin = [lattice_res.v_start[i], -0.5 * height]
+                patch_list.append(obj_compound.create_shapes(square_origin, lattice_res.v_len[i], height, element))
 
 
         aperture_up = [i for i in aperture]
@@ -334,15 +335,14 @@ class PlotDataSet(PicturePlot_2D):
         print(aper_x)
 
 
-        self.x = [self.x]*len(self.y) + [aper_x] * 2
-
-        self.y = self.y + [aperture_up] + [aperture_down]
-
         self.labels = self.labels + [None, None]
         self.colors += ["black", "black"]
 
         self.patch_list = patch_list
-        self.ylim = []
+
+
+        # print(354, self.x )
+        # print(355, self.y )
 
         if aper == 0:
             self.x = self.x[:-2]
@@ -351,12 +351,17 @@ class PlotDataSet(PicturePlot_2D):
             self.labels = self.labels[:-2]
             self.colors = self.colors[:-2]
 
+
+
+
 if __name__ == "__main__":
     project_path = None
-    dataset_path = r"C:\Users\wangh\Desktop\long_dis2\av_ori\OutputFile\DataSet.txt"
-    a = PlotDataSet(project_path=None,  picture_name = 'rms_xy', dataset_path=dataset_path)
+    dataset_path = r"C:\Users\wangh\Desktop\long_dis2\av_input\kv\DataSet.txt"
+    project_path = r"C:\Users\wangh\Desktop\long_dis2\av_input"
+    a = PlotDataSet(project_path=project_path,  picture_name = 'rms_xy', dataset_path=dataset_path)
 
     a.get_x_y()
+    a.need_element(aper=1)
     a.run(show_=1)
 
 

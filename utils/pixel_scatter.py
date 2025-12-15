@@ -103,7 +103,7 @@ def pixel_scatter(x, y,
     N = x.shape[0]
 
     # 块大小（可以根据需要改）
-    block_num = 10
+    block_num = 4
     block_h = block_num
     block_w = block_num
 

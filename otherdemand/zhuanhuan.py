@@ -223,7 +223,7 @@ def tran_tracewin_avas(tracewin_list):
             pass
 
         else:
-            print(101, stat)
+            print("未识别命令", stat)
             pass
 
 

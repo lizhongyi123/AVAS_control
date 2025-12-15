@@ -224,7 +224,7 @@ if __name__ == "__main__":
     t0 = time.time()
     # dst_path = r"F:\save\python_code\scatter\cpu_scatter_demo2\cafe1000.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
-    dst_path = r"F:\save\long_space_charge\save-10-12\入口分布\kongxin\outData_0.000000.dst"
+    dst_path = r"C:\Users\wangh\Desktop\long_dis2\av_input\kongxin\outData_5.843388.dst"
     plot_phase = PlotPhase(dst_path)
 
     # plot_phase.run(show_=False, save_path = "test1.png")

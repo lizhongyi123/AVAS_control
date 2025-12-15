@@ -529,26 +529,26 @@ class MergeDensityData(ExtoDensity):
         self.write_file(self.target_path, data)
 
 if __name__ == "__main__":
-    import time
-    t1 = time.time()
-
-    # base = os.path.join(project, "OutputFile")
-
-    base = r"C:\Users\anxin\Desktop\test\test_error\OutputFile\error_output\output_0_0"
-    exdata_path = os.path.join(base, "PCHistogram.dat")
-    dataset_path = os.path.join(base, "DataSet.txt")
-
-
-    base1 = r"C:\Users\anxin\Desktop\test\test_error\OutputFile"
-
-    target_density_path = os.path.join(base1, "density.dat")
-
-    print(target_density_path)
-    # normal_density_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_0_0.dat"
-    obj = ExtoDensity(exdata_path, dataset_path, target_density_path)
-    obj.generate_density_file_onestep(isnormal=1)
-    t2 = time.time()
-    print(t2-t1)
+    # import time
+    # t1 = time.time()
+    #
+    # # base = os.path.join(project, "OutputFile")
+    #
+    # base = r"C:\Users\anxin\Desktop\test\test_error\OutputFile\error_output\output_0_0"
+    # exdata_path = os.path.join(base, "PCHistogram.dat")
+    # dataset_path = os.path.join(base, "DataSet.txt")
+    #
+    #
+    # base1 = r"C:\Users\anxin\Desktop\test\test_error\OutputFile"
+    #
+    # target_density_path = os.path.join(base1, "density.dat")
+    #
+    # print(target_density_path)
+    # # normal_density_path = r"E:\using\test_avas_qt\fileld_ciads\OutputFile\density_par_0_0.dat"
+    # obj = ExtoDensity(exdata_path, dataset_path, target_density_path)
+    # obj.generate_density_file_onestep(isnormal=1)
+    # t2 = time.time()
+    # print(t2-t1)
 
 
 
@@ -572,11 +572,11 @@ if __name__ == "__main__":
     # # obj = PlttoDensity(beamset_path, dataset_path, target_density_path, normal_density_path, project_path)
     # # obj.generate_density_file_onestep(isnormal=0)
 
-    # paths = [
-    #     r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_1.dat",
-    #     r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_2.dat",
-    # ]
-    #
-    # target_path = r"C:\Users\anxin\Desktop\test\test_error\OutputFile\density_tot_par_3.dat"
-    # obj = MergeDensityData(paths, target_path)
-    # obj.generate_density_file()
+    paths = [
+        r"C:\Users\wangh\Desktop\likai_duibi\02_AVAS_Env_error\OutputFile\density_par_0_0.dat",
+        r"C:\Users\wangh\Desktop\likai_duibi\02_AVAS_Env_error\OutputFile\density_par_1_1.dat",
+    ]
+
+    target_path = r"C:\Users\wangh\Desktop\likai_duibi\02_AVAS_Env_error\OutputFile\density_tot.dat"
+    obj = MergeDensityData(paths, target_path)
+    obj.generate_density_file()

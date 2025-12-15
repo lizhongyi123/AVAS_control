@@ -158,6 +158,7 @@ class PicturePlot_2D():
             ax1.set_ylim(self.ylim[0], self.ylim[1])
 
 
+
         if self.set_legend == 1:
             ax1.legend()
 
@@ -165,8 +166,9 @@ class PicturePlot_2D():
         if self.patch_list:
             for shapes in self.patch_list:
                 for shape in shapes:
-                    ax1.gca().add_patch(shape)
+                    ax1.add_patch(shape)
 
+        ax1.set_ylim(0, 200)
         # ax1.grid()
         if show_:
             plt.show()

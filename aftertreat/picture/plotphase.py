@@ -167,7 +167,7 @@ def make_tracewin_like_jet(low_frac=0.1, N=256):
 if __name__ == "__main__":
     import time
     t0 = time.time()
-    dst_path = r"C:\Users\wangh\Desktop\danengsan_p10\generate_particle\res\part_dtl1.dst"
+    dst_path = r"C:\Users\wangh\Desktop\part_rfq_1e6.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
     plot_phase = PlotPhase(dst_path)
 

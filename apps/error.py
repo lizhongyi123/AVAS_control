@@ -47,6 +47,9 @@ class Error():
         if_normal = item.get("if_normal")
         field_path = item.get("field_path")
         if_generate_density_file = item.get("if_generate_density_file")
+        restart = item.get("restart", 0)
+        self.restart = restart
+
         self.device = item.get("device")
         self.item = item
 
@@ -98,20 +101,20 @@ class Error():
 
         self.decimal = 5  # 小数点保留多少位
         self.result_queue = multiprocessing.Queue()
+        if self.restart == 0:
+            if os.path.exists(self.error_middle_path):
+                delete_directory(self.error_middle_path)
+            os.makedirs(self.error_middle_path)
 
-        if os.path.exists(self.error_middle_path):
-            delete_directory(self.error_middle_path)
-        os.makedirs(self.error_middle_path)
 
+            if os.path.exists(self.error_output_path):
+                delete_directory(self.error_output_path)
+            os.makedirs(self.error_output_path)
 
-        if os.path.exists(self.error_output_path):
-            delete_directory(self.error_output_path)
-        os.makedirs(self.error_output_path)
-
-        self.err_adjust_path = os.path.join(self.project_path, "OutputFile", "error_adjust")
-        if os.path.exists(self.err_adjust_path):
-            delete_directory(self.err_adjust_path)
-        os.makedirs(self.err_adjust_path)
+            self.err_adjust_path = os.path.join(self.project_path, "OutputFile", "error_adjust")
+            if os.path.exists(self.err_adjust_path):
+                delete_directory(self.err_adjust_path)
+            os.makedirs(self.err_adjust_path)
 
         v = LatticeParameter(self.lattice_mulp_path)
         v.get_parameter()
@@ -569,13 +572,13 @@ class Error():
         return input_lines
 
 
-    def run_multiparticle(self, p_path, out_putfile_):
+    def run_multiparticle(self, p_path, out_putfile_, if_error=1):
         item = {
             "project_path": p_path,
             "output_file": os.path.join(p_path, out_putfile_),
             "field_path": self.field_path,
-            "errorlog_path": os.path.join(p_path, r'OutputFile/error_middle/output_0/ErrorLog.txt'),
             "device": self.device,
+            "if_error": if_error,
         }
         multiparticle_obj = MultiParticle(item)
 
@@ -594,7 +597,7 @@ class Error():
         #
         # process.start()  # 启动子进程
         # process.join()  # 等待子进程运行结束
-
+        if_error = 0
         self.run_multiparticle(self.project_path, 'OutputFile/error_middle/output_0')
 
         self.write_density_every_time(0, 0)
@@ -900,7 +903,6 @@ class Error():
 
             filtered_files = [path for path in all_file if f'density_par_{group}' in path]
             target_density_path = os.path.join(self.output_path, f"density_tot_par_{group}.dat")
-
             merge_obj = MergeDensityData(filtered_files, target_density_path)
             merge_obj.generate_density_file()
 
@@ -1014,11 +1016,8 @@ class ErrorDyn(Error):
         # process.start()  # 启动子进程
         # process.join()  # 等待子进程运行结束
         res = self.run_multiparticle(self.project_path, 'OutputFile/error_middle')
-
         self.write_density_every_time(group, time)
-
         copy_file(self.lattice_path, self.error_middle_output0_path)
-
         new_name = f'output_{group}_{time}'
 
 
@@ -1035,23 +1034,24 @@ class ErrorDyn(Error):
         self.judge_dyn_on()
 
 
+        if self.restart ==0:
+            self.write_err_par_title()
+            self.write_err_par_tot_title()
 
-        self.write_err_par_title()
-        self.write_err_par_tot_title()
-
-        if self.if_normal == 1:
-            self.run_normal()
-            self.write_err_par_every_time(0,0)
+            if self.if_normal == 1:
+                self.run_normal()
+                self.write_err_par_every_time(0,0)
 
 
 
-        for i in range(1, self.all_group + 1):
-            for j in range(1, self.all_time + 1):
+        for i in range(2, self.all_group + 1):
+            for j in range(3, self.all_time + 1):
                 print(i, j)
                 lattice_mulp_list = self.generate_lattice_mulp_list(i)
                 self.run_one_time(i, j, lattice_mulp_list)
                 self.write_err_datas(i, j)  #误差数据
                 self.write_err_par_every_time(i, j)  #par_tot
+
 
                 # 将束诊参数写入到文件
                 group = i
@@ -1611,7 +1611,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\wangh\Desktop\likai_duibi\02_AVAS_Env_error"
+    path = r"F:\using\test_avas_qt\cafe_avas_err"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 
@@ -1623,7 +1623,8 @@ if __name__ == "__main__":
         "if_normal": 1,
         "field_path": None,
         "if_generate_density_file":1,
-        "device":"cpu"
+        "device":"cpu",
+        "restart": 0,
     }
     obj = ErrorDyn(item)
 

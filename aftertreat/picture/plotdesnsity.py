@@ -406,17 +406,22 @@ if __name__ == "__main__":
     # path3 = r"C:\Users\shliu\Desktop\testz\OutputFile\density_tot_par.dat"
 
     # path1 = r"C:\Users\shliu\Desktop\test_yiman3\AVAS1\OutputFile\density_par_1_98.dat"
-    path1 = r"C:\Users\shliu\Desktop\testex2\OutputFile\density_par_0_0.dat"
-    # v = PlotDensity(path1)
-    # v.get_data('x')
-    # v.ylim = [-50, 50]
-    # v.run(show_=1, fig=None)
-    #
-    #
+    path1 = r"C:\Users\wangh\Desktop\long_dis2\av_err\OutputFile\density_tot_par.dat"
+    # obj = PlotDensityProcess(path1, "x", "centroid", 1)
+    # obj.get_x_y()
+    # obj.run(show_=1)
+
+    obj = PlotDensity(path1, "x", 1 )
+
+
+    obj.get_x_y()
+    obj.xlim = [-150,150]
+    obj.run(show_=1, fig = None)
+
     # # v = PlotDensityLevel(path1)
     # # v.get_x_y(picture_type='r')
     # # v.ylim = [0, 50]
     # # v.run(show_=1, fig=None)
-    v = PlotDensityLevel(path1, "x", 1)
-    v.get_x_y()
-    v.run(show_=1, fig=None)
+    # v = PlotDensityLevel(path1, "x", 1)
+    # v.get_x_y()
+    # v.run(show_=1, fig=None)

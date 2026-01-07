@@ -222,10 +222,10 @@ def repeat(input_file, output_file, raio = 10):
     print(f"Processed data saved to {output_file}")
 
 if __name__ == "__main__":
-    # inFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp.dst"
-    # outFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp1.dst"
-    # a = ChangeNp(inFileName, outFileName, 100)
-    # a.run()
-    input_file = r"C:\Users\wangh\Desktop\danengsan_p10\p10.dst"
-    output_file = r"C:\Users\wangh\Desktop\danengsan_p10\p1000.dst"
-    repeat(input_file, output_file, 100)
+    inFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp.dst"
+    outFileName = r"C:\Users\shliu\Desktop\新建文件夹 (5)\mebt2\InputFile\temp1.dst"
+    a = ChangeNp(inFileName, outFileName, 100)
+    a.run()
+    # input_file = r"C:\Users\wangh\Desktop\danengsan_p10\p10.dst"
+    # output_file = r"C:\Users\wangh\Desktop\danengsan_p10\p1000.dst"
+    # repeat(input_file, output_file, 100)

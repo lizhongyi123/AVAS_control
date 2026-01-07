@@ -1,26 +1,38 @@
-import sys
-import time
-import platform
-import os
+
 
 from core.MultiParticleEngine import MultiParticleEngine
+
+import platform
+
+
 from utils.readfile import read_txt
 from utils.tool import write_to_txt, convert_dic2lis
-
-
+from aftertreat.dataanalysis.new_dataset import trans_dataset2new
+import os
 
 class MultiParticle():
     """
     多粒子模拟
     """
     def __init__(self, item):  # *arg **kwargs #dllpath写死
+        #{
+        # "project_path": path,
+        # "input_file": path,
+        # "output_file": path,
+        # "field_path": path,
+        # "errorlog_path": errorlog_path,
+        # "mulp_engine": ,
+        # "device": ,
+        # "if_error": 0/1,
+        #}
         self.project_path = item["project_path"]
         self.input_file = item.get("input_file")
         self.output_file = item.get("output_file")
         self.field_path = item.get("field_path")
-        self.errorlog_path = item.get("errorlog_path")
+        # self.errorlog_path = item.get("errorlog_path")
         self.multiparticle_engine = item.get("mulp_engine")
         self.device = item.get("device")
+        self.if_error = item.get("if_error", 0)
 
         if self.device in [None, ""]:
             self.device = "cpu"
@@ -32,13 +44,36 @@ class MultiParticle():
 
         if self.field_path == None:
             self.field_path = self.input_file
-
-        if self.errorlog_path is None:
-            self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
+        #
+        # if self.errorlog_path is None:
+        #     self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
 
         if self.device  == "cpu":
             if self.multiparticle_engine is None:
                 self.multiparticle_engine = MultiParticleEngine()
+                # self.multiparticle_engine = engine
+
+        if self.if_error == 0:
+            self.errorlog_path = os.path.join(self.output_file, "ErrorLog.txt")
+
+        elif self.if_error == 1:
+            self.errorlog_path = os.path.join(self.output_file, "output_0", "ErrorLog.txt")
+
+
+
+
+    def after_treat(self):
+        #误差模拟的情况
+        if self.if_error == 1:
+            ori_dataset_path = os.path.join(self.output_file, "output_0", "DataSet.txt")
+            new_dataset_path = os.path.join(self.output_file, "output_0", "Dataset_New.txt")
+
+        if self.if_error == 0:
+            ori_dataset_path = os.path.join(self.output_file, "DataSet.txt")
+            new_dataset_path = os.path.join(self.output_file, "Dataset_New.txt")
+
+        res = trans_dataset2new(ori_dataset_path, new_dataset_path)
+        return res
 
 
 
@@ -52,6 +87,7 @@ class MultiParticle():
 
             res = self.multiparticle_engine.main_agent(1)
 
+            #检查报错
             if res == 1:
                 # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
 
@@ -61,6 +97,8 @@ class MultiParticle():
                 # raise Exception(f'模拟错误，请查询OutputFile中的ErrorLog.txt')
                 error = self.check_error_file(self.errorlog_path)
                 raise Exception(f'{error}')
+
+
         elif self.device == "gpu":
             from sim_gpu.pic import SimulationRunner
 
@@ -85,6 +123,7 @@ class MultiParticle():
 
             res= 0
 
+        # self.after_treat()
         return res
 
     def stop(self):
@@ -134,10 +173,29 @@ def basic_mulp(project_path):
 
 
 if __name__ == "__main__":
-    item = {'project_path': r"C:\Users\wangh\Desktop\demao",
+    import sys, os
+
+
+
+    item = {'project_path': r"F:\using\test_avas_qt\cafe_AVAS",
             "device":"cpu"
             }
+
     obj = MultiParticle(item)
+    print(">" * 30)
+    print("exe =", sys.executable)
+    print("cwd =", os.getcwd())
+    print("__file__ =", __file__)
+    print("platform =", platform.platform())
+    print("PATH(head) =", os.environ.get("PATH", "")[:300])
+    print("PATH(has dllfile) =", "dllfile" in os.environ.get("PATH", ""))
+    print("sys.path(head) =", sys.path[:5])
+    print(">" * 30)
+
+
+
+
+
     obj.run()
 
 

@@ -45,7 +45,7 @@ class DstParameter():
         self.Ib = data.get('ib')
 
         data = data.get('partran_dist')
-
+        print(data)
         self.x_list = [i[0] * 10 for i in data]   #mm
         self.x1_list = [i[1] * 1000 for i in data]  # mrad
         self.y_list = [i[2] * 10 for i in data]
@@ -63,6 +63,7 @@ class DstParameter():
         times = []
         for index, i in enumerate(data):
             tmp_gamma = 1 + i[5] / self.BaseMassInMeV
+            print(66, tmp_gamma, self.BaseMassInMeV)
             tmp_beta = math.sqrt(1 - 1.0 / tmp_gamma / tmp_gamma)
             tmp_speed = tmp_beta * c_light  # 总速度
             speedz = math.sqrt(pow(tmp_speed, 2) / (pow(i[1], 2) + pow(i[3], 2) + 1))
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     # # obj.get_parameter()
     # # print(obj.x_list)
     # res = get_entrance_beam_parameter(project_path)
-    dst_path = r"C:\Users\shliu\Desktop\test_tr_av\av_err_dyn\InputFile\part_rfq.dst"
+    dst_path = r"C:\Users\wangh\Desktop\trans_0105\av_rfq_before\InputFile\part_rfq.dst"
 
     obj = DstParameter(dst_path)
     obj.get_parameter()

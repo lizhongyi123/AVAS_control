@@ -170,7 +170,7 @@ def read_dst_fast(input):
 
         # 读取整数和两个双精度浮点数
         number = struct.unpack("<i", f.read(4))[0]
-        print("粒子数", number/10000, "万")
+        # print("粒子数", number/10000, "万")
         Ib = struct.unpack("<d", f.read(8))[0]
         freq = struct.unpack("<d", f.read(8))[0]
 
@@ -189,15 +189,16 @@ def read_dst_fast(input):
     res['partran_dist'] = partran_dist
     res['basemassinmev'] = BaseMassInMeV
     t1 = time.time()
-    print("读文件时间", t1 - t0)
+    # print("读文件时间", t1 - t0)
     res['kneticenergy'] = float(partran_dist[:, 5].mean())
+    res["y_mean"] = float(partran_dist[:, 2].mean()) *10
     t2 = time.time()
 
-    print("计算能量时间", t2 - t1)
+    # print("计算能量时间", t2 - t1)
 
     return res
 
-def write_to_dst(path, particle_info, p_dst):
+def write_to_dst(path, particle_info, ):
     # particle_info = {
     #     "np": ,
     #     "Ib":
@@ -205,12 +206,12 @@ def write_to_dst(path, particle_info, p_dst):
     #     "BaseMassInMeV": ,
     # }
 
-    np = particle_info["np"]
-    Ib = particle_info["Ib"]
+    np = particle_info["number"]
+    Ib = particle_info["ib"]
     freq = particle_info["freq"]
-    BaseMassInMeV = particle_info["BaseMassInMeV"]
+    BaseMassInMeV = particle_info["basemassinmev"]
 
-
+    p_dst = particle_info["partran_dist"]
 
     outputfile_one_step = path
 
@@ -312,8 +313,31 @@ if __name__ == "__main__":
     # res = read_lattice_mulp_with_name(path)
     # print(res)
 
-    path = r"C:\Users\wangh\Desktop\long_dis2\av_input\kongxin\inData.dst"
-    res = read_dst_fast(path)
+    # path0 = r"C:\Users\wangh\Desktop\likai_duibi2\04_TraceWin_Par_error\result\0.dst"
+    # print(read_dst_fast(path0)["y_mean"])
+    #
+    # path0 = r"C:\Users\wangh\Desktop\likai_duibi2\04_TraceWin_Par_error\result\-2.dst"
+    # print(read_dst_fast(path0)["y_mean"])
+
+    path0 = r"C:\Users\wangh\Desktop\trans_0105\rfq_before\result\part_rfq_v1.dst"
+    res= read_dst_fast(path0)
+    print(res)
+
+    new_res = res
+    new_res["ib"] = 0.91
+    new_path = r"C:\Users\wangh\Desktop\trans_0105\rfq_before\result\part_rfq_v2.dst"
+    write_to_dst(new_path, new_res)
+
+
+
+
+
+
+
+
+
+
+
     # partran_dist = res['partran_dist']
     #
     # x = [i[0] for i in partran_dist]
@@ -323,5 +347,3 @@ if __name__ == "__main__":
     #
     # plt.plot(x,y)
     # plt.show()
-
-    print(res)

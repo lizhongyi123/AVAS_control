@@ -65,20 +65,37 @@ def read_txt(input, out='dict', readdall=None, case_sensitive=None):
 #     print("文件已删除")
 # else:
 #     print("文件不存在")
+# def read_tracewin(in_put):
+#
+#     with open(in_put, encoding='utf-8') as file_object:
+#         lines = file_object.readlines()
+#
+#     tracewin_list = []
+#
+#     for line in lines:
+#         lst = line.split()
+#         tracewin_list.append(lst)
+#
+#     return tracewin_list
+
 def read_tracewin(in_put):
 
     with open(in_put, encoding='utf-8') as file_object:
         lines = file_object.readlines()
 
-
-
     tracewin_list = []
 
     for line in lines:
-        lst = line.split()
-        tracewin_list.append(lst)
+        lst = line
+        if lst[0] == ";":
+            new_command = [lst]
+        elif line != "":
+            new_command = line.split(";", 1)[0].split()
+        elif line == "":
+            new_command = []
 
-    # tracewin_list = [[word.lower() for word in line] for line in tracewin_list]
+
+        tracewin_list.append(new_command)
 
     return tracewin_list
 
@@ -130,6 +147,7 @@ def tran_tracewin_avas(tracewin_list):
 
     freq = 0
     for index, stat in enumerate(tracewin_list):
+        print(stat)
         if len(stat) == 0:
             avas_list.append([])
 
@@ -153,7 +171,6 @@ def tran_tracewin_avas(tracewin_list):
             avas_list.append(tmp)
 
         elif stat[0].lower() == 'FIELD_MAP'.lower():
-            print(156, stat)
             if int(stat[1]) == 7:
                 #静电场
                 tmp = ["field", float(stat[2])/1000,float(stat[4])/1000, 0, 2, 0, 0, stat[6], 0, stat[9]]
@@ -172,6 +189,10 @@ def tran_tracewin_avas(tracewin_list):
 
         elif stat[0].lower() == "QUAD".lower():
             tmp = ['quad', float(stat[1])/1000, float(stat[3])/1000, 0, float(stat[2])]
+            if tmp[4] == 0:
+                tmp = ["drift", float(stat[1])/1000, float(stat[3])/1000, 0 ]
+
+
             avas_list.append(tmp)
 
             if chexck_superposeend(tracewin_list, index):
@@ -216,8 +237,9 @@ def tran_tracewin_avas(tracewin_list):
             avas_list.append(stat)
 
         elif stat[0].lower() in diag_list:
-            tmp = stat
+            tmp = ["diag_size",0, 0, 0 ,0 ]
             avas_list.append(tmp)
+
 
         elif stat[0].lower() in pass_list:
             pass
@@ -227,7 +249,7 @@ def tran_tracewin_avas(tracewin_list):
             pass
 
 
-    #删除带哦repeat的空格
+    #删除带repeat的空格
     avas_list = delete_repeat_space(avas_list)
 
     avas_list2 = []
@@ -277,14 +299,15 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\1112mebt\mebt.dat"
-
-    avas_lattice_path = r"C:\Users\wangh\Desktop\1112mebt\mebt.txt"
+    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\trans_0105\rfq_before.dat"
+    avas_lattice_path = r"C:\Users\wangh\Desktop\trans_0105\avas_rfq_before.dat"
 
 
     # 修改后的lattice
 
     tracewin_lattice = read_tracewin(tracewin_lattiace_path)
+    # for i in tracewin_lattice:
+    #     print(i)
 
     avas_lattice_list = tran_tracewin_avas(tracewin_lattice)
 

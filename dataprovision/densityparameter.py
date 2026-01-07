@@ -3,7 +3,7 @@ import struct
 class DensityParameter():
     def __init__(self, density_path):
         self.density_path = density_path
-    def get_parameter(self, ):
+    def  get_parameter(self, ):
         data = {}
 
 

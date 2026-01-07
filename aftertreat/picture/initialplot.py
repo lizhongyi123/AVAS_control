@@ -8,6 +8,7 @@ from utils.treatlist import get_dimension
 import numpy as np
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import LinearSegmentedColormap
+from utils.my_jet import make_tracewin_like_jet
 class PicturelBar_2D():
     """
     二维柱状图，父类
@@ -168,7 +169,7 @@ class PicturePlot_2D():
                 for shape in shapes:
                     ax1.add_patch(shape)
 
-        ax1.set_ylim(0, 200)
+        # ax1.set_ylim(0, 200)
         # ax1.grid()
         if show_:
             plt.show()
@@ -352,6 +353,7 @@ class Picturedensity():
 
         colors = [(1, 1, 1), *plt.cm.jet(np.linspace(0, 1, 256))]  # 第一个颜色为白色，其余为 'jet'
         custom_cmap = LinearSegmentedColormap.from_list('custom_jet', colors)
+        # tracewin_like_jet = make_tracewin_like_jet()
 
         # 使用pcolormesh绘制密度图
         mesh = ax1.pcolormesh(self.z_m, self.y_m,self.density_m, cmap=custom_cmap, shading='auto')

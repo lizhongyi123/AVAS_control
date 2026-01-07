@@ -23,7 +23,7 @@ from utils.pixel_scatter import pixel_scatter, warmup
 class PlotPhase:
     def __init__(self, dst_path):
         self.dst_path = dst_path
-        self.fig_size = (6.4,4.8)
+        self.fig_size = (12.8 *2 /3, 9.2*2 /3)
         self.fontsize = 18
         self.gird_bins = 100
         self.maxpar_num = 10**4
@@ -73,7 +73,10 @@ class PlotPhase:
         font1 = {'family': 'Times New Roman', 'weight': 'bold', 'size': self.fontsize}
 
         # 绘制子图
-        self._plot_density(fig, 111, x, y, "x", "y", font1)
+        self._plot_density(fig, 221, x, x1, "x", "x'", font1)
+        self._plot_density(fig, 222, y, y1, "y", "y'", font1)
+        self._plot_density(fig, 223, phi, E, "φ", "Energy", font1)
+        self._plot_density(fig, 224, x, y, "x", "y", font1)
 
         plt.tight_layout()
         if show_:
@@ -130,13 +133,9 @@ class PlotPhase:
                        origin='lower', aspect='auto',
                        cmap= tracewin_like_jet, vmin=vmin, vmax=vmax)
 
-        ratio = 0.2
-        if 1:
-            v1 = abs(xmin)
-            v2 = abs(xmax)
-            v3 = np.max([v1, v2])
-        ax.set_xlim([-v3 - abs(v3) * ratio, v3 + abs(v3) * ratio])
-        ax.set_ylim([-v3 - abs(v3) * ratio, v3 + abs(v3) * ratio])
+        ratio = 0.4
+        ax.set_xlim([xmin - abs(xmin) * ratio, xmax + abs(xmax) * ratio])
+        ax.set_ylim([ymin - abs(ymin) * ratio, ymax + abs(ymax) * ratio])
         norm = mpl.colors.Normalize(vmin=0.0, vmax=1.0)
         sm = mpl.cm.ScalarMappable(norm=norm, cmap=tracewin_like_jet)
         sm.set_array([])  # 必须调用，否则警告
@@ -225,7 +224,7 @@ if __name__ == "__main__":
     t0 = time.time()
     # dst_path = r"F:\save\python_code\scatter\cpu_scatter_demo2\cafe1000.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
-    dst_path = r"F:\save\long_space_charge\save-10-12\纯质子束0-200磁场\c200\outData_100060.656230.dst"
+    dst_path = r"C:\Users\wangh\Desktop\part_rfq_1e6.dst"
     plot_phase = PlotPhase(dst_path)
 
     # plot_phase.run(show_=False, save_path = "test1.png")

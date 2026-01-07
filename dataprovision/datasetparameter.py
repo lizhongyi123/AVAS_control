@@ -217,12 +217,12 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\wangh\Desktop\danengsan_p10\avas_p10\OutputFile\DataSet.txt"
+    path1 = r"C:\Users\wangh\Desktop\hiaf_v2\AVAS_HIAF_dxy\OutputFile\output_0\DataSet.txt"
     project_path =None
     obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()
-    # print(obj.beta_x)
-    print(obj.z)
+
+    print(obj.z[-10: ])
     #
     # import numpy as np
     # import time

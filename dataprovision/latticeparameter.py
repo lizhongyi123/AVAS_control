@@ -179,7 +179,9 @@ class LatticeParameter():
                     raise Exception("This lattice_end command is missing the corresponding lattice command.")
 
                 if in_lattice is True:
+
                     if (perirod_end - period_start) % period_size != 0:
+                        print(period_start, perirod_end)
                         raise Exception("This lattice cannot be divided into an integer number of periods.")
 
                     for i in range(period_start, perirod_end, period_size):

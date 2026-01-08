@@ -3,7 +3,7 @@
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
-from aftertreat.picture.plotphase2 import PlotPhase
+from past_file.plotphase2 import PlotPhase
 from aftertreat.dataanalysis.caltwiss import CalTwiss
 from aftertreat.picture.plotenvbeamout import PlotEnvBeamOut
 
@@ -14,21 +14,17 @@ from apps.circlematch import CircleMatch
 from aftertreat.picture.plotacc import PlotAcc
 from apps.calacceptance import Acceptance
 import os
-from utils.readfile import read_txt
 from apps.basicenv import BasicEnvSim
 from apps.LongAccelerator import LongAccelerator
 from utils.tolattice import write_mulp_to_lattice_only_sim2
-from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
+from apps.error import Errorstat, ErrorDyn, Errorstatdyn
 
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
 from aftertreat.picture.plotdesnsity import PlotDensity, PlotDensityLevel, PlotDensityProcess
 
 ########################################################################################################################
-import multiprocessing
-from apis.qt_api.judge_lattice import JudgeLattice
 from aftertreat.picture.plotphaseellipse import PlotPhaseEllipse
 from utils.tool import format_output, generate_web_picture_param, generate_web_picture_path
-import uuid
 from apps.diaginfo import DiagInfo
 from aftertreat.dataanalysis.extodensity import ExtoDensity
 from utils.inputconfig import InputConfig

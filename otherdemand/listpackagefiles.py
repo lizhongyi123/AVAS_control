@@ -24,9 +24,13 @@ if __name__ == "__main__":
         v1 = v1 + res
     # print(v1)
     # print(v1[0])
-    new_path = updated_paths = [path.replace(r'F:/AVAS_CONTROL/AVAS_control', '.') for path in v1]
-    new_path = updated_paths = [path.replace('\\', r'/') for path in new_path]
-    new_path = updated_paths = [path.replace('\\', r'/') for path in new_path if "__pycache__" not in path]
+    new_path = [path.replace(r'F:/AVAS_CONTROL/AVAS_control', '.') for path in v1]
+    new_path = [path.replace('\\', r'/') for path in new_path]
+    new_path = [path.replace('\\', r'/') for path in new_path if "__pycache__" not in path]
     # print(new_path)
-    for i in new_path:
-        print(f"'{i}',")
+    new_path = ['main.py', 'api.py', 'global_varible.py',] + new_path
+    #
+    # for i in new_path:
+    #     print(f"'{i}',")
+    new_path = [i for i in new_path if '.py' in i]
+    print(new_path)

@@ -152,6 +152,5 @@ if __name__ == '__main__':
 
     trace_win_list = tran_avas_tracewin_list(avas_lattice)
 
-
     write_to_tracewin_lattice(trace_win_list, tracewin_lattice_path)
 

@@ -3,7 +3,7 @@ import os
 import copy
 import sys
 import re
-os.chdir(sys.path[0])
+
 
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
     """
@@ -140,14 +140,14 @@ def tran_tracewin_avas(tracewin_list):
 
 
     pass_list = ['SHIFT_IN_FIELD_MAP'.lower(), "SHIFT_BEAM".lower(),
-                'SET_SYNC_PHASE'.lower(), 'lattice', 'lattice_end', 'ADJUST'.lower(), "DIAG_PHASE".lower(),
+                'SET_SYNC_PHASE'.lower(),  'ADJUST'.lower(), "DIAG_PHASE".lower(),
                 "PLOT_DST_LOST".lower(),
                 ]
     diag_list = ['DIAG_CURRENT'.lower(), 'DIAG_SIZE'.lower(), 'DIAG_POSITION'.lower(),  "DIAG_PHASE".lower()]
 
     freq = 0
     for index, stat in enumerate(tracewin_list):
-        print(stat)
+
         if len(stat) == 0:
             avas_list.append([])
 
@@ -240,6 +240,15 @@ def tran_tracewin_avas(tracewin_list):
             tmp = ["diag_size",0, 0, 0 ,0 ]
             avas_list.append(tmp)
 
+        elif stat[0].lower() == "lattice":
+            tmp = stat
+            avas_list.append(stat)
+
+        elif stat[0].lower() == "lattice_end":
+            tmp = stat
+            avas_list.append(stat)
+
+
 
         elif stat[0].lower() in pass_list:
             pass
@@ -299,8 +308,8 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\trans_0105\rfq_before.dat"
-    avas_lattice_path = r"C:\Users\wangh\Desktop\trans_0105\avas_rfq_before.dat"
+    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\yiman\1GeV.dat"
+    avas_lattice_path = r"C:\Users\wangh\Desktop\yiman\1GeV.txt"
 
 
     # 修改后的lattice

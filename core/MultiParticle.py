@@ -6,9 +6,9 @@ import platform
 
 
 from utils.readfile import read_txt
-from utils.tool import write_to_txt, convert_dic2lis
+from utils.tool import write_to_txt
 from aftertreat.dataanalysis.new_dataset import trans_dataset2new
-import os
+
 
 class MultiParticle():
     """
@@ -182,15 +182,15 @@ if __name__ == "__main__":
             }
 
     obj = MultiParticle(item)
-    print(">" * 30)
-    print("exe =", sys.executable)
-    print("cwd =", os.getcwd())
-    print("__file__ =", __file__)
-    print("platform =", platform.platform())
-    print("PATH(head) =", os.environ.get("PATH", "")[:300])
-    print("PATH(has dllfile) =", "dllfile" in os.environ.get("PATH", ""))
-    print("sys.path(head) =", sys.path[:5])
-    print(">" * 30)
+    # print(">" * 30)
+    # print("exe =", sys.executable)
+    # print("cwd =", os.getcwd())
+    # print("__file__ =", __file__)
+    # print("platform =", platform.platform())
+    # print("PATH(head) =", os.environ.get("PATH", "")[:300])
+    # print("PATH(has dllfile) =", "dllfile" in os.environ.get("PATH", ""))
+    # print("sys.path(head) =", sys.path[:5])
+    # print(">" * 30)
 
 
 

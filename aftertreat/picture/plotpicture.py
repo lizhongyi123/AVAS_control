@@ -178,7 +178,7 @@ class PlotPhaseAdvance(PicturePlot_2D):
 
 
 if __name__ == "__main__":
-    project_path = r"C:\Users\shliu\Desktop\test_schedule\cafe_avas"
+    project_path = r"C:\Users\wangh\Desktop\yiman\1gEv"
     obj = PlotPhaseAdvance(project_path, "period" )
     obj.get_x_y()
     obj.run(show_=1, fig =None)

@@ -261,11 +261,11 @@ class PageLattice(QWidget):
 #
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageLattice(r'C:\Users\anxin\Desktop\comparison\avas_test')
+    main_window = PageLattice(r'F:\using\test_avas_qt\cafe_AVAS')
 
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
-    main_window.updatePath(r'C:\Users\shliu\Desktop\AVAS_0.5\example')
+    main_window.updatePath(r'F:\using\test_avas_qt\cafe_AVAS')
     main_window.fill_parameter()
     main_window.show()
     sys.exit(app.exec_())

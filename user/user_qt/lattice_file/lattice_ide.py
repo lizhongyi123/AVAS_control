@@ -16,7 +16,7 @@ from PyQt5.QtCore import QRegExp
 from user.user_qt.lattice_file. latticeideuseclass import FindReplaceDialog, SearchDialog, SyntaxHighlighter
 import global_varible
 
-
+from PyQt5.QtGui import QFont, QFontDatabase
 
 class LineNumberArea(QWidget):
     """行号区域，支持折叠功能"""
@@ -51,11 +51,27 @@ class LineNumberArea(QWidget):
 class CodeEditor(QPlainTextEdit):
     def __init__(self):
         super().__init__()
-        font = QFont("Courier")
-        self.setFont(font)
+        # font = QFont("Courier")
+        # self.setFont(font)
+
+        font = QFontDatabase.systemFont(QFontDatabase.FixedFont)  # 系统默认等宽 TrueType
+        font.setPointSize(12)
+        font.setStyleHint(QFont.Monospace) #需要的是等宽字体（monospace），优先找等宽字体来匹配
+        font.setFixedPitch(True) #每个字符宽度必须一致
+        self.document().setDefaultFont(font)  # 关键：文档默认字体也要同步
+
+
+
+        ##############################################
         self.setLineWrapMode(QPlainTextEdit.NoWrap)
 
+        self.line_number_map = {}                # ✅ 提前
+        self.max_logical_number = 1              # ✅ 可选：给宽度计算一个默认值
+        self.last_index = -1
+
+
         self.line_number_area = LineNumberArea(self)
+
         self.highlighter = SyntaxHighlighter(self.document())
         self.folded_blocks = {}  # 存储折叠区域 { 起始block_number: [隐藏的block_number列表] }
 
@@ -64,8 +80,8 @@ class CodeEditor(QPlainTextEdit):
         self.cursorPositionChanged.connect(self.highlight_current_line)
         self.update_line_number_area_width()
 
-        self.line_number_map = {}
-        self.last_index = -1
+        # self.line_number_map = {}
+        # self.last_index = -1
 
         # self.keywords = [
         #     "drift", "drift2", "drift3",
@@ -92,29 +108,93 @@ class CodeEditor(QPlainTextEdit):
         # self.completer.setFilterMode(Qt.MatchContains)  # 支持匹配中间部分
         self.completer.activated.connect(self.insert_completion)  # 选中项时插入
 
+        self.textChanged.connect(self.on_text_changed)
+        self.on_text_changed()
 
-    def set_font_size(self, size):
-        """ 修改 CodeEditor 的字体大小 """
-        font = self.font()  # 获取当前字体
-        font.setPointSize(size)  # 设置新的字体大小
-        self.setFont(font)  # 应用新的字体大小
-        self.line_number_area.setFont(font)
+        self.index_v1 = 0
+
+    # def set_font_size(self, size):
+    #     """ 修改 CodeEditor 的字体大小 """
+    #     font = self.font()  # 获取当前字体
+    #     print("before:", font.pointSize(), font.pixelSize(), "-> request:", size)
+    #     font.setPointSize(size)  # 设置新的字体大小
+    #     self.setFont(font)  # 应用新的字体大小
+    #     self.line_number_area.setFont(font)
+
+    def zoom_editor(self, delta_steps: int):
+        """delta_steps >0 放大，<0 缩小"""
+        if delta_steps > 0:
+            self.zoomIn(delta_steps)
+        elif delta_steps < 0:
+            self.zoomOut(-delta_steps)
+
+        # 关键：同步行号区字体（用 editor 当前 font）
+        self.line_number_area.setFont(self.font())
+
+        # 关键：如果你行号栏宽度是动态的，字体变了要重算宽度
+        self.update_line_number_area_width()
+        # self.line_number_area.update()
+
+    def line_number_area_width(self) -> int:
+        """根据最大行号位数动态计算行号栏宽度（像素）"""
+        # 这里用“可见的逻辑行号”或 blockCount 都行
+        # 你如果想按 blockCount 来算：
+        # max_num = max(1, self.blockCount())
+
+        # 你现在的逻辑行号是 logical_number（元素计数），那就用它更贴合
+
+        if self.line_number_map:
+            max_num = max(1, max(self.line_number_map.keys()))  # 或者用你自己的最大 logical_number
+        else:
+            max_num = "12345"
+        digits = len(str(max_num))
+        # print(151, max_num, digits)
+
+
+        fm = self.fontMetrics()
+        # '9' 通常最宽，用它估计位数宽度
+        text_width = fm.horizontalAdvance('9' * digits)
+
+        padding = 12   # 左右留白（你还画了折叠符号，适当大点）
+        fold_icon_space = 14  # 给 "▶" 留点空间（如果你要显示）
+        return text_width + padding + fold_icon_space
 
     def update_line_number_area_width(self):
-        self.setViewportMargins(50, 0, 0, 0)
+        w = self.line_number_area_width()
+        if getattr(self, "_lnw", None) == w:
+            return
+
+        self._lnw = w
+        # print(155, self._lnw)
+        self.setViewportMargins(self._lnw, 0, 0, 0)
+        self.line_number_area.setFixedWidth(w)
+
 
     def update_line_number_area(self, rect, dy):
         if dy:
             self.line_number_area.scroll(0, dy)
-        else:
-            self.line_number_area.update(0, rect.y(), self.line_number_area.width(), rect.height())
-        if rect.contains(self.viewport().rect()):
-            self.update_line_number_area_width()
+        # else:
+        #     print(149, "光标触发")
+        #     self.line_number_area.update(0, rect.y(), self.line_number_area.width(), rect.height())
+
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         rect = self.contentsRect()
+        #设置line_number_area的左上角和宽度
         self.line_number_area.setGeometry(QRect(rect.left(), rect.top(), 50, rect.height()))
+        # print(157, "结束")
+        # print("<<" * 30)
+        # w = self.line_number_area_width()
+        # self.line_number_area.setGeometry(QRect(rect.left(), rect.top(), w, rect.height()))
+
+    def on_text_changed(self):
+        # print(176, "文本变化")
+        #只有文本变化，才重新计算
+        self.update_line_numbers()  # ✅ 只在文本变化时重算
+        # self.line_number_area.update()  # ✅ 让行号区重绘一次
+        self.update_line_number_area_width()  # 如果你做动态宽度，可以在这里更新
+
 
     def highlight_current_line(self):
         extra_selections = []
@@ -153,11 +233,14 @@ class CodeEditor(QPlainTextEdit):
             elif text.startswith("end"):
                 break
             block = block.next()  # 移动到下一个 block
+        # print("line_number_map", self.line_number_map)
+
+
 
     def line_number_area_paint_event(self, event):
         """绘制行号（按 `drift` 或 `field` 递增）"""
-        self.update_line_numbers()  # 重新计算行号，确保正确
-
+        self.index_v1 += 1
+        # print(224, "绘制区域", self.index_v1)
         painter = QPainter(self.line_number_area)
         painter.fillRect(event.rect(), Qt.lightGray)
 
@@ -188,7 +271,8 @@ class CodeEditor(QPlainTextEdit):
             block = block.next()
             top = bottom
             bottom = top + self.blockBoundingRect(block).height()
-
+        # print(241, "绘制区域结束")
+        # print("<<" * 60)
     def insert_completion(self, completion=None):
         """ 插入补全文本（回车/鼠标选择） """
         if completion is None:
@@ -363,31 +447,31 @@ class CodeEditorWithLineNumbers(QWidget):
         # 搜索按钮
         self.search_button = QPushButton("find", self)
         self.search_button.clicked.connect(self.open_search_dialog)
-        self.search_button.setFixedSize(50, 25)
+        # self.search_button.setFixedSize(50, 25)
 
         # 添加注释按钮
         self.comment_button = QPushButton("!", self)
         self.comment_button.clicked.connect(self.add_comment)
-        self.comment_button.setFixedSize(25, 25)
+        # self.comment_button.setFixedSize(25, 25)
 
         # 取消注释按钮
         self.uncomment_button = QPushButton("x!", self)
         self.uncomment_button.clicked.connect(self.remove_comment)
-        self.uncomment_button.setFixedSize(25, 25)
+        # self.uncomment_button.setFixedSize(25, 25)
 
         # **新增字体放大按钮**
         self.increase_font_button = QPushButton("A+", self)
         self.increase_font_button.clicked.connect(self.increase_font_size)
-        self.increase_font_button.setFixedSize(25, 25)
+        # self.increase_font_button.setFixedSize(25, 25)
 
         # **新增字体缩小按钮**
         self.decrease_font_button = QPushButton("A-", self)
         self.decrease_font_button.clicked.connect(self.decrease_font_size)
-        self.decrease_font_button.setFixedSize(25, 25)
+        # self.decrease_font_button.setFixedSize(25, 25)
 
         self.replace_button = QPushButton("replace", self)
         self.replace_button.clicked.connect(self.open_replace_dialog)
-        self.replace_button.setFixedSize(50, 25)
+        # self.replace_button.setFixedSize(50, 25)
 
         self.editor = CodeEditor()
 
@@ -414,17 +498,34 @@ class CodeEditorWithLineNumbers(QWidget):
         dialog.exec_()  # 以模态方式运行
 
     def increase_font_size(self):
-        """ 增加字体大小 """
-        if self.current_font_size < 18:  # 设置最小字体大小
-            self.current_font_size += 3
-            self.editor.set_font_size(self.current_font_size)
-        # print(self.current_font_size)
+        self.editor.zoom_editor(3)
+
     def decrease_font_size(self):
-        """ 减小字体大小 """
-        if self.current_font_size > 9:  # 设置最小字体大小
-            self.current_font_size -= 3
-            self.editor.set_font_size(self.current_font_size)
-        # print(self.current_font_size)
+        self.editor.zoom_editor(-3)
+
+    # def increase_font_size(self):
+    #     """ 增加字体大小 """
+    #     self.editor.zoomIn(3)
+    #     self.editor.update_line_number_area_width()
+    #     # self.current_font_size += 3
+    #     # self.editor.set_font_size(self.current_font_size)
+    #     #
+    #     # # if self.current_font_size < 18:  # 设置最小字体大小
+    #     # #     self.current_font_size += 3
+    #     # #     self.editor.set_font_size(self.current_font_size)
+    #     # print("增加后的大小", self.current_font_size)
+    # def decrease_font_size(self):
+    #     self.editor.zoomOut(3)
+    #     self.editor.update_line_number_area_width()
+    #     """ 减小字体大小 """
+    #     # self.current_font_size -= 3
+    #     # self.editor.set_font_size(self.current_font_size)
+    #     #
+    #     # # if self.current_font_size > 9:  # 设置最小字体大小
+    #     # #     self.current_font_size -= 3
+    #     # #     self.editor.set_font_size(self.current_font_size)
+    #     # print("缩小后的大小", self.current_font_size)
+
     def open_search_dialog(self):
         dialog = SearchDialog(self.editor)
         dialog.exec_()
@@ -444,6 +545,7 @@ class CodeEditorWithLineNumbers(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     editor = CodeEditorWithLineNumbers()
+    print(530, ">>" * 60)
     editor.setPlainText(
         "drift      0.08513  0.02   0 \n"
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
@@ -451,16 +553,18 @@ if __name__ == "__main__":
         "drift      0.08513  0.02   0 \n"
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
         "field      0.21	   0.02     0   1   162.5e6   -31   1.68    -1.68   hwR010 \n"
-        "drift      0.08513  0.02   0 \n"
+        "drift      0.08513  0.02   0 \n"                                                                                                                                                                                      
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
         "field      0.21	   0.02     0   1   162.5e6   -31   1.68    -1.68   hwR010 \n"
         "drift      0.08513  0.02   0 \n"
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
         "field      0.21	   0.02     0   1   162.5e6   -31   1.68    -1.68   hwR010 \n"
         "drift      0.08513  0.02   0 \n"
+        "section { \n"
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
         "field      0.21	   0.02     0   1   162.5e6   -31   1.68    -1.68   hwR010 \n"
         "drift      0.08513  0.02   0 \n"
+        "}"
         "field      0.35	   0.02     0   3   0   0   1    0.620137  sol_yuan \n"
         "field      0.21	   0.02     0   1   162.5e6   -31   1.68    -1.68   hwR010 \n"
     )

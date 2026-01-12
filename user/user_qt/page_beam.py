@@ -276,13 +276,50 @@ class PageBeam(QWidget):
         emittance_group_box.setLayout(emittance_layout)
 
 ###############################
+
+
+        # vertical_layout1.addWidget(particle_input_file_group_box)
+        # vertical_layout1.addLayout(hbox_charge)
+        # vertical_layout1.addLayout(hbox_mass)
+        # vertical_layout1.addLayout(hbox_current)
+        # vertical_layout1.addLayout(hbox_particel_number)
+        # vertical_layout1.addLayout(hbox_frequency)
+        # vertical_layout1.addLayout(hbox_energy)
+
+        grid_beam = QGridLayout()
+        grid_beam.setContentsMargins(0, 0, 0, 0)
+        grid_beam.setHorizontalSpacing(12)
+        grid_beam.setVerticalSpacing(8)
+
+        def add_row(r, title, edit, unit=""):
+            lab = QLabel(title)
+            lab.setAlignment(Qt.AlignRight | Qt.AlignVCenter)  # 右对齐更整齐
+            # 不要 setFixedHeight(12) 这种，会导致高 DPI 被裁切
+            grid_beam.addWidget(lab, r, 0)
+            grid_beam.addWidget(edit, r, 1)
+            if unit:
+                u = QLabel(unit)
+                u.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                grid_beam.addWidget(u, r, 2)
+            else:
+                # 占位，保证三列结构稳定（可选）
+                grid_beam.addWidget(QLabel(""), r, 2)
+
+        # 三列的列宽策略：编辑框列可伸缩，单位列最小
+        grid_beam.setColumnStretch(0, 0)  # label 列不拉伸
+        grid_beam.setColumnStretch(1, 1)  # edit 列拉伸（关键）
+        grid_beam.setColumnStretch(2, 0)  # unit 列不拉伸
+
+        add_row(0, "Charge", self.text_charge, "e")
+        add_row(1, "Mass", self.text_mass, "MeV")
+        add_row(2, "Current", self.text_current, "mA")
+        add_row(3, "Num of particle", self.text_particel_number, "")
+        add_row(4, "Frequency", self.text_frequency, "Hz")
+        add_row(5, "Energy", self.text_energy, "")
+
         vertical_layout1.addWidget(particle_input_file_group_box)
-        vertical_layout1.addLayout(hbox_charge)
-        vertical_layout1.addLayout(hbox_mass)
-        vertical_layout1.addLayout(hbox_current)
-        vertical_layout1.addLayout(hbox_particel_number)
-        vertical_layout1.addLayout(hbox_frequency)
-        vertical_layout1.addLayout(hbox_energy)
+        vertical_layout1.addLayout(grid_beam)
+
 
         vertical_layout1.addWidget(line_frame1)
         vertical_layout1.addWidget(outer_group_box)
@@ -870,7 +907,7 @@ class PageBeam(QWidget):
         #         line_edit.setStyleSheet("background-color: rgb(240, 240, 240);")
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageBeam(r'D:\using\test_avas_qt\test_beam')
+    main_window = PageBeam(r'F:\using\test_avas_qt\cafe_avas')
     main_window.fill_parameter()
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")

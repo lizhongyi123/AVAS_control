@@ -782,7 +782,7 @@ class PageInput(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    main_window = PageInput(r'E:\using\test_avas_qt\cafe_avas2')
+    main_window = PageInput(r'F:\using\test_avas_qt\cafe_avas')
     main_window.setGeometry(800, 500, 600, 650)
     main_window.setStyleSheet("background-color: rgb(253, 253, 253);")
     main_window.fill_parameter()

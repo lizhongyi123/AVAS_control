@@ -8,7 +8,7 @@ import platform
 from utils.readfile import read_txt
 from utils.tool import write_to_txt
 from aftertreat.dataanalysis.new_dataset import trans_dataset2new
-
+import os
 
 class MultiParticle():
     """
@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
 
 
-    item = {'project_path': r"F:\using\test_avas_qt\cafe_AVAS",
+    item = {'project_path': r"C:\Users\wangh\Desktop\danengsan_p10_2\avas_p10_sol",
             "device":"cpu"
             }
 

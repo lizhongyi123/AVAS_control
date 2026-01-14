@@ -319,13 +319,21 @@ if __name__ == "__main__":
     # path0 = r"C:\Users\wangh\Desktop\likai_duibi2\04_TraceWin_Par_error\result\-2.dst"
     # print(read_dst_fast(path0)["y_mean"])
 
-    path0 = r"C:\Users\wangh\Desktop\trans_0105\rfq_before\result\part_rfq_v1.dst"
+    path0 = r"C:\Users\wangh\Desktop\danengsan_p10_2\p10.dst"
     res= read_dst_fast(path0)
     print(res)
 
-    new_res = res
-    new_res["ib"] = 0.91
-    new_path = r"C:\Users\wangh\Desktop\trans_0105\rfq_before\result\part_rfq_v2.dst"
+    par_dist = res['partran_dist']
+    v1 = []
+
+    for i in par_dist:
+        vt2 = i
+        vt2[4] = 0
+        v1.append(vt2)
+    new_res =res
+    new_res["partran_dist"] = v1
+
+    new_path = r"C:\Users\wangh\Desktop\danengsan_p10_2\p10_2.dst"
     write_to_dst(new_path, new_res)
 
 

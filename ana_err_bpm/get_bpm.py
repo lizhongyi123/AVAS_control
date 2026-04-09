@@ -1,3 +1,5 @@
+#根据dataset提取x，y, phase
+
 # import sys
 # avas_path = r'/public/home/lzy_gpu/li1221/AVAS_control'
 # sys.path.append(avas_path)

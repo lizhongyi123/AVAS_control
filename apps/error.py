@@ -1044,8 +1044,8 @@ class ErrorDyn(Error):
 
 
 
-        for i in range(2, self.all_group + 1):
-            for j in range(3, self.all_time + 1):
+        for i in range(1, self.all_group + 1):
+            for j in range(1, self.all_time + 1):
                 print(i, j)
                 lattice_mulp_list = self.generate_lattice_mulp_list(i)
                 self.run_one_time(i, j, lattice_mulp_list)
@@ -1611,7 +1611,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"F:\using\test_avas_qt\cafe_avas_err"
+    path = r"C:\Users\wangh\Desktop\test_orbit\u235-avas"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 

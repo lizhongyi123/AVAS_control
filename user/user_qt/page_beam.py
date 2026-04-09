@@ -453,7 +453,7 @@ class PageBeam(QWidget):
         vertical_layout2.addLayout(hbox_distribution)
         vertical_layout2.addWidget(group_use_dst)
         vertical_layout2.addWidget(group_cw)
-        vertical_layout2.addWidget(self.button_phase_ellipse)
+        # vertical_layout2.addWidget(self.button_phase_ellipse)
 
         # vertical_layout2.addLayout(hbox_displacePos)
         # vertical_layout2.addLayout(hbox_displaceDpos)

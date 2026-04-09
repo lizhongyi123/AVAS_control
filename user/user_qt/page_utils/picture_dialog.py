@@ -182,7 +182,7 @@ class Picturewidgetrightkey(QWidget):
         pass
 
 
-#用来处理只有一张图片，但是需要邮件
+#用来处理只有一张图片，但是需要右键
 class OnePicyureRightkeys(QDialog):
     def __init__(self, project_path, func):
         super().__init__()
@@ -221,9 +221,7 @@ class OnePicyureRightkeys(QDialog):
         print("保存文件！")
 
 
-
-
-
+#多粒子中的包络
 class MulpEnvelopeDialog(OnePicyureRightkeys):
     def __init__(self, project_path, func):
         super().__init__(project_path, func)
@@ -463,6 +461,9 @@ class CavityVoltageDialog(QDialog):
 
     def save_file(self):
         pass
+
+
+
 if __name__ == "__main__":
     obj = PictureDialog1()
     obj.initUI()

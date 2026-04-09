@@ -272,6 +272,7 @@ def trans_xp_xx1(item):
 def cal_twiss(item):
     x = item["x"]
     x1 = item["x1"]
+    # print(275, x, x1)
     coefficient = item["coefficient"]
     gamma = item["gamma"]
     beta = item["beta"]
@@ -283,10 +284,10 @@ def cal_twiss(item):
     sigma_x1 = np.average([(i - average_x1) ** 2 for i in x1])
 
     sigma_xx1 = np.average([(x[i] - average_x) * (x1[i] - average_x1) for i in range(len(x))])
-    print("sigma_x =", sigma_x)
-    print("sigma_x1 =", sigma_x1)
-    print("sigma_xx1 =", sigma_xx1)
-    print("expr =", sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)
+    # print("sigma_x =", sigma_x)
+    # print("sigma_x1 =", sigma_x1)
+    # print("sigma_xx1 =", sigma_xx1)
+    # print("expr =", sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)
 
     epsilon_x = math.sqrt(sigma_x * sigma_x1 - sigma_xx1 * sigma_xx1)
 
@@ -294,7 +295,10 @@ def cal_twiss(item):
     alpha_x = -sigma_xx1 / epsilon_x
     gamma_x = (1 + alpha_x ** 2) / beta_x
 
-    norm_epsilon_x = beta * gamma ** (coefficient) * epsilon_x
+    if coefficient != 0:
+        norm_epsilon_x = beta * gamma ** (coefficient) * epsilon_x
+    else:
+        norm_epsilon_x = epsilon_x
 
     return alpha_x, beta_x, gamma_x, epsilon_x, norm_epsilon_x
 

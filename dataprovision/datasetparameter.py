@@ -65,6 +65,7 @@ class DatasetParameter():
         sign2 = 0
         #一旦进入二级铁，sign1就永远=1，
 
+        no_valid_data_index = [] #无效数据
         for i in range(len(dataset_info)):
             if (dataset_info[i][35] == 0):
                 sign2 = 0
@@ -84,6 +85,7 @@ class DatasetParameter():
                 sign2 = 1
 
             else:
+                no_valid_data_index.append(i)
                 #条件为2， sign2 = 1
                 #也就是说，如果这一次的标志为2，但是前一次的标志也为2，那么进入这次循环
                 continue
@@ -98,6 +100,8 @@ class DatasetParameter():
         #     elif dataset_info[i][35] == 2:
         #         pass
 
+        invalid_set = set(no_valid_data_index)
+        dataset_info = [row for idx, row in enumerate(dataset_info) if idx not in invalid_set]
 
         self.x = [i[1] + i[29] for i in dataset_info]  # m
         self.px = [i[2] for i in dataset_info]  # MeV
@@ -217,12 +221,15 @@ if __name__ == "__main__":
     # obj.get_parameter()
     # print(obj.z)
     #
-    path1 = r"C:\Users\wangh\Desktop\hiaf_v2\AVAS_HIAF_dxy\OutputFile\output_0\DataSet.txt"
+    path1 = r"C:\Users\wangh\Desktop\test_maxin\proton\OutputFile\DataSet.txt"
     project_path =None
     obj = DatasetParameter(path1, project_path)
     v = obj.get_parameter()
+    # print(len(obj.z)
+    print(len(obj.rms_y))
 
-    print(obj.z[-10: ])
+
+
     #
     # import numpy as np
     # import time

@@ -32,6 +32,8 @@ def make_tracewin_like_jet(low_frac=0.1, N=256):
     # 需要替换的低端长度（索引数）
     k = max(2, int(low_frac * N))  # 至少 2，避免除零
 
+
+
     # 找到 low_frac 对应的 jet 颜色
     target_rgba = plt.cm.jet(low_frac)  # 这是个 tuple 或 array
     target_rgb = np.asarray(target_rgba[:3], dtype=np.float64)
@@ -41,15 +43,22 @@ def make_tracewin_like_jet(low_frac=0.1, N=256):
 
     # 构造从 white -> target_rgb 的渐变
     new_low = np.zeros((k, 4), dtype=np.float64)
+
     for i in range(k):
         t = i / (k - 1)  # 0 ~ 1
-        rgb = (1.0 - t) * white + t * target_rgb
+
+        tw = (1-t) * 7/10
+        tt = 1- tw
+        rgb = tw * white  + tt * target_rgb
         new_low[i, :3] = rgb
         new_low[i, 3] = 1.0  # alpha 固定为 1
 
     # 拷贝 jet 颜色，并用 new_low 覆盖前 k 个
     new_colors = jet.copy()
+    new_low[0, :] = [1.0, 1.0, 1.0, 1.0]
     new_colors[:k, :] = new_low
+
+    # new_colors[0, :] = [1.0, 1.0, 1.0, 1.0]
 
     # 构造新的 colormap
     return LinearSegmentedColormap.from_list("tracewin_like_jet", new_colors)

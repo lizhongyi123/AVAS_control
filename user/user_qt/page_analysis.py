@@ -1,30 +1,15 @@
 ﻿import sys
-import time
 from matplotlib.figure import Figure
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QToolBar, QVBoxLayout, QWidget, QPushButton, \
-    QStackedWidget, QMenu, QLabel, QLineEdit, QTextEdit,  QGridLayout, QHBoxLayout,  QFrame, QFileDialog, QGroupBox, \
-    QComboBox, QSizePolicy, QDialog, QCheckBox, QButtonGroup, QMessageBox
+from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QPushButton, \
+    QLabel, QLineEdit, QHBoxLayout, QFileDialog, QGroupBox, \
+    QCheckBox, QButtonGroup
 
 import os
-from utils.readfile import read_txt, read_dst
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt
 from apis.basic_api.api import plot_cavity_syn_phase, plot_dataset,  plot_cavity_voltage,\
-     plot_phase, plot_phase_advance
-from user.user_qt.user_defined import treat_err
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-
-import matplotlib.pyplot as plt
-import numpy as np
-from PyQt5.QtCore import pyqtSignal  # 注意这里使用 PyQt5
-from apis.basic_api.api import plot_env_beam_out
+     plot_dst, plot_phase_advance
 
 from aftertreat.dataanalysis.plttodstfile import Plttozcode
-from aftertreat.picture.plotphase import PlotPhase
-from aftertreat.picture.plotpicture import PlotCavityVoltage, PlotPhaseAdvance, PlotCavitySynPhase
-from aftertreat.picture.plotdataset import PlotDataSet
-from functools import partial
 from user.user_qt.page_utils.picture_dialog import (PictureDialog1, MulpEnvelopeDialog,
                                                     MulpEmittanceDialog, CavityVoltageDialog, BeamPahseAdvance)
 
@@ -347,8 +332,8 @@ class PageAnalysis(QWidget):
 
 
         # gb1_layout.addWidget(plt_to_dst_group_box)
-        gb1_layout.addWidget(phase_group_box)
-        gb1_layout.addWidget(group_box_in_out)
+        # gb1_layout.addWidget(phase_group_box)
+        # gb1_layout.addWidget(group_box_in_out)
         gb1_layout.addStretch(1)
 
         group_box_1.setLayout(gb1_layout)
@@ -380,7 +365,7 @@ class PageAnalysis(QWidget):
     def button_input_plot(self):
         dst_path = os.path.join(self.project_path, "OutputFile", "inData.dst")
 
-        func = plot_phase
+        func = plot_dst
         self.phase_dialog = PhaseDialog(self.project_path, func, dst_path)
         self.phase_dialog.initUI()
         self.phase_dialog.plot_image()

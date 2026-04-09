@@ -498,10 +498,10 @@ class CodeEditorWithLineNumbers(QWidget):
         dialog.exec_()  # 以模态方式运行
 
     def increase_font_size(self):
-        self.editor.zoom_editor(3)
+        self.editor.zoom_editor(1)
 
     def decrease_font_size(self):
-        self.editor.zoom_editor(-3)
+        self.editor.zoom_editor(-1)
 
     # def increase_font_size(self):
     #     """ 增加字体大小 """

@@ -84,17 +84,23 @@ def write_to_dst(path, particle_info):
 
 if __name__ == "__main__":
     #读取原来的分布
-    ori_dst = r"C:\Users\wangh\Desktop\2brfq\2brfq\inputFile\part_input.dst"
+    import copy
+    ori_dst = r"C:\Users\wangh\Desktop\test_energy\danengsan_p10_3\avas_p10_sol_2\InputFile\p10_2.dst"
     ori_fenbu = read_dst_fast(ori_dst)
     print(ori_fenbu)
 
-    new_fenbu = ori_fenbu
+    new_fenbu = copy.copy(ori_fenbu)
+
+    pdst = new_fenbu["partran_dist"]
+
+    for i in pdst:
+        i[1] = 0.000001
+        i[3] = 0.000001
 
 ######################
     #修改参数
-    new_fenbu["ib"] = 20
-    new_fenbu["freq"] = 750 #换算单位 Mhz到hz
+
 
     #生成新的分布
-    new_dst = r"C:\Users\wangh\Desktop\2brfq\2brfq\inputFile\part_input2.dst"
+    new_dst = r"C:\Users\wangh\Desktop\test_energy\danengsan_p10_3\avas_p10_sol_2\InputFile\p10_4.dst"
     write_to_dst(new_dst, new_fenbu)

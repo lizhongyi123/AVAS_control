@@ -7,6 +7,10 @@ from utils.exception import CustomFileNotFoundError
 import re
 import global_varible
 import time
+
+import logging
+logger = logging.getLogger(__name__)
+
 def write_to_txt():
     pass
 def read_txt(input, out='dict', readdall=None, case_sensitive=None):
@@ -191,7 +195,6 @@ def read_dst_fast(input):
     t1 = time.time()
     # print("读文件时间", t1 - t0)
     res['kneticenergy'] = float(partran_dist[:, 5].mean())
-    res["y_mean"] = float(partran_dist[:, 2].mean()) *10
     t2 = time.time()
 
     # print("计算能量时间", t2 - t1)
@@ -296,62 +299,33 @@ def read_file_with_np(path, dtype=np.float64):
 
 #
 if __name__ == "__main__":
-    # path = r"D:\using\test_avas_qt\cafe_avas\OutputFile\DataSet.txt"
-    # res = read_file_with_np(path)
-    # print(res)
 
-    # print(read_txt(r'C:\Users\anxin\Desktop\cafe_avas\InputFile\lattice.txt', out='list'))
-    # print(read_txt(r"C:\Users\anxin\Desktop\comparison\avas_test\inputFile\lattice_mulp.txt", "list"))
-    # path = r"C:\Users\anxin\Desktop\test_acct\InputFile\part_rfq.dst"
-    # res = read_dst(path)
-    # print(res['phase'][0])
-    # read_runsignal(0)
-    # path = r"C:\Users\shliu\Desktop\test_lattice\lattice_mulp.txt"
-    # # res = read_lattice_mulp(path)
-    # # for i in res:
-    # #     print(i)
-    # res = read_lattice_mulp_with_name(path)
-    # print(res)
 
-    # path0 = r"C:\Users\wangh\Desktop\likai_duibi2\04_TraceWin_Par_error\result\0.dst"
-    # print(read_dst_fast(path0)["y_mean"])
+    # path0 = r"C:\Users\wangh\Desktop\danengsan_p10_2\p10_2.dst"
+    # res= read_dst_fast(path0)
+    # print(res)
     #
-    # path0 = r"C:\Users\wangh\Desktop\likai_duibi2\04_TraceWin_Par_error\result\-2.dst"
-    # print(read_dst_fast(path0)["y_mean"])
+    # par_dist = res['partran_dist']
+    #
+    # v1 = new_arr = np.concatenate([par_dist] * 1000, axis=0)
+    # new_res =res
+    # new_res["partran_dist"] = v1
+    # new_res["number"] = 1000
+    # new_path = r"C:\Users\wangh\Desktop\danengsan_p10_2\p1000_2.dst"
+    # write_to_dst(new_path, new_res)
 
-    path0 = r"C:\Users\wangh\Desktop\danengsan_p10_2\p10.dst"
-    res= read_dst_fast(path0)
+
+
+    # path = r"C:\Users\wangh\Desktop\324\v1\OutputFile\inData.dst"
+    # res = read_dst_fast(path)
+    # print(res)
+
+    path = r"C:\Users\wangh\Desktop\phase_plot\ge_dst\result\part_rfq.dst"
+    res = read_dst_fast(path)
     print(res)
 
-    par_dist = res['partran_dist']
-    v1 = []
-
-    for i in par_dist:
-        vt2 = i
-        vt2[4] = 0
-        v1.append(vt2)
-    new_res =res
-    new_res["partran_dist"] = v1
-
-    new_path = r"C:\Users\wangh\Desktop\danengsan_p10_2\p10_2.dst"
-    write_to_dst(new_path, new_res)
 
 
 
 
 
-
-
-
-
-
-
-    # partran_dist = res['partran_dist']
-    #
-    # x = [i[0] for i in partran_dist]
-    # y = [i[1] for i in partran_dist]
-    #
-    # import matplotlib.pyplot as plt
-    #
-    # plt.plot(x,y)
-    # plt.show()

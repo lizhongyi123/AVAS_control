@@ -30,7 +30,8 @@ class PlotPhase:
         res = read_dst_fast(self.dst_path)
 
         partran_dist = np.array(res['partran_dist'])
-
+        # for i in partran_dist:
+        #     print(i)
         # 限制最大点数以提高效率
         # if len(partran_dist) >= self.maxpar_num:
         #     indices = np.random.choice(len(partran_dist),  self.maxpar_num, replace=False)
@@ -41,7 +42,6 @@ class PlotPhase:
         y = partran_dist[:, 2] * 10
         y1 = partran_dist[:, 3] * 1000
         phi = partran_dist[:, 4] * 180 / global_varible.Pi
-        print(phi)
         E = partran_dist[:, 5]
         E -= np.mean(E)
 
@@ -167,7 +167,7 @@ def make_tracewin_like_jet(low_frac=0.1, N=256):
 if __name__ == "__main__":
     import time
     t0 = time.time()
-    dst_path = r"C:\Users\wangh\Desktop\trans_0105\av_rfq_before\OutputFile\nd.dst"
+    dst_path = r"C:\Users\wangh\Desktop\phase_plot\outData_198.295500.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
     plot_phase = PlotPhase(dst_path)
 

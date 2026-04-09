@@ -3,6 +3,8 @@
 import math
 from dataprovision.beamparameter import DstParameter
 from utils.tool import cal_twiss
+import time
+import copy
 class PercentEmit():
     """
     本类为计算发射度及百分比发射度
@@ -13,7 +15,7 @@ class PercentEmit():
 
 
     """
-    def __init__(self, dst_path):
+    def __init__(self, ):
         self.x_list = []
         self.x1_list = []
         self.y_list = []
@@ -23,7 +25,6 @@ class PercentEmit():
         self.phi_list = []
         self.E_list = []
         self.z_speed_list = []
-        self.dst_path = dst_path
         self.number = 0
         self.Ib = 0
         self.freq = 0
@@ -34,75 +35,8 @@ class PercentEmit():
         self.beta = 0
         self.energy = 0
 
-    def get_data(self):
-
-        dst_obj = DstParameter(self.dst_path)
-        dst_obj.get_parameter()
-
-        self.number = dst_obj.number
-        self.freq = dst_obj.freq
-        self.BaseMassInMeV = dst_obj.BaseMassInMeV
-
-        self.x_list = dst_obj.x_list
-        self.x1_list = dst_obj.x1_list
-        self.y_list = dst_obj.y_list
-        self.y1_list = dst_obj.y1_list
-
-        self.phi_list = [i / math.pi * 180 for i in dst_obj.phi_list]
-        self.E_list = dst_obj.E_list
-
-        self.z_list = dst_obj.z_list
-        self.z1_list = dst_obj.z1_list
-        self.z_speed_list = dst_obj.z_speed_list
-
-        self.energy = dst_obj.energy
-        self.gamma = dst_obj.gamma
-        self.beta = dst_obj.beta
-        # plt.scatter(self.z_list, self.z1_list,s=30)
-        # plt.show()
-        # sys.exit()
-        #
-        # data = read_dst(self.dst_path)
-        # self.number = data.get('number')
-        # self.freq = data.get('freq')
-        # self.BaseMassInMeV = data.get('BaseMassInMeV')
-        #
-        # data = data.get('phase')
-        # self.x_list = [i[0] * 10 for i in data]
-        # self.x1_list = [i[1] * 1000 for i in data]
-        # self.y_list = [i[2] * 10 for i in data]
-        # self.y1_list = [i[3] * 1000 for i in data]
-        #
-        # self.phi_list = [i[4] for i in data]
-        # self.E_list = [i[5] for i in data]
-        #
-        # for i in data:
-        #     tmp_gamma = 1 + i[5] / self.BaseMassInMeV
-        #     tmp_beta = math.sqrt(1 - 1.0 / tmp_gamma / tmp_gamma)
-        #     tmp_speed = tmp_beta * self.__C_light  # 总速度
-        #     speedz = math.sqrt(pow(tmp_speed, 2) / (pow(i[1], 2) + pow(i[3], 2) + 1))
-        #     tmp_t0 = i[4] / (2 * math.pi * self.freq)
-        #
-        #     self.z_list.append(-1 * tmp_t0 * speedz * 1000)  # mm
-        #
-        #     ##############################
-        #     # 使用z方向的速度
-        #     # self.z_speed_list.append(speedz)
-        #     # 总速度
-        #     self.z_speed_list.append(tmp_speed)
-        #     #############################################
-        #
-        # average_z_speend = np.mean(self.z_speed_list)
-        #
-        # self.z1_list = [(i - average_z_speend) / i * 1000 for i in self.z_speed_list]
-        #
-        # self.energy = np.mean(self.E_list)
-        # self.gamma = 1 + self.energy / self.BaseMassInMeV
-        # self.beta = math.sqrt(1 - 1.0 / self.gamma / self.gamma)
-
-
     # 计算任意一个twiss参数和发射度
-    def cal_twiss_emitt(self, x, x1, coefficient=1):
+    def                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         cal_twiss_emitt(self, x, x1, coefficient=1):
         item = {
             "x": x,
             "x1": x1,
@@ -110,6 +44,7 @@ class PercentEmit():
             "gamma": self.gamma,
             "beta": self.beta,
         }
+
         res =cal_twiss(item)
         return res
 
@@ -120,14 +55,22 @@ class PercentEmit():
 
     # 得到任意一个平面的百分比发射度
     def get_any_emit(self, x, y, ratio, coefficient):
+        t0 = time.time()
         #########################################################
-        alpha_x, beta_x, gamma_x, epson_x, norm_epson_x = self.cal_twiss_emitt(x, y, coefficient)
+        alpha_100, beta_100, gamma_100, epsilon_100, norm_epsilon_100 = self.cal_twiss_emitt(x, y, coefficient)
+
+        t1 = time.time()
+        #print(t1-t0, "计算twiss时间")
 
         size_list = []
         for i in range(len(self.x_list)):
-            size = self.get_size(x[i], y[i], alpha_x, beta_x, gamma_x)
+            size = self.get_size(x[i], y[i], alpha_100, beta_100, gamma_100)
             size_list.append(size)
         index = int(ratio * self.number)
+
+
+        t2 = time.time()
+        #print(t2-t1, "get_size时间")
 
         if index >= len(size_list):
             index = len(size_list) - 1
@@ -138,19 +81,33 @@ class PercentEmit():
 
         any_x_list = [x[i] for i in indices]
         any_y_list = [y[i] for i in indices]
-        # print(len(any_x_list))
+        # #print(len(any_x_list))
         # 根据百分比的例子计算rms的twiss参数
-        alpha, beta, gamma, epsilon, norm_epsilon = list(self.cal_twiss_emitt(any_x_list, any_y_list, coefficient))
+        alpha_percent, beta_percent, gamma_percent, epsilon_percent, norm_epsilon_percent = list(self.cal_twiss_emitt(any_x_list, any_y_list, coefficient))
+
+
+        t3 = time.time()
+        #print(t3-t2, "百分比计算twiss参数时间")
         ###########################################################
-        # 根据全twiss参数，计算的全发射度
-        all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, alpha_x, beta_x, gamma_x)
+
+        # 根据100%twiss参数，计算的全发射度
+        all_epsilon_100 = self.get_all_epsilon(any_x_list, any_y_list, alpha_100, beta_100, gamma_100)
+
+        t4 = time.time()
+        #print(t4-t3, "获取全发射度参数时间")
 
         ###########################################################
         # 根据百分比twiss参数，计算全发射度
-        percent_all_epsilon = self.get_all_epsilon(any_x_list, any_y_list, alpha, beta, gamma)
+        all_epsilon_percent = self.get_all_epsilon(any_x_list, any_y_list, alpha_percent, beta_percent, gamma_percent)
+        t5 = time.time()
+        #print(t5-t4, "百分比计算twiss参数计算发射度时间")
 
         ###########################################################
-        res = [alpha, beta, gamma, epsilon, norm_epsilon, all_epsilon, percent_all_epsilon]
+        res = [alpha_percent, beta_percent, gamma_percent,
+               norm_epsilon_percent, norm_epsilon_100,
+               all_epsilon_percent,  all_epsilon_100,
+               epsilon_percent, epsilon_100]
+
 
         return res
 
@@ -164,87 +121,116 @@ class PercentEmit():
         return max(all_size)
 
     # 得到几个平面的百分比发射度
-    def get_percent_emit(self, ratio):
-        self.get_data()
+    def get_percent_emit(self, item):
+        # item = {
+        #     "ratio": ,
+        #     "picture_type": ,
+        #     "dst_path": ,
+        #     "dst_dict": ,
+        #
+        # }
+        t0 = time.time()
+
+
+        ratio = item.get("ratio")
+        picture_type = item.get("picture_type")
+        dst_path = item.get("dst_path")
+        dst_dict = item.get("dst_dict")
+
+        this_dst_dict = {}
+        if dst_path and not dst_dict:
+            dst_obj = DstParameter(dst_path)
+            this_dst_dict = dst_obj.get_parameter()
+        if dst_dict:
+            this_dst_dict = dst_dict
+        t1 = time.time()
+        # #print(t1 - t0, "读取文件的时间")
+
+        self.energy = this_dst_dict["energy"]
+        self.gamma = this_dst_dict["gamma"]
+        self.beta = this_dst_dict["beta"]
+        self.number = this_dst_dict["number"]
+
+
+        coefficient = 0
+        if "z1" in picture_type:
+            coefficient = 3
+        elif "x1" in picture_type or "y1" in picture_type \
+                or "dp/p" in picture_type:
+            coefficient = 1
+
+        #判断是否需要norm
+
+        #判断coefficient
+
+
         #这里的alpha，beta是根据百分比粒子求的
         #epsi_xx1：rms发射度(归一化)  all_epsi_xx1：全twiss参数全发射度  percent_all_epsi_xx1：根据百分比twiss参数 全发射度
-        alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1, all_epsi_xx1, percent_all_epsi_xx1 = self.get_any_emit(self.x_list,
-                                                                                                            self.x1_list,
-                                                                                                            ratio, 1)
-        all_epsi_xx1 = all_epsi_xx1 * self.beta * self.gamma
 
-        percent_all_epsi_xx1 = percent_all_epsi_xx1 * self.beta * self.gamma
+        # #print(this_dst_dict)
+        self.x_list = this_dst_dict[picture_type[0]]
+        self.y_list = this_dst_dict[picture_type[1]]
 
-        xx1_list = [alpha_xx1, beta_xx1, epsi_xx1, all_epsi_xx1, percent_all_epsi_xx1]
-        # print('xx1', alpha_xx1, beta_xx1,  epsi_xx1)
+        if len(set(self.x_list)) == 1 or len(set(self.y_list)) == 1:
+            return [0] * 11
 
-        alpha_yy1, beta_yy1, gamma_yy1, _, epsi_yy1, all_epsi_yy1, percent_all_epsi_yy1 = self.get_any_emit(self.y_list,
-                                                                                                            self.y1_list,
-                                                                                                            ratio, 1)
-        all_epsi_yy1 = all_epsi_yy1 * self.beta * self.gamma
-        percent_all_epsi_yy1 = percent_all_epsi_yy1 * self.beta * self.gamma
 
-        yy1_list = [alpha_yy1, beta_yy1, epsi_yy1, all_epsi_yy1, percent_all_epsi_yy1]
-        # print('yy1', alpha_yy1, beta_yy1,  epsi_yy1)
+        (alpha_percent, beta_percent, gamma_percent,
+               norm_epsilon_percent, norm_epsilon_100,   #归一化发射度
+               no_norm_all_epsilon_percent,  no_norm_all_epsilon_100,    #非归一化全发射度
+               no_norm_epsilon_percent, no_norm_epsilon_100)= self.get_any_emit(self.x_list,  self.y_list, ratio, coefficient)   #非归一化发射度
 
-        alpha_zz1, beta_zz1, gamma_zz1, _, epsi_zz1, all_epsi_zz1, percent_all_epsi_zz1 = self.get_any_emit(self.z_list,
-                                                                                                            self.z1_list,
-                                                                                                            ratio, 3)
-        all_epsi_zz1 = all_epsi_zz1 * self.beta * self.gamma
-        percent_all_epsi_zz1 = percent_all_epsi_zz1 * self.beta * self.gamma
+        t2 = time.time()
+        # #print(t2-t1, "计算twiss参数的时间")
 
-        zz1_list = [alpha_zz1, beta_zz1, epsi_zz1, all_epsi_zz1, percent_all_epsi_zz1]
-        # print('zz1',alpha_zz1, beta_zz1,  epsi_zz1)
+        #返回的都是rms发射度，唯一的区别是归一化还是不归一化
 
-        alpha_xy, beta_xy, gamma_xy, epsi_xy, _, all_epsi_xy, percent_all_epsi_xy = self.get_any_emit(self.x_list,
-                                                                                                      self.y_list,
-                                                                                                      ratio, 1)
-        xy_list = [alpha_xy, beta_xy, epsi_xy, all_epsi_xy, percent_all_epsi_xy]
-        # print('xy', alpha_xy, beta_xy,  epsi_xy)
-        
-        alpha_phie, beta_phie, gamma_phie, epsi_phie, _, all_epsi_phie, percent_all_epsi_phie = self.get_any_emit(self.phi_list,
-                                                                                                      self.E_list,
-                                                                                                      ratio, 1)
-        phie_list = [alpha_phie, beta_phie, epsi_phie, all_epsi_phie, percent_all_epsi_phie]
+        norm_all_epsilon_percent = no_norm_all_epsilon_percent
+        norm_all_epsilon_100 = no_norm_all_epsilon_100
+        if coefficient != 0:
+            norm_all_epsilon_percent = self.beta * self.gamma ** coefficient * no_norm_all_epsilon_100
+            norm_all_epsilon_100 = self.beta * self.gamma ** coefficient * no_norm_all_epsilon_percent
 
-        res = [xx1_list, yy1_list, zz1_list, xy_list, phie_list]
+
+        #最终返回的是rms发射度
+        res = [
+            alpha_percent, beta_percent, gamma_percent,
+            norm_epsilon_percent, norm_epsilon_100,
+            norm_all_epsilon_percent, norm_all_epsilon_100,
+            no_norm_epsilon_percent, no_norm_epsilon_100,
+            no_norm_all_epsilon_percent, no_norm_all_epsilon_100
+        ]
+
+
         return res
 
     # 得到几个平面的100%发射度
-    def get_100_emit(self):
-        self.get_data()
-        alpha_xx1, beta_xx1, gamma_xx1, _, epsi_xx1 = self.cal_twiss_emitt(self.x_list, self.x1_list, 1)
-        # print('xx1', alpha_xx1, beta_xx1,  epsi_xx1)
 
-        alpha_yy1, beta_yy1, gamma_yy1, _, epsi_yy1 = self.cal_twiss_emitt(self.y_list, self.y1_list, 1)
-        # print('yy1',alpha_yy1, beta_yy1,  epsi_yy1)
-
-        alpha_zz1, beta_zz1, gamma_zz1, _, epsi_zz1 = self.cal_twiss_emitt(self.z_list, self.z1_list, 3)
-        # print('zz1',alpha_zz1, beta_zz1,  epsi_zz1)
-
-        alpha_xy, beta_xy, gamma_xy, epsi_xy, _ = self.cal_twiss_emitt(self.x_list, self.y_list, 1)
-        # print('xy', alpha_xy, beta_xy,  epsi_xy)
-
-        xx1_list = [alpha_xx1, beta_xx1, epsi_xx1]
-        yy1_list = [alpha_yy1, beta_yy1, epsi_yy1]
-        zz1_list = [alpha_zz1, beta_zz1, epsi_zz1]
-        xy_list = [alpha_xy, beta_xy, epsi_xy]
-
-        res = [xx1_list, yy1_list, zz1_list, xy_list]
-        return res
 
 
 if __name__ == '__main__':
-    dst_path = r"C:\Users\wangh\Desktop\long_dis2\kongxin_beam\part_rfq.dst"
-    # dst_path = r"C:\Users\shliu\Desktop\xiaochu\OutputFile\inData.dst"
-    # dst_path = r"C:\Users\shliu\Desktop\test42\part_rfq.dst"
+    # ['phi', 'w_minus_mean']
+    dst_path = r"C:\Users\wangh\Desktop\324\v3\OutputFile\inData.dst"
+    # pt = ["y", "y1"]
+    pt = ['phi', 'w_minus_mean']
+    pt = ['x', 'x1']
 
-    # dst_path = r"C:\Users\anxin\Desktop\tace_test\result\part_dtl1.dst"
-    # dst_path = r"D:\重要程序\lizituijinzongjie\75\butongliuqiang\OutputFile\outData_100000.000000.dst"
-    v = PercentEmit(dst_path)
-    # res1 = v.get_100_emit()
-    res1 = v.get_percent_emit(1)
-    # print(res1)
-    # res = v.get_data()
-    for i in res1:
-        print(i)
+    item = {
+        "ratio": 1,
+        "picture_type": pt,
+        "dst_path": dst_path,
+        "dst_dict": None,
+    }
+    obj = PercentEmit()
+    # pt = [["z", "dp_p_100"],  ["z", "w_minus_mean"], ["z1", "1"]]
+
+    res = obj.get_percent_emit(item)
+    print(res)
+
+
+
+    # for i in pt:
+    #     item["picture_type"] = i
+    #     res = obj.get_percent_emit(item)
+    #
+    #     print(res)

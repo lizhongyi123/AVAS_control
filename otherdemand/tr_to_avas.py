@@ -308,15 +308,17 @@ def write_to_avas_lattice(new_avaslattice, avas_lattice_path):
 
 
 if __name__ == "__main__":
-    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\yiman\1GeV.dat"
-    avas_lattice_path = r"C:\Users\wangh\Desktop\yiman\1GeV.txt"
-
+    tracewin_lattiace_path = r"C:\Users\wangh\Desktop\qiaoxin-04-07\2beam\END to end.dat"
+    avas_lattice_path = r"C:\Users\wangh\Desktop\qiaoxin-04-07\2beam\END to end.txt"
 
     # 修改后的lattice
 
     tracewin_lattice = read_tracewin(tracewin_lattiace_path)
+
     # for i in tracewin_lattice:
-    #     print(i)
+    #     if len(i) > 1:
+    #         if i[0].lower() == "drift":
+    #             print(i)
 
     avas_lattice_list = tran_tracewin_avas(tracewin_lattice)
 

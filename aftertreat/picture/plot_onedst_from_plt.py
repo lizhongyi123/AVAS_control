@@ -1,3 +1,5 @@
+
+
 from dataprovision.beamset import BeamsetParameter
 from dataprovision.datasetparameter import DatasetParameter
 import math
@@ -14,9 +16,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from utils.griddensity import grid_density
-from matplotlib.colors import LinearSegmentedColormap
+
 import time
 from global_varible import c_light, Pi
+
 class PLlotdstfromplt():
     def __init__(self, plt_path, distance, dataset_path=None, specified_index= None, ):
         self.plt_path = plt_path
@@ -160,11 +163,14 @@ class PLlotdstfromplt():
         # 计算 2D 直方图
         z = grid_density(x, y, self.gird_bins, norm=True)
         # 画密度图
-        colors = [(1, 1, 1), *plt.cm.jet(np.linspace(0, 1, 256))]  # 第一个颜色为白色，其余为 'jet'
-        custom_cmap = LinearSegmentedColormap.from_list('custom_jet', colors)
+        # colors = [(1, 1, 1), *plt.cm.jet(np.linspace(0, 1, 256))]  # 第一个颜色为白色，其余为 'jet'
+        # custom_cmap = LinearSegmentedColormap.from_list('custom_jet', colors)
+        #
+        # scatter = ax.scatter(x, y, c=z, s=1.0, cmap=custom_cmap, vmin=0, vmax=1.0)
 
-        scatter = ax.scatter(x, y, c=z, s=1.0, cmap=custom_cmap, vmin=0, vmax=1.0)
-        fig.colorbar(scatter, ax=ax)
+        # fig.colorbar(scatter, ax=ax)
+        ax.scatter(x, y)
+
         ax.set_xlabel(xlabel, fontdict=font)
         ax.set_ylabel(ylabel, fontdict=font)
 
@@ -174,15 +180,12 @@ class PLlotdstfromplt():
         ax.grid(linestyle="--")
 
 if __name__ == '__main__':
+    project = r"C:\Users\wangh\Desktop\qiaoxin\Outputfile"
+    plt_path = os.path.join(project, "BeamSet.plt")
+    dataset_path = os.path.join(project, "DataSet.txt")
 
-    plt_path1 =  r"C:\Users\wangh\Desktop\qiaoxin3\test_qiao\OutputFile\最后原件加粗\BeamSet.plt"
-    dataset_path = r"C:\Users\wangh\Desktop\qiaoxin3\test_qiao\OutputFile\最后原件加粗\DataSet.txt"
-
-    # obj = PLlotdstfromplt(plt_path1, 3.26, dataset_path,None)
-
-    # plt_path1 = R"C:\Users\wangh\Desktop\qiaoxin\test_qiao\OutputFile\BeamSet.plt"
     #
-    obj = PLlotdstfromplt(plt_path1, 4.248352, dataset_path, None)
+    obj = PLlotdstfromplt(plt_path, 0.1, dataset_path, None)
 
     obj.run(show_=1)
 

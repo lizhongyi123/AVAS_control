@@ -26,53 +26,8 @@ class BeamsetParameter():
             # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
 
             tdata = struct.unpack("<i", f.read(4))
-            numofp = int(tdata[0])
-            # print("粒子数为：{aa}".format(aa=numofp))
-
-            tdata = struct.unpack("<d", f.read(8))
-            # self.Ib = float(tdata[0])
-            # print("流强为：{aa}mA".format(aa=self.Ib))
-
-            tdata = struct.unpack("<d", f.read(8))
-            # self.freq = float(tdata[0])
-            # print("频率为：{aa}MHz".format(aa=self.freq))
-
-            tdata = struct.unpack("<d", f.read(8))
-            self.BaseMassInMeV = float(tdata[0])
-            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
-
-            #一步的字节数
-        byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 8) * numofp
-        byte_onestep_head = 1 + 1 + 4*2 + 8*3
-
-        file_size = os.path.getsize(self.beamset_path)
-        step = (file_size - byte_onestep_head) / byte_onestep
-        return int(step)
-
-    def get_one_parameter(self, num):
-        step_num = self.get_step()
-        step_list = [i for i in range(step_num)]
-        # print(step_list)
-        if num < 0:
-            num = step_list[num]
-        elif num >= step_num or num < step_num*-1:
-            print(f"There are {step_num - 1} step in this file, it's beyond that",)
-            return 0
-
-        with open(self.beamset_path, 'rb') as f:
-
-            tdata = struct.unpack("<c", f.read(1))
-            char1 = str(tdata[0])
-            tdata = struct.unpack("<c", f.read(1))
-            char2 = str(tdata[0])
-
-            tdata = struct.unpack("<i", f.read(4))
-            self.dumpPeriodicity = int(tdata[0])
-            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
-
-            tdata = struct.unpack("<i", f.read(4))
             self.numofp = int(tdata[0])
-            # print("粒子数为：{aa}".format(aa=self.numofp))
+            # print("粒子数为：{aa}".format(aa=numofp))
 
             tdata = struct.unpack("<d", f.read(8))
             self.Ib = float(tdata[0])
@@ -87,28 +42,55 @@ class BeamsetParameter():
             # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
 
             #一步的字节数
-            byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 8) * self.numofp
-            f.seek(num * byte_onestep, 1)
+        byte_onestep = 1 + 4 + 4 + 8 + 8 + (48 + 8) * self.numofp
+        byte_head = 1 + 1 + 4*2 + 8*3
+
+        file_size = os.path.getsize(self.beamset_path)
+        step = (file_size - byte_head) / byte_onestep
+
+        self.byte_onestep = byte_onestep   #一步的总比特
+        self.step_byte_head = 1 + 4 + 4 + 8 + 8   #一步的开头比特
+        self.step_particle_block_bytes = (48 + 8) * self.numofp  #一步的粒子比特
+
+        self.byte_head = byte_head     #总的开头比特
+
+
+        return int(step)
+
+    def get_one_parameter(self, num):
+        step_num = self.get_step()
+        step_list = [i for i in range(step_num)]
+        # print(step_list)
+        if num < 0:
+            num = step_list[num]
+        elif num >= step_num or num < step_num*-1:
+            print(f"There are {step_num - 1} step in this file, it's beyond that",)
+            return 0
+
+        with open(self.beamset_path, 'rb') as f:
+
+
+            #跳过开头
+            f.seek(self.byte_head, 1)
+
+            #跳过多少步
+            f.seek(num * self.byte_onestep, 1)
 
             self.one_step_dict = {}
             self.one_step_list = []
 
-            tdata = struct.unpack("<c", f.read(1))
+            header_struct = struct.Struct("<c i i d d")
+            buf = f.read(self.step_byte_head)
 
-            tpye = struct.unpack("<i", f.read(4))
-            self.one_step_dict["tpye"] = int(tpye[0])
-            # print("tpye", tpye)
+            _, tpye, index, time, location = header_struct.unpack(buf)
 
-            Index = struct.unpack("<i", f.read(4))
-            self.one_step_dict["index"] = int(Index[0])
-            # print("index", Index)
+            self.one_step_dict = {
+                "type": tpye,
+                "index": index,
+                "time": time,
+                "location": location,
+            }
 
-            time = struct.unpack("<d", f.read(8))
-            self.one_step_dict["time"] = float(time[0])
-            # print(time)
-
-            location = struct.unpack("<d", f.read(8))
-            self.one_step_dict["location"] = float(location[0])
 
             # print("location", location)
             # for i in range(self.numofp):
@@ -121,8 +103,9 @@ class BeamsetParameter():
                 ('x', '<f8'), ('xp', '<f8'), ('y', '<f8'), ('yp', '<f8'), ('z', '<f8'), ('zp', '<f8'),
                 ('id', '<i4'), ('status', '<i4')
             ]))
-            data = [list(row) for row in data]
+
             self.one_step_list = data
+
             # while True:
             #     try:
             #         tdata = struct.unpack("<c", f.read(1))
@@ -168,143 +151,126 @@ class BeamsetParameter():
 
     def get_parameter(self):
         with open(self.beamset_path, 'rb') as f:
+            # 跳过开头
+            f.seek(self.byte_head, 1)
 
-            tdata = struct.unpack("<c", f.read(1))
-            char1 = str(tdata[0])
-            tdata = struct.unpack("<c", f.read(1))
-            char2 = str(tdata[0])
-
-            tdata = struct.unpack("<i", f.read(4))
-            self.dumpPeriodicity = int(tdata[0])
-            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
-
-            tdata = struct.unpack("<i", f.read(4))
-            self.numofp = int(tdata[0])
-            # print("粒子数为：{aa}".format(aa=self.numofp))
-
-            tdata = struct.unpack("<d", f.read(8))
-            self.Ib = float(tdata[0])
-            # print("流强为：{aa}mA".format(aa=self.Ib))
-
-            tdata = struct.unpack("<d", f.read(8))
-            self.freq = float(tdata[0])
-            # print("频率为：{aa}MHz".format(aa=self.freq))
-
-            tdata = struct.unpack("<d", f.read(8))
-            self.BaseMassInMeV = float(tdata[0])
-            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+            # 跳过多少步
 
             self.allstep_list = []
             self.allstep_dict = []
 
-            every_step_dict = {}
-            every_step_list = []
-            phase_zero = 0
-
-            # while True:
             while True:
-
-                every_step_dict = {}
-                every_step_list = []
-
-                try:
-                    tdata = struct.unpack("<c", f.read(1))
-                except struct.error:
+                header_struct = struct.Struct("<c i i d d")
+                buf = f.read(self.step_byte_head)
+                if len(buf) == 0:
                     break
 
-                else:
+                _, tpye, index, time, location = header_struct.unpack(buf)
 
-                    tpye = struct.unpack("<i", f.read(4))
-                    every_step_dict["tpye"] = int(tpye[0])
-                    # print(tpye)
+                every_step_dict = {
+                    "type": tpye,
+                    "index": index,
+                    "time": time,
+                    "location": location,
+                }
 
-                    Index = struct.unpack("<i", f.read(4))
-                    every_step_dict["Index"] = int(Index[0])
-                    print(int(Index[0]))
+                vadata = np.frombuffer(f.read((48 + 8) * self.numofp), dtype=np.dtype([
+                    ('x', '<f8'), ('xp', '<f8'), ('y', '<f8'), ('yp', '<f8'), ('z', '<f8'), ('zp', '<f8'),
+                    ('id', '<i4'), ('status', '<i4')
+                ]))
 
-                    time = struct.unpack("<d", f.read(8))
-                    every_step_dict["time"] = float(time[0])
-                    # print(time)
 
-                    location = struct.unpack("<d", f.read(8))
-                    every_step_dict["location"] = float(location[0])
-                    # print(location)
 
-                    for i in range(self.numofp):
+                self.allstep_dict.append(every_step_dict)
+                self.allstep_list.append(vadata)
 
-                        vdata1 = struct.unpack("<dddddd", f.read(48))
-                        vdata2 = struct.unpack("<i", f.read(4))
-                        vadata = list(vdata1) + list(vdata2)
+        return self.allstep_dict, self.allstep_list
 
-                        every_step_list.append(vadata)
-
-                    self.allstep_dict.append(every_step_dict)
-                    self.allstep_list.append(every_step_list)
 
     def get_all_dict(self, ):
-        step_num = self.get_step()
 
         all_step_dict = []
-        with open(self.beamset_path, 'rb') as f:
+        header_struct = struct.Struct("<c i i d d")
 
-            tdata = struct.unpack("<c", f.read(1))
+        with open(self.beamset_path, "rb") as f:
+            f.seek(self.byte_head, 1)
 
-            tdata = struct.unpack("<c", f.read(1))
+            while True:
+                # 直接从文件开头偏移到 byte_head
+                buf = f.read(self.step_byte_head)
+                if len(buf) < self.step_byte_head:
+                    break
 
+                _, tpye, index, time, location = header_struct.unpack(buf)
 
-            tdata = struct.unpack("<i", f.read(4))
-            # print("输出间隔为{aa}".format(aa=self.dumpPeriodicity))
-            tdata = struct.unpack("<i", f.read(4))
-            numofp = int(tdata[0])
-            # print("粒子数为：{aa}".format(aa=self.numofp))
-            tdata = struct.unpack("<d", f.read(8))
-            # print("流强为：{aa}mA".format(aa=self.Ib))
-            tdata = struct.unpack("<d", f.read(8))
-            # print("频率为：{aa}MHz".format(aa=self.freq))
-            tdata = struct.unpack("<d", f.read(8))
-            # print("粒子静止质量为：{aa}MeV".format(aa=self.BaseMassInMeV))
+                all_step_dict.append({
+                    "tpye": tpye,
+                    "index": index,
+                    "time": time,
+                    "location": location,
+                })
 
+                f.seek(self.step_particle_block_bytes, 1)
 
+            return all_step_dict
 
-            for step_index in range(step_num):
-                one_step_dict = {}
-                tdata = struct.unpack("<c", f.read(1))
-
-                tpye = struct.unpack("<i", f.read(4))
-                one_step_dict["tpye"] = int(tpye[0])
-                # print("tpye", tpye)
-
-                Index = struct.unpack("<i", f.read(4))
-                one_step_dict["index"] = int(Index[0])
-                # print("index", Index)
-
-                time = struct.unpack("<d", f.read(8))
-                one_step_dict["time"] = float(time[0])
-                # print(time)
-
-                location = struct.unpack("<d", f.read(8))
-                one_step_dict["location"] = float(location[0])
-
-                f.seek((48+8) * numofp, 1)
-
-                all_step_dict.append(one_step_dict)
-
-        return all_step_dict
-
-
-
-        return self.one_step_dict, self.one_step_list
 
 if __name__ == "__main__":
     import os
     import numpy as np
-    beamset_pasth = r"C:\Users\shliu\Desktop\test_changdu\OutputFile\BeamSet.plt"
+    beamset_pasth = r"C:\Users\wangh\Desktop\324\v1\OutputFile\BeamSet.plt"
     obj = BeamsetParameter(beamset_pasth)
 
     step = obj.get_step()
     print(step)
-    v1, v2 = obj.get_one_parameter(0)
-    print(v1, v2)
+    dic ,lis = obj.get_one_parameter(0)
+    # print(dic, lis )
+
+    d1, v2 = obj.get_one_parameter(0)
+    # print(d1, l1[0])
+
+    res =obj.get_all_dict()
+    # # print(res)
+    # x = np.array([i[0] for i in v2])
+    # x1 = np.array([i[1]/i[5] for i in v2])
+    #
+    # z = np.asarray([i[4] for i in v2])
+    #
+    # from matplotlib import pyplot as plt
+    # plt.scatter(x,x1)
+    # plt.show()
+
+
+    # res = obj.get_all_dict()
+    # print(res)
+
+    # v1, v2 = obj.get_one_parameter(49)
+    # print(v1)
+    # # print(v1, v2)
+
+
+    # print(x)
+    # print(x1)
+    # from utils.tool import cal_twiss
+    #
+    # item ={
+    #     "x": x,
+    #     "x1": x1,
+    #     "coefficient": 1,
+    #     "gamma": 1.000042631556908,
+    #     "beta": 0.029190516,
+    # }
+    # res = cal_twiss(item)
+    # print(res)
+    #
+    # from matplotlib import pyplot as plt
+    # print(len(x), len(x1))
+    # plt.scatter(x, x1)
+    # plt.show()
+
+    # res = obj.get_parameter()
+    # res = obj.allstep_dict[0]
+    # print(res)
 
     # for i in range(697):
     #     v1, v2 =obj.get_one_parameter(i)

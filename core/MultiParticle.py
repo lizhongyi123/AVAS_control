@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
 
 
-    item = {'project_path': r"C:\Users\wangh\Desktop\danengsan_p10_2\avas_p10_sol",
+    item = {'project_path': r"C:\Users\wangh\Desktop\yaxin\project_3",
             "device":"cpu"
             }
 
@@ -191,10 +191,6 @@ if __name__ == "__main__":
     # print("PATH(has dllfile) =", "dllfile" in os.environ.get("PATH", ""))
     # print("sys.path(head) =", sys.path[:5])
     # print(">" * 30)
-
-
-
-
 
     obj.run()
 

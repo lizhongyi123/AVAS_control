@@ -3,7 +3,8 @@
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
-from past_file.plotphase2 import PlotPhase
+from aftertreat.picture.plotphase import PlotPhase
+from aftertreat.picture.plotphase2 import PlotPhase2
 from aftertreat.dataanalysis.caltwiss import CalTwiss
 from aftertreat.picture.plotenvbeamout import PlotEnvBeamOut
 
@@ -29,6 +30,7 @@ from apps.diaginfo import DiagInfo
 from aftertreat.dataanalysis.extodensity import ExtoDensity
 from utils.inputconfig import InputConfig
 from utils.change_win_to_linux import change_end_crlf
+from aftertreat.picture.plotplt import PlotPlt
 #下列为功能函数
 #基础运行
 
@@ -284,39 +286,191 @@ def plot_dataset(**item):
 
 
 # 画相图
-# def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
-#     v = PlotPhase(dst_path)
-#     res = v.run(show_, fig)
-#     return res
+def plot_phase(dst_path, show_=1, fig = None, platform = "qt"):
+    v = PlotPhase(dst_path)
+    res = v.run(show_, fig)
+    return res
 
-def plot_phase(**item):
-    default_item = {"filePath": None, "pictureType": "xx1", "show_": 0, "fig": None, "platform": "qt",
-                    "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out"}
+# def plot_dst(item):
+#     default_picture_type = [
+#         ["x", "x1"],
+#         ["y", "y1"],
+#         ["phi", "w"],
+#         ["z", "z1"],
+#     ]
+#
+#     default_item = {"filePath": None, "pictureType": default_picture_type, "show_": 0, "fig": None, "platform": "qt",
+#                     "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out",
+#                     "dst_dict": None,
+#                     "twiss_dict": None}
+#
+#     default_item.update(item)
+#     platform = default_item.get("platform")
+#     project_path = default_item.get("projectPath")
+#     fig = default_item.get("fig")
+#     sample_interval = default_item.get("sampleInterval")
+#     location = default_item.get("location")
+#     show_ = default_item.get("show_")
+#     picture_type = default_item.get("pictureType")
+#     dst_dict = default_item.get("dst_dict")
+#     twiss_dict = default_item.get("twiss_dict")
+#
+#
+#     if platform == "qt":
+#         file_path = default_item.get("filePath")
+#     elif platform == "web":
+#         if location == "out":
+#             file_path = os.path.join(project_path, "OutputFile", default_item.get("filePath"))
+#         elif location == "in":
+#             file_path = os.path.join(project_path, "InputFile", default_item.get("filePath"))
+#
+#
+#     dst_picture_item = {
+#         "show_": show_,
+#         "fig": fig,
+#         "save_path": None,
+#         "picture_type": picture_type,
+#         "dst_path": file_path,
+#         "dst_dict": dst_dict,
+#         "twiss_dict": twiss_dict,
+#     }
+#
+#
+#     v = PlotPhase()
+#
+#     if platform == "qt":
+#         output = v.run(dst_picture_item)
+#
+#     elif platform == "web":
+#         try:
+#             save_path = generate_web_picture_path(project_path)
+#
+#             dst_picture_item["save_path"] = save_path
+#
+#             v.run(dst_picture_item)
+#             picture_param = {"picturePath": save_path}
+#             output = format_output(**picture_param)
+#         except Exception as e:
+#             code = -1
+#             msg = str(e)
+#             picture_param = {"picturePath": ""}
+#             output = format_output(code, msg=msg, **picture_param)
+#     return output
+
+
+
+
+
+#第二种相图画法
+def plot_dst(item):
+    default_item = {"dst_path": None, "picture_type": [["x", "x1"]], "show_": 0, "fig": None, "platform": "qt",
+                    "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out",
+                    "dst_dict": None, "twiss_dict": None,
+    }
 
     default_item.update(item)
+
     platform = default_item.get("platform")
     project_path = default_item.get("projectPath")
     fig = default_item.get("fig")
     sample_interval = default_item.get("sampleInterval")
     location = default_item.get("location")
     show_ = default_item.get("show_")
+    dst_dict = default_item.get("dst_dict")
+    twiss_dict = default_item.get("twiss_dict")
+    picture_type = default_item.get("picture_type")
+
 
     if platform == "qt":
-        file_path = default_item.get("filePath")
+        dst_path = default_item.get("dst_path")
     elif platform == "web":
         if location == "out":
-            file_path = os.path.join(project_path, "OutputFile", default_item.get("filePath"))
+            dst_path = os.path.join(project_path, "OutputFile", default_item.get("dst_path"))
         elif location == "in":
-            file_path = os.path.join(project_path, "InputFile", default_item.get("filePath"))
+            dst_path = os.path.join(project_path, "InputFile", default_item.get("dst_path"))
 
-    v = PlotPhase(file_path)
+    v = PlotPhase2()
+
+    item = {
+        "show_": show_,
+        "fig": fig,
+        "save_path": None,
+        "picture_type":picture_type,
+        "dst_path": dst_path,
+        "dst_dict": dst_dict,
+        "twiss_dict": twiss_dict,
+    }
+
 
     if platform == "qt":
-        output = v.run(show_, fig)
+        output = v.run(item)
     elif platform == "web":
         try:
             save_path = generate_web_picture_path(project_path)
-            v.run(show_, fig, save_path)
+            item["save_path"] = save_path
+            v.run(item)
+
+            picture_param = {"picturePath": save_path}
+            output = format_output(**picture_param)
+        except Exception as e:
+            code = -1
+            msg = str(e)
+            picture_param = {"picturePath": ""}
+            output = format_output(code, msg=msg, **picture_param)
+    return output
+
+def plot_plt(item):
+    default_item = {"plt_path": None, "picture_type": [["x", "x1"]], "show_": 0, "fig": None, "platform": "qt",
+                    "sampleInterval": 1, "needData": False, "project_path": None, "location": "out",
+                    "dst_dict": None, "part_arr": None, "exist_particle": None,
+                    "twiss_dict": None, "num": None,
+    }
+
+    default_item.update(item)
+
+    platform = default_item.get("platform")
+    project_path = default_item.get("project_path")
+    plt_path = default_item.get("plt_path")
+    fig = default_item.get("fig")
+
+    sample_interval = default_item.get("sampleInterval")
+    location = default_item.get("location")
+    show_ = default_item.get("show_")
+
+    dst_dict = default_item.get("dst_dict")
+    part_arr = default_item.get("part_arr")
+    exist_particle = default_item.get("exist_particle")
+
+    twiss_dict = default_item.get("twiss_dict")
+    picture_type = default_item.get("picture_type")
+    num = default_item.get("num")
+
+    v = PlotPlt()
+
+    item = {
+        "show_": show_,
+        "fig": fig,
+        "save_path": None,
+        "picture_type":picture_type,
+        "project_path": project_path,
+        "plt_path": plt_path,
+        "num": 0,
+
+        "part_arr": part_arr,
+        "exist_particle": exist_particle,
+        "dst_dict": dst_dict,
+
+        "twiss_dict": twiss_dict,
+    }
+
+    if platform == "qt":
+        output = v.run(item)
+    elif platform == "web":
+        try:
+            save_path = generate_web_picture_path(project_path)
+            item["save_path"] = save_path
+            v.run(item)
+
             picture_param = {"picturePath": save_path}
             output = format_output(**picture_param)
         except Exception as e:
@@ -772,149 +926,77 @@ def change_file_win2linux(**item):
 
 
 
+def plot_dst4qt(item):
+    # item = {
+    #     "dst_path": ,
+    #     "show_": ,
+    #  }
 
+
+    dst_path = item.get("dst_path")
+    show_ = item.get("show_")
+
+    plot_phase = PlotPhase(dst_path)
+
+    plot_phase.run(show_=show_)
+    return 1
 
 if __name__ == '__main__':
+    item = {
+        "show_": 1,
+        "fig": None,
+        "save_path": None,
+        "picture_type":  [["x", "x1"], ["y", "y1"], ["z", "z1"], ["phi", "w"]],
+        "project_path": r"C:\Users\wangh\Desktop\324\v1",
+        "plt_path": r"C:\Users\wangh\Desktop\324\v1\OutputFile\BeamSet.plt",
+        "num": 0,
+        "part_arr": None,
+        "exist_particle": None,
+        "dst_dict": None,
+        }
 
-    # path = r"C:\Users\anxin\Desktop\AVAS1.1\error_example"
-    # item = {"project_path": path}
-    # res = change_file_win2linux(**item)
-    # print(res)
+    plot_plt(item)
 
-    # path = r"C:\Users\shliu\Desktop\test_lattice"
-    # path = r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
+    # dst_path = r"C:\Users\wangh\Desktop\phase_plot\outData_198.295500.dst"
     #
-    # item = {"project_path": path,
-    #         "if_normal": 0,
-    #         "if_generate_density_file": 0
-    #         }
-    # res = err_dyn(**item)
-    #
-    path= r"C:\Users\wangh\Desktop\shao"
-    item = {"project_path": path,}
-    res = basic_mulp(**item)
-    # path = r"D:\using\test_avas_qt\cafe_avas"
-    # item = {
-    #     "projectPath": path,
-    #     "pictureType": "meter",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "needData": True
-    #
-    # }
-    # res = plot_phase_advance(**item)
-    # print(res)
-
-    # item = {
-    #     "projectPath": path,
-    #     "platform": "web",
-    #     # "show_": 1
-    #     "needData": True
-    # }
-    # res = plot_cavity_syn_phase(**item)
-    # print(res)
-
-
-
-    # item = {
-    #     "projectPath": path,
-    #     "pictureType": "rms_x",
-    #     "platform": "web",
-    #     "sampleInterval": 1000,
-    #     "show_": 0,
-    #     "needData": True,
+    # default_picture_type = [
+    #     ["x", "x1"],
+    #     ["y", "y1"],
+    #     ["phi", "w"],
+    #     ["z", "z1"],
+    # ]
+    # twiss_dict =  {
+    #     ('x', 'x1'): [-0.5955557297222218, 9.331564347619306, 0.1451725109253069, 0.21574159520806604,
+    #                   0.21574159520806604, 3.5197134193924007, 3.5197134193924007],
+    #     ('y', 'y1'): [-1.5285043418095665, 13.96799872389979, 0.23885494184804823, 0.221916635869112, 0.221916635869112,
+    #                   6.032377575558818, 6.032377575558818],
+    #     ('z', 'z1'): [-0.22635657542606882, 12.41136999871493, 0.08469953754883325, 0.22470403577547238,
+    #                   0.22470403577547238, 5.58181134263423, 5.58181134263423],
+    #     ('phi', 'w'): [0.22636619976753608, 1.0725986011069375, 0.9800885954095961, 0.04114192767268835,
+    #                    0.04114192767268835, 1.0228596169403126, 1.0228596169403126]
     # }
     #
-    # res = plot_dataset(**item)
-    # print(res)
-
-
-    # item = {
-    #     "filePath": r"errors_par.txt",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "needData": False,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-    # res = plot_error_emit_loss(**item)
-    # print(res)
-
-
-    # item = {
-    #     "filePath": r"errors_par.txt",
-    #     "statMethod": "average",
-    #     "pictureType": "xy",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "needData": True,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-    # res = plot_error_out(**item)
-    # print(res)
-
-
-
-    # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\errors_par.txt",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "needData": True,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-    # res = plot_error_emit_loss(**item)
-    # print(res)
-
-    # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\density_par_0_0.dat",
-    #     "pictureType": "x",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "sampleInterval": 100,
-    #     "needData": True,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
-
+    # item = {"filePath": dst_path, "pictureType": default_picture_type, "show_": 1, "fig": None, "platform": "qt",
+    #                 "sampleInterval": 1, "needData": False, "projectPath": None, "location": "out", "dst_dict": None,
+    #         "twiss_dict": twiss_dict}
     #
-    # res = plot_density(**item)
-    # print(res)
+    # plot_dst(item)
 
-    # item = {
-    #     "filePath": r"D:\using\test_avas_qt\cafe_avas\OutputFile\density_par_0_0.dat",
-    #     "pictureType": "x",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "sampleInterval": 1000,
-    #     "needData": True,
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas"
-    # }
+
+
+    # dst_path = \
+    #     r"C:\Users\wangh\Desktop\phase_plot\1000w.dst"
     #
-    # res = plot_density_level(**item)
-    # print(res)
+    # plot_phase = PlotPhase2()
     #
     # item = {
-    #     "filePath": r"density_par_0_0.dat",
-    #     "desnityPlane": "x",
-    #     "pictureType": "density_level",
-    #     "platform": "web",
-    #     "show_": 0,
-    #     "sampleInterval": 1,
-    #     "needData": False,
-    #     "projectPath": r"C:\Users\anxin\Desktop\test_schedule\cafe_avas_error"
-    # }
+    #     "show_": 1,
+    #     "fig": None,
     #
+    #     "picture_type":  [["x", "x1"], ["y", "y1"], ["z", "z1"], ["phi", "w"]],
+    #     "dst_path": dst_path,
+    #     "dst_dict": None,
+    #     "twiss_dict": None
+    #        }
     #
-    # res = plot_density_transport(**item)
-
-    # print(res)
-    # "filePath": r"inData.dst",
-    #"filePath": r"part_rfq.dst",
-    # item = {
-    #     "filePath": r"inData.dst",
-    #     "platform": "web",
-    #     "projectPath": r"D:\using\test_avas_qt\cafe_avas",
-    #     "location": "out"
-    # }
-    #
-    #
-    # res = plot_phase(**item)
-    # print(res)
+    # plot_phase2(**item)

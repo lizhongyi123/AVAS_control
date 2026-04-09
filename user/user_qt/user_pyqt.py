@@ -23,6 +23,7 @@ from user.user_qt.page_longdistance import PageLongdistance
 from user.user_qt.page_match import PageMatch
 from user.user_qt.page_others import PageOthers
 from user.user_qt.page_output import PageOutput
+from user.user_qt.page_tool import PageTool
 
 
 from user.user_qt.page_data import PageData
@@ -274,7 +275,7 @@ class MainWindow(QMainWindow):
         # self.page_longdistance = PageLongdistance(self.project_path)
         self.page_output = PageOutput(self.project_path)
         self.page_accept = PageAccept(self.project_path)
-
+        self.page_tool = PageTool(self.project_path)
 
         page_beam_action = QAction("beam", self)
         page_lattice_action = QAction("lattice", self)
@@ -288,6 +289,7 @@ class MainWindow(QMainWindow):
         page_error_action = QAction('error', self)
         page_output_action = QAction('output', self)
         page_accept_action = QAction('accept', self)
+        page_tool_action = QAction('tool', self)
 
         # page_longdistance_action = QAction('long distance', self)
 
@@ -304,6 +306,8 @@ class MainWindow(QMainWindow):
         self.stacked_widget.addWidget(self.page_error)
         self.stacked_widget.addWidget(self.page_output)
         self.stacked_widget.addWidget(self.page_accept)
+        self.stacked_widget.addWidget(self.page_tool)
+
 
         # self.stacked_widget.addWidget(self.page_others)
 
@@ -325,6 +329,8 @@ class MainWindow(QMainWindow):
         page_output_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_output))
         page_accept_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_accept))
 
+        page_tool_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_tool))
+
         # page_longdistance_action.triggered.connect(lambda: self.stacked_widget.setCurrentWidget(self.page_longdistance))
 
         toolbar.addAction(page_beam_action)
@@ -338,6 +344,7 @@ class MainWindow(QMainWindow):
         toolbar.addAction(page_data_action)
         toolbar.addAction(page_analysis_action)
         toolbar.addAction(page_accept_action)
+        toolbar.addAction(page_tool_action)
 
         # toolbar.addAction(page_others_action)
         # toolbar.addAction(page_longdistance_action)

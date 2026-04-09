@@ -28,7 +28,8 @@ class PlotDataSet(PicturePlot_2D):
             self.project_path = None
         self.dataset_path = dataset_path
         # self.beam_path = self.project_path + r'\InputFile' + r'\beam.txt'
-        self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", 'lattice_mulp.txt')
+        if self.project_path:
+            self.lattice_mulp_path = os.path.join(self.project_path, "InputFile", 'lattice_mulp.txt')
         # self.lattice_mulp_path = self.project_path + r'\InputFile' + r'\lattice_mulp.txt'
         # self.input_path = self.project_path + r'\InputFile' + r'\input.txt'
         # self.dataset_path = os.path.join(self.project_path, "OutputFile", "Dataset.txt" )

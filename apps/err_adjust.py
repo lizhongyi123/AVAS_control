@@ -1,33 +1,19 @@
-import sys
-
 from scipy.optimize import minimize
 
 import numpy as np
 
-from dataprovision.latticeparameter import LatticeParameter
-from dataprovision.datasetparameter import DatasetParameter
-
-from utils.readfile import read_txt, read_lattice_mulp
-from utils.treatlist import flatten_list, list_one_two
-from utils.treatfile import copy_file, split_file
-from utils.tool import write_to_txt, calculate_mean, calculate_rms, add_to_txt, judge_command_on_element, delete_element_end_index
+from utils.treatlist import flatten_list
+from utils.tool import judge_command_on_element, delete_element_end_index
 
 import os
 
 
 import random
 from core.MultiParticle import MultiParticle
-from utils.treat_directory import list_files_in_directory, copy_directory, delete_directory
-import multiprocessing
 
 import global_varible
 import copy
-from utils.exception import BaseError
 
-from utils.tolattice import write_mulp_to_lattice_only_sim
-from aftertreat.dataanalysis.plttodensity import PlttoDensity, MergeDensityData
-
-from utils.exception import BaseError
 from apps.diaginfo import DiagInfo
 class Adjust_Error():
     """

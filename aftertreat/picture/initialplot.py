@@ -169,6 +169,7 @@ class PicturePlot_2D():
                 for shape in shapes:
                     ax1.add_patch(shape)
 
+        ax1.ticklabel_format(style='plain', axis='y', useOffset=False)
         # ax1.set_ylim(0, 200)
         # ax1.grid()
         if show_:
@@ -303,6 +304,7 @@ class PicturePlot_2ax():
         # 把x轴的刻度间隔设置为1，并存在变量里
         ax1.xaxis.set_major_locator(x_major_locator)
 
+        ax1.ticklabel_format(style='plain', axis='y', useOffset=False)
         if show_:
             plt.show()
             return None

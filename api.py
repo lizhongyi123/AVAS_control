@@ -2,7 +2,7 @@
 from core.MultiParticle import MultiParticle
 
 from aftertreat.picture.plotdataset import PlotDataSet
-from aftertreat.picture.plotphase import PlotPhase
+from past_file.plotphase import PlotPhase
 from aftertreat.dataanalysis.caltwiss import CalTwiss
 from aftertreat.picture.plotenvbeamout import PlotEnvBeamOut
 
@@ -21,7 +21,6 @@ from apps.error import Errorstat, ErrorDyn, Errorstatdyn, OnlyAdjust
 
 from aftertreat.picture.ploterror import PlotErrout, PlotErr_emit_loss
 ########################################################################################################################
-import multiprocessing
 
 #下列为功能函数
 #基础运行

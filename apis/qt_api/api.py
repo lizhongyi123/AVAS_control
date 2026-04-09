@@ -16,7 +16,7 @@ import pandas as pd
 from utils.beamconfig import BeamConfig
 from apis.qt_api.judge_lattice import JudgeLattice
 import global_varible
-
+from dataprovision.beamparameter import DstParameter
 
 def cal_beam_parameter(item):
     dst_path = item["dstPath"]
@@ -32,25 +32,37 @@ def cal_beam_parameter(item):
         beam_parameter['frequency'] = dst_res['freq']
         beam_parameter['kneticenergy'] = dst_res['kneticenergy']
 
+        dst_obj = DstParameter(dst_path)
+        dst_dict = dst_obj.get_parameter()
 
-        obj = PercentEmit(dst_path)
-        res = obj.get_percent_emit(1)
+        item = {
+            "ratio": 1,
+            "picture_type": ["z1", "x1"],
+            "dst_path": dst_path,
+            "dst_dict": dst_dict,
+        }
+        obj = PercentEmit()
 
-        alpha_xx1, beta_xx1, epsi_xx1, _, _ = res[0]
-        alpha_yy1, beta_yy1, epsi_yy1, _, _ = res[1]
-        alpha_zz1, beta_zz1, epsi_zz1, _, _ = res[2]
+        pt = [["x", "x1"], ["y", "y1"], ["z", "z1"], ]
 
-        beam_parameter['alpha_x'] = alpha_xx1
-        beam_parameter['beta_x'] = beta_xx1
-        beam_parameter['emit_x'] = epsi_xx1
+        twiss = []
+        for i in pt:
+            item["picture_type"] = i
+            this_twiss = obj.get_percent_emit(item)
+            twiss.append(this_twiss)
 
-        beam_parameter['alpha_y'] = alpha_yy1
-        beam_parameter['beta_y'] = beta_yy1
-        beam_parameter['emit_y'] = epsi_yy1
 
-        beam_parameter['alpha_z'] = alpha_zz1
-        beam_parameter['beta_z'] = beta_zz1
-        beam_parameter['emit_z'] = epsi_zz1
+        beam_parameter['alpha_x'] = twiss[0][0]
+        beam_parameter['beta_x'] = twiss[0][1]
+        beam_parameter['emit_x'] = twiss[0][3]
+
+        beam_parameter['alpha_y'] = twiss[1][0]
+        beam_parameter['beta_y'] = twiss[1][1]
+        beam_parameter['emit_y'] = twiss[1][3]
+
+        beam_parameter['alpha_z'] = twiss[2][0]
+        beam_parameter['beta_z'] = twiss[2][1]
+        beam_parameter['emit_z'] = twiss[2][3]
 
         beam_parameter["readparticledistribution"] = ""
         beam_parameter["distribution_x"] = "GS"
@@ -533,7 +545,7 @@ if __name__ == '__main__':
     # res = get_fieldname(item)
     # print(res)
 
-    dst_path = r"C:\Users\wangh\Desktop\qiaoxin\test_qiao\InputFile\part_rfq.dst"
+    dst_path = r"C:\Users\wangh\Desktop\phase_plot\outData_198.295500.dst"
     item = {"dstPath": dst_path}
     beam_parameter = cal_beam_parameter(item)
     print(beam_parameter)

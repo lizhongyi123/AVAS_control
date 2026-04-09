@@ -40,6 +40,9 @@ class PageTool(QWidget):
         layout.addWidget(group_box3)
         self.setLayout(layout)
 
+    def updatePath(self, new_path):
+        self.project_path = new_path
+
     def btn_avasplot_start(self):
         self.avasplot_window = PagePlotphase(self.project_path)
         self.avasplot_window.show()

@@ -478,6 +478,7 @@ class MainWindow(QMainWindow):
         self.page_others.updatePath(self.project_path)
         self.page_output.updatePath(self.project_path)
         self.page_accept.updatePath(self.project_path)
+        self.page_tool.updatePath(self.project_path)
 
 
 

@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
 
 
-    item = {'project_path': r"C:\Users\wangh\Desktop\yaxin\project_3",
+    item = {'project_path': r"C:\Users\wangh\Desktop\tmp-02-07\long_dis2\av_input",
             "device":"cpu"
             }
 

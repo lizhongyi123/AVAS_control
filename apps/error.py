@@ -1611,7 +1611,7 @@ if __name__ == "__main__":
     #     os.mkdir(file)
 
 
-    path = r"C:\Users\wangh\Desktop\test_orbit\u235-avas"
+    path = r"C:\Users\wangh\Desktop\tmp-02-07\long_dis2\av_err"
     # obj = ErrorDyn(path,
     #                50, 1, field_path=None, if_generate_density_file = 1)
 

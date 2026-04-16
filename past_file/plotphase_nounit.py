@@ -108,10 +108,10 @@ class PlotPhase:
         ymin, ymax = float(y.min()), float(y.max())
 
         W, H = 400, 300
-
+        block_num = 4
 
         t0 = time.time()
-        density_img = pixel_scatter(x, y,  xmin, xmax, ymin, ymax, W, H, 0.0)
+        density_img = pixel_scatter(x, y,  xmin, xmax, ymin, ymax, W, H, block_num, 0.0)
         t1 = time.time()
         print("生成img的时间", t1-t0)
 
@@ -224,7 +224,7 @@ if __name__ == "__main__":
     t0 = time.time()
     # dst_path = r"F:\save\python_code\scatter\cpu_scatter_demo2\cafe1000.dst"
     # dst_path =r"C:\Users\shliu\Desktop\boun\part_dtl1.dst"
-    dst_path = r"C:\Users\wangh\Desktop\part_rfq_1e6.dst"
+    dst_path = r"C:\Users\wangh\Desktop\tmp-02-07\long_dis2\av_input\no_sc\kongxin\outData_5.843388.dst"
     plot_phase = PlotPhase(dst_path)
 
     # plot_phase.run(show_=False, save_path = "test1.png")
